@@ -1,0 +1,117 @@
+/**
+ * X Freeze - site-wide typography (x.ai inspired: Inter only, minimal)
+ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('xai-system.css');
+@import url('glass-backdrop.css');
+@import url('theme-dark.css');
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+
+  /* Type scale - one size + weight for headings, one for subtext */
+  --type-section-size: clamp(1.75rem, 4vw, 2.5rem);
+  --type-section-weight: 500;
+  --type-section-tracking: -0.035em;
+  --type-sub-size: 0.9375rem;
+  --type-sub-weight: 400;
+
+  --line-heading: 1.25;
+  --line-body: 1.6;
+  --line-small: 1.5;
+  --space-after-title: 1rem;
+}
+
+html,
+body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: var(--line-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: var(--type-section-weight);
+  letter-spacing: -0.02em;
+  line-height: var(--line-heading);
+}
+
+/* ── Section headings (same everywhere) ── */
+.xf-section-title,
+.xf-marquee-title,
+.xf-library-title,
+.xf-final-cta-title,
+.xf-faq-title,
+.xf-content-title,
+.xf-motion-title,
+.xf-motion-headline,
+.xf-motion-home__title,
+.pl-hero h1,
+.pl-hero__copy h1,
+.contact-hero__title,
+.skills-hero h1,
+main h1.text-5xl,
+.page-main h1.text-5xl,
+.bundles-main h1.text-5xl,
+.templates-main h1.text-5xl,
+section h2.text-5xl,
+#section-experimental h2,
+#section-minimal h2 {
+  font-family: var(--font-sans);
+  font-size: var(--type-section-size);
+  font-weight: var(--type-section-weight);
+  letter-spacing: var(--type-section-tracking);
+  line-height: var(--line-heading);
+  color: var(--text, #0a0a0a);
+}
+
+/* Prompt library hero title color is theme-aware (see prompt-library.css) */
+
+.xf-section-title em,
+.xf-marquee-title em,
+.xf-library-title em,
+.xf-final-cta-title em,
+.xf-content-title em,
+.xf-motion-headline em {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: var(--type-section-weight);
+  letter-spacing: -0.02em;
+}
+
+/* ── Section subtext (same everywhere) ── */
+.xf-section-lead,
+.xf-content-lead,
+.xf-final-cta-lead,
+.xf-text-body,
+.xf-motion-lead,
+.xf-motion-home__lead,
+.skills-hero-lead,
+.pl-hero__lead {
+  font-size: var(--type-sub-size);
+  font-weight: var(--type-sub-weight);
+  line-height: var(--line-body);
+  color: var(--text-secondary, #52525b);
+}
+
+.xf-section-lead,
+.xf-content-lead,
+.xf-final-cta-lead {
+  margin-top: var(--space-after-title);
+}
+
+.xf-section-lead--flush {
+  margin-top: 0;
+}
+
+.xf-section-lead--compact {
+  margin-top: 0.5rem;
+}

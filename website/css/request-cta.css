@@ -1,0 +1,73 @@
+/* Request CTA - fixed corner on library pages (not in hero) */
+
+.xf-request-cta {
+  position: fixed;
+  z-index: 55;
+  right: max(1rem, env(safe-area-inset-right, 0px));
+  bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border, #e5e7eb);
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--text, #0a0a0a);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 8px 28px -10px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    bottom 0.22s ease,
+    opacity 0.2s ease;
+}
+
+.xf-request-cta i {
+  font-size: 0.68rem;
+  opacity: 0.75;
+}
+
+.xf-request-cta:hover {
+  background: var(--surface-elevated, #fafafa);
+  border-color: var(--border-hover, #d4d4d8);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.22);
+}
+
+.xf-request-cta:focus-visible {
+  outline: 2px solid var(--text, #0a0a0a);
+  outline-offset: 2px;
+}
+
+html.dark .xf-request-cta {
+  background: rgba(10, 13, 11, 0.92);
+  border-color: var(--border, #1f2623);
+  color: var(--text, #f2f5f3);
+  box-shadow: 0 8px 28px -10px rgba(0, 0, 0, 0.55);
+}
+
+html.dark .xf-request-cta:hover {
+  background: var(--surface-subtle, #161a18);
+}
+
+@media (max-width: 480px) {
+  .xf-request-cta span {
+    display: none;
+  }
+
+  .xf-request-cta {
+    padding: 0.65rem;
+    border-radius: 50%;
+  }
+
+  .xf-request-cta i {
+    font-size: 0.8rem;
+    opacity: 1;
+  }
+}

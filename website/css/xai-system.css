@@ -1,0 +1,409 @@
+/**
+ * X Freeze - x.ai inspired design system
+ * Minimal monochrome, large type, generous whitespace, flat navigation
+ */
+
+:root {
+  --xf-page-max: 1200px;
+  --xf-hero-size: clamp(2.5rem, 6vw, 4.25rem);
+  --xf-hero-tracking: -0.045em;
+  --xf-hero-leading: 1.05;
+  --xf-section-gap: clamp(4rem, 8vw, 7rem);
+  --xf-radius-sm: 0.5rem;
+  --xf-radius-md: 0.75rem;
+  --xf-radius-lg: 1rem;
+  --xf-transition: 0.2s ease;
+}
+
+/* Narrower readable column like x.ai (opt-in) */
+.content-container--narrow {
+  max-width: min(var(--xf-page-max), calc(100% - var(--page-gutter, 1rem) * 2));
+}
+
+/* ── Eyebrows ── */
+.xf-section-eyebrow,
+.skills-hero-eyebrow,
+.xf-content-eyebrow,
+.sb-hero__eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+
+/* ── Hero titles (skills + content pages; home lines sized in home.css) ── */
+.skills-hero h1,
+.xf-content-title,
+.sb-hero h1 {
+  font-family: var(--font-sans);
+  font-size: var(--xf-hero-size);
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: var(--xf-hero-tracking);
+  line-height: var(--xf-hero-leading);
+}
+
+.skills-hero h1,
+.xf-content-title,
+.sb-hero h1 {
+  color: var(--text);
+}
+
+/* Section titles - sans only, no serif */
+.xf-section-title,
+.xf-marquee-title,
+.xf-library-title,
+.xf-final-cta-title,
+.xf-faq-title {
+  font-family: var(--font-sans);
+  font-size: clamp(1.875rem, 4vw, 2.75rem);
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+.xf-section-title em,
+.xf-marquee-title em,
+.xf-library-title em,
+.xf-final-cta-title em,
+.xf-content-title em {
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* ── Leads ── */
+.hero-lead,
+.skills-hero-lead,
+.xf-section-lead,
+.xf-content-lead {
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.hero-lead {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* ── Buttons (x.ai: filled + ghost) ── */
+.hero-btn,
+.xf-btn,
+.bundle-btn--primary,
+.skills-builder-promo__cta {
+  border-radius: var(--xf-radius-sm);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.hero-btn--primary,
+.xf-btn--primary {
+  background: var(--text);
+  color: var(--surface);
+  border: 1px solid var(--text);
+}
+
+.hero-btn--primary:hover,
+.xf-btn--primary:hover {
+  opacity: 0.88;
+}
+
+.hero-btn--ghost,
+.xf-btn--ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.hero-btn--ghost:hover,
+.xf-btn--ghost:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.xf-btn--ghost-on-light {
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  background: transparent !important;
+}
+
+.xf-btn--ghost-on-light:hover {
+  border-color: var(--border-hover) !important;
+  background: var(--surface-muted) !important;
+}
+
+.xf-btn--primary.xf-btn--ghost-on-light,
+.skills-hero-actions .xf-btn--primary {
+  background: var(--text) !important;
+  color: var(--surface) !important;
+  border: 1px solid var(--text) !important;
+}
+
+.xf-btn--primary.xf-btn--ghost-on-light:hover,
+.skills-hero-actions .xf-btn--primary:hover {
+  opacity: 0.88;
+}
+
+/* Explore link pattern */
+.xf-explore-link,
+.skills-bundle-card .skill-bundle-link,
+.xf-start-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  text-decoration: none;
+  transition: opacity var(--xf-transition);
+}
+
+.xf-explore-link:hover,
+.skills-bundle-card .skill-bundle-link:hover {
+  opacity: 0.65;
+}
+
+.xf-explore-link::after {
+  content: '→';
+  font-size: 0.9em;
+}
+
+/* ── Stats (bare, no boxed panel) ── */
+.skills-hero-stats,
+.xf-stat-row {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(2rem, 5vw, 4rem);
+  margin-top: 2.5rem;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.skills-hero-stat,
+.xf-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0 !important;
+  min-width: 5rem;
+}
+
+/* Pseudo dividers off by default — banner uses explicit .skills-hero-stat-divider nodes */
+.skills-hero-stat + .skills-hero-stat::before {
+  display: none !important;
+}
+
+.skills-hero-stat-divider {
+  display: block;
+  flex-shrink: 0;
+  width: 1.5px;
+  height: 2.75rem;
+  align-self: center;
+  background: rgba(15, 23, 42, 0.2);
+  border-radius: 2px;
+}
+
+html.dark .skills-hero-stat-divider {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.skills-hero-stat-num,
+.xf-stat-num,
+.bundles-stat-value {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text);
+}
+
+.skills-hero-stat-label,
+.xf-stat-label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* ── Navigation: flat links on inner pages (light + dark) ── */
+.site-nav.page-nav .site-nav-pill,
+.site-nav.is-scrolled .site-nav-pill {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  gap: 0.25rem;
+  padding: 0;
+}
+
+.site-nav.page-nav .site-nav-pill-link,
+.site-nav.is-scrolled .site-nav-pill-link {
+  height: 2rem;
+  padding: 0 0.8rem;
+  border-radius: var(--xf-radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  background: transparent;
+}
+
+.site-nav.page-nav .site-nav-pill-link:hover,
+.site-nav.is-scrolled .site-nav-pill-link:hover {
+  background: transparent;
+  color: var(--text);
+}
+
+.site-nav.page-nav .site-nav-pill-link--active,
+.site-nav.page-nav .site-nav-pill-link[aria-current='page'],
+.site-nav.is-scrolled .site-nav-pill-link--active,
+.site-nav.is-scrolled .site-nav-pill-link[aria-current='page'] {
+  background: transparent;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.site-nav.page-nav .site-nav-coffee,
+.site-nav.is-scrolled .site-nav-coffee {
+  height: 2.25rem;
+  padding: 0 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: var(--xf-radius-sm);
+}
+
+/* ── Skills hero: clean professional (no decorative line clutter) ── */
+.skills-hero-lines,
+.skills-hero-glow,
+.skills-hero-text-veil {
+  display: none !important;
+}
+
+.skills-hero {
+  max-width: 46rem;
+}
+
+/* ── Cards: flatter, cleaner ── */
+.skill-bundle-card,
+.xf-start-card,
+.skills-how-card,
+.skills-builder-promo {
+  border-radius: var(--xf-radius-lg);
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+.skill-bundle-card:hover,
+.xf-start-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.08);
+}
+
+html.dark .skill-bundle-card:hover,
+html.dark .xf-start-card:hover {
+  box-shadow: 0 8px 28px -12px rgba(0, 0, 0, 0.45);
+}
+
+.skills-builder-promo {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+}
+
+/* Section spacing */
+.section,
+[data-scroll-reveal].border-t {
+  padding-block: var(--xf-section-gap);
+}
+
+/* Softer section borders */
+.border-t-2 {
+  border-top-width: 1px !important;
+}
+
+/* ── Footer: quieter ── */
+.xf-site-footer {
+  border-top: 1px solid var(--border);
+}
+
+.xf-footer-logo {
+  font-weight: 500;
+  font-size: 1.125rem;
+}
+
+/* ── Search inputs ── */
+.skills-browse-search,
+.skills-search {
+  border-radius: var(--xf-radius-sm);
+}
+
+/* Filter pills - subtler active state */
+.skills-filter-pill--active,
+.skills-tab--active {
+  font-weight: 500;
+}
+
+/* Hero CTA row */
+.skills-hero-actions,
+.xf-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.625rem;
+  margin-top: 1.75rem;
+}
+
+.xf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.5rem 1.125rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: var(--xf-radius-sm);
+  transition: opacity var(--xf-transition), background-color var(--xf-transition), border-color var(--xf-transition);
+  cursor: pointer;
+}
+
+/* Newsletter + final CTA */
+.xf-newsletter-btn--primary,
+.xf-final-cta-btn--primary {
+  background: var(--text) !important;
+  color: var(--surface) !important;
+  border: 1px solid var(--text) !important;
+  border-radius: var(--xf-radius-sm) !important;
+  font-weight: 500 !important;
+}
+
+.xf-newsletter-btn--secondary,
+.xf-final-cta-btn--ghost {
+  background: transparent !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--xf-radius-sm) !important;
+  font-weight: 500 !important;
+}
+
+.xf-newsletter-box,
+.xf-final-cta-box {
+  border-radius: var(--xf-radius-lg) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
+}
+
+.sb-hero {
+  padding: clamp(4rem, 10vw, 6rem) 0 clamp(2rem, 4vw, 3rem);
+}
+
+.sb-hero h1 {
+  max-width: 28rem;
+  margin-inline: auto;
+}

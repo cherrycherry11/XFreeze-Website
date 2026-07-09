@@ -1,0 +1,136 @@
+/* Neon pill dark / light theme switch (matches reference toggle) */
+.theme-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  vertical-align: middle;
+}
+.theme-switch:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 3px;
+  border-radius: 9999px;
+}
+.theme-switch-track {
+  position: relative;
+  display: block;
+  width: 3.35rem;
+  height: 1.8rem;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #1c1c22 0%, #0a0a0e 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.07),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  transition: background 0.35s ease, box-shadow 0.35s ease;
+}
+html:not(.dark) .theme-switch-track,
+html.light .theme-switch-track {
+  background: linear-gradient(180deg, #ececf1 0%, #c8c8d0 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.95),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(0, 0, 0, 0.07);
+}
+.theme-switch-thumb {
+  position: absolute;
+  top: 50%;
+  left: 0.14rem;
+  width: 1.42rem;
+  height: 1.42rem;
+  margin-top: -0.71rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #30303a 0%, #14141a 72%);
+  transform: translateX(0);
+  transition:
+    transform 0.38s cubic-bezier(0.34, 1.25, 0.64, 1),
+    box-shadow 0.38s ease,
+    background 0.38s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.45);
+}
+html.dark .theme-switch-thumb {
+  transform: translateX(1.55rem);
+  background: radial-gradient(circle at 38% 32%, #1e3a5f 0%, #0c1220 72%);
+  box-shadow:
+    0 0 0 2px rgba(56, 232, 255, 0.7),
+    0 0 14px rgba(34, 211, 238, 0.75),
+    0 0 32px rgba(34, 211, 238, 0.45),
+    0 0 52px rgba(34, 211, 238, 0.2),
+    0 3px 10px rgba(0, 0, 0, 0.55);
+}
+html:not(.dark) .theme-switch-thumb,
+html.light .theme-switch-thumb {
+  background: radial-gradient(circle at 38% 32%, #fffef5 0%, #fde68a 72%);
+  box-shadow:
+    0 0 0 2px rgba(251, 191, 36, 0.55),
+    0 0 12px rgba(251, 191, 36, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.12);
+}
+.theme-switch:hover .theme-switch-thumb {
+  filter: brightness(1.06);
+}
+.theme-switch-icon {
+  width: 0.72rem;
+  height: 0.72rem;
+  display: none;
+  pointer-events: none;
+}
+.theme-switch-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+html:not(.dark) .theme-switch-icon--sun,
+html.light .theme-switch-icon--sun {
+  display: flex;
+  color: #d97706;
+}
+html.dark .theme-switch-icon--moon {
+  display: flex;
+  color: #a5f3fc;
+}
+
+/* Mobile menu row */
+.theme-toggle-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--border, #e5e7eb);
+  background: var(--surface-elevated, #fafafa);
+  color: var(--text, #0a0a0a);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.theme-toggle-mobile:hover {
+  background: #f4f4f5;
+}
+html.dark .theme-toggle-mobile {
+  background: #141816;
+  border-color: #3d4a42;
+  color: var(--text, #f2f5f3);
+}
+html.dark .theme-toggle-mobile:hover {
+  background: #1c211e;
+}
+
+/* Legacy icon rules - hide if any remain */
+.theme-icon--to-light,
+.theme-icon--to-dark {
+  display: none !important;
+}

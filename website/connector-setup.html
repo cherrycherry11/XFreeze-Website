@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X Freeze - Connector Setup</title>
+  <script>
+    (function () {
+      var stored = localStorage.getItem('xfreeze-theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
+      document.documentElement.classList.toggle('dark', isDark);
+    })();
+  </script>
+  <script src="js/auth-config.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/site-fonts.css">
+<link rel="stylesheet" href="css/theme-switch.css">
+  <link rel="stylesheet" href="css/scroll-reveal.css">
+  <link rel="stylesheet" href="css/site-nav.css">
+  <link rel="stylesheet" href="css/site-mobile.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/connector-setup.css">
+</head>
+<body>
+
+  <nav id="site-nav" class="site-nav page-nav" aria-label="Main">
+    <div class="content-container">
+      <div class="site-nav-bar">
+        <a href="home.html" class="site-nav-logo">X Freeze</a>
+                        <div class="site-nav-pill">
+          <a href="home.html" class="site-nav-pill-link">Home</a>
+          <a href="templates.html" class="site-nav-pill-link">Templates</a>
+          <a href="prompt-library.html" class="site-nav-pill-link">Prompts</a>
+          <a href="skills.html" class="site-nav-pill-link">Skills</a>
+          <a href="about.html" class="site-nav-pill-link">About</a>
+          <a href="blog.html" class="site-nav-pill-link">Blog</a>
+          <a href="contact.html" class="site-nav-pill-link">Contact</a>
+        </div>
+        <div class="site-nav-end">
+          <div id="xf-auth-nav" class="site-nav-auth"></div>
+          <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee">
+            <i class="fa-solid fa-mug-hot text-xs"></i>
+            <span class="hidden sm:inline">Buy me a coffee</span>
+          </a>
+          <button type="button" id="theme-toggle" onclick="toggleTheme()" class="theme-switch theme-toggle" role="switch" aria-checked="false" aria-label="Switch to dark mode">
+            <span class="theme-switch-track"><span class="theme-switch-thumb">
+              <span class="theme-switch-icon theme-switch-icon--sun"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12z"/></svg></span>
+              <span class="theme-switch-icon theme-switch-icon--moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg></span>
+            </span></span>
+          </button>
+          <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu"><i class="fa-solid fa-bars text-sm"></i></button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+    <div id="mobile-menu-backdrop" class="site-nav-mobile-backdrop hidden lg:hidden" aria-hidden="true"></div>
+
+  <div id="mobile-menu" class="site-nav-mobile-panel site-nav-mobile-panel--drawer hidden lg:hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Site menu">
+    <div class="site-nav-mobile-drawer">
+      <header class="site-nav-drawer-head">
+        <a href="home.html" class="site-nav-drawer-logo" onclick="toggleMobileMenu()">X Freeze</a>
+        <button type="button" class="site-nav-drawer-close" onclick="toggleMobileMenu()" aria-label="Close menu"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </header>
+
+                  <nav class="site-nav-drawer-nav" aria-label="Mobile">
+        <a href="home.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Home</a>
+        <a href="templates.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Templates</a>
+        <a href="prompt-library.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Prompts</a>
+        <a href="skills.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Skills</a>
+        <a href="about.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">About</a>
+        <a href="blog.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Blog</a>
+        <a href="contact.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Contact</a>
+      </nav>
+
+      <footer class="site-nav-drawer-footer">
+        <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-drawer-meta" onclick="toggleMobileMenu()">
+          Buy me a coffee <i class="fa-solid fa-arrow-up-right" aria-hidden="true"></i>
+        </a>
+        <div class="site-nav-drawer-theme">
+          <span class="site-nav-drawer-theme__label">Dark mode</span>
+          <button type="button" onclick="toggleTheme()" class="site-nav-drawer-theme__switch theme-switch theme-switch--sm" role="switch" aria-checked="false" aria-label="Switch to dark mode">
+            <span class="theme-switch-track" aria-hidden="true">
+              <span class="theme-switch-thumb">
+                <span class="theme-switch-icon theme-switch-icon--sun"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12z"/></svg></span>
+                <span class="theme-switch-icon theme-switch-icon--moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg></span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="xf-glass-hero">
+    <div class="content-container">
+      <div class="scroll-reveal-in connector-setup-header">
+        <a href="skills.html" class="connector-setup-back">
+          <i class="fa-solid fa-arrow-left text-xs" aria-hidden="true"></i> Back to skills
+        </a>
+        <p class="connector-setup-eyebrow">Guide</p>
+        <h1>Connector setup</h1>
+        <p class="connector-setup-lead">
+          Connector skills talk to real apps - Gmail, Outlook, Google Calendar, Canva, and more.
+          Instant skills do not need this step.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <main class="connector-setup-main content-container" data-scroll-reveal>
+    <div class="connector-setup-grid scroll-reveal-in" data-scroll-reveal>
+      <section class="connector-setup-card xf-glass-panel">
+        <h2><i class="fa-solid fa-robot" aria-hidden="true"></i> Grok</h2>
+        <ol>
+          <li>Type <code>/mcps</code> in chat.</li>
+          <li>Find the app you need (Gmail, Google Calendar, Microsoft Outlook, Canva, etc.).</li>
+          <li>Turn it <strong>on</strong> and complete sign-in when prompted.</li>
+          <li>Press <code>r</code> in <code>/mcps</code> to refresh the tool list.</li>
+          <li>Run a quick test - e.g. ask Grok to list today's calendar events or summarize unread mail.</li>
+        </ol>
+        <p class="connector-setup-note">
+          Advanced: add servers in <code>~/.grok/config.toml</code> under <code>[mcp_servers]</code>, then refresh <code>/mcps</code>.
+        </p>
+      </section>
+
+      <section class="connector-setup-card xf-glass-panel">
+        <h2><i class="fa-solid fa-code" aria-hidden="true"></i> Cursor</h2>
+        <ol>
+          <li>Open <strong>Cursor Settings → MCP</strong> (or edit your MCP config file).</li>
+          <li>Add the server for the app you need - Gmail, GitHub, Slack, etc.</li>
+          <li>Authenticate when Cursor prompts you (browser OAuth or API token).</li>
+          <li>Restart or reload MCP so tools appear in the agent.</li>
+          <li>Paste the skill install prompt; the agent can then call live tools.</li>
+        </ol>
+        <p class="connector-setup-note">
+          Each MCP server has its own install docs. Use the official connector for the app when available.
+        </p>
+      </section>
+
+      <section class="connector-setup-card xf-glass-panel">
+        <h2><i class="fa-solid fa-message" aria-hidden="true"></i> Claude (Desktop)</h2>
+        <ol>
+          <li>Open <strong>Settings → Integrations / Connectors</strong>.</li>
+          <li>Enable the connector for the service you need.</li>
+          <li>Sign in and confirm permissions.</li>
+          <li>Paste the skill install prompt from X Freeze, then use the slash command.</li>
+        </ol>
+      </section>
+    </div>
+
+    <section class="connector-setup-apps scroll-reveal-in" data-scroll-reveal>
+      <h2>Common connectors</h2>
+      <p class="connector-setup-apps-lead">Each connector pack on the skills page lists which apps it needs. Typical mappings:</p>
+      <div class="connector-setup-table-wrap">
+        <table class="connector-setup-table">
+          <thead>
+            <tr><th>Pack</th><th>Apps to connect</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Google Gmail</td><td>Gmail</td></tr>
+            <tr><td>Google Calendar</td><td>Google Calendar</td></tr>
+            <tr><td>Google Drive / Docs</td><td>Google Drive</td></tr>
+            <tr><td>Microsoft Outlook</td><td>Microsoft Outlook / Microsoft 365 mail</td></tr>
+            <tr><td>Microsoft Calendar / Teams</td><td>Outlook Calendar, Microsoft Teams</td></tr>
+            <tr><td>Canva</td><td>Canva</td></tr>
+            <tr><td>Notion / Slack / GitHub</td><td>Notion, Slack, or GitHub</td></tr>
+            <tr><td>Zapier / Workflow combos</td><td>Multiple apps (listed on each skill)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="connector-setup-faq scroll-reveal-in" data-scroll-reveal>
+      <h2>Troubleshooting</h2>
+      <dl>
+        <dt>Skill installed but nothing happens</dt>
+        <dd>Connector is probably off or not signed in. Open <code>/mcps</code> (Grok) or MCP settings (Cursor) and verify green/authenticated status.</dd>
+        <dt>AI says it cannot access my mail</dt>
+        <dd>That is expected without a connector. The skill is working - the integration is not connected yet.</dd>
+        <dt>Do I need connectors for every skill?</dt>
+        <dd>No. Use the <strong>Instant only</strong> filter on the <a href="skills.html">skills page</a> for skills that work from text alone.</dd>
+        <dt>Is my data sent somewhere else?</dt>
+        <dd>Connector skills use your AI tool's official integration. X Freeze only gives you the SKILL.md instructions - we never see your mail or files.</dd>
+      </dl>
+    </section>
+
+    <div class="connector-setup-cta scroll-reveal-in" data-scroll-reveal>
+      <a href="skills.html" class="connector-setup-cta-btn">Browse skills library</a>
+    </div>
+  </main>
+
+  <footer class="border-t border-[#e5e7eb] py-8" data-scroll-reveal>
+    <div class="scroll-reveal-in content-container flex flex-col md:flex-row md:items-center gap-y-2 text-xs text-[#52525b]">
+      <div>© X Freeze. All rights reserved.</div>
+      <div class="md:ml-auto flex gap-6">
+        <a href="https://x.com/XFreeze" target="_blank" class="hover:text-[#0a0a0a]">X</a>
+        <a href="https://buymeacoffee.com/xfreeze" target="_blank" class="hover:text-[#0a0a0a]">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/site-nav.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/scroll-reveal.js"></script>
+  <script>
+    function getPreferredTheme() {
+      var stored = localStorage.getItem('xfreeze-theme');
+      if (stored === 'dark' || stored === 'light') return stored;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    function applyTheme(theme) {
+      var isDark = theme === 'dark';
+      document.documentElement.classList.toggle('dark', isDark);
+      localStorage.setItem('xfreeze-theme', theme);
+      document.querySelectorAll('.theme-toggle').forEach(function (btn) {
+        btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+        btn.setAttribute('aria-checked', isDark ? 'true' : 'false');
+      });
+    }
+    function toggleTheme() {
+      applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+    }
+    applyTheme(getPreferredTheme());
+  </script>
+</body>
+</html>

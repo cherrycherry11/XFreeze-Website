@@ -1,0 +1,334 @@
+/**
+ * X Freeze — dark mode (deep black, not gray)
+ * Light mode is untouched. Only html.dark rules live here.
+ *
+ * Palette (true dark):
+ *   page     #000000
+ *   elevated #050505
+ *   muted    #0a0a0a
+ *   subtle   #111111
+ *   text     #f2f2f2
+ *   secondary #9a9a9a
+ *   border   #1a1a1a
+ */
+
+/* ── Tokens ── */
+html.dark {
+  color-scheme: dark;
+  --text: #f2f2f2;
+  --text-secondary: #9a9a9a;
+  --border: #1a1a1a;
+  --border-subtle: #121212;
+  --border-hover: #2a2a2a;
+  --surface: #000000;
+  --surface-elevated: #050505;
+  --surface-muted: #0a0a0a;
+  --surface-subtle: #111111;
+  --nav-bg: rgba(0, 0, 0, 0.94);
+  background-color: #000000;
+}
+
+html.dark body {
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+/* ── Tailwind utility remaps (hardcoded light classes) ── */
+html.dark .bg-white:not(.text-black) {
+  background-color: var(--surface) !important;
+}
+html.dark .bg-white\/70 {
+  background-color: rgba(0, 0, 0, 0.88) !important;
+}
+html.dark .bg-white\/92 {
+  background-color: rgba(8, 8, 8, 0.94) !important;
+}
+html.dark .bg-\[\#fafafa\],
+html.dark .bg-\[\#f8f8f8\],
+html.dark .bg-\[\#f7f6f8\],
+html.dark .bg-\[\#f5f4f7\],
+html.dark .bg-\[\#f4f4f5\],
+html.dark .bg-\[\#f4f4f4\] {
+  background-color: var(--surface-elevated) !important;
+}
+html.dark .text-\[\#0a0a0a\],
+html.dark .text-black {
+  color: var(--text) !important;
+}
+html.dark .text-\[\#52525b\],
+html.dark .text-\[\#71717a\] {
+  color: var(--text-secondary) !important;
+}
+html.dark .text-\[\#27272a\] {
+  color: #c9cfcb !important;
+}
+html.dark .border-\[\#e5e7eb\],
+html.dark .border-\[\#f4f4f5\] {
+  border-color: var(--border) !important;
+}
+html.dark .border-\[\#d4d4d8\] {
+  border-color: var(--border-hover) !important;
+}
+html.dark .hover\:bg-\[\#fafafa\]:hover,
+html.dark .hover\:bg-\[\#f4f4f5\]:hover {
+  background-color: var(--surface-subtle) !important;
+}
+html.dark .hover\:border-\[\#d4d4d8\]:hover {
+  border-color: var(--border-hover) !important;
+}
+html.dark .hover\:text-black:hover,
+html.dark .hover\:text-\[\#0a0a0a\]:hover {
+  color: var(--text) !important;
+}
+html.dark .hover\:text-\[\#27272a\]:hover {
+  color: #c9cfcb !important;
+}
+html.dark .placeholder\:text-\[\#52525b\]::placeholder {
+  color: var(--text-secondary) !important;
+}
+
+/* Primary filled buttons invert */
+html.dark a.bg-\[\#0a0a0a\],
+html.dark button.bg-\[\#0a0a0a\],
+html.dark .bg-\[\#0a0a0a\] {
+  background-color: #f2f2f2 !important;
+  color: #000000 !important;
+  border-color: #f2f2f2 !important;
+}
+html.dark a.bg-\[\#0a0a0a\]:hover,
+html.dark button.bg-\[\#0a0a0a\]:hover,
+html.dark a.hover\:bg-black:hover,
+html.dark button.hover\:bg-black:hover,
+html.dark .hover\:bg-\[\#27272a\]:hover {
+  background-color: #e0e0e0 !important;
+  color: #000000 !important;
+}
+
+/* ── Type ── */
+html.dark .xf-section-title,
+html.dark .xf-content-title,
+html.dark .xf-marquee-title,
+html.dark .xf-library-title,
+html.dark .xf-final-cta-title,
+html.dark .xf-faq-title,
+html.dark .xf-motion-headline,
+html.dark .skills-hero h1,
+html.dark .sb-hero h1,
+html.dark #section-experimental h2,
+html.dark #section-minimal h2,
+html.dark .pl-hero h1,
+html.dark .pl-hero__copy h1 {
+  color: #ffffff !important;
+}
+
+html.dark .xf-section-lead,
+html.dark .xf-content-lead,
+html.dark .xf-section-eyebrow,
+html.dark .xf-content-eyebrow,
+html.dark .skills-hero-lead,
+html.dark .skills-hero-eyebrow,
+html.dark .sb-hero__lead,
+html.dark .sb-hero__eyebrow,
+html.dark .xf-final-cta-lead,
+html.dark .xf-final-cta-eyebrow {
+  color: var(--text-secondary);
+}
+
+/* Style / Product dark glass handled in glass-backdrop.css */
+
+/* Glass sections: deep black base (gradients layered by glass-backdrop.css) */
+html.dark .xf-glass-section,
+html.dark .xf-glass-hero {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+html.dark #section-experimental a,
+html.dark #section-minimal a {
+  color: var(--text);
+}
+
+/* ── Cards & panels (base dark; glass sections override below) ── */
+html.dark .simple-card,
+html.dark .xf-start-card,
+html.dark .xf-spot-card,
+html.dark .xf-combo-card,
+html.dark .xf-motion-card,
+html.dark .xf-motion-flow,
+html.dark .bundles-stats-panel,
+html.dark .xf-newsletter-box,
+html.dark .xf-final-cta-box,
+html.dark .skills-builder-promo,
+html.dark .skill-bundle-card,
+html.dark .templates-subscription-note,
+html.dark .connector-setup-card,
+html.dark .sb-panel {
+  background: var(--surface-muted) !important;
+  border-color: var(--border) !important;
+  box-shadow: none !important;
+  color: var(--text);
+}
+
+/* Dark glass cards — deep + translucent */
+html.dark .xf-glass-section .xf-spot-card,
+html.dark .xf-glass-section .xf-combo-card,
+html.dark .xf-glass-section .xf-motion-card,
+html.dark .xf-glass-section .xf-motion-flow,
+html.dark .xf-glass-section .bundles-stats-panel,
+html.dark .xf-glass-section .xf-newsletter-box,
+html.dark .xf-glass-section .xf-final-cta-box,
+html.dark .xf-glass-hero .xf-glass-panel,
+html.dark .xf-glass-panel {
+  background: rgba(0, 0, 0, 0.55) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(20px) saturate(1.15) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.15) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 16px 40px -18px rgba(0, 0, 0, 0.7) !important;
+}
+
+html.dark .xf-spot-card:hover,
+html.dark .xf-combo-card:hover,
+html.dark .xf-start-card:hover,
+html.dark .simple-card:hover {
+  border-color: var(--border-hover) !important;
+  box-shadow: 0 12px 32px -18px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* ── Buttons (site components) ── */
+html.dark .xf-newsletter-btn--primary,
+html.dark .xf-final-cta-btn--primary,
+html.dark .xf-motion-btn--primary,
+html.dark .xf-motion-cta-link {
+  background: #f2f2f2 !important;
+  color: #000000 !important;
+  border-color: #f2f2f2 !important;
+}
+
+html.dark .xf-newsletter-btn--primary:hover,
+html.dark .xf-final-cta-btn--primary:hover,
+html.dark .xf-motion-btn--primary:hover,
+html.dark .xf-motion-cta-link:hover {
+  background: #e0e0e0 !important;
+}
+
+html.dark .xf-newsletter-btn--secondary,
+html.dark .xf-final-cta-btn--ghost,
+html.dark .xf-motion-btn--ghost {
+  background: transparent !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+html.dark .xf-newsletter-btn--secondary:hover,
+html.dark .xf-final-cta-btn--ghost:hover,
+html.dark .xf-motion-btn--ghost:hover {
+  background: var(--surface-subtle) !important;
+  border-color: var(--border-hover) !important;
+}
+
+/* ── Forms ── */
+html.dark input[type="search"],
+html.dark input[type="text"],
+html.dark input[type="email"],
+html.dark input[type="password"],
+html.dark textarea,
+html.dark select {
+  background-color: var(--surface-muted) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+html.dark input:focus,
+html.dark textarea:focus,
+html.dark select:focus {
+  border-color: var(--border-hover) !important;
+  outline: none;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: var(--text-secondary) !important;
+}
+
+/* ── Skills / templates page chrome ── */
+html.dark .skills-hero-section:not(.skills-banner) {
+  background: var(--surface) !important;
+  border-bottom-color: var(--border) !important;
+}
+
+html.dark .skills-hero-stats {
+  border-color: var(--border);
+}
+
+html.dark .template-filters-bar,
+html.dark .template-tier-filters,
+html.dark .template-subcat-panel {
+  color: var(--text);
+}
+
+html.dark .templates-subscription-note {
+  background: var(--surface-muted) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+}
+
+html.dark .templates-subscription-note strong,
+html.dark .templates-subscription-note i {
+  color: var(--text) !important;
+}
+
+/* ── Blog ── */
+html.dark .blog-card,
+html.dark .blog-card-body {
+  color: var(--text);
+}
+
+html.dark .blog-card h2,
+html.dark .blog-card h3 {
+  color: var(--text) !important;
+}
+
+/* ── Footer already themed; keep link hover readable ── */
+html.dark .xf-site-footer {
+  background: var(--surface) !important;
+  border-top-color: var(--border) !important;
+}
+
+/* ── Motion section chips ── */
+html.dark .xf-motion-chip {
+  background: var(--surface-muted);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+html.dark .xf-motion-chip:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
+}
+
+html.dark .xf-motion-card__cat {
+  background: var(--surface-subtle);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+/* ── Explore links ── */
+html.dark .xf-explore-link {
+  color: var(--text);
+}
+
+/* ── Contact form area ── */
+html.dark .contact-panel {
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* ── Reduce harsh pure-black shadows ── */
+html.dark .artistic-card {
+  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.45);
+}
+
+html.dark .artistic-card:hover {
+  box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.55);
+}

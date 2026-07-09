@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script>
+    (function () {
+      var hash = location.hash || '';
+      var search = location.search || '';
+      var isOAuthReturn =
+        hash.indexOf('access_token') !== -1 ||
+        hash.indexOf('error') !== -1 ||
+        search.indexOf('code=') !== -1;
+      if (isOAuthReturn) return;
+      if (search.indexOf('signin=1') !== -1) return;
+      try {
+        if (sessionStorage.getItem('xf-auth-intent') === 'signin') return;
+      } catch (e) {}
+      location.replace('home.html');
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in - X Freeze</title>
+  <script>
+    (function () {
+      var stored = localStorage.getItem('xfreeze-theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
+      document.documentElement.classList.toggle('dark', isDark);
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/site-fonts.css">
+<link rel="stylesheet" href="css/theme-switch.css">
+  <script src="js/auth-config.js"></script>
+  <link rel="stylesheet" href="css/site-footer.css">
+  <link rel="stylesheet" href="css/site-nav.css">
+  <link rel="stylesheet" href="css/site-mobile.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/support-toast.css">
+  <style>
+:root {
+      --text: #0a0a0a;
+      --text-secondary: #52525b;
+      --border: #e5e7eb;
+      --surface: #ffffff;
+      --surface-elevated: #fafafa;
+      --surface-muted: #f8f8f8;
+      --nav-bg: rgba(255, 255, 255, 0.94);
+      --border-hover: #d4d4d8;
+      --page-max: 1520px;
+      --page-gutter: 1rem;
+    }
+    html.dark {
+      color-scheme: dark;
+      --text: #f2f2f2;
+      --text-secondary: #9a9a9a;
+      --border: #1a1a1a;
+      --surface: #000000;
+      --surface-elevated: #050505;
+      --surface-muted: #0a0a0a;
+      --nav-bg: rgba(0, 0, 0, 0.92);
+      --border-hover: #2a2a2a;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--surface);
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="site-nav" class="site-nav page-nav" aria-label="Main">
+    <div class="content-container">
+      <div class="site-nav-bar">
+        <a href="login.html" class="site-nav-logo">X Freeze</a>
+        <div class="site-nav-end">
+          <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee">
+            <i class="fa-solid fa-mug-hot text-xs" aria-hidden="true"></i>
+            <span class="hidden sm:inline">Buy me a coffee</span>
+            <span class="sm:hidden">Coffee</span>
+          </a>
+          <div id="xf-auth-nav" class="site-nav-auth"></div>
+          <button type="button" id="theme-toggle" onclick="toggleTheme()" class="theme-switch theme-toggle" role="switch" aria-checked="false" aria-label="Switch to dark mode" title="Dark mode">
+            <span class="theme-switch-track" aria-hidden="true">
+              <span class="theme-switch-thumb">
+                <span class="theme-switch-icon theme-switch-icon--sun" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12zM4.22 4.22l2.12 2.12-1.06 1.06L3.16 5.28l1.06-1.06zm15.56 15.56 2.12 2.12-1.06 1.06-2.12-2.12 1.06-1.06zM19.78 4.22l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12zM6.34 17.66l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12z"/></svg>
+                </span>
+                <span class="theme-switch-icon theme-switch-icon--moon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main id="xf-auth-page" class="xf-auth-page">
+    <div class="content-container xf-auth-page-inner">
+      <div class="xf-auth-card">
+        <h1 id="xf-auth-heading">Sign in to X Freeze</h1>
+        <p id="xf-auth-subheading">Use your email and password, or sign in with X.</p>
+
+        <div class="xf-auth-social" aria-label="Social sign-in options">
+          <button type="button" id="xf-auth-twitter" class="xf-auth-provider-btn xf-auth-provider-btn--twitter" data-provider="twitter">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            <span class="xf-auth-provider-label">Continue with X</span>
+            <span class="xf-auth-provider-badge">Soon</span>
+          </button>
+        </div>
+
+        <div class="xf-auth-divider">or email</div>
+
+        <div class="xf-auth-mode-tabs" role="tablist" aria-label="Account mode">
+          <button type="button" id="xf-auth-tab-signin" class="xf-auth-mode-tab is-active" role="tab" aria-selected="true">Sign in</button>
+          <button type="button" id="xf-auth-tab-signup" class="xf-auth-mode-tab" role="tab" aria-selected="false">Create account</button>
+        </div>
+
+        <form id="xf-auth-password-form" class="xf-auth-email-form">
+          <label for="xf-auth-email">Email</label>
+          <input id="xf-auth-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+
+          <label for="xf-auth-password">Password</label>
+          <input id="xf-auth-password" name="password" type="password" autocomplete="current-password" placeholder="Your password" minlength="6" required>
+
+          <button type="submit" id="xf-auth-password-submit" class="xf-auth-submit">Sign in</button>
+        </form>
+
+        <div id="xf-auth-status" class="xf-auth-status" hidden></div>
+      </div>
+
+      <aside class="xf-auth-support" aria-label="Support options">
+        <h2>Support the project</h2>
+        <p>No account needed - coffee and crypto tips help keep X Freeze free.</p>
+        <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="xf-auth-support-coffee">
+          <i class="fa-solid fa-mug-hot" aria-hidden="true"></i>
+          Buy me a coffee
+        </a>
+        <details class="xf-crypto-tip">
+          <summary class="xf-crypto-tip__summary">Optional tip · wallets</summary>
+          <div class="xf-crypto-tip__panel">
+            <p class="xf-crypto-tip__note">Totally optional - helps keep the library free.</p>
+            <div class="xf-crypto-tip__row">
+              <button type="button" class="xf-crypto-chip" onclick="XFreezeFooter.copyCrypto('solana', this)">
+                <span>◎ SOL</span><span class="xf-crypto-chip__addr">EYTx…VjWb</span>
+              </button>
+              <button type="button" class="xf-crypto-chip" onclick="XFreezeFooter.copyCrypto('bitcoin', this)">
+                <span>₿ BTC</span><span class="xf-crypto-chip__addr">bc1q…cjwy</span>
+              </button>
+              <button type="button" class="xf-crypto-chip" onclick="XFreezeFooter.copyCrypto('ethereum', this)">
+                <span>Ξ ETH</span><span class="xf-crypto-chip__addr">0x22…6d12</span>
+              </button>
+            </div>
+          </div>
+        </details>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    function toggleTheme() {
+      var root = document.documentElement;
+      var isDark = root.classList.toggle('dark');
+      root.classList.toggle('light', !isDark);
+      localStorage.setItem('xfreeze-theme', isDark ? 'dark' : 'light');
+      var btn = document.getElementById('theme-toggle');
+      if (btn) btn.setAttribute('aria-checked', isDark ? 'true' : 'false');
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/site-nav.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/support-toast.js"></script>
+</body>
+</html>

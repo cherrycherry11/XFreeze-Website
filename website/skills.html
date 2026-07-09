@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en" data-xf-meta-title="1000+ AI Skills for Grok, Cursor &amp; Claude - X Freeze" data-xf-meta-desc="Copy-paste skill prompts for business, social, connectors, and workflows. Free library with instant and connector skills." data-xf-meta-path="skills.html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X Freeze - AI Skills Library</title>
+  <script src="js/site-config.js"></script>
+  <script src="js/site-meta.js"></script>
+  <script>
+    (function () {
+      var stored = localStorage.getItem('xfreeze-theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
+      document.documentElement.classList.toggle('dark', isDark);
+    })();
+  </script>
+  <script src="js/auth-config.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/site-fonts.css">
+<link rel="stylesheet" href="css/theme-switch.css">
+  <link rel="stylesheet" href="css/scroll-reveal.css">
+  <link rel="stylesheet" href="css/motion.css">
+  <link rel="stylesheet" href="css/site-footer.css">
+  <link rel="stylesheet" href="css/site-nav.css">
+  <link rel="stylesheet" href="css/site-mobile.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/skills-browse.css">
+  <link rel="stylesheet" href="css/support-toast.css">
+  <link rel="stylesheet" href="css/request-cta.css">
+  <link rel="stylesheet" href="css/skill-builder.css">
+  <link rel="preload" href="data/skills-browse-index.js" as="script">
+  <style>
+:root {
+      --text: #0a0a0a; --text-secondary: #52525b; --border: #e5e7eb;
+      --surface: #ffffff; --surface-elevated: #fafafa; --surface-muted: #f8f8f8;
+      --surface-subtle: #f4f4f5; --nav-bg: rgba(255,255,255,0.94); --border-hover: #d4d4d8;
+      --page-max: 1520px; --page-gutter: 1rem;
+    }
+    @media (min-width:640px){:root{--page-gutter:1.25rem}}
+    @media (min-width:768px){:root{--page-gutter:1.5rem}}
+    @media (min-width:1024px){:root{--page-gutter:2rem}}
+    html.dark {
+      color-scheme: dark;
+      --text:#f2f5f3; --text-secondary:#8a958c; --border:#1f2623;
+      --surface:#020403; --surface-elevated:#0a0d0b; --surface-muted:#0f1311;
+      --surface-subtle:#161a18; --nav-bg:rgba(2,4,3,0.94); --border-hover:#2d3632;
+    }
+    body { font-family: var(--font-sans); background:var(--surface); color:var(--text); }
+    .content-container {
+      width:100%; max-width:min(var(--page-max),calc(100% - var(--page-gutter)*2));
+      margin-inline:auto; padding-inline:var(--page-gutter);
+    }
+
+    html.dark .bg-white { background-color:var(--surface)!important; }
+    html.dark .text-\[\#0a0a0a\] { color:var(--text)!important; }
+    html.dark .text-\[\#52525b\] { color:var(--text-secondary)!important; }
+    html.dark .border-\[\#e5e7eb\] { border-color:var(--border)!important; }
+  </style>
+</head>
+<body>
+
+  <nav id="site-nav" class="site-nav page-nav" aria-label="Main">
+    <div class="content-container">
+      <div class="site-nav-bar">
+        <a href="home.html" class="site-nav-logo">X Freeze</a>
+                        <div class="site-nav-pill">
+          <a href="home.html" class="site-nav-pill-link">Home</a>
+          <a href="templates.html" class="site-nav-pill-link">Templates</a>
+          <a href="prompt-library.html" class="site-nav-pill-link">Prompts</a>
+          <a href="skills.html" class="site-nav-pill-link site-nav-pill-link--active" aria-current="page">Skills</a>
+          <a href="about.html" class="site-nav-pill-link">About</a>
+          <a href="blog.html" class="site-nav-pill-link">Blog</a>
+          <a href="contact.html" class="site-nav-pill-link">Contact</a>
+        </div>
+        <div class="site-nav-end">
+          <div id="xf-auth-nav" class="site-nav-auth"></div>
+          <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee">
+            <i class="fa-solid fa-mug-hot text-xs"></i>
+            <span class="hidden sm:inline">Buy me a coffee</span>
+          </a>
+          <button type="button" id="theme-toggle" onclick="toggleTheme()" class="theme-switch theme-toggle" role="switch" aria-checked="false" aria-label="Switch to dark mode">
+            <span class="theme-switch-track"><span class="theme-switch-thumb">
+              <span class="theme-switch-icon theme-switch-icon--sun"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12z"/></svg></span>
+              <span class="theme-switch-icon theme-switch-icon--moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg></span>
+            </span></span>
+          </button>
+          <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu"><i class="fa-solid fa-bars text-sm"></i></button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+    <div id="mobile-menu-backdrop" class="site-nav-mobile-backdrop hidden lg:hidden" aria-hidden="true"></div>
+
+  <div id="mobile-menu" class="site-nav-mobile-panel site-nav-mobile-panel--drawer hidden lg:hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Site menu">
+    <div class="site-nav-mobile-drawer">
+      <header class="site-nav-drawer-head">
+        <a href="home.html" class="site-nav-drawer-logo" onclick="toggleMobileMenu()">X Freeze</a>
+        <button type="button" class="site-nav-drawer-close" onclick="toggleMobileMenu()" aria-label="Close menu"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </header>
+
+                  <nav class="site-nav-drawer-nav" aria-label="Mobile">
+        <a href="home.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Home</a>
+        <a href="templates.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Templates</a>
+        <a href="prompt-library.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Prompts</a>
+        <a href="skills.html" class="site-nav-drawer-link site-nav-drawer-link--active" onclick="toggleMobileMenu()">Skills</a>
+        <a href="about.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">About</a>
+        <a href="blog.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Blog</a>
+        <a href="contact.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Contact</a>
+      </nav>
+
+      <footer class="site-nav-drawer-footer">
+        <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-drawer-meta" onclick="toggleMobileMenu()">
+          Buy me a coffee <i class="fa-solid fa-arrow-up-right" aria-hidden="true"></i>
+        </a>
+        <div class="site-nav-drawer-theme">
+          <span class="site-nav-drawer-theme__label">Dark mode</span>
+          <button type="button" onclick="toggleTheme()" class="site-nav-drawer-theme__switch theme-switch theme-switch--sm" role="switch" aria-checked="false" aria-label="Switch to dark mode">
+            <span class="theme-switch-track" aria-hidden="true">
+              <span class="theme-switch-thumb">
+                <span class="theme-switch-icon theme-switch-icon--sun"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12z"/></svg></span>
+                <span class="theme-switch-icon theme-switch-icon--moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg></span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <main class="skills-main">
+    <section class="skills-hero-section skills-banner" data-scroll-reveal>
+      <div class="skills-banner__media" aria-hidden="true">
+        <video
+          class="skills-banner__video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          data-banner-light="assets/videos/skills-banner-light.mp4"
+          data-banner-dark="assets/videos/skills-banner-dark.mp4"
+        ></video>
+        <div class="skills-banner__veil"></div>
+      </div>
+      <div class="content-container skills-hero-inner">
+        <header class="skills-hero scroll-reveal-in">
+          <p class="skills-hero-eyebrow">AI skill command library</p>
+          <h1>Skip the prompt writing<br>Start with a ready-made skill.</h1>
+          <p class="skills-hero-lead">
+            Copy a portable SKILL.md from any pack and use it across your favorite AI assistants. Get instant text-based skills or connect to live apps with secure approval gates. Works with Grok, Cursor, Claude, ChatGPT, and more.
+          </p>
+          <div class="skills-hero-actions">
+            <a href="#xf-skills-view-home" class="xf-btn xf-btn--primary xf-btn--ghost-on-light">Browse library</a>
+            <a href="skill-builder.html" class="xf-btn xf-btn--ghost xf-btn--ghost-on-light">Build your own</a>
+          </div>
+          <div class="skills-hero-stats" role="list" aria-label="Library stats">
+            <div class="skills-hero-stat" role="listitem">
+              <span class="skills-hero-stat-num" id="xf-stat-total">-</span>
+              <span class="skills-hero-stat-label">Skills</span>
+            </div>
+            <span class="skills-hero-stat-divider" aria-hidden="true"></span>
+            <div class="skills-hero-stat" role="listitem">
+              <span class="skills-hero-stat-num" id="xf-stat-instant">-</span>
+              <span class="skills-hero-stat-label">Work instantly</span>
+            </div>
+            <span class="skills-hero-stat-divider" aria-hidden="true"></span>
+            <div class="skills-hero-stat" role="listitem">
+              <span class="skills-hero-stat-num">3</span>
+              <span class="skills-hero-stat-label">Tool targets</span>
+            </div>
+          </div>
+        </header>
+      </div>
+    </section>
+
+    <div class="content-container skills-body">
+    <div id="xf-skills-view-home">
+      <div class="skills-search-wrap scroll-reveal-in" data-scroll-reveal>
+        <input type="search" id="xf-skills-search" class="skills-browse-search" placeholder="Search skills or packs…" aria-label="Search skills">
+      </div>
+
+      <div id="xf-skills-filter-pills" class="skills-filter-pills scroll-reveal-in" data-scroll-reveal role="tablist" aria-label="Skill categories"></div>
+
+      <div class="skills-grid-wrap scroll-reveal-in" data-scroll-reveal>
+        <div id="xf-skills-bundle-grid" class="skills-browse-grid"></div>
+      </div>
+      <p id="xf-skills-empty" class="skills-empty skills-browse-hidden">No skills match your search.</p>
+
+      <div class="skills-how-card scroll-reveal-in" data-scroll-reveal>
+        <h2>How to use (copy &amp; paste)</h2>
+        <div class="skills-how-split">
+          <div class="skills-how-path">
+            <h3>Instant skills <span class="skills-how-path-tag">no setup</span></h3>
+            <ol class="skills-how-steps">
+              <li><span class="skills-how-step-num">1</span><span class="skills-how-step-text">Filter <strong>Instant only</strong> or pick a pack tagged Instant.</span></li>
+              <li><span class="skills-how-step-num">2</span><span class="skills-how-step-text"><strong>Copy prompt</strong> - includes the full SKILL.md file.</span></li>
+              <li><span class="skills-how-step-num">3</span><span class="skills-how-step-text">Paste into Grok, Cursor, or Claude. It creates the skill file for you.</span></li>
+              <li><span class="skills-how-step-num">4</span><span class="skills-how-step-text">Run the slash command (e.g. <code>/meeting-notes</code>) or describe the task.</span></li>
+            </ol>
+          </div>
+          <div class="skills-how-path skills-how-path--connector">
+            <h3>Connector skills <span class="skills-how-path-tag connector">needs apps</span></h3>
+            <ol class="skills-how-steps">
+              <li><span class="skills-how-step-num">1</span><span class="skills-how-step-text">Read the <a href="connector-setup.html" class="skills-how-link">connector setup guide</a> for your AI tool (Grok, Cursor, or Claude).</span></li>
+              <li><span class="skills-how-step-num">2</span><span class="skills-how-step-text">Open a pack tagged <strong>Connector</strong> and check which apps it needs.</span></li>
+              <li><span class="skills-how-step-num">3</span><span class="skills-how-step-text"><strong>Copy prompt</strong> and paste into your AI tool.</span></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="xf-skills-view-detail" class="skills-detail-panel skills-browse-hidden scroll-reveal-in" data-scroll-reveal>
+      <button type="button" class="skills-detail-back" id="xf-skills-back-btn">
+        <i class="fa-solid fa-arrow-left text-xs" aria-hidden="true"></i> All packs
+      </button>
+      <div class="skills-browse-detail">
+        <div class="skills-detail-header">
+          <span class="skills-browse-tag" id="xf-skills-detail-tag">Free</span>
+          <h3 id="xf-skills-detail-title"></h3>
+          <p id="xf-skills-detail-desc" class="skills-detail-desc"></p>
+          <p id="xf-skills-detail-count" class="skills-detail-count" aria-live="polite"></p>
+          <div id="xf-skills-connector-banner" class="skills-connector-banner skills-browse-hidden" role="note"></div>
+        </div>
+        <div id="xf-skills-skill-list" data-scroll-stagger></div>
+      </div>
+    </div>
+
+      <a href="skill-builder.html" class="skills-builder-promo skills-builder-promo--footer scroll-reveal-in" data-scroll-reveal>
+        <span class="skills-builder-promo__icon" aria-hidden="true"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+        <span class="skills-builder-promo__body">
+          <p class="skills-builder-promo__title">Build your own skill</p>
+          <p class="skills-builder-promo__sub">Answer five questions - get a prompt that has your AI draft, test, and refine a custom skill with you.</p>
+        </span>
+        <span class="skills-builder-promo__cta">Open builder <i class="fa-solid fa-arrow-right text-xs" aria-hidden="true"></i></span>
+      </a>
+    </div>
+  </main>
+
+  <a href="contact.html?topic=skill" class="xf-request-cta" title="Need a skill we do not have? Request one">
+    <i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i>
+    <span>Request skill</span>
+  </a>
+
+  <footer class="xf-site-footer" data-xf-footer-root></footer>
+<div id="xf-skill-modal" class="skills-modal skills-browse-hidden" role="dialog" aria-modal="true" aria-labelledby="xf-skill-modal-title" hidden>
+    <div class="skills-modal-backdrop" data-close-modal></div>
+    <div class="skills-modal-panel">
+      <div class="skills-modal-header">
+        <h2 id="xf-skill-modal-title" class="skills-modal-title"></h2>
+        <button type="button" class="skills-modal-close" data-close-modal aria-label="Close preview">&times;</button>
+      </div>
+      <pre id="xf-skill-modal-body" class="skills-modal-body" data-lenis-prevent></pre>
+      <div class="skills-modal-footer">
+        <button type="button" id="xf-skill-modal-copy" class="skills-browse-btn primary">Copy prompt</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/scroll-reveal.js"></script>
+  <script src="js/support-toast.js"></script>
+  <script src="data/skills-browse-index.js"></script>
+  <script src="js/skills-browse.js"></script>
+  <script>
+    function getPreferredTheme() {
+      var stored = localStorage.getItem('xfreeze-theme');
+      if (stored === 'dark' || stored === 'light') return stored;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    function syncSkillsBannerVideo() {
+      var video = document.querySelector('.skills-banner__video');
+      if (!video) return;
+      var isDark = document.documentElement.classList.contains('dark');
+      var nextSrc = isDark
+        ? (video.getAttribute('data-banner-dark') || 'assets/videos/skills-banner-dark.mp4')
+        : (video.getAttribute('data-banner-light') || 'assets/videos/skills-banner-light.mp4');
+      var current = video.currentSrc || video.getAttribute('src') || '';
+      if (current.indexOf(nextSrc) !== -1) {
+        video.muted = true;
+        video.playsInline = true;
+        var p0 = video.play();
+        if (p0 && typeof p0.catch === 'function') p0.catch(function () {});
+        return;
+      }
+      video.muted = true;
+      video.playsInline = true;
+      video.setAttribute('src', nextSrc);
+      video.load();
+      var tryPlay = function () {
+        var p = video.play();
+        if (p && typeof p.catch === 'function') p.catch(function () {});
+      };
+      if (video.readyState >= 2) tryPlay();
+      else video.addEventListener('canplay', tryPlay, { once: true });
+    }
+
+    function applyTheme(theme) {
+      var isDark = theme === 'dark';
+      document.documentElement.classList.toggle('dark', isDark);
+      localStorage.setItem('xfreeze-theme', theme);
+      document.querySelectorAll('.theme-toggle').forEach(function (btn) {
+        btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+        btn.setAttribute('aria-checked', isDark ? 'true' : 'false');
+      });
+      syncSkillsBannerVideo();
+    }
+    function toggleTheme() {
+      applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+    }
+    applyTheme(getPreferredTheme());
+    syncSkillsBannerVideo();
+
+    XFreezeSkillsBrowse.init();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/site-nav.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/motion.js"></script>
+</body>
+</html>

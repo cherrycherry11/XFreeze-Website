@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" data-xf-meta-title="330+ Motion Prompts for AI Video - X Freeze" data-xf-meta-desc="Copy-paste image-to-video motion prompts for Grok Imagine, Runway, Kling, and more. 30+ categories, 330+ shot-ready prompts." data-xf-meta-path="prompt-library.html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Motion Prompt Library - X Freeze</title>
+  <script>
+    (function () {
+      var stored = localStorage.getItem('xfreeze-theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
+      document.documentElement.classList.toggle('dark', isDark);
+    })();
+  </script>
+  <script src="js/site-config.js"></script>
+  <script src="js/site-meta.js"></script>
+  <script src="js/auth-config.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/site-fonts.css">
+  <link rel="stylesheet" href="css/theme-switch.css">
+  <link rel="stylesheet" href="css/scroll-reveal.css">
+  <link rel="stylesheet" href="css/motion.css">
+  <link rel="stylesheet" href="css/site-footer.css">
+  <link rel="stylesheet" href="css/site-nav.css">
+  <link rel="stylesheet" href="css/site-mobile.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/support-toast.css">
+  <link rel="stylesheet" href="css/prompt-library.css">
+
+  <link rel="stylesheet" href="css/request-cta.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&family=IBM+Plex+Mono:wght@400;500&family=Playfair+Display:wght@500;600&family=Fraunces:opsz,wght@9..144,500;600&family=DM+Sans:wght@500;600&family=Outfit:wght@500;600&display=swap">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    :root {
+      --text: #0a0a0a; --text-secondary: #52525b; --border: #e5e7eb;
+      --surface: #ffffff; --surface-elevated: #fafafa; --surface-muted: #f8f8f8;
+      --surface-subtle: #f4f4f5; --nav-bg: rgba(255,255,255,0.94); --border-hover: #d4d4d8;
+      --page-max: 1520px; --page-gutter: 1rem;
+    }
+    @media (min-width:640px){:root{--page-gutter:1.25rem}}
+    @media (min-width:768px){:root{--page-gutter:1.5rem}}
+    @media (min-width:1024px){:root{--page-gutter:2rem}}
+    html.dark {
+      --text:#f2f5f3; --text-secondary:#8a958c; --border:#1f2623;
+      --surface:#020403; --surface-elevated:#0a0d0b; --surface-muted:#0f1311;
+      --surface-subtle:#161a18; --nav-bg:rgba(2,4,3,0.94); --border-hover:#2d3632;
+    }
+    body { font-family:'Inter',system-ui,sans-serif; background:var(--surface); color:var(--text); }
+    .content-container {
+      width:100%; max-width:min(var(--page-max),calc(100% - var(--page-gutter)*2));
+      margin-inline:auto; padding-inline:var(--page-gutter);
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="site-nav" class="site-nav page-nav" aria-label="Main">
+    <div class="content-container">
+      <div class="site-nav-bar">
+        <a href="home.html" class="site-nav-logo">X Freeze</a>
+                        <div class="site-nav-pill">
+          <a href="home.html" class="site-nav-pill-link">Home</a>
+          <a href="templates.html" class="site-nav-pill-link">Templates</a>
+          <a href="prompt-library.html" class="site-nav-pill-link site-nav-pill-link--active" aria-current="page">Prompts</a>
+          <a href="skills.html" class="site-nav-pill-link">Skills</a>
+          <a href="about.html" class="site-nav-pill-link">About</a>
+          <a href="blog.html" class="site-nav-pill-link">Blog</a>
+          <a href="contact.html" class="site-nav-pill-link">Contact</a>
+        </div>
+        <div class="site-nav-end">
+          <div id="xf-auth-nav" class="site-nav-auth"></div>
+          <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee">
+            <i class="fa-solid fa-mug-hot text-xs"></i>
+            <span class="hidden sm:inline">Buy me a coffee</span>
+          </a>
+          <button type="button" id="theme-toggle" onclick="toggleTheme()" class="theme-switch theme-toggle" role="switch" aria-checked="false" aria-label="Switch to dark mode">
+            <span class="theme-switch-track"><span class="theme-switch-thumb">
+              <span class="theme-switch-icon theme-switch-icon--sun"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12z"/></svg></span>
+              <span class="theme-switch-icon theme-switch-icon--moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg></span>
+            </span></span>
+          </button>
+          <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu"><i class="fa-solid fa-bars text-sm"></i></button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div id="mobile-menu-backdrop" class="site-nav-mobile-backdrop hidden lg:hidden" aria-hidden="true"></div>
+
+  <div id="mobile-menu" class="site-nav-mobile-panel site-nav-mobile-panel--drawer hidden lg:hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Site menu">
+    <div class="site-nav-mobile-drawer">
+      <header class="site-nav-drawer-head">
+        <a href="home.html" class="site-nav-drawer-logo" onclick="toggleMobileMenu()">X Freeze</a>
+        <button type="button" class="site-nav-drawer-close" onclick="toggleMobileMenu()" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+                  <nav class="site-nav-drawer-nav" aria-label="Mobile">
+        <a href="home.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Home</a>
+        <a href="templates.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Templates</a>
+        <a href="prompt-library.html" class="site-nav-drawer-link site-nav-drawer-link--active" onclick="toggleMobileMenu()">Prompts</a>
+        <a href="skills.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Skills</a>
+        <a href="about.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">About</a>
+        <a href="blog.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Blog</a>
+        <a href="contact.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Contact</a>
+      </nav>
+      <footer class="site-nav-drawer-footer">
+        <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-drawer-meta" onclick="toggleMobileMenu()">Buy me a coffee <i class="fa-solid fa-arrow-up-right"></i></a>
+        <div class="site-nav-drawer-theme">
+          <span class="site-nav-drawer-theme__label">Dark mode</span>
+          <button type="button" onclick="toggleTheme()" class="site-nav-drawer-theme__switch theme-switch theme-switch--sm" role="switch" aria-checked="false" aria-label="Switch to dark mode">
+            <span class="theme-switch-track"><span class="theme-switch-thumb">
+              <span class="theme-switch-icon theme-switch-icon--sun"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg></span>
+              <span class="theme-switch-icon theme-switch-icon--moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg></span>
+            </span></span>
+          </button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <main class="pl-main">
+    <section class="pl-hero" data-scroll-reveal>
+      <div class="pl-hero__grain" aria-hidden="true"></div>
+      <div class="pl-hero__perfs pl-hero__perfs--top" aria-hidden="true"></div>
+      <div class="pl-hero__perfs pl-hero__perfs--bottom" aria-hidden="true"></div>
+      <div class="pl-hero__glow" aria-hidden="true"></div>
+      <div class="pl-hero__glow pl-hero__glow--2" aria-hidden="true"></div>
+      <div class="pl-hero__marquee" aria-hidden="true">
+        <div class="pl-hero__marquee-track" id="pl-marquee-track"></div>
+      </div>
+      <div class="content-container pl-hero__inner scroll-reveal-in">
+        <div class="pl-hero__layout">
+          <div class="pl-hero__copy">
+            <p class="pl-hero__eyebrow"><i class="fa-solid fa-film"></i> Image-to-video motion prompts</p>
+            <h1>Prompt Library</h1>
+            <p class="pl-hero__lead">
+              330+ shot-ready prompts that turn still images into believable video motion. Four layers - combo recipes, camera moves, subject motion, and style - so you can paste one prompt or stack your own. Works with Grok Imagine, Runway, Kling, Luma, and similar tools.
+            </p>
+            <div class="pl-hero__stats" role="list">
+              <div role="listitem">
+                <span class="pl-hero__stat-num" data-xf-motion-prompt-count>330+</span>
+                <span class="pl-hero__stat-label">Motion prompts</span>
+              </div>
+              <div role="listitem">
+                <span class="pl-hero__stat-num" data-xf-motion-category-count>25+</span>
+                <span class="pl-hero__stat-label">Categories</span>
+              </div>
+              <div role="listitem">
+                <span class="pl-hero__stat-num">5</span>
+                <span class="pl-hero__stat-label">Prompt families</span>
+              </div>
+            </div>
+            <div class="pl-hero__tools" aria-label="Compatible tools">
+              <span class="pl-hero__tool">Grok Imagine</span>
+              <span class="pl-hero__tool">Runway</span>
+              <span class="pl-hero__tool">Kling</span>
+              <span class="pl-hero__tool">Luma</span>
+              <span class="pl-hero__tool">Pika</span>
+            </div>
+          </div>
+          <aside class="pl-hero__stage" aria-hidden="true">
+            <div class="pl-hero__typewriter" id="pl-hero-typewriter-panel">
+              <div class="pl-hero__tw-chrome">
+                <span class="pl-hero__tw-tag" id="pl-tw-tag"></span>
+                <span class="pl-hero__tw-meta" id="pl-tw-meta">Motion prompt</span>
+              </div>
+              <div class="pl-hero__tw-main">
+                <p class="pl-hero__tw-title" id="pl-tw-title"></p>
+                <p class="pl-hero__tw-body" id="pl-tw-body"></p>
+              </div>
+              <div class="pl-hero__tw-foot">
+                <p class="pl-hero__tw-best"><strong>Best for</strong> <span id="pl-tw-best"></span></p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <div class="content-container pl-body" data-scroll-reveal>
+      <div class="pl-toolbar">
+        <div class="pl-search-wrap">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input type="search" id="pl-search" class="pl-search" placeholder="Search prompts - push-in, golden hour, unboxing, first dance..." autocomplete="off" aria-label="Search motion prompts">
+        </div>
+        <div class="pl-filters-bar">
+          <div class="pl-filters-bar__groups">
+            <div class="pl-filters" role="group" aria-label="Filter by family">
+              <div class="pl-group-filters" id="pl-group-filters" role="group" aria-label="Filter by prompt family">
+                <button type="button" class="pl-filter-btn is-active" data-pl-group="all">All</button>
+              </div>
+            </div>
+          </div>
+          <div class="pl-filters-bar__subcats" id="pl-subfilters-wrap" hidden>
+            <details class="pl-filter-panel" id="pl-filter-details" open>
+              <summary class="pl-filter-panel__summary">
+                <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+                <span>Filters</span>
+                <span class="pl-filter-panel__active" id="pl-filter-active" hidden></span>
+              </summary>
+              <div class="pl-filter-panel__body">
+                <p class="pl-filter-panel__lede">Jump to a section within this family.</p>
+                <div class="pl-cat-scroll-wrap">
+                  <div class="pl-cat-scroll" id="pl-cat-scroll" role="group" aria-label="Filter by category">
+                    <button type="button" class="pl-cat-btn is-active" data-pl-cat="all">All categories</button>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <p class="pl-results-meta" id="pl-results-meta">330+ motion prompts across 30+ categories</p>
+      <div class="pl-grid" id="pl-grid"></div>
+    </div>
+  </main>
+
+  <div class="pl-panel-backdrop" id="pl-panel-backdrop" aria-hidden="true"></div>
+  <aside class="pl-panel" id="pl-panel" aria-hidden="true" aria-labelledby="pl-panel-title" role="dialog">
+    <header class="pl-panel__head">
+      <div class="pl-panel__head-top">
+        <span class="pl-panel__cat" id="pl-panel-cat">Category</span>
+        <span class="pl-panel__pos" id="pl-panel-pos"></span>
+        <button type="button" class="pl-panel__close" id="pl-panel-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <h2 class="pl-panel__title" id="pl-panel-title">Prompt title</h2>
+    </header>
+    <div class="pl-panel__body">
+      <p class="pl-panel__shot" id="pl-panel-shot"></p>
+      <p class="pl-panel__text" id="pl-panel-text"></p>
+      <div class="pl-panel__built" id="pl-panel-built" style="display:none">
+        <strong>Built from</strong>
+        <span id="pl-panel-built-text"></span>
+      </div>
+      <div class="pl-panel__best" id="pl-panel-best">
+        <strong>Best for</strong>
+        <span id="pl-panel-best-text"></span>
+      </div>
+    </div>
+    <footer class="pl-panel__foot">
+      <button type="button" class="pl-panel__nav-btn" id="pl-panel-prev" aria-label="Previous prompt"><i class="fa-solid fa-arrow-left"></i></button>
+      <button type="button" class="pl-panel__copy-btn" id="pl-panel-copy"><i class="fa-regular fa-copy"></i> Copy prompt</button>
+      <button type="button" class="pl-panel__nav-btn" id="pl-panel-next" aria-label="Next prompt"><i class="fa-solid fa-arrow-right"></i></button>
+    </footer>
+  </aside>
+
+  <a href="contact.html?topic=prompt" class="xf-request-cta" title="Want a motion prompt we have not built? Request one">
+    <i class="fa-solid fa-clapperboard" aria-hidden="true"></i>
+    <span>Request prompt</span>
+  </a>
+
+  <footer class="xf-site-footer" data-xf-footer-root></footer>
+
+  <script src="js/scroll-reveal.js"></script>
+  <script src="js/support-toast.js"></script>
+  <script>
+    function getPreferredTheme(){var s=localStorage.getItem('xfreeze-theme');if(s==='dark'||s==='light')return s;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+    function applyTheme(t){var d=t==='dark';document.documentElement.classList.toggle('dark',d);localStorage.setItem('xfreeze-theme',t);document.querySelectorAll('.theme-toggle,.site-nav-drawer-theme__switch').forEach(function(b){b.setAttribute('aria-label',d?'Switch to light mode':'Switch to dark mode');b.setAttribute('aria-checked',d?'true':'false');});}
+    function toggleTheme(){applyTheme(document.documentElement.classList.contains('dark')?'light':'dark');}
+    applyTheme(getPreferredTheme());
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/site-nav.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/motion.js"></script>
+  <script src="data/motion-prompt-library-data.js"></script>
+  <script src="js/prompt-library.js"></script>
+</body>
+</html>

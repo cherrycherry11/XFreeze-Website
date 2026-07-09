@@ -1,0 +1,259 @@
+/**
+ * X Freeze Motion System - Phase 1
+ * Shared: display type, nav, hovers, reduced-motion
+ */
+
+
+
+:root {
+  --xf-accent: #00c8d4;
+  --xf-accent-glow: rgba(0, 200, 212, 0.35);
+  --xf-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --xf-nav-duration: 0.35s;
+}
+
+html.dark {
+  --xf-accent: #00f0ff;
+  --xf-accent-glow: rgba(0, 240, 255, 0.4);
+}
+
+/* Display typography */
+h1,
+h2,
+h3,
+.contact-booking-title,
+.skills-hero h1,
+.bundles-stat-value,
+.xf-display {
+  font-family: var(--font-sans);
+}
+
+/* Lenis recommended */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+
+
+/* Nav: compact + pill link underline */
+.site-nav,
+.site-nav.page-nav {
+  transition:
+    padding var(--xf-nav-duration) var(--xf-ease-out),
+    background-color var(--xf-nav-duration) ease,
+    border-color var(--xf-nav-duration) ease,
+    box-shadow var(--xf-nav-duration) ease;
+}
+
+.site-nav.is-scrolled,
+.site-nav.page-nav.xf-nav-compact {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Keep bar height fixed — only color/background may change on scroll */
+.site-nav-bar {
+  min-height: var(--xf-nav-h, 4rem);
+  height: var(--xf-nav-h, 4rem);
+}
+
+.site-nav.is-scrolled .site-nav-bar,
+.site-nav.page-nav.xf-nav-compact .site-nav-bar {
+  min-height: var(--xf-nav-h, 4rem);
+  height: var(--xf-nav-h, 4rem);
+}
+
+.site-nav-pill-link {
+  position: relative;
+  overflow: hidden;
+}
+
+.site-nav-pill-link::after {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.35rem;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s var(--xf-ease-out);
+  opacity: 0.5;
+}
+
+.site-nav-pill-link:hover::after,
+.site-nav-pill-link--active::after,
+.site-nav-pill-link[aria-current='page']::after {
+  transform: scaleX(1);
+}
+
+/* Mobile menu panel */
+.site-nav-mobile-panel {
+  transition:
+    opacity 0.3s var(--xf-ease-out),
+    transform 0.35s var(--xf-ease-out),
+    visibility 0.35s;
+}
+
+.site-nav-mobile-panel.xf-mobile-closed {
+  opacity: 0;
+  transform: translateY(-8px);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.site-nav-mobile-panel.xf-mobile-open {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.site-nav-mobile-panel--drawer.xf-mobile-closed {
+  transform: translateX(100%);
+  opacity: 1;
+}
+
+.site-nav-mobile-panel--drawer.xf-mobile-open {
+  transform: translateX(0);
+}
+
+
+.site-nav-mobile-panel.xf-mobile-open .site-nav-pill-link {
+  animation: xf-menu-item-in 0.45s var(--xf-ease-out) both;
+}
+.site-nav-mobile-panel.xf-mobile-open .site-nav-pill-link:nth-child(1) { animation-delay: 0.04s; }
+.site-nav-mobile-panel.xf-mobile-open .site-nav-pill-link:nth-child(2) { animation-delay: 0.08s; }
+.site-nav-mobile-panel.xf-mobile-open .site-nav-pill-link:nth-child(3) { animation-delay: 0.12s; }
+.site-nav-mobile-panel.xf-mobile-open .site-nav-pill-link:nth-child(4) { animation-delay: 0.16s; }
+.site-nav-mobile-panel.xf-mobile-open .site-nav-pill-link:nth-child(5) { animation-delay: 0.2s; }
+.site-nav-mobile-panel.xf-mobile-open .site-nav-pill-link:nth-child(6) { animation-delay: 0.24s; }
+.site-nav-mobile-panel.xf-mobile-open .site-nav-pill-link:nth-child(7) { animation-delay: 0.28s; }
+
+.site-nav-mobile-panel.xf-mobile-open .site-nav-drawer-link {
+  animation: xf-menu-item-in 0.45s var(--xf-ease-out) both;
+}
+.site-nav-mobile-panel.xf-mobile-open .site-nav-drawer-link:nth-child(1) { animation-delay: 0.04s; }
+.site-nav-mobile-panel.xf-mobile-open .site-nav-drawer-link:nth-child(2) { animation-delay: 0.08s; }
+.site-nav-mobile-panel.xf-mobile-open .site-nav-drawer-link:nth-child(3) { animation-delay: 0.12s; }
+.site-nav-mobile-panel.xf-mobile-open .site-nav-drawer-link:nth-child(4) { animation-delay: 0.16s; }
+.site-nav-mobile-panel.xf-mobile-open .site-nav-drawer-link:nth-child(5) { animation-delay: 0.2s; }
+.site-nav-mobile-panel.xf-mobile-open .site-nav-drawer-link:nth-child(6) { animation-delay: 0.24s; }
+
+
+@keyframes xf-menu-item-in {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Magnetic primary buttons */
+[data-xf-magnetic] {
+  transition: transform 0.2s var(--xf-ease-out);
+  will-change: transform;
+}
+
+/* Template gallery tile - premium hover */
+.template-gallery-tile {
+  transition:
+    transform 0.35s var(--xf-ease-out),
+    border-color 0.25s ease,
+    box-shadow 0.35s var(--xf-ease-out);
+}
+.template-gallery-tile:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 16px 40px -12px rgba(0, 0, 0, 0.18),
+    0 0 0 1px var(--xf-accent-glow);
+}
+.template-gallery-tile:hover img {
+  transform: scale(1.06);
+}
+.template-gallery-tile:hover .template-gallery-label {
+  opacity: 1;
+  color: var(--xf-accent);
+  transform: translateY(-2px);
+}
+.template-gallery-tile:hover .template-gallery-overlay {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.4) 55%, transparent 100%);
+}
+
+/* Bundle + blog card lift */
+.bundle-card,
+.blog-card {
+  transition:
+    transform 0.35s var(--xf-ease-out),
+    box-shadow 0.35s var(--xf-ease-out),
+    border-color 0.25s ease;
+}
+.bundle-card:hover,
+.blog-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Skills browse cards */
+.skills-browse-card {
+  transition:
+    transform 0.3s var(--xf-ease-out),
+    box-shadow 0.3s var(--xf-ease-out),
+    border-color 0.2s ease;
+}
+.skills-browse-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Marquee image tilt */
+#selected-work-marquee img,
+#selected-work-marquee-reverse img {
+  transition: transform 0.4s var(--xf-ease-out), box-shadow 0.4s ease;
+}
+#selected-work-marquee img:hover,
+#selected-work-marquee-reverse img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+/* Count-up stats */
+[data-xf-count].is-counting {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Nav menu button micro-interaction */
+.site-nav-menu-btn {
+  transition:
+    transform 0.2s var(--xf-ease-out),
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+.site-nav-menu-btn:hover {
+  transform: scale(1.05);
+}
+.site-nav-menu-btn[aria-expanded='true'] {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav-mobile-panel .site-nav-pill-link {
+    animation: none !important;
+  }
+  [data-xf-magnetic] {
+    transform: none !important;
+  }
+  .template-gallery-tile:hover img,
+  #selected-work-marquee img:hover {
+    transform: none !important;
+  }
+}

@@ -1,0 +1,170 @@
+/* X Freeze - "Support our work" slide-in tab after copy / valuable actions */
+.xf-support-toast {
+  position: fixed;
+  right: 1rem;
+  /* Sit above the compact bot FAB */
+  bottom: calc(1rem + 3.25rem);
+  z-index: 9999;
+  max-width: min(22rem, calc(100vw - 2rem));
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(0.75rem) scale(0.98);
+  transition: opacity 0.28s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.xf-support-toast.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.xf-support-toast.is-leaving {
+  opacity: 0;
+  transform: translateY(0.5rem) scale(0.98);
+  pointer-events: none;
+}
+
+.xf-support-toast-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 0.75rem 0.7rem 0.85rem;
+  border-radius: 1rem;
+  border: 1px solid var(--xf-toast-border, #e5e7eb);
+  background: var(--xf-toast-bg, rgba(255, 255, 255, 0.96));
+  color: var(--xf-toast-text, #0a0a0a);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.06),
+    0 16px 40px -12px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+html.dark .xf-support-toast-inner {
+  --xf-toast-border: #2d3632;
+  --xf-toast-bg: rgba(10, 13, 11, 0.94);
+  --xf-toast-text: #f2f5f3;
+  --xf-toast-muted: #8a958c;
+  --xf-toast-cta-bg: #f2f5f3;
+  --xf-toast-cta-text: #020403;
+}
+
+html:not(.dark) .xf-support-toast-inner {
+  --xf-toast-muted: #52525b;
+  --xf-toast-cta-bg: #0a0a0a;
+  --xf-toast-cta-text: #ffffff;
+}
+
+/* Next.js app uses .light / .dark on html */
+html.light .xf-support-toast-inner {
+  --xf-toast-border: #e5e7eb;
+  --xf-toast-bg: rgba(255, 255, 255, 0.96);
+  --xf-toast-text: #0a0a0a;
+  --xf-toast-muted: #52525b;
+  --xf-toast-cta-bg: #0a0a0a;
+  --xf-toast-cta-text: #ffffff;
+}
+
+html.dark .xf-support-toast-inner,
+:root.dark .xf-support-toast-inner {
+  --xf-toast-border: #2d3632;
+  --xf-toast-bg: rgba(10, 13, 11, 0.94);
+  --xf-toast-text: #f2f5f3;
+  --xf-toast-muted: #8a958c;
+  --xf-toast-cta-bg: #f2f5f3;
+  --xf-toast-cta-text: #020403;
+}
+
+.xf-support-toast-icon {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.65rem;
+  background: var(--xf-toast-icon-bg, rgba(10, 10, 10, 0.06));
+  color: var(--xf-toast-text, #0a0a0a);
+  font-size: 0.95rem;
+}
+
+html.dark .xf-support-toast-icon {
+  --xf-toast-icon-bg: rgba(242, 245, 243, 0.08);
+}
+
+.xf-support-toast-copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.xf-support-toast-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: var(--line-heading);
+}
+
+.xf-support-toast-sub {
+  font-size: 0.6875rem;
+  line-height: var(--line-body);
+  color: var(--xf-toast-muted, #52525b);
+}
+
+.xf-support-toast-cta {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  background: var(--xf-toast-cta-bg, #0a0a0a);
+  color: var(--xf-toast-cta-text, #fff);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.xf-support-toast-cta:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.xf-support-toast-close {
+  flex-shrink: 0;
+  width: 1.65rem;
+  height: 1.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--xf-toast-muted, #52525b);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.xf-support-toast-close:hover {
+  color: var(--xf-toast-text, #0a0a0a);
+  background: var(--xf-toast-icon-bg, rgba(10, 10, 10, 0.06));
+}
+
+@media (max-width: 480px) {
+  .xf-support-toast {
+    right: 0.75rem;
+    left: 0.75rem;
+    bottom: calc(0.85rem + 3.1rem);
+    max-width: none;
+  }
+
+  .xf-support-toast-sub {
+    display: none;
+  }
+}

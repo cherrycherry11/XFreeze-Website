@@ -1,0 +1,40 @@
+# dependencies
+node_modules/
+payment-server/node_modules/
+
+# build
+.next/
+out/
+dist/
+
+# env & secrets
+.env
+.env.local
+.env*.local
+payment-server/.env
+
+# OS
+.DS_Store
+Thumbs.db
+**/.DS_Store
+
+# logs
+*.log
+npm-debug.log*
+
+# typescript
+*.tsbuildinfo
+
+# vercel
+.vercel
+
+# editor / agent junk
+.claude/
+website/_agent_write_test.txt
+website/_test2.txt
+website/.!*
+website/PASTE-INTO-HOME-HTML.txt
+website/MOTION-WIRE-INSTRUCTIONS.txt
+
+# original full-res video sources (not needed for deploy)
+website/assets/videos/*-original.mp4

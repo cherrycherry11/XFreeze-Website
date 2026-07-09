@@ -1,0 +1,327 @@
+/* X Freeze content pages (about, legal, guides, journal) */
+
+/* Shared theme tokens - nav, prose, and surfaces */
+:root {
+  --text: #0a0a0a;
+  --text-secondary: #52525b;
+  --border: #e5e7eb;
+  --surface: #ffffff;
+  --surface-elevated: #fafafa;
+  --surface-muted: #f8f8f8;
+  --surface-subtle: #f4f4f5;
+  --border-hover: #d4d4d8;
+  --nav-bg: rgba(255, 255, 255, 0.94);
+  --page-max: 1520px;
+  --page-gutter: 1rem;
+}
+
+@media (min-width: 640px) {
+  :root { --page-gutter: 1.25rem; }
+}
+
+@media (min-width: 768px) {
+  :root { --page-gutter: 1.5rem; }
+}
+
+@media (min-width: 1024px) {
+  :root { --page-gutter: 2rem; }
+}
+
+html.dark {
+  color-scheme: dark;
+  --text: #f2f2f2;
+  --text-secondary: #9a9a9a;
+  --border: #1a1a1a;
+  --surface: #000000;
+  --surface-elevated: #050505;
+  --surface-muted: #0a0a0a;
+  --surface-subtle: #111111;
+  --border-hover: #2a2a2a;
+  --nav-bg: rgba(0, 0, 0, 0.92);
+}
+
+.page-main {
+  padding-bottom: 5rem;
+}
+
+@media (min-width: 768px) {
+  .page-main {
+    padding-bottom: 6.5rem;
+  }
+}
+
+.xf-content-hero {
+  padding-top: 0;
+  margin-bottom: 2rem;
+}
+
+.xf-content-hero--wide .xf-content-lead {
+  max-width: 38rem;
+}
+
+.xf-content-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 0.65rem;
+}
+
+.xf-content-title {
+  margin: 0 0 0.75rem;
+}
+
+.xf-content-lead {
+  margin: 0;
+}
+
+.xf-section-title {
+  margin: 0 0 1rem;
+}
+
+.xf-prose {
+  font-size: 0.9375rem;
+  line-height: var(--line-body);
+  color: var(--text-secondary);
+}
+
+.xf-prose p { margin: 0 0 1rem; }
+.xf-prose p:last-child { margin-bottom: 0; }
+.xf-prose h2 { font-size: 1.05rem; font-weight: 600; color: var(--text); margin: 1.75rem 0 0.65rem; }
+.xf-prose ul { margin: 0 0 1rem; padding-left: 1.2rem; }
+.xf-prose li { margin-bottom: 0.35rem; }
+.xf-prose a { color: var(--text); text-decoration: underline; text-underline-offset: 2px; }
+.xf-prose strong { color: var(--text); font-weight: 600; }
+
+.xf-card-grid {
+  display: grid;
+  gap: 1rem;
+}
+.xf-card-grid--3 {
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .xf-card-grid--3 { grid-template-columns: repeat(3, 1fr); }
+}
+.xf-info-card {
+  padding: 1.25rem 1.3rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.xf-info-card h3 { font-size: 0.95rem; font-weight: 600; color: var(--text); margin: 0; }
+.xf-info-card p { margin-top: 0.5rem; font-size: 0.875rem; line-height: var(--line-small); color: var(--text-secondary); }
+.xf-link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.85rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+}
+.xf-link-arrow::after { content: "→"; }
+
+.xf-changelog-list { display: flex; flex-direction: column; gap: 1.25rem; }
+.xf-changelog-item { padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+.xf-changelog-item:last-child { border-bottom: none; }
+.xf-changelog-date { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
+.xf-changelog-item h3 { margin: 0.35rem 0 0.5rem; font-size: 1rem; font-weight: 600; color: var(--text); }
+.xf-changelog-item ul { margin: 0; padding-left: 1.1rem; color: var(--text-secondary); font-size: 0.875rem; }
+
+/* About page layout */
+.xf-about-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+}
+
+.xf-about-section {
+  max-width: 42rem;
+}
+
+.xf-about-section--wide {
+  max-width: none;
+}
+
+.xf-about-section .xf-section-title {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+}
+
+.xf-about-section .xf-prose {
+  max-width: none;
+}
+
+.xf-about-section .xf-prose p:last-child {
+  margin-bottom: 0;
+}
+
+.xf-about-section .xf-card-grid {
+  margin-top: 0;
+}
+
+.xf-pull-quote {
+  margin: 1.5rem 0 0;
+  padding: 1.15rem 0 1.15rem 1.15rem;
+  border-left: 3px solid var(--border-hover, #d4d4d8);
+}
+
+.xf-pull-quote__label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 0.45rem;
+}
+
+.xf-pull-quote__text {
+  font-size: 1.0625rem;
+  line-height: var(--line-body);
+  color: var(--text);
+  font-weight: 500;
+}
+
+.xf-pull-quote__text a {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.xf-about-library-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .xf-about-library-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.xf-about-library-card {
+  padding: 1.35rem 1.4rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.xf-about-library-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.xf-about-library-card p {
+  margin-top: 0.55rem;
+  font-size: 0.875rem;
+  line-height: var(--line-body);
+  color: var(--text-secondary);
+}
+
+.xf-about-library-card p:last-of-type {
+  margin-bottom: 0;
+}
+
+.xf-about-library-card .xf-link-arrow {
+  margin-top: 1rem;
+}
+
+.xf-about-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.15rem;
+  border-radius: 0.85rem;
+  border: 1px dashed var(--border);
+  background: var(--surface-muted, #f8f8f8);
+  font-size: 0.875rem;
+  line-height: var(--line-body);
+  color: var(--text-secondary);
+}
+
+.xf-about-note strong {
+  color: var(--text);
+}
+
+.xf-about-note a {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.xf-about-note__icon {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.xf-about-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin-top: 1rem;
+}
+
+.xf-about-section--closing {
+  max-width: 42rem;
+  margin-top: 0.5rem;
+}
+
+/* Journal / guide articles */
+.xf-article {
+  max-width: 42rem;
+  padding-top: 1.5rem;
+}
+
+.xf-back-link {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.xf-back-link:hover {
+  color: var(--text);
+}
+
+.xf-article-meta {
+  margin: 0 0 1.5rem;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.xf-prose ol {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+}
+
+.xf-prose li {
+  margin-bottom: 0.45rem;
+}
+
+.xf-prose code {
+  font-size: 0.85em;
+  padding: 0.12rem 0.4rem;
+  border-radius: 0.35rem;
+  background: var(--surface-subtle);
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+html.dark .xf-prose code {
+  background: var(--surface-muted);
+  color: var(--text);
+  border-color: var(--border);
+}

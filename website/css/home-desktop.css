@@ -1,0 +1,131 @@
+/**
+ * Home page - desktop layout only (lg / 1024px+)
+ * Mobile styles live in home.css (max-width: 1023px)
+ */
+
+@media (min-width: 1024px) {
+  .hero-header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    min-height: 36rem;
+    height: 88vh;
+    max-height: none;
+  }
+
+  .hero-video-flipped {
+    transform: scaleX(-1) !important;
+  }
+
+  .hero-video-layer {
+    object-position: 42% center !important;
+  }
+
+  /* Lighter left wash — more open video, still readable type */
+  .hero-overlay__wash {
+    background: linear-gradient(
+      102deg,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.42) 28%,
+      rgba(0, 0, 0, 0.14) 52%,
+      transparent 78%
+    ) !important;
+  }
+
+  .hero-content {
+    flex: 0 0 auto;
+    width: 100%;
+    /* Sit optically in the left-center of the frame */
+    padding-top: 6.5rem !important;
+    padding-bottom: 5.5rem !important;
+  }
+
+  .hero-copy {
+    max-width: 36rem;
+  }
+
+  .hero-kicker {
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    margin-bottom: 1.65rem;
+  }
+
+  .hero-headline {
+    margin-bottom: 1.65rem;
+  }
+
+  .hero-headline__line,
+  .hero-headline__sans,
+  .hero-headline em {
+    font-size: clamp(3.25rem, 4.2vw, 4.25rem) !important;
+    letter-spacing: -0.052em !important;
+    line-height: 1.02 !important;
+  }
+
+  .hero-lead {
+    max-width: 36rem !important;
+    font-size: 1.0625rem !important;
+    line-height: 1.65 !important;
+    margin-bottom: 2.5rem !important;
+  }
+
+  .hero-actions {
+    gap: 0.85rem;
+  }
+
+  .hero-btn {
+    min-height: 2.875rem !important;
+    padding: 0 1.5rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  .hero-header .site-nav:not(.is-scrolled) .site-nav-coffee {
+    display: inline-flex !important;
+    width: auto !important;
+    min-width: auto !important;
+    padding: 0 1rem !important;
+    gap: 0.4rem !important;
+  }
+
+  .hero-header .site-nav:not(.is-scrolled) .site-nav-coffee__label {
+    display: inline !important;
+  }
+
+  .hero-header .site-nav:not(.is-scrolled) .site-nav-end .theme-switch.theme-toggle {
+    display: inline-flex !important;
+  }
+
+  .hero-header .site-nav-logo {
+    font-size: 1.25rem !important;
+    max-width: none !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+
+  .hero-header .site-nav-end {
+    gap: 0.5rem !important;
+  }
+
+  .hero-header .site-nav-mobile-backdrop,
+  .hero-header .site-nav-mobile-panel--drawer {
+    display: none !important;
+  }
+}
+
+/* Wide screens: more air around the type block */
+@media (min-width: 1280px) {
+  .hero-copy {
+    max-width: 38rem;
+  }
+
+  .hero-headline__line,
+  .hero-headline__sans,
+  .hero-headline em {
+    font-size: 4.35rem !important;
+  }
+
+  .hero-lead {
+    max-width: 36rem !important;
+  }
+}

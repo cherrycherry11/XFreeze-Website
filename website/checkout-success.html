@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="css/site-fonts.css">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment successful - X Freeze</title>
+  <script>
+    (function () {
+      var stored = localStorage.getItem('xfreeze-theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.classList.toggle('dark', stored === 'dark' || (stored !== 'light' && prefersDark));
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+:root {
+      --text: #0a0a0a; --text-secondary: #52525b; --border: #e5e7eb;
+      --surface: #ffffff; --surface-subtle: #f4f4f5;
+    }
+    html.dark {
+      --text: #f2f2f2; --text-secondary: #9a9a9a; --border: #1a1a1a;
+      --surface: #000000; --surface-subtle: #111111;
+    }
+    body { font-family: var(--font-sans); background: var(--surface); color: var(--text); }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+  <div class="max-w-md w-full text-center">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mb-6">
+      <i class="fa-solid fa-check text-2xl" aria-hidden="true"></i>
+    </div>
+    <h1 class="text-2xl font-semibold tracking-tight">Payment successful</h1>
+    <p id="success-detail" class="mt-3 text-sm text-[#52525b] dark:text-[#8a958c]">Thank you for your purchase.</p>
+    <p id="success-product" class="mt-2 text-lg font-semibold"></p>
+    <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="templates.html" class="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-[#0a0a0a] dark:bg-[#f2f5f3] text-white dark:text-[#020403] text-sm font-semibold">Browse templates</a>
+</div>
+    <p class="mt-8 text-xs text-[#52525b] dark:text-[#8a958c]">
+      A receipt will be sent if you provided an email. Download links will be delivered separately once fulfillment is connected.
+    </p>
+  </div>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var provider = params.get('provider') || 'card';
+      var pending = sessionStorage.getItem('xf_pending_product');
+      var product = pending ? JSON.parse(pending) : null;
+
+      document.getElementById('success-detail').textContent =
+        provider === 'paypal'
+          ? 'Your PayPal payment was captured successfully.'
+          : 'Your card payment was confirmed by Stripe.';
+
+      if (product) {
+        document.getElementById('success-product').textContent =
+          product.name + ' - $' + (Number.isInteger(product.price) ? product.price : product.price.toFixed(2));
+        sessionStorage.removeItem('xf_pending_product');
+        sessionStorage.removeItem('xf_paypal_order');
+      }
+    })();
+  </script>
+</body>
+</html>

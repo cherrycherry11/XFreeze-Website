@@ -1,0 +1,44 @@
+{
+  "generatedAt": "2026-07-02",
+  "positioning": "Outcome-first AI skills library for creators, operators, developers, analysts, and everyday users.",
+  "groups": [
+    {
+      "name": "Creator Command Center",
+      "purpose": "Content systems, AI visuals, SEO, launches, communities, and creator commerce."
+    },
+    {
+      "name": "Business & Revenue",
+      "purpose": "Founder operations, sales, support, ecommerce, local services, and client work."
+    },
+    {
+      "name": "Product, Developer & Research",
+      "purpose": "Product discovery, UX, coding-agent rules, security review, and research workflows."
+    },
+    {
+      "name": "Documents, Data & Decisions",
+      "purpose": "Reports, decks, spreadsheets, analysis, dashboards, and decision artifacts."
+    },
+    {
+      "name": "Communication & Productivity",
+      "purpose": "Email, calendar, docs, collaboration, weekly planning, and workspace productivity."
+    },
+    {
+      "name": "Finance, Legal, People & Home",
+      "purpose": "High-stakes admin support with disclaimers, review gates, and human escalation."
+    },
+    {
+      "name": "Live Connectors & Automations",
+      "purpose": "Connector-dependent workflows with read-only-first and approval-before-write rules."
+    },
+    {
+      "name": "Meta Systems",
+      "purpose": "Skill creation, memory, prompt engineering, and library maintenance."
+    }
+  ],
+  "qualityStandard": [
+    "Every skill must produce an operational artifact, not only advice.",
+    "Every connector skill must verify live app access and tool names before claiming results.",
+    "Every high-stakes skill must separate facts, assumptions, and professional review needs.",
+    "Every SKILL.md must work outside Grok by avoiding Grok-only assumptions."
+  ]
+}

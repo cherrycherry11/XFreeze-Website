@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" data-xf-meta-title="Free vs. Premium Skills - What's the Difference? - X Freeze" data-xf-meta-desc="Understand X Freeze free instant skills vs premium consultant-grade skills - who each tier is for and what to expect." data-xf-meta-path="blog/free-vs-premium-skills.html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free vs. Premium Skills - X Freeze</title>
+  <script>
+    (function () {
+      var stored = localStorage.getItem('xfreeze-theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
+      document.documentElement.classList.toggle('dark', isDark);
+    })();
+  </script>
+  <script src="../js/auth-config.js"></script>
+  <script src="../js/site-config.js"></script>
+  <script src="../js/site-meta.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../css/content-pages.css">
+    <link rel="stylesheet" href="../css/site-fonts.css">
+<link rel="stylesheet" href="../css/theme-switch.css">
+  <link rel="stylesheet" href="../css/site-nav.css">
+  <link rel="stylesheet" href="../css/site-mobile.css">
+  <link rel="stylesheet" href="../css/site-footer.css">
+  <link rel="stylesheet" href="../css/auth.css">
+  <link rel="stylesheet" href="../css/scroll-reveal.css">
+  <link rel="stylesheet" href="../css/motion.css">
+  <style>
+:root {
+      --text: #0a0a0a;
+      --text-secondary: #52525b;
+      --border: #e5e7eb;
+      --surface: #ffffff;
+      --surface-elevated: #fafafa;
+      --surface-muted: #f8f8f8;
+      --surface-subtle: #f4f4f5;
+      --nav-bg: rgba(255, 255, 255, 0.94);
+      --page-gutter: 1rem;
+    }
+    @media (min-width:640px){:root{--page-gutter:1.25rem}}
+    @media (min-width:768px){:root{--page-gutter:1.5rem}}
+    @media (min-width:1024px){:root{--page-gutter:2rem}}
+    html.dark {
+      color-scheme: dark;
+      --text: #f2f5f3;
+      --text-secondary: #8a958c;
+      --border: #1f2623;
+      --surface: #020403;
+      --surface-elevated: #0a0d0b;
+      --surface-muted: #0f1311;
+      --surface-subtle: #161a18;
+      --nav-bg: rgba(2, 4, 3, 0.94);
+      --border-hover: #2d3632;
+    }
+    body { font-family: var(--font-sans); background:var(--surface); color:var(--text); }
+    .content-container { width:100%; max-width:min(1520px,calc(100% - var(--page-gutter)*2)); margin-inline:auto; padding-inline:var(--page-gutter); }
+    .xf-tier-card {
+      margin: 1.25rem 0 1.5rem;
+      padding: 1.15rem 1.25rem;
+      border-radius: 0.85rem;
+      border: 1px solid var(--border);
+      background: var(--surface-muted);
+    }
+    .xf-tier-card--free { border-color: #bbf7d0; background: linear-gradient(135deg, #f0fdf4 0%, var(--surface-muted) 100%); }
+    .xf-tier-card--premium { border-color: #ddd6fe; background: linear-gradient(135deg, #f5f3ff 0%, var(--surface-muted) 100%); }
+    html.dark .xf-tier-card--free { border-color: #14532d; background: linear-gradient(135deg, #0a1f14 0%, var(--surface-muted) 100%); }
+    html.dark .xf-tier-card--premium { border-color: #4c1d95; background: linear-gradient(135deg, #1a1033 0%, var(--surface-muted) 100%); }
+    .xf-tier-card h2 { margin-top: 0; }
+    .xf-tier-card p:last-child { margin-bottom: 0; }
+  </style>
+</head>
+<body>
+  <nav id="site-nav" class="site-nav page-nav" aria-label="Main">
+    <div class="content-container">
+      <div class="site-nav-bar">
+        <a href="../home.html" class="site-nav-logo">X Freeze</a>
+                        <div class="site-nav-pill">
+          <a href="../home.html" class="site-nav-pill-link">Home</a>
+          <a href="../templates.html" class="site-nav-pill-link">Templates</a>
+          <a href="../prompt-library.html" class="site-nav-pill-link">Prompts</a>
+          <a href="../skills.html" class="site-nav-pill-link">Skills</a>
+          <a href="../about.html" class="site-nav-pill-link">About</a>
+          <a href="../blog.html" class="site-nav-pill-link site-nav-pill-link--active" aria-current="page">Blog</a>
+          <a href="../contact.html" class="site-nav-pill-link">Contact</a>
+        </div>
+        <div class="site-nav-end">
+          <div id="xf-auth-nav" class="site-nav-auth"></div>
+          <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee" aria-label="Buy me a coffee">
+            <i class="fa-solid fa-mug-hot text-xs" aria-hidden="true"></i>
+            <span class="site-nav-coffee__label hidden lg:inline">Buy me a coffee</span>
+          </a>
+          <button type="button" id="theme-toggle" onclick="toggleTheme()" class="theme-switch theme-toggle" role="switch" aria-checked="false" aria-label="Switch to dark mode">
+            <span class="theme-switch-track" aria-hidden="true"><span class="theme-switch-thumb">
+              <span class="theme-switch-icon theme-switch-icon--sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12z"/></svg></span>
+              <span class="theme-switch-icon theme-switch-icon--moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg></span>
+            </span></span>
+          </button>
+          <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><i class="fa-solid fa-bars text-sm"></i></button>
+        </div>
+      </div>
+    </div>
+  </nav>
+    <div id="mobile-menu-backdrop" class="site-nav-mobile-backdrop hidden lg:hidden" aria-hidden="true"></div>
+
+  <div id="mobile-menu" class="site-nav-mobile-panel site-nav-mobile-panel--drawer hidden lg:hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Site menu">
+    <div class="site-nav-mobile-drawer">
+      <header class="site-nav-drawer-head">
+        <a href="../home.html" class="site-nav-drawer-logo" onclick="toggleMobileMenu()">X Freeze</a>
+        <button type="button" class="site-nav-drawer-close" onclick="toggleMobileMenu()" aria-label="Close menu"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </header>
+
+                  <nav class="site-nav-drawer-nav" aria-label="Mobile">
+        <a href="../home.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Home</a>
+        <a href="../templates.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Templates</a>
+        <a href="../prompt-library.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Prompts</a>
+        <a href="../skills.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Skills</a>
+        <a href="../about.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">About</a>
+        <a href="../blog.html" class="site-nav-drawer-link site-nav-drawer-link--active" onclick="toggleMobileMenu()">Blog</a>
+        <a href="../contact.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Contact</a>
+      </nav>
+
+      <footer class="site-nav-drawer-footer">
+        <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-drawer-meta" onclick="toggleMobileMenu()">
+          Buy me a coffee <i class="fa-solid fa-arrow-up-right" aria-hidden="true"></i>
+        </a>
+        <div class="site-nav-drawer-theme">
+          <span class="site-nav-drawer-theme__label">Dark mode</span>
+          <button type="button" onclick="toggleTheme()" class="site-nav-drawer-theme__switch theme-switch theme-switch--sm" role="switch" aria-checked="false" aria-label="Switch to dark mode">
+            <span class="theme-switch-track" aria-hidden="true">
+              <span class="theme-switch-thumb">
+                <span class="theme-switch-icon theme-switch-icon--sun"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12z"/></svg></span>
+                <span class="theme-switch-icon theme-switch-icon--moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg></span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <main class="page-main content-container" data-scroll-reveal>
+    <article class="scroll-reveal-in xf-article">
+      <a href="../blog.html" class="xf-back-link">← Journal</a>
+      <p class="xf-content-eyebrow">AI Skills</p>
+      <h1 class="xf-content-title">Free vs. Premium - What's the Difference?</h1>
+      <p class="xf-article-meta">3 min read · Jul 2026</p>
+      <div class="xf-prose">
+        <p><strong>Every skill on X Freeze falls into one of two tiers, built for two different jobs.</strong></p>
+
+        <div class="xf-tier-card xf-tier-card--free">
+          <h2>Free / Instant Skills - for everyday tasks</h2>
+          <p>These are quick, copy-paste tools for the things you need done <em>right now</em>: draft a meeting agenda, write exit-interview questions, summarize an email thread, build a SWOT analysis. No setup, no learning curve - copy the skill, paste it into Grok, Claude, Cursor, or ChatGPT, and you have a usable draft in seconds.</p>
+          <p><strong>Built for:</strong> individuals, students, freelancers, anyone who wants a fast, reliable starting point instead of a blank page.</p>
+          <p><strong>What to expect:</strong> a clear, focused workflow (usually 3-5 steps) that gets you 80% of the way there quickly. Simple by design - not because it's unfinished, but because the task itself doesn't need more.</p>
+        </div>
+
+        <div class="xf-tier-card xf-tier-card--premium">
+          <h2>Premium Skills - for teams and businesses</h2>
+          <p>These are the deep, consultant-grade versions: a founder's weekly decision memo, a security threat-model review, a real-estate maintenance risk assessment, a churn-risk playbook for customer success teams. Each one is written with real professional judgment - the tradeoffs, the pitfalls, the exact document a specialist in that field would actually produce.</p>
+          <p><strong>Built for:</strong> teams and businesses making decisions with real stakes, where "good enough" isn't good enough - legal, financial, hiring, security, and strategic work that deserves more than a generic template.</p>
+          <p><strong>What to expect:</strong> genuinely distinct, situation-specific guidance - not the same recipe with the topic swapped. Every premium skill in a sensitive category (legal, HR, health, security, finance) also comes with the right professional-review flags built in, so you know exactly when to loop in a real expert.</p>
+        </div>
+
+        <h2>Why we split it this way</h2>
+        <p>Free skills are meant to be <strong>fast and broad</strong> - one for almost anything you'd want to draft in five minutes. Premium skills are meant to be <strong>narrow and deep</strong> - built for the moments where getting it right actually matters. You're never paying for the same thing twice; you're paying for depth when the stakes call for it.</p>
+
+        <p>Browse the library on <a href="../skills.html">Skills</a>, or read <a href="ai-skills-work.html">how AI skills work</a> if you're new to copy-paste workflows.</p>
+      </div>
+    </article>
+  </main>
+
+  <footer class="xf-site-footer" data-xf-footer-root></footer>
+  <script src="../js/scroll-reveal.js"></script>
+  <script src="../js/support-toast.js"></script>
+  <script>
+    function getPreferredTheme(){var stored=localStorage.getItem('xfreeze-theme');if(stored==='dark'||stored==='light')return stored;return window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+    function applyTheme(theme){var isDark=theme==='dark';document.documentElement.classList.toggle('dark',isDark);localStorage.setItem('xfreeze-theme',theme);document.querySelectorAll('.theme-toggle, .theme-toggle-mobile, .site-nav-drawer-theme__switch').forEach(function(btn){btn.setAttribute('aria-label',isDark?'Switch to light mode':'Switch to dark mode');btn.setAttribute('aria-checked',isDark?'true':'false');});}
+    function toggleTheme(){applyTheme(document.documentElement.classList.contains('dark')?'light':'dark');}
+    applyTheme(getPreferredTheme());
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/site-nav.js"></script>
+  <script src="../js/site-footer.js"></script>
+  <script src="../js/motion.js"></script>
+</body>
+</html>

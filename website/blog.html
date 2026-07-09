@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en" data-xf-meta-title="Simple X Freeze Guides - Journal" data-xf-meta-desc="Short guides for X Freeze templates, AI skills, and useful workflow combos." data-xf-meta-path="blog.html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X Freeze - Simple Guides</title>
+  <script src="js/site-config.js"></script>
+  <script src="js/site-meta.js"></script>
+  <script>
+    (function () {
+      var stored = localStorage.getItem('xfreeze-theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
+      document.documentElement.classList.toggle('dark', isDark);
+    })();
+  </script>
+  <script src="js/auth-config.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/site-fonts.css">
+<link rel="stylesheet" href="css/theme-switch.css">
+  <link rel="stylesheet" href="css/scroll-reveal.css">
+  <link rel="stylesheet" href="css/motion.css">
+  <link rel="stylesheet" href="css/site-footer.css">
+  <link rel="stylesheet" href="css/site-nav.css">
+  <link rel="stylesheet" href="css/site-mobile.css">
+  <link rel="stylesheet" href="css/auth.css">
+
+
+  <style>
+:root {
+      --text: #0a0a0a;
+      --text-secondary: #52525b;
+      --border: #e5e7eb;
+      --surface: #ffffff;
+      --surface-elevated: #fafafa;
+      --surface-muted: #f8f8f8;
+      --surface-subtle: #f4f4f5;
+      --nav-bg: rgba(255, 255, 255, 0.94);
+      --border-hover: #d4d4d8;
+      --page-max: 1520px;
+      --page-gutter: 1rem;
+    }
+    @media (min-width: 640px) {
+      :root { --page-gutter: 1.25rem; }
+    }
+    @media (min-width: 768px) {
+      :root { --page-gutter: 1.5rem; }
+    }
+    @media (min-width: 1024px) {
+      :root { --page-gutter: 2rem; }
+    }
+
+    html.dark {
+      color-scheme: dark;
+      --text: #f2f2f2;
+      --text-secondary: #9a9a9a;
+      --border: #1a1a1a;
+      --surface: #000000;
+      --surface-elevated: #050505;
+      --surface-muted: #0a0a0a;
+      --surface-subtle: #111111;
+      --nav-bg: rgba(0, 0, 0, 0.92);
+      --border-hover: #2a2a2a;
+    }
+    
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--surface);
+      color: var(--text);
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    
+    .nav-link {
+      color: var(--text-secondary);
+      transition: color 0.15s ease;
+    }
+    .nav-link:hover {
+      color: var(--text);
+    }
+
+    .bundles-edge-fade {
+      background: linear-gradient(to right, #ffffff 0%, transparent 8%, transparent 92%, #ffffff 100%);
+    }
+    html.dark .bundles-edge-fade {
+      background: linear-gradient(to right, #020403 0%, transparent 8%, transparent 92%, #020403 100%);
+    }
+    
+    .section {
+      scroll-margin-top: 80px;
+    }
+    
+    .pro-badge {
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: #0a0a0a;
+      color: white;
+      font-weight: 600;
+    }
+    html.dark .pro-badge {
+      background: #f2f5f3;
+      color: #020403;
+    }
+    
+    .simple-card {
+      border: 1px solid var(--border);
+      background-color: var(--surface);
+      transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.2s ease, background-color 0.2s ease;
+    }
+    .simple-card:hover {
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    }
+    html.dark .simple-card:hover {
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.35), 0 2px 4px -2px rgb(0 0 0 / 0.25);
+    }
+    
+    .image-thumb {
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      border: 1px solid var(--border);
+    }
+    .image-thumb:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+    }
+
+    .hero-video-flipped {
+      transform: scaleX(-1);
+      display: block;
+    }
+    
+    .stat {
+      font-feature-settings: "tnum";
+    }
+    
+    .content-container {
+      width: 100%;
+      max-width: min(var(--page-max), calc(100% - var(--page-gutter) * 2));
+      margin-inline: auto;
+      padding-inline: var(--page-gutter);
+      box-sizing: border-box;
+    }
+
+    @media (min-width: 768px) {
+      .bundles-stat-col {
+        padding-inline: calc(var(--page-gutter) * 0.75);
+      }
+      .bundles-stat-col:first-child {
+        padding-left: 0;
+      }
+      .bundles-stat-col:last-child {
+        padding-right: 0;
+      }
+    }
+
+    
+
+    /* Templates page: always solid nav */
+    html.dark .blog-card-media {
+      background: linear-gradient(135deg, #0a0d0b 0%, #1f2623 50%, #3d4a42 100%);
+    }
+    .blog-thumb {
+      position: relative;
+      min-height: 11rem;
+      padding: 1.1rem;
+      overflow: hidden;
+      background: #f4f4f5;
+      color: #0a0a0a;
+    }
+    .blog-card-featured .blog-thumb {
+      min-height: 14rem;
+    }
+    .blog-thumb::before {
+      content: '';
+      position: absolute;
+      inset: auto -12% -38% 30%;
+      height: 78%;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.46);
+      transform: rotate(-10deg);
+    }
+    .blog-thumb__label {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      min-height: 1.55rem;
+      padding: 0 0.55rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(10,10,10,0.08);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .blog-thumb__title {
+      position: relative;
+      z-index: 2;
+      max-width: 11rem;
+      margin-top: 0.75rem;
+      font-size: 1.45rem;
+      line-height: var(--line-heading);
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+    .blog-thumb__visual {
+      position: absolute;
+      right: 1rem;
+      bottom: 1rem;
+      z-index: 2;
+      display: grid;
+      gap: 0.45rem;
+      width: 46%;
+      max-width: 11rem;
+    }
+    .blog-thumb__chip,
+    .blog-thumb__box {
+      border: 1px solid rgba(10,10,10,0.08);
+      background: rgba(255,255,255,0.78);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    }
+    .blog-thumb__chip {
+      padding: 0.5rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      white-space: nowrap;
+    }
+    .blog-thumb__box {
+      min-height: 3.2rem;
+      border-radius: 0.7rem;
+    }
+    .blog-thumb--start { background: linear-gradient(145deg, #e8f0ff, #fff7ed); }
+    .blog-thumb--skills { background: linear-gradient(145deg, #eef2ff, #ecfeff); }
+    .blog-thumb--combos { background: linear-gradient(145deg, #ecfdf5, #fff7ed); }
+    .blog-thumb--templates { background: linear-gradient(145deg, #fdf2f8, #eef2ff); }
+    .blog-thumb--best { background: linear-gradient(145deg, #fff7ed, #f0f9ff); }
+    .blog-thumb--tiers { background: linear-gradient(145deg, #ecfdf5, #ede9fe); }
+    .blog-thumb--combos .blog-thumb__visual {
+      grid-template-columns: 1fr;
+    }
+    .blog-thumb--templates .blog-thumb__visual,
+    .blog-thumb--best .blog-thumb__visual {
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 480px) {
+      .blog-thumb {
+        min-height: 10.5rem;
+        padding: 1rem;
+      }
+      .blog-thumb__title {
+        max-width: 8.1rem;
+        font-size: 1.22rem;
+      }
+      .blog-thumb__visual {
+        right: 0.85rem;
+        bottom: 0.85rem;
+        width: 42%;
+      }
+      .blog-thumb__chip {
+        padding: 0.45rem 0.55rem;
+        font-size: 0.66rem;
+      }
+      .blog-thumb__box {
+        min-height: 2.7rem;
+      }
+    }
+    html.dark .blog-thumb {
+      color: #f2f5f3;
+      background: #0a0d0b;
+    }
+    html.dark .blog-thumb::before {
+      background: rgba(255,255,255,0.08);
+    }
+    html.dark .blog-thumb__label,
+    html.dark .blog-thumb__chip,
+    html.dark .blog-thumb__box {
+      background: rgba(242,245,243,0.1);
+      border-color: rgba(242,245,243,0.12);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.26);
+    }
+    .blog-card-body { padding: 1.5rem 1.75rem; }
+    .blog-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+    .blog-meta {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      margin-top: 1rem;
+    }
+
+/* Dark mode: Tailwind arbitrary utilities + surfaces */
+    html.dark .bg-white:not(.text-black) { background-color: var(--surface) !important; }
+    html.dark .bg-white\/70 { background-color: rgba(2, 4, 3, 0.82) !important; }
+    html.dark .bg-white\/92 { background-color: rgba(15, 19, 17, 0.92) !important; }
+    html.dark .bg-\[\#fafafa\] { background-color: var(--surface-elevated) !important; }
+    html.dark .bg-\[\#f8f8f8\] { background-color: var(--surface-muted) !important; }
+    html.dark .bg-\[\#f4f4f5\] { background-color: var(--surface-subtle) !important; }
+    html.dark .text-\[\#0a0a0a\] { color: var(--text) !important; }
+    html.dark .text-\[\#52525b\] { color: var(--text-secondary) !important; }
+    html.dark .border-\[\#e5e7eb\] { border-color: var(--border) !important; }
+    html.dark .border-\[\#f4f4f5\] { border-color: var(--border-subtle) !important; }
+    html.dark .border-t-2.border-\[\#e5e7eb\] { border-color: var(--border) !important; }
+    html.dark .hover\:bg-\[\#fafafa\]:hover { background-color: var(--surface-subtle) !important; }
+    html.dark .hover\:border-\[\#d4d4d8\]:hover { border-color: var(--border-hover, #3f3f46) !important; }
+    html.dark .hover\:text-black:hover { color: var(--text) !important; }
+    html.dark .hover\:text-\[\#0a0a0a\]:hover { color: var(--text) !important; }
+    html.dark .hover\:text-\[\#27272a\]:hover { color: #d4d4d8 !important; }
+
+    html.dark a.bg-\[\#0a0a0a\],
+    html.dark button.bg-\[\#0a0a0a\] {
+      background-color: #f2f5f3 !important;
+      color: #020403 !important;
+    }
+    html.dark a.bg-\[\#0a0a0a\]:hover,
+    html.dark button.bg-\[\#0a0a0a\]:hover,
+    html.dark a.hover\:bg-black:hover,
+    html.dark button.hover\:bg-black:hover {
+      background-color: #dfe5e1 !important;
+    }
+    html.dark a.hover\:bg-\[\#27272a\]:hover {
+      background-color: #cdd5cf !important;
+      color: #020403 !important;
+    }
+
+    
+  </style>
+</head>
+<body>
+
+  <nav id="site-nav" class="site-nav page-nav" aria-label="Main">
+    <div class="content-container">
+      <div class="site-nav-bar">
+        <a href="home.html" class="site-nav-logo">X Freeze</a>
+                        <div class="site-nav-pill">
+          <a href="home.html" class="site-nav-pill-link">Home</a>
+          <a href="templates.html" class="site-nav-pill-link">Templates</a>
+          <a href="prompt-library.html" class="site-nav-pill-link">Prompts</a>
+          <a href="skills.html" class="site-nav-pill-link">Skills</a>
+          <a href="about.html" class="site-nav-pill-link">About</a>
+          <a href="blog.html" class="site-nav-pill-link site-nav-pill-link--active" aria-current="page">Blog</a>
+          <a href="contact.html" class="site-nav-pill-link">Contact</a>
+        </div>
+        <div class="site-nav-end">
+          <div id="xf-auth-nav" class="site-nav-auth"></div>
+          <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee" aria-label="Buy me a coffee">
+            <i class="fa-solid fa-mug-hot text-xs" aria-hidden="true"></i>
+            <span class="site-nav-coffee__label hidden lg:inline">Buy me a coffee</span>
+          </a>
+                    <button type="button" id="theme-toggle" onclick="toggleTheme()" class="theme-switch theme-toggle" role="switch" aria-checked="false" aria-label="Switch to dark mode" title="Dark mode">
+            <span class="theme-switch-track" aria-hidden="true">
+              <span class="theme-switch-thumb">
+                <span class="theme-switch-icon theme-switch-icon--sun" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12zM4.22 4.22l2.12 2.12-1.06 1.06L3.16 5.28l1.06-1.06zm15.56 15.56 2.12 2.12-1.06 1.06-2.12-2.12 1.06-1.06zM19.78 4.22l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12zM6.34 17.66l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12z"/></svg>
+                </span>
+                <span class="theme-switch-icon theme-switch-icon--moon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg>
+                </span>
+              </span>
+            </span>
+          </button>
+          <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+            <i class="fa-solid fa-bars text-sm" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+    <div id="mobile-menu-backdrop" class="site-nav-mobile-backdrop hidden lg:hidden" aria-hidden="true"></div>
+
+  <div id="mobile-menu" class="site-nav-mobile-panel site-nav-mobile-panel--drawer hidden lg:hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Site menu">
+    <div class="site-nav-mobile-drawer">
+      <header class="site-nav-drawer-head">
+        <a href="home.html" class="site-nav-drawer-logo" onclick="toggleMobileMenu()">X Freeze</a>
+        <button type="button" class="site-nav-drawer-close" onclick="toggleMobileMenu()" aria-label="Close menu"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </header>
+
+                  <nav class="site-nav-drawer-nav" aria-label="Mobile">
+        <a href="home.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Home</a>
+        <a href="templates.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Templates</a>
+        <a href="prompt-library.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Prompts</a>
+        <a href="skills.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Skills</a>
+        <a href="about.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">About</a>
+        <a href="blog.html" class="site-nav-drawer-link site-nav-drawer-link--active" onclick="toggleMobileMenu()">Blog</a>
+        <a href="contact.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Contact</a>
+      </nav>
+
+      <footer class="site-nav-drawer-footer">
+        <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-drawer-meta" onclick="toggleMobileMenu()">
+          Buy me a coffee <i class="fa-solid fa-arrow-up-right" aria-hidden="true"></i>
+        </a>
+        <div class="site-nav-drawer-theme">
+          <span class="site-nav-drawer-theme__label">Dark mode</span>
+          <button type="button" onclick="toggleTheme()" class="site-nav-drawer-theme__switch theme-switch theme-switch--sm" role="switch" aria-checked="false" aria-label="Switch to dark mode">
+            <span class="theme-switch-track" aria-hidden="true">
+              <span class="theme-switch-thumb">
+                <span class="theme-switch-icon theme-switch-icon--sun"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12z"/></svg></span>
+                <span class="theme-switch-icon theme-switch-icon--moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg></span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  
+  <div class="xf-glass-hero">
+    <div class="content-container">
+      <div class="scroll-reveal-in max-w-2xl">
+        <p class="xf-section-eyebrow">Journal</p>
+        <h1 class="xf-content-title">Simple X Freeze Guides</h1>
+        <p class="xf-section-lead">
+          Quick guides for templates, AI skills, and the best combos. Short enough to read before you start creating.
+        </p>
+      </div>
+    </div>
+  </div>
+  <main class="page-main content-container" data-scroll-reveal>
+    <a href="blog/getting-started.html" class="scroll-reveal-in blog-card blog-card-featured mb-10 max-w-4xl">
+      <div class="blog-card-media blog-thumb blog-thumb--start" aria-hidden="true">
+        <span class="blog-thumb__label">Start here</span>
+        <div class="blog-thumb__title">How to use X Freeze</div>
+        <div class="blog-thumb__visual">
+          <span class="blog-thumb__chip">Templates</span>
+          <span class="blog-thumb__chip">Skills</span>
+          <span class="blog-thumb__chip">Create</span>
+        </div>
+      </div>
+      <div class="blog-card-body flex flex-col justify-center">
+        <span class="blog-tag">Featured</span>
+        <h2 class="xf-section-title">
+          How to Use X Freeze
+        </h2>
+        <p class="mt-3 text-[15px] xf-text-body text-[#52525b]">
+          The fastest way to use templates, copy skills, and get your first useful result.
+        </p>
+        <p class="blog-meta">2 min read · Updated Jul 2026</p>
+      </div>
+    </a>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="blog-grid" data-scroll-stagger>
+      <a href="blog/free-vs-premium-skills.html" class="blog-card">
+        <div class="blog-card-media h-44 blog-thumb blog-thumb--tiers" aria-hidden="true">
+          <span class="blog-thumb__label">Skills</span>
+          <div class="blog-thumb__title">Free vs. Premium</div>
+          <div class="blog-thumb__visual">
+            <span class="blog-thumb__chip">Free</span>
+            <span class="blog-thumb__chip">Premium</span>
+            <span class="blog-thumb__chip">Depth</span>
+          </div>
+        </div>
+        <div class="blog-card-body">
+          <span class="blog-tag">Skills</span>
+          <h3 class="text-lg font-semibold tracking-[-0.02em] text-[#0a0a0a]">Free vs. Premium - What's the Difference?</h3>
+          <p class="mt-2 text-sm xf-text-body text-[#52525b]">Fast everyday drafts vs. consultant-grade skills for work where getting it right matters.</p>
+          <p class="blog-meta">3 min read · Jul 2026</p>
+        </div>
+      </a>
+      <a href="blog/ai-skills-work.html" class="blog-card">
+        <div class="blog-card-media h-44 blog-thumb blog-thumb--skills" aria-hidden="true">
+          <span class="blog-thumb__label">AI Skills</span>
+          <div class="blog-thumb__title">AI skills</div>
+          <div class="blog-thumb__visual">
+            <span class="blog-thumb__chip">/copy</span>
+            <span class="blog-thumb__chip">/paste</span>
+            <span class="blog-thumb__chip">/run</span>
+          </div>
+        </div>
+        <div class="blog-card-body">
+          <span class="blog-tag">Skills</span>
+          <h3 class="text-lg font-semibold tracking-[-0.02em] text-[#0a0a0a]">How AI Skills Work</h3>
+          <p class="mt-2 text-sm xf-text-body text-[#52525b]">Copy the skill, paste it into your AI tool, then use the slash command.</p>
+          <p class="blog-meta">2 min read · Jul 2026</p>
+        </div>
+      </a>
+      <a href="blog/best-skill-combos.html" class="blog-card">
+        <div class="blog-card-media h-44 blog-thumb blog-thumb--combos" aria-hidden="true">
+          <span class="blog-thumb__label">Combos</span>
+          <div class="blog-thumb__title">Best skill combos</div>
+          <div class="blog-thumb__visual">
+            <span class="blog-thumb__chip">Creator</span>
+            <span class="blog-thumb__chip">Shop</span>
+            <span class="blog-thumb__chip">Founder</span>
+          </div>
+        </div>
+        <div class="blog-card-body">
+          <span class="blog-tag">Workflow</span>
+          <h3 class="text-lg font-semibold tracking-[-0.02em] text-[#0a0a0a]">Best Skill Combos</h3>
+          <p class="mt-2 text-sm xf-text-body text-[#52525b]">Simple creator, e-commerce, meeting, and founder combos with only 3-4 skills each.</p>
+          <p class="blog-meta">2 min read · Jul 2026</p>
+        </div>
+      </a>
+      <a href="blog/how-to-use-templates.html" class="blog-card">
+        <div class="blog-card-media h-44 blog-thumb blog-thumb--templates" aria-hidden="true">
+          <span class="blog-thumb__label">Templates</span>
+          <div class="blog-thumb__title">How to use templates</div>
+          <div class="blog-thumb__visual">
+            <span class="blog-thumb__box"></span>
+            <span class="blog-thumb__box"></span>
+            <span class="blog-thumb__box"></span>
+            <span class="blog-thumb__box"></span>
+          </div>
+        </div>
+        <div class="blog-card-body">
+          <span class="blog-tag">Templates</span>
+          <h3 class="text-lg font-semibold tracking-[-0.02em] text-[#0a0a0a]">How to Use Templates</h3>
+          <p class="mt-2 text-sm xf-text-body text-[#52525b]">Pick a category, open Grok, add your image, and generate a few variations.</p>
+          <p class="blog-meta">2 min read · Jul 2026</p>
+        </div>
+      </a>
+      <a href="blog/top-product-templates.html" class="blog-card">
+        <div class="blog-card-media h-44 blog-thumb blog-thumb--best" aria-hidden="true">
+          <span class="blog-thumb__label">Best picks</span>
+          <div class="blog-thumb__title">Templates to start with</div>
+          <div class="blog-thumb__visual">
+            <span class="blog-thumb__box"></span>
+            <span class="blog-thumb__box"></span>
+            <span class="blog-thumb__box"></span>
+            <span class="blog-thumb__box"></span>
+          </div>
+        </div>
+        <div class="blog-card-body">
+          <span class="blog-tag">Templates</span>
+          <h3 class="text-lg font-semibold tracking-[-0.02em] text-[#0a0a0a]">Best Templates to Start With</h3>
+          <p class="mt-2 text-sm xf-text-body text-[#52525b]">Product shots, mockups, style edits, filters, and pro shots for quick wins.</p>
+          <p class="blog-meta">2 min read · Jul 2026</p>
+        </div>
+      </a>
+    </div>
+  </main>
+
+
+  <footer class="xf-site-footer" data-xf-footer-root></footer>
+<script src="js/scroll-reveal.js"></script>
+  <script>
+    function getPreferredTheme() {
+      const stored = localStorage.getItem('xfreeze-theme');
+      if (stored === 'dark' || stored === 'light') return stored;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function applyTheme(theme) {
+      const isDark = theme === 'dark';
+      document.documentElement.classList.toggle('dark', isDark);
+      localStorage.setItem('xfreeze-theme', theme);
+      document.querySelectorAll('.theme-toggle, .theme-toggle-mobile, .site-nav-drawer-theme__switch').forEach(btn => {
+        btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+        btn.setAttribute('title', isDark ? 'Light mode' : 'Dark mode');
+        btn.setAttribute('aria-checked', isDark ? 'true' : 'false');
+      });
+      document.querySelectorAll('.theme-toggle-label').forEach(el => {
+        el.textContent = isDark ? 'Light mode' : 'Dark mode';
+      });
+    }
+
+    function toggleTheme() {
+      applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+    }
+
+    function initTheme() {
+      applyTheme(getPreferredTheme());
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('xfreeze-theme')) {
+          applyTheme(e.matches ? 'dark' : 'light');
+        }
+      });
+    }
+
+    window.onload = initTheme;
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/site-nav.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/motion.js"></script>
+
+</body>
+</html>

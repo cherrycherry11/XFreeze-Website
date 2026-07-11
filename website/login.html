@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="css/site-footer.css">
   <link rel="stylesheet" href="css/site-nav.css">
   <link rel="stylesheet" href="css/site-mobile.css">
+  <link rel="stylesheet" href="css/glass-backdrop.css">
   <link rel="stylesheet" href="css/auth.css">
   <link rel="stylesheet" href="css/support-toast.css">
   <style>
@@ -43,19 +44,25 @@
       --text-secondary: #9a9a9a;
       --border: #1a1a1a;
       --surface: #000000;
-      --surface-elevated: #050505;
+      --surface-elevated: #0a0a0a;
       --surface-muted: #0a0a0a;
       --nav-bg: rgba(0, 0, 0, 0.92);
       --border-hover: #2a2a2a;
     }
     body {
       font-family: var(--font-sans);
-      background: transparent;
       color: var(--text);
     }
   </style>
 </head>
 <body class="xf-auth-body">
+
+  <!-- Same glass field as the rest of the site (animated) -->
+  <div class="xf-auth-bg xf-glass-backdrop" aria-hidden="true">
+    <div class="xf-glass-backdrop__img"></div>
+    <div class="xf-glass-backdrop__mesh"></div>
+    <div class="xf-glass-backdrop__veil"></div>
+  </div>
 
   <nav id="site-nav" class="site-nav page-nav" aria-label="Main">
     <div class="content-container">

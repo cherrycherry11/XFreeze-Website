@@ -18,12 +18,17 @@
   }
 
   function providerConfigKey(name) {
-    if (name === 'x') return 'twitter';
+    /* Site config may use either key for X login. */
+    if (name === 'x' || name === 'twitter') return 'x';
     return name;
   }
 
   function isProviderEnabled(name) {
-    return Boolean(providers()[providerConfigKey(name)]);
+    var p = providers();
+    if (name === 'x' || name === 'twitter') {
+      return Boolean(p.x || p.twitter);
+    }
+    return Boolean(p[providerConfigKey(name)]);
   }
 
   function isConfigured() {
@@ -50,7 +55,9 @@
   }
 
   function supabaseProviderName(name) {
-    if (name === 'x') return 'twitter';
+    /* Supabase "X / Twitter (OAuth 2.0)" uses provider id "x".
+       Legacy "Twitter (Deprecated)" was "twitter" - do not use that. */
+    if (name === 'x' || name === 'twitter') return 'x';
     return name;
   }
 
@@ -596,12 +603,15 @@
 
     if (heading) heading.textContent = authMode === 'signup' ? 'Create your account' : 'Sign in to X Freeze';
     if (subheading) {
-      subheading.textContent =
-        authMode === 'signup'
-          ? 'Set up email and password to save progress. Free to start.'
-          : isProviderEnabled('google')
-            ? 'Use Google, or email and password.'
-            : 'Use your email and password.';
+      if (authMode === 'signup') {
+        subheading.textContent = 'Set up email and password to save progress. Free to start.';
+      } else if (isProviderEnabled('google') && isProviderEnabled('x')) {
+        subheading.textContent = 'Use Google, email and password, or X.';
+      } else if (isProviderEnabled('google')) {
+        subheading.textContent = 'Use Google, or email and password.';
+      } else {
+        subheading.textContent = 'Use your email and password.';
+      }
     }
     if (tabSignIn) {
       tabSignIn.classList.toggle('is-active', authMode === 'signin');

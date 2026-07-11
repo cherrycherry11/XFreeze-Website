@@ -82,44 +82,34 @@ html.dark .hero-stage__base {
   opacity: 1;
 }
 
-/* Soft left wash so copy stays readable over liquid glass */
+/* Centered wash so middle copy stays readable over liquid glass */
 .hero-stage__vignette {
   position: absolute;
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(
-      105deg,
-      rgba(255, 255, 255, 0.72) 0%,
-      rgba(255, 255, 255, 0.38) 34%,
-      rgba(255, 255, 255, 0.08) 58%,
-      transparent 78%
-    ),
-    linear-gradient(to top, rgba(255, 255, 255, 0.35) 0%, transparent 26%);
+    radial-gradient(ellipse 75% 70% at 50% 48%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.18) 48%, transparent 72%),
+    linear-gradient(to top, rgba(255, 255, 255, 0.28) 0%, transparent 30%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 0%, transparent 22%);
 }
 
 html.dark .hero-stage__vignette {
   background:
-    linear-gradient(
-      105deg,
-      rgba(0, 0, 0, 0.72) 0%,
-      rgba(0, 0, 0, 0.4) 34%,
-      rgba(0, 0, 0, 0.1) 58%,
-      transparent 80%
-    ),
-    linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, transparent 28%);
+    radial-gradient(ellipse 75% 70% at 50% 48%, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.2) 48%, transparent 72%),
+    linear-gradient(to top, rgba(0, 0, 0, 0.35) 0%, transparent 30%),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.25) 0%, transparent 22%);
 }
 
 @media (max-width: 1023px) {
   .hero-stage__vignette {
     background:
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.15) 40%, rgba(255, 255, 255, 0.55) 100%),
-      linear-gradient(to right, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.15) 72%, transparent 100%);
+      radial-gradient(ellipse 95% 80% at 50% 52%, rgba(255, 255, 255, 0.58) 0%, rgba(255, 255, 255, 0.2) 55%, transparent 78%),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 0%, transparent 35%, rgba(255, 255, 255, 0.4) 100%);
   }
   html.dark .hero-stage__vignette {
     background:
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.15) 40%, rgba(0, 0, 0, 0.65) 100%),
-      linear-gradient(to right, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.2) 72%, transparent 100%);
+      radial-gradient(ellipse 95% 80% at 50% 52%, rgba(0, 0, 0, 0.58) 0%, rgba(0, 0, 0, 0.22) 55%, transparent 78%),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, transparent 35%, rgba(0, 0, 0, 0.45) 100%);
   }
 }
 
@@ -139,10 +129,13 @@ html:not(.dark) .hero-header--studio .site-nav:not(.is-scrolled) {
   --xf-nav-coffee-text: #fff;
 }
 
-/* ── Layout: copy + product visual ── */
+/* ── Centered copy layout (no product cards) ── */
 .hero-header--studio .hero-content {
   padding-top: 6.5rem;
   padding-bottom: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (min-width: 768px) {
@@ -153,19 +146,43 @@ html:not(.dark) .hero-header--studio .site-nav:not(.is-scrolled) {
 }
 
 .hero-layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2.5rem;
-  align-items: center;
+  display: flex;
   width: 100%;
+  max-width: 44rem;
+  margin-inline: auto;
+  align-items: center;
+  justify-content: center;
 }
 
-@media (min-width: 1024px) {
-  .hero-layout {
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    gap: 3rem;
-    min-height: 28rem;
-  }
+.hero-layout--center {
+  text-align: center;
+}
+
+.hero-layout--center .hero-copy {
+  width: 100%;
+  max-width: 40rem;
+  margin-inline: auto;
+  align-items: center;
+  text-align: center;
+}
+
+.hero-layout--center .hero-headline,
+.hero-layout--center .hero-lead {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.hero-layout--center .hero-lead {
+  max-width: 34rem;
+}
+
+.hero-layout--center .hero-actions {
+  justify-content: center;
+}
+
+.hero-layout--center .hero-proof {
+  justify-content: center;
 }
 
 /* Copy colors for light studio */

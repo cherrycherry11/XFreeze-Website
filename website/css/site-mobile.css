@@ -7,6 +7,58 @@ html {
   max-width: 100%;
 }
 
+/*
+ * Performance: phones choke on stacked backdrop-filter + animated blurs
+ * while multiple MP4s decode. Trim the expensive effects under 1024px.
+ */
+@media (max-width: 1023px) {
+  .xf-glass-backdrop__img,
+  .xf-glass-backdrop__mesh,
+  .xf-glass-section:not(:has(.xf-glass-backdrop))::before,
+  .xf-glass-hero::before {
+    animation: none !important;
+  }
+
+  .xf-glass-backdrop__veil,
+  .xf-glass-section:not(:has(.xf-glass-backdrop))::after,
+  .xf-glass-hero::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .xf-feature-copy__blob,
+  .xf-feature-copy__blob--2 {
+    animation: none !important;
+    filter: blur(32px) !important;
+    opacity: 0.28 !important;
+  }
+
+  html.dark .xf-feature-copy__blob,
+  html.dark .xf-feature-copy__blob--2 {
+    filter: blur(36px) !important;
+  }
+
+  /* Infinite marquees cost continuous compositing on mobile */
+  .animate-marquee,
+  .bundles-wall-drift,
+  #selected-work-marquee.animate-marquee {
+    animation-play-state: paused !important;
+  }
+
+  /* Prefer content-visibility for below-fold sections */
+  #section-experimental,
+  #section-minimal,
+  #xf-more-categories,
+  #xf-skills-spotlight-section,
+  #creator-library,
+  #xf-motion-prompts,
+  #xf-final-cta,
+  .xf-site-footer {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 720px;
+  }
+}
+
 body {
   overflow-x: clip;
   max-width: 100%;

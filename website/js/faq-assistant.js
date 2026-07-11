@@ -759,6 +759,7 @@
       var base = basePath();
       var dataScript = document.createElement('script');
       dataScript.src = base + 'data/faq-bot-data.js?v=1';
+      dataScript.async = true;
       dataScript.onload = bootBot;
       dataScript.onerror = bootBot;
       document.body.appendChild(dataScript);
@@ -768,10 +769,16 @@
     bootBot();
   }
 
+  /* Defer bot on load so hero video + first paint stay smooth */
+  function scheduleInit() {
+    var delay = window.matchMedia('(max-width: 1023px)').matches ? 2800 : 1200;
+    window.setTimeout(init, delay);
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', scheduleInit);
   } else {
-    init();
+    scheduleInit();
   }
 
   global.XFreezeFaqBot = {

@@ -981,7 +981,9 @@
     } else {
       renderNavSlot();
       if (!(session && session.user)) {
-        window.setTimeout(maybeShowGoogleOneTap, 600);
+        /* Defer One Tap so it does not compete with hero video decode */
+        var oneTapDelay = window.matchMedia('(max-width: 1023px)').matches ? 2200 : 900;
+        window.setTimeout(maybeShowGoogleOneTap, oneTapDelay);
       }
     }
   }

@@ -10,11 +10,17 @@
 
   function initLenis() {
     if (reducedMotion || typeof Lenis === 'undefined') return null;
+    /* Continuous rAF smooth-scroll kills FPS on phones and many laptops. */
+    var isCoarse = window.matchMedia('(pointer: coarse)').matches;
+    var isNarrow = window.matchMedia('(max-width: 1023px)').matches;
+    var saveData = navigator.connection && navigator.connection.saveData;
+    if (isCoarse || isNarrow || saveData) return null;
+
     var lenis = new Lenis({
-      lerp: 0.09,
+      lerp: 0.12,
       smoothWheel: true,
-      wheelMultiplier: 0.9,
-      touchMultiplier: 1.2,
+      wheelMultiplier: 0.85,
+      touchMultiplier: 1,
     });
     function raf(time) {
       lenis.raf(time);

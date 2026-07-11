@@ -160,29 +160,49 @@ html:not(.dark) .hero-header--studio .site-nav:not(.is-scrolled) {
 
 .hero-header--studio .hero-layout--center .hero-copy {
   width: 100%;
-  max-width: 40rem;
+  max-width: 42rem;
   margin-inline: auto;
   align-items: center !important;
   text-align: center !important;
 }
 
-.hero-layout--center .hero-headline,
-.hero-layout--center .hero-lead {
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
+/* Headline is flex column with align-items:flex-start in home.css - force center */
+.hero-header--studio .hero-layout--center .hero-headline {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
-.hero-layout--center .hero-lead {
-  max-width: 34rem;
+.hero-header--studio .hero-layout--center .hero-headline__line,
+.hero-header--studio .hero-layout--center .hero-headline__sans,
+.hero-header--studio .hero-layout--center .hero-headline em {
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
 }
 
-.hero-layout--center .hero-actions {
-  justify-content: center;
+.hero-header--studio .hero-layout--center .hero-kicker,
+.hero-header--studio .hero-layout--center .hero-lead {
+  width: 100%;
+  max-width: 36rem;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
 }
 
-.hero-layout--center .hero-proof {
-  justify-content: center;
+.hero-header--studio .hero-layout--center .hero-actions {
+  justify-content: center !important;
+  width: 100%;
+}
+
+.hero-header--studio .hero-layout--center .hero-proof {
+  justify-content: center !important;
+  width: 100%;
 }
 
 /* Copy colors for light studio */

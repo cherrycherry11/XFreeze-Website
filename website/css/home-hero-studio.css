@@ -32,7 +32,11 @@ html.dark .hero-header--studio {
   }
 }
 
-/* ── Atmospheric stage (CSS only - light) ── */
+/*
+ * Atmospheric stage - premium Magnific stills (local assets):
+ * light = iridescent holographic silk
+ * dark  = cinematic night landscape
+ */
 .hero-stage {
   position: absolute;
   inset: 0;
@@ -44,136 +48,139 @@ html.dark .hero-header--studio {
 .hero-stage__base {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(ellipse 90% 70% at 80% 20%, rgba(180, 210, 255, 0.45) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 60% at 10% 80%, rgba(255, 210, 230, 0.28) 0%, transparent 50%),
-    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(255, 255, 255, 0.7) 0%, transparent 70%),
-    linear-gradient(165deg, #f7f6fa 0%, #eef1f8 45%, #f4f2f7 100%);
+  background: #f4f2f6;
 }
 
 html.dark .hero-stage__base {
-  background:
-    radial-gradient(ellipse 75% 65% at 78% 18%, rgba(45, 90, 180, 0.28) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 55% at 12% 75%, rgba(90, 50, 140, 0.16) 0%, transparent 52%),
-    radial-gradient(ellipse 50% 45% at 50% 100%, rgba(20, 60, 100, 0.12) 0%, transparent 55%),
-    #000000;
+  background: #05060a;
 }
 
-/* Soft glass texture (existing free asset) */
+/* Photo plate - Magnific premium backdrops */
+.hero-stage__photo {
+  position: absolute;
+  inset: 0;
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transform: scale(1.04);
+  transition: opacity 0.45s ease, filter 0.45s ease;
+}
+
+/* Light: premium white / holographic silk */
+html:not(.dark) .hero-stage__photo {
+  background-image: url('../assets/images/hero/backdrop-light.jpg');
+  opacity: 1;
+  filter: saturate(1.05) brightness(1.02);
+}
+
+/* Dark: night cinematic plate */
+html.dark .hero-stage__photo {
+  background-image: url('../assets/images/hero/backdrop-dark.jpg');
+  opacity: 1;
+  filter: saturate(1.05) brightness(0.92) contrast(1.04);
+}
+
+/* Soft mesh tint (glass asset) - light only, very subtle */
 .hero-stage__mesh {
   position: absolute;
-  inset: -8%;
+  inset: -6%;
   background: url('../assets/images/glass-gradient.png') center 40% / cover no-repeat;
-  opacity: 0.42;
-  filter: saturate(1.05) brightness(1.05);
-  animation: hero-mesh-drift 36s ease-in-out infinite alternate;
+  opacity: 0.18;
+  mix-blend-mode: soft-light;
+  animation: hero-mesh-drift 40s ease-in-out infinite alternate;
 }
 
 html.dark .hero-stage__mesh {
-  opacity: 0.22;
-  filter: saturate(1.1) brightness(0.42) contrast(1.08);
-  mix-blend-mode: soft-light;
+  opacity: 0.08;
+  filter: brightness(0.5);
+  mix-blend-mode: screen;
 }
 
 .hero-stage__orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(48px);
-  opacity: 0.55;
-  animation: hero-orb-float 22s ease-in-out infinite alternate;
-}
-
-.hero-stage__orb--a {
-  width: min(28rem, 55vw);
-  height: min(28rem, 55vw);
-  right: -6%;
-  top: 8%;
-  background: radial-gradient(circle, rgba(120, 170, 255, 0.55) 0%, transparent 70%);
-}
-
-.hero-stage__orb--b {
-  width: min(22rem, 48vw);
-  height: min(22rem, 48vw);
-  left: -4%;
-  bottom: 10%;
-  background: radial-gradient(circle, rgba(255, 180, 220, 0.35) 0%, transparent 70%);
-  animation-delay: -6s;
-}
-
-html.dark .hero-stage__orb--a {
-  background: radial-gradient(circle, rgba(50, 100, 200, 0.45) 0%, transparent 70%);
-  opacity: 0.45;
-  filter: blur(56px);
-}
-
-html.dark .hero-stage__orb--b {
-  background: radial-gradient(circle, rgba(120, 60, 180, 0.28) 0%, transparent 70%);
-  opacity: 0.35;
-  filter: blur(60px);
+  display: none;
 }
 
 .hero-stage__grid {
   position: absolute;
   inset: 0;
-  opacity: 0.35;
+  opacity: 0.18;
   background-image:
-    linear-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse 70% 60% at 55% 45%, #000 20%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 55% 45%, #000 20%, transparent 75%);
+    linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 40%, #000 15%, transparent 72%);
+  -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 40%, #000 15%, transparent 72%);
 }
 
 html.dark .hero-stage__grid {
-  opacity: 0.22;
+  opacity: 0.12;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
 }
 
+/* Keep type readable over rich photos */
 .hero-stage__vignette {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(to bottom, rgba(246, 245, 248, 0.2) 0%, transparent 18%),
-    linear-gradient(to top, rgba(246, 245, 248, 0.55) 0%, transparent 32%);
+    linear-gradient(
+      105deg,
+      rgba(255, 255, 255, 0.78) 0%,
+      rgba(255, 255, 255, 0.42) 32%,
+      rgba(255, 255, 255, 0.08) 58%,
+      transparent 78%
+    ),
+    linear-gradient(to top, rgba(246, 245, 248, 0.55) 0%, transparent 28%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 0%, transparent 18%);
 }
 
 html.dark .hero-stage__vignette {
   background:
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, transparent 22%),
-    linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 34%);
+    linear-gradient(
+      105deg,
+      rgba(0, 0, 0, 0.78) 0%,
+      rgba(0, 0, 0, 0.48) 34%,
+      rgba(0, 0, 0, 0.12) 58%,
+      transparent 80%
+    ),
+    linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 30%),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, transparent 20%);
 }
 
 @keyframes hero-mesh-drift {
   from { transform: scale(1.02) translate3d(0, 0, 0); }
-  to { transform: scale(1.06) translate3d(-1.2%, 0.8%, 0); }
-}
-
-@keyframes hero-orb-float {
-  from { transform: translate3d(0, 0, 0) scale(1); }
-  to { transform: translate3d(-3%, 4%, 0) scale(1.08); }
+  to { transform: scale(1.05) translate3d(-0.8%, 0.5%, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-stage__mesh,
-  .hero-stage__orb {
+  .hero-stage__mesh {
     animation: none !important;
+  }
+  .hero-stage__photo {
+    transform: none;
   }
 }
 
 @media (max-width: 1023px) {
   .hero-stage__mesh {
     animation: none;
-    opacity: 0.32;
+    opacity: 0.12;
   }
-  html.dark .hero-stage__mesh { opacity: 0.18; }
-  .hero-stage__orb {
-    animation: none;
-    filter: blur(36px);
-    opacity: 0.4;
+  html.dark .hero-stage__mesh { opacity: 0.06; }
+  .hero-stage__grid { opacity: 0.1; }
+
+  /* Stronger left wash on mobile so copy stays crisp */
+  .hero-stage__vignette {
+    background:
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.2) 40%, rgba(255, 255, 255, 0.65) 100%),
+      linear-gradient(to right, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.2) 70%, transparent 100%);
   }
-  .hero-stage__grid { opacity: 0.2; }
+  html.dark .hero-stage__vignette {
+    background:
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.2) 40%, rgba(0, 0, 0, 0.72) 100%),
+      linear-gradient(to right, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.25) 70%, transparent 100%);
+  }
 }
 
 /* ── Nav over studio: readable in light + dark ── */

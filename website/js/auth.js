@@ -11,7 +11,7 @@
   var oauthPrefetching = {};
 
   function config() {
-    return window.X FreezeAuthConfig || {};
+    return window.XFreezeAuthConfig || {};
   }
 
   function providers() {
@@ -740,7 +740,7 @@
     }
   }
 
-  window.X FreezeAuth = {
+  window.XFreezeAuth = {
     init: init,
     rememberRedirect: rememberRedirect,
     signInWithTwitter: function () { return signInWithOAuth('x'); },

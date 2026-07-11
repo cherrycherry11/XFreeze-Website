@@ -37,7 +37,7 @@ var XF_REQUIRE_AUTH_LIVE = false;
 /**
  * X Freeze Supabase auth config - xfreeze.com
  */
-window.X FreezeAuthConfig = {
+window.XFreezeAuthConfig = {
   supabaseUrl: 'https://ekmllicbgmuodptvgxsl.supabase.co',
   supabaseAnonKey: 'sb_publishable_hwfaIz4HJxim1Rb3o04-UA_jyyoJgfY',
   siteUrl: 'https://xfreeze.com',

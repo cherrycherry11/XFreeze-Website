@@ -2,7 +2,7 @@
  * Copy to js/auth-config.js and fill in your Supabase values.
  * See docs/AUTH-SETUP.md
  */
-window.X FreezeAuthConfig = {
+window.XFreezeAuthConfig = {
   supabaseUrl: 'https://YOUR_PROJECT_REF.supabase.co',
   supabaseAnonKey: 'YOUR_SUPABASE_ANON_OR_PUBLISHABLE_KEY',
   siteUrl: 'https://xfreeze.com',

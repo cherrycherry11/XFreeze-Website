@@ -7,8 +7,6 @@
   var client = null;
   var session = null;
   var authMode = 'signin';
-  var oauthUrlCache = {};
-  var oauthPrefetching = {};
 
   function config() {
     return window.XFreezeAuthConfig || {};
@@ -40,8 +38,8 @@
   }
 
   function siteOrigin() {
-    var c = config();
-    if (c.siteUrl) return c.siteUrl.replace(/\/$/, '');
+    /* Prefer the origin the user is actually on so the session cookie/storage
+       stays on the same host (www vs apex, vercel vs custom domain). */
     return window.location.origin;
   }
 
@@ -49,6 +47,11 @@
     var c = config();
     var path = c.loginPath || 'login.html';
     return siteOrigin() + '/' + path.replace(/^\//, '');
+  }
+
+  function supabaseProviderName(name) {
+    if (name === 'x') return 'twitter';
+    return name;
   }
 
   function redirectAfterLogin() {
@@ -234,6 +237,8 @@
         autoRefreshToken: true,
         detectSessionInUrl: true,
         flowType: 'pkce',
+        storage: window.localStorage,
+        storageKey: 'xf-auth-session',
       },
     });
     return client;
@@ -273,7 +278,11 @@
   function finishLogin(statusEl) {
     clearSignInIntent();
     setStatus(statusEl, 'success', 'Signed in. Redirecting…');
-    window.location.href = redirectAfterLogin();
+    var target = redirectAfterLogin();
+    /* Small delay so the session is flushed to localStorage before navigation. */
+    window.setTimeout(function () {
+      window.location.href = target;
+    }, 80);
   }
 
   function renderDrawerAuth(loggedInHtml, signedOutHtml) {
@@ -365,6 +374,27 @@
     }
   }
 
+  function cleanAuthParamsFromUrl() {
+    try {
+      var url = new URL(window.location.href);
+      var keys = ['code', 'state', 'error', 'error_description', 'error_code'];
+      var changed = false;
+      keys.forEach(function (key) {
+        if (url.searchParams.has(key)) {
+          url.searchParams.delete(key);
+          changed = true;
+        }
+      });
+      if (url.hash && (url.hash.indexOf('access_token') !== -1 || url.hash.indexOf('error') !== -1)) {
+        url.hash = '';
+        changed = true;
+      }
+      if (changed) {
+        window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+      }
+    } catch (e) {}
+  }
+
   async function refreshSession() {
     var sb = getClient();
     if (!sb) {
@@ -373,8 +403,36 @@
       return null;
     }
 
+    try {
+      if (typeof sb.auth.initialize === 'function') {
+        await sb.auth.initialize();
+      }
+    } catch (e) {}
+
+    /* Explicit PKCE code exchange - more reliable than relying only on auto-detect. */
+    try {
+      var params = new URLSearchParams(window.location.search || '');
+      var code = params.get('code');
+      if (code) {
+        var exchanged = await sb.auth.exchangeCodeForSession(code);
+        if (exchanged.error) {
+          console.warn('[xf-auth] code exchange failed', exchanged.error);
+        } else if (exchanged.data && exchanged.data.session) {
+          session = exchanged.data.session;
+          cleanAuthParamsFromUrl();
+          renderNavSlot();
+          return session;
+        }
+      }
+    } catch (err) {
+      console.warn('[xf-auth] code exchange error', err);
+    }
+
     var result = await sb.auth.getSession();
-    session = result.data.session;
+    if (result.error) {
+      console.warn('[xf-auth] getSession failed', result.error);
+    }
+    session = result.data && result.data.session ? result.data.session : null;
     renderNavSlot();
     return session;
   }
@@ -390,7 +448,7 @@
     rememberRedirect();
 
     var result = await sb.auth.signInWithOAuth({
-      provider: provider,
+      provider: supabaseProviderName(provider),
       options: {
         redirectTo: loginUrl(),
         skipBrowserRedirect: true,
@@ -398,33 +456,17 @@
     });
 
     if (result.error) throw result.error;
-    if (result.data && result.data.url) {
-      oauthUrlCache[provider] = result.data.url;
-    }
     return result.data;
   }
 
-  function prefetchOAuthUrl(provider) {
-    if (!isProviderEnabled(provider) || oauthUrlCache[provider] || oauthPrefetching[provider]) return;
-    oauthPrefetching[provider] = true;
-    fetchOAuthUrl(provider)
-      .catch(function () {})
-      .finally(function () {
-        oauthPrefetching[provider] = false;
-      });
-  }
-
   async function signInWithOAuth(provider) {
-    if (oauthUrlCache[provider]) {
-      window.location.assign(oauthUrlCache[provider]);
-      return { url: oauthUrlCache[provider] };
-    }
-
+    /* Always start a fresh OAuth request (PKCE verifier must match this attempt). */
     var data = await fetchOAuthUrl(provider);
     if (data && data.url) {
       window.location.assign(data.url);
+      return data;
     }
-    return data;
+    throw new Error('Could not start sign-in. Try again.');
   }
 
   async function signInWithPassword(email, password) {
@@ -542,13 +584,6 @@
       badge.hidden = enabled;
     }
 
-    btn.addEventListener('mouseenter', function () {
-      if (enabled) prefetchOAuthUrl(provider);
-    });
-    btn.addEventListener('focus', function () {
-      if (enabled) prefetchOAuthUrl(provider);
-    });
-
     btn.addEventListener('click', async function () {
       if (!enabled) {
         setStatus(statusEl, 'info', 'This sign-in method is coming soon. Use email and password for now.');
@@ -557,11 +592,6 @@
 
       btn.disabled = true;
       setStatus(statusEl, 'info', provider === 'google' ? 'Redirecting to Google...' : 'Redirecting to X...');
-
-      if (oauthUrlCache[provider]) {
-        window.location.assign(oauthUrlCache[provider]);
-        return;
-      }
 
       try {
         await signInWithOAuth(provider);
@@ -587,11 +617,14 @@
       return;
     }
 
+    if (!window.supabase) {
+      setStatus(statusEl, 'error', 'Sign-in library failed to load. Refresh the page.');
+      return;
+    }
+
     var googleBtn = document.getElementById('xf-auth-google');
     bindProviderButton(googleBtn, 'google', statusEl);
-    prefetchOAuthUrl('google');
     bindProviderButton(twitterBtn, 'x', statusEl);
-    prefetchOAuthUrl('x');
 
     if (tabSignIn && tabSignIn.tagName === 'BUTTON') {
       tabSignIn.addEventListener('click', function () { setAuthMode('signin'); });
@@ -680,22 +713,33 @@
 
     var statusEl = document.getElementById('xf-auth-status');
     var sb = getClient();
-    if (!sb) return;
+    if (!sb) {
+      setStatus(statusEl, 'error', 'Auth is not configured.');
+      return;
+    }
 
-    await refreshSession();
+    var params = new URLSearchParams(window.location.search || '');
+    var oauthError = params.get('error_description') || params.get('error');
+    if (oauthError) {
+      setStatus(statusEl, 'error', decodeURIComponent(oauthError.replace(/\+/g, ' ')));
+      cleanAuthParamsFromUrl();
+      return;
+    }
 
     if (session && session.user) {
       finishLogin(statusEl);
       return;
     }
 
-    sb.auth.onAuthStateChange(function (event, nextSession) {
-      if (event === 'SIGNED_IN' && nextSession) {
-        session = nextSession;
-        renderNavSlot();
+    if (isOAuthCallback()) {
+      setStatus(statusEl, 'info', 'Finishing sign-in…');
+      await refreshSession();
+      if (session && session.user) {
         finishLogin(statusEl);
+        return;
       }
-    });
+      setStatus(statusEl, 'error', 'Sign-in did not complete. Try Google or email again.');
+    }
   }
 
   async function init() {
@@ -717,26 +761,37 @@
 
     bindLoginPage();
     bindProtectedLinks();
-    renderNavSlot();
 
     var sb = getClient();
-    if (!sb) return;
-
-    sb.auth.onAuthStateChange(function (_event, nextSession) {
-      session = nextSession;
+    if (!sb) {
       renderNavSlot();
-    });
-
-    if (!session) {
-      await refreshSession();
+      return;
     }
 
+    sb.auth.onAuthStateChange(function (event, nextSession) {
+      session = nextSession;
+      renderNavSlot();
+      if (
+        event === 'SIGNED_IN' &&
+        nextSession &&
+        nextSession.user &&
+        document.getElementById('xf-auth-page') &&
+        isOAuthCallback()
+      ) {
+        finishLogin(document.getElementById('xf-auth-status'));
+      }
+    });
+
+    await refreshSession();
+
     if (document.getElementById('xf-auth-page')) {
-      if (!isOAuthCallback() && !(session && session.user) && !shouldStayOnLoginPage()) {
+      if (!isOAuthCallback() && session && session.user && !shouldStayOnLoginPage()) {
         window.location.replace(config().defaultRedirect || 'home.html');
         return;
       }
       await handleLoginCallback();
+    } else {
+      renderNavSlot();
     }
   }
 

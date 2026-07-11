@@ -20,6 +20,22 @@ html.dark.xf-auth-pending::before {
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  /* Always sit at the far right of the top nav */
+  order: 100;
+  margin-left: 0.15rem;
+}
+
+.site-nav-end {
+  display: flex;
+  align-items: center;
+}
+
+/* Keep coffee / theme / menu before the account circle */
+.site-nav-end > .site-nav-coffee,
+.site-nav-end > .theme-switch,
+.site-nav-end > .theme-toggle,
+.site-nav-end > .site-nav-menu-btn {
+  order: 1;
 }
 
 .site-nav-auth-btn {
@@ -76,6 +92,7 @@ html.dark .site-nav.is-scrolled .site-nav-auth-btn:hover {
   position: relative;
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 /* Simple circle profile button - image only */

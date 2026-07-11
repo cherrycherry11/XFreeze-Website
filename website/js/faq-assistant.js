@@ -732,7 +732,7 @@
     if (!document.querySelector('link[data-xf-faq-bot-css]')) {
       var link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = base + 'css/faq-assistant.css?v=8';
+      link.href = base + 'css/faq-assistant.css?v=9';
       link.setAttribute('data-xf-faq-bot-css', '');
       document.head.appendChild(link);
     }

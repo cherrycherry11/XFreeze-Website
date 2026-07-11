@@ -79,4 +79,34 @@
     xfNavEnsureOverlayOrder();
   }
 
+  /**
+   * Home hero flag - hide Ask bot while the hero fills the screen so it
+   * does not cover CTAs / theme controls on mobile.
+   */
+  function updateOnHeroClass() {
+    var hero = document.getElementById('hero-header');
+    if (!hero) {
+      document.body.classList.remove('xf-on-hero');
+      return;
+    }
+    var rect = hero.getBoundingClientRect();
+    var onHero = rect.bottom > Math.min(window.innerHeight * 0.45, 320);
+    document.body.classList.toggle('xf-on-hero', onHero);
+  }
+
+  function bindHeroWatch() {
+    if (!document.getElementById('hero-header')) return;
+    document.body.classList.add('xf-on-hero');
+    updateOnHeroClass();
+    window.addEventListener('scroll', updateOnHeroClass, { passive: true });
+    window.addEventListener('resize', updateOnHeroClass);
+    window.addEventListener('orientationchange', updateOnHeroClass);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindHeroWatch);
+  } else {
+    bindHeroWatch();
+  }
+
 })();

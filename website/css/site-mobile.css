@@ -4,6 +4,71 @@
 
 html {
   overflow-x: clip;
+  max-width: 100%;
+}
+
+body {
+  overflow-x: clip;
+  max-width: 100%;
+  position: relative;
+}
+
+/* Kill sideways pan that reveals black gutters on mobile */
+@media (max-width: 1023px) {
+  html,
+  body {
+    overflow-x: hidden !important;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  /* Clip sections that use oversized ambient blobs / gradients */
+  .xf-glass-section,
+  .xf-glass-hero,
+  .hero-header,
+  #hero-header,
+  #section-experimental,
+  #section-minimal,
+  .xf-feature-copy {
+    overflow-x: hidden;
+  }
+
+  .xf-feature-copy__blob,
+  .xf-feature-copy__blob--2 {
+    max-width: none;
+  }
+
+  .content-container,
+  .hero-content,
+  .site-nav .content-container {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .site-nav-end {
+    max-width: 100%;
+    flex-shrink: 0;
+  }
+
+  .site-nav-bar {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* FAQ bot: never cover drawer / theme controls */
+  body.xf-menu-open .xf-faq-bot {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* Hide Ask bot on the home hero (covers CTAs + looks like comment box) */
+  body.xf-on-hero .xf-faq-bot {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+  }
 }
 
 body.xf-menu-open {
@@ -113,17 +178,40 @@ html.dark .hover\:text-black:hover { color: var(--text, #f2f5f3) !important; }
   }
 }
 
-/* Home hero */
+/* Home hero - lock height so iOS chrome show/hide does not grow the video */
 @media (max-width: 767px) {
-  #hero-header {
+  #hero-header,
+  .hero-header {
+    /* Use small viewport only - 100dvh grows when the address bar hides */
     min-height: 100svh !important;
-    min-height: 100dvh !important;
-    height: auto !important;
+    height: 100svh !important;
+    max-height: 100svh !important;
+    overflow: hidden !important;
+  }
+
+  #hero-header .hero-video-stack,
+  .hero-header .hero-video-stack {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  #hero-header .hero-video-layer,
+  .hero-header .hero-video-layer {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
   }
 
   #hero-header .hero-content.content-container {
     padding-top: 0;
     padding-bottom: max(2.25rem, env(safe-area-inset-bottom, 0px));
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   #hero-header h1,

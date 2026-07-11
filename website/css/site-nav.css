@@ -281,7 +281,7 @@ html.dark .site-nav.page-nav.xf-nav-compact {
   width: 2.25rem;
   height: 2.25rem;
   flex-shrink: 0;
-  border-radius: 9999px;
+  border-radius: 0.5rem;
   border: 1px solid var(--xf-nav-menu-border);
   background: var(--xf-nav-menu-bg);
   color: var(--xf-nav-menu-text);
@@ -490,10 +490,13 @@ html.dark .site-nav-mobile-panel--drawer {
 }
 
 .site-nav-drawer-theme {
+  position: relative;
+  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  padding-bottom: 0.25rem;
 }
 
 .site-nav-drawer-theme__label {

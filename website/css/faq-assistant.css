@@ -92,11 +92,22 @@ html.dark .xf-faq-bot__launcher:focus-visible {
   }
 
   .xf-faq-bot__panel {
-    width: min(22rem, calc(100vw - 1.5rem)) !important;
-    height: min(70vh, calc(100dvh - 5rem)) !important;
+    width: min(22rem, calc(100% - 1.5rem)) !important;
+    max-width: calc(100vw - 1.5rem);
+    height: min(70vh, calc(100svh - 5rem)) !important;
     right: 0;
     bottom: 0;
   }
+
+  /* Keep bot under drawer chrome; drawer is ~320 */
+  .xf-faq-bot {
+    z-index: 40;
+  }
+}
+
+/* When mobile menu is open, never cover Dark mode toggle */
+body.xf-menu-open .xf-faq-bot {
+  display: none !important;
 }
 
 .xf-faq-bot__panel {

@@ -8,8 +8,9 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  /* svh only on mobile base - dvh re-expands the hero when the browser chrome hides */
   min-height: 100svh;
-  min-height: 100dvh;
+  overflow: hidden;
   /* Keep stacking simple so fixed nav can sit above page content.
      isolation here trapped the fixed nav and let cards paint over it. */
   isolation: auto;
@@ -24,6 +25,8 @@
 
 .hero-video-stack {
   z-index: 0;
+  overflow: hidden;
+  max-width: 100%;
 }
 
 .hero-header .hero-overlay {
@@ -75,6 +78,7 @@
     justify-content: center;
     min-height: 34rem;
     height: 84vh;
+    max-height: none;
   }
 }
 

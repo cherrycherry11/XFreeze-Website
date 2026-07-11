@@ -158,12 +158,12 @@ html:not(.dark) .hero-header--studio .site-nav:not(.is-scrolled) {
   text-align: center;
 }
 
-.hero-layout--center .hero-copy {
+.hero-header--studio .hero-layout--center .hero-copy {
   width: 100%;
   max-width: 40rem;
   margin-inline: auto;
-  align-items: center;
-  text-align: center;
+  align-items: center !important;
+  text-align: center !important;
 }
 
 .hero-layout--center .hero-headline,

@@ -166,17 +166,18 @@ html.lenis body {
   will-change: transform;
 }
 
-/* Template gallery tile - premium hover (soft edges, no hard border flash) */
+/* Template gallery tile hover */
 .template-gallery-tile {
   transition:
     transform 0.35s var(--xf-ease-out),
-    box-shadow 0.35s var(--xf-ease-out);
+    box-shadow 0.35s var(--xf-ease-out),
+    border-color 0.25s ease;
 }
 .template-gallery-tile:hover {
-  transform: translateY(-4px) translateZ(0);
+  transform: translateY(-3px);
 }
 .template-gallery-tile:hover img {
-  transform: translate(-50%, -50%) scale(1.06);
+  transform: scale(1.03);
 }
 .template-gallery-tile:hover .template-gallery-label {
   opacity: 1;
@@ -249,7 +250,7 @@ html.lenis body {
     transform: none !important;
   }
   .template-gallery-tile:hover img {
-    transform: translate(-50%, -50%) !important;
+    transform: none !important;
   }
   #selected-work-marquee img:hover {
     transform: none !important;

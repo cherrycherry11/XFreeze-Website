@@ -12,7 +12,12 @@
       var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
       document.documentElement.classList.toggle('dark', isDark);
-      /* Studio hero - no hero video boot */
+      document.documentElement.setAttribute(
+        'data-hero-video',
+        isDark
+          ? 'assets/videos/hero-liquid/liquid-dark.mp4'
+          : 'assets/videos/hero-liquid/liquid-light.mp4'
+      );
       document.documentElement.style.backgroundColor = isDark ? '#000000' : '#f6f5f8';
     })();
   </script>
@@ -1382,14 +1387,57 @@
   <!-- ==================== HERO (studio - no video; local WIP) ==================== -->
   <header id="hero-header" class="hero-header hero-header--studio relative overflow-hidden">
 
-    <!-- Atmospheric stage: Magnific premium stills (local assets; not live yet) -->
+    <!-- Liquid glass hero videos (local WIP - light/dark) -->
     <div class="hero-stage" aria-hidden="true">
       <div class="hero-stage__base"></div>
-      <div class="hero-stage__photo" role="img" aria-label=""></div>
-      <div class="hero-stage__mesh"></div>
-      <div class="hero-stage__grid"></div>
+      <div id="hero-video-stack" class="hero-video-stack hero-stage__video">
+        <video
+          id="hero-video-a"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          class="hero-video-layer is-active"
+        >
+          <source type="video/mp4">
+        </video>
+        <video
+          id="hero-video-b"
+          muted
+          loop
+          playsinline
+          preload="none"
+          class="hero-video-layer"
+        >
+          <source type="video/mp4">
+        </video>
+      </div>
       <div class="hero-stage__vignette"></div>
     </div>
+    <script>
+      (function () {
+        var src = document.documentElement.getAttribute('data-hero-video');
+        var hero = document.getElementById('hero-video-a');
+        var source = hero && hero.querySelector('source');
+        if (!hero || !source || !src) return;
+        source.setAttribute('src', src);
+        hero.setAttribute('data-active-src', src);
+        hero.muted = true;
+        hero.loop = true;
+        hero.load();
+        function reveal() {
+          if (hero.getAttribute('data-active-src') !== src) return;
+          hero.classList.add('hero-ready', 'is-active');
+          hero.play().catch(function () {});
+        }
+        if (hero.readyState >= 2) reveal();
+        else {
+          hero.addEventListener('loadeddata', reveal, { once: true });
+          hero.addEventListener('canplay', reveal, { once: true });
+        }
+      })();
+    </script>
 
     <!-- Nav overlaid on studio stage -->
     <nav id="site-nav" class="site-nav" aria-label="Main">
@@ -1959,8 +2007,8 @@
     }
 
     const HERO_VIDEOS = {
-      light: 'assets/videos/hero.mp4',
-      dark: 'assets/videos/hero-night.mp4',
+      light: 'assets/videos/hero-liquid/liquid-light.mp4',
+      dark: 'assets/videos/hero-liquid/liquid-dark.mp4',
     };
     const HERO_CROSSFADE_MS = 650;
     let heroActiveKey = 'a';
@@ -2102,7 +2150,6 @@
     }
 
     function setHeroVideoForTheme(isDark) {
-      /* Studio hero has no video stack - keep theme swap lightweight */
       const { stack } = heroLayers();
       if (!stack) return;
       const nextSrc = isDark ? HERO_VIDEOS.dark : HERO_VIDEOS.light;

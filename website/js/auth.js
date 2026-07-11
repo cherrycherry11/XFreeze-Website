@@ -90,24 +90,15 @@
   }
 
   function loginPageUrl() {
-    return (config().loginPath || 'login.html') + '?signin=1';
+    return config().loginPath || 'login.html';
   }
 
   function shouldStayOnLoginPage() {
     var page = currentPage();
-    if (page === 'signup.html') return true;
-    if (page !== loginPageName()) return false;
+    /* Always allow the login + signup pages to render */
+    if (page === 'signup.html' || page === loginPageName()) return true;
     if (isOAuthCallback()) return true;
-    var search = window.location.search || '';
-    if (search.indexOf('signin=1') !== -1) return true;
-    if (search.indexOf('signup=1') !== -1) return true;
-    if (search.indexOf('mode=signup') !== -1 || search.indexOf('mode=signin') !== -1) return true;
-    try {
-      var intent = sessionStorage.getItem('xf-auth-intent');
-      return intent === 'signin' || intent === 'signup';
-    } catch (e) {
-      return false;
-    }
+    return false;
   }
 
   function markSignInIntent() {
@@ -291,14 +282,14 @@
 
     if (!isConfigured()) {
       slot.innerHTML =
-        '<a href="login.html?signin=1" class="site-nav-auth-btn" title="Auth not configured yet">Sign in</a>' +
+        '<a href="login.html" class="site-nav-auth-btn" title="Auth not configured yet">Sign in</a>' +
         '<a href="signup.html" class="site-nav-auth-btn site-nav-auth-btn--ghost">Sign up</a>';
       return;
     }
 
     if (!session || !session.user) {
       slot.innerHTML =
-        '<a href="login.html?signin=1" class="site-nav-auth-btn" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign in</a>' +
+        '<a href="login.html" class="site-nav-auth-btn" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign in</a>' +
         '<a href="signup.html" class="site-nav-auth-btn site-nav-auth-btn--ghost" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign up</a>';
       return;
     }

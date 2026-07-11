@@ -2,25 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <script>
-    (function () {
-      var hash = location.hash || '';
-      var search = location.search || '';
-      var isOAuthReturn =
-        hash.indexOf('access_token') !== -1 ||
-        hash.indexOf('error') !== -1 ||
-        search.indexOf('code=') !== -1;
-      if (isOAuthReturn) return;
-      if (search.indexOf('signin=1') !== -1) return;
-      if (search.indexOf('signup=1') !== -1) return;
-      if (search.indexOf('mode=signup') !== -1 || search.indexOf('mode=signin') !== -1) return;
-      try {
-        if (sessionStorage.getItem('xf-auth-intent') === 'signin') return;
-        if (sessionStorage.getItem('xf-auth-intent') === 'signup') return;
-      } catch (e) {}
-      location.replace('home.html');
-    })();
-  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign in - X Freeze</title>
   <script>document.documentElement.setAttribute('data-xf-auth-mode', (location.search.indexOf('mode=signup') !== -1 || location.search.indexOf('signup=1') !== -1) ? 'signup' : 'signin');</script>

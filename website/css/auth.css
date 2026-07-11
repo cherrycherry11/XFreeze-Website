@@ -361,6 +361,55 @@ html.dark .xf-auth-mode-tabs {
   gap: 0.4rem;
 }
 
+.site-nav-drawer-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.85rem 1.1rem 0.35rem;
+}
+
+.site-nav-drawer-auth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.6rem;
+  padding: 0 1rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border, #e5e7eb);
+  background: var(--text, #0a0a0a);
+  color: var(--surface, #fff);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+html.dark .site-nav-drawer-auth-btn {
+  background: #f2f2f2;
+  color: #0a0a0a;
+  border-color: #2a2a2a;
+}
+
+.site-nav-drawer-auth-btn--ghost {
+  background: transparent !important;
+  color: var(--text, #0a0a0a) !important;
+  border-color: var(--border, #e5e7eb) !important;
+}
+
+html.dark .site-nav-drawer-auth-btn--ghost {
+  color: #f2f2f2 !important;
+  border-color: #2a2a2a !important;
+}
+
+.site-nav-drawer-auth-email {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #52525b);
+  text-align: center;
+  word-break: break-all;
+}
+
 .site-nav-auth-btn--ghost {
   background: transparent !important;
   border-color: transparent !important;

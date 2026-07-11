@@ -341,10 +341,18 @@
   }
 }
 
-/* Nav over hero - mobile: logo + menu only */
+/* Nav over hero - mobile: keep Sign in visible; coffee can hide for space */
 @media (max-width: 1023px) {
-  .hero-header .site-nav:not(.is-scrolled) .site-nav-coffee,
+  .hero-header .site-nav:not(.is-scrolled) .site-nav-coffee {
+    display: none !important;
+  }
+
+  /* Always show Sign in on the hero bar (was hidden before) */
   .hero-header .site-nav:not(.is-scrolled) .site-nav-auth {
+    display: flex !important;
+  }
+
+  .hero-header .site-nav:not(.is-scrolled) .site-nav-auth-btn--ghost {
     display: none !important;
   }
 

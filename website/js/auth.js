@@ -276,21 +276,26 @@
     window.location.href = redirectAfterLogin();
   }
 
+  function renderDrawerAuth(loggedInHtml, signedOutHtml) {
+    var drawer = document.getElementById('xf-auth-drawer');
+    if (!drawer) return;
+    drawer.innerHTML = loggedInHtml || signedOutHtml || '';
+  }
+
   function renderNavSlot() {
     var slot = document.getElementById('xf-auth-nav');
-    if (!slot) return;
+    var signedOutNav =
+      '<a href="login.html" class="site-nav-auth-btn" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign in</a>' +
+      '<a href="signup.html" class="site-nav-auth-btn site-nav-auth-btn--ghost" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign up</a>';
+    var signedOutDrawer =
+      '<a href="login.html" class="site-nav-drawer-auth-btn" onclick="toggleMobileMenu && toggleMobileMenu()">Sign in</a>' +
+      '<a href="signup.html" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu && toggleMobileMenu()">Sign up</a>';
 
-    if (!isConfigured()) {
-      slot.innerHTML =
-        '<a href="login.html" class="site-nav-auth-btn" title="Auth not configured yet">Sign in</a>' +
-        '<a href="signup.html" class="site-nav-auth-btn site-nav-auth-btn--ghost">Sign up</a>';
-      return;
-    }
+    if (!slot && !document.getElementById('xf-auth-drawer')) return;
 
-    if (!session || !session.user) {
-      slot.innerHTML =
-        '<a href="login.html" class="site-nav-auth-btn" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign in</a>' +
-        '<a href="signup.html" class="site-nav-auth-btn site-nav-auth-btn--ghost" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign up</a>';
+    if (!isConfigured() || !session || !session.user) {
+      if (slot) slot.innerHTML = signedOutNav;
+      renderDrawerAuth(null, signedOutDrawer);
       return;
     }
 
@@ -299,43 +304,62 @@
     var avatar = avatarUrl(user);
     var initials = initialsFromUser(user);
 
-    slot.innerHTML =
-      '<div class="site-nav-user">' +
-      '<button type="button" class="site-nav-user-trigger" id="xf-auth-user-trigger" aria-expanded="false" aria-haspopup="true">' +
-      '<span class="site-nav-user-avatar">' +
-      (avatar
-        ? '<img src="' + escapeHtml(avatar) + '" alt="" referrerpolicy="no-referrer">'
-        : escapeHtml(initials)) +
-      '</span>' +
-      '<span class="hidden sm:inline">Account</span>' +
-      '<i class="fa-solid fa-chevron-down text-[10px] opacity-60" aria-hidden="true"></i>' +
-      '</button>' +
-      '<div class="site-nav-user-menu" id="xf-auth-user-menu" hidden>' +
-      '<div class="site-nav-user-email">' + escapeHtml(email) + '</div>' +
-      '<button type="button" id="xf-auth-sign-out"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Sign out</button>' +
-      '</div>' +
-      '</div>';
+    if (slot) {
+      slot.innerHTML =
+        '<div class="site-nav-user">' +
+        '<button type="button" class="site-nav-user-trigger" id="xf-auth-user-trigger" aria-expanded="false" aria-haspopup="true">' +
+        '<span class="site-nav-user-avatar">' +
+        (avatar
+          ? '<img src="' + escapeHtml(avatar) + '" alt="" referrerpolicy="no-referrer">'
+          : escapeHtml(initials)) +
+        '</span>' +
+        '<span class="hidden sm:inline">Account</span>' +
+        '<i class="fa-solid fa-chevron-down text-[10px] opacity-60" aria-hidden="true"></i>' +
+        '</button>' +
+        '<div class="site-nav-user-menu" id="xf-auth-user-menu" hidden>' +
+        '<div class="site-nav-user-email">' + escapeHtml(email) + '</div>' +
+        '<button type="button" id="xf-auth-sign-out"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Sign out</button>' +
+        '</div>' +
+        '</div>';
 
-    var trigger = document.getElementById('xf-auth-user-trigger');
-    var menu = document.getElementById('xf-auth-user-menu');
-    var signOutBtn = document.getElementById('xf-auth-sign-out');
+      var trigger = document.getElementById('xf-auth-user-trigger');
+      var menu = document.getElementById('xf-auth-user-menu');
+      var signOutBtn = document.getElementById('xf-auth-sign-out');
 
-    if (trigger && menu) {
-      trigger.addEventListener('click', function (event) {
-        event.stopPropagation();
-        var open = menu.hasAttribute('hidden');
-        menu.hidden = !open;
-        trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
+      if (trigger && menu) {
+        trigger.addEventListener('click', function (event) {
+          event.stopPropagation();
+          var open = menu.hasAttribute('hidden');
+          menu.hidden = !open;
+          trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
 
-      document.addEventListener('click', function () {
-        menu.hidden = true;
-        trigger.setAttribute('aria-expanded', 'false');
-      });
+        document.addEventListener('click', function () {
+          menu.hidden = true;
+          trigger.setAttribute('aria-expanded', 'false');
+        });
+      }
+
+      if (signOutBtn) {
+        signOutBtn.addEventListener('click', function () {
+          signOut();
+        });
+      }
     }
 
-    if (signOutBtn) {
-      signOutBtn.addEventListener('click', function () {
+    renderDrawerAuth(
+      '<button type="button" class="site-nav-drawer-auth-btn" id="xf-auth-drawer-sign-out">' +
+        '<i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Sign out' +
+        '</button>' +
+        '<p class="site-nav-drawer-auth-email">' +
+        escapeHtml(email) +
+        '</p>',
+      signedOutDrawer
+    );
+
+    var drawerSignOut = document.getElementById('xf-auth-drawer-sign-out');
+    if (drawerSignOut) {
+      drawerSignOut.addEventListener('click', function () {
         signOut();
       });
     }

@@ -82,6 +82,32 @@ html.dark .hero-stage__base {
   opacity: 1;
 }
 
+/* Soft bottom-right cover - kills watermark without a hard rectangle or seam line */
+.hero-stage__logo-cover {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: clamp(150px, 15vw, 240px);
+  height: clamp(64px, 9vh, 110px);
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 100% 100% at 100% 100%,
+    #f4f4f4 0%,
+    #f4f4f4 48%,
+    rgba(244, 244, 244, 0) 74%
+  );
+}
+
+html.dark .hero-stage__logo-cover {
+  background: radial-gradient(
+    ellipse 100% 100% at 100% 100%,
+    #000000 0%,
+    #000000 50%,
+    rgba(0, 0, 0, 0) 76%
+  );
+}
+
 /* Centered wash so middle copy stays readable over liquid glass */
 .hero-stage__vignette {
   position: absolute;

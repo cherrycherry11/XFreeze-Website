@@ -316,14 +316,14 @@
     if (slot) {
       slot.innerHTML =
         '<div class="site-nav-user">' +
-        '<button type="button" class="site-nav-user-trigger" id="xf-auth-user-trigger" aria-expanded="false" aria-haspopup="true">' +
+        '<button type="button" class="site-nav-user-trigger" id="xf-auth-user-trigger" aria-expanded="false" aria-haspopup="true" aria-label="Account" title="' +
+        escapeHtml(email) +
+        '">' +
         '<span class="site-nav-user-avatar">' +
         (avatar
           ? '<img src="' + escapeHtml(avatar) + '" alt="" referrerpolicy="no-referrer">'
           : escapeHtml(initials)) +
         '</span>' +
-        '<span class="hidden sm:inline">Account</span>' +
-        '<i class="fa-solid fa-chevron-down text-[10px] opacity-60" aria-hidden="true"></i>' +
         '</button>' +
         '<div class="site-nav-user-menu" id="xf-auth-user-menu" hidden>' +
         '<div class="site-nav-user-email">' + escapeHtml(email) + '</div>' +

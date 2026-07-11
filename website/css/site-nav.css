@@ -41,19 +41,25 @@
   min-width: 0;
 }
 
-/* Hero overlay (home) - same footprint as page-nav (no extra padding) */
+/* Hero overlay (home) - slight air under the top edge */
 .site-nav:not(.page-nav) {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  padding: 0;
+  padding: 0.85rem 0 0;
   background: transparent;
   border: none;
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease,
-    box-shadow 0.3s ease;
+    box-shadow 0.3s ease,
+    padding 0.25s ease;
+}
+
+/* When scrolled, lock flush to the top as a solid bar */
+.site-nav:not(.page-nav).is-scrolled {
+  padding-top: 0;
 }
 
 /* Inner pages - sticky bar */

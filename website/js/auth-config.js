@@ -1,22 +1,30 @@
 /**
- * Public pages - no login required.
+ * Public pages - no login required (landing + legal + auth only).
+ * Everything else requires a signed-in account on the live site.
  */
 var XF_PUBLIC_PAGES = ['login.html', 'signup.html', 'home.html', 'index.html', 'terms.html', 'privacy.html'];
 
 /**
- * Protected pages - login required (direct URL or link from home).
+ * Explicit protected list (kept for clarity). Live auth also gates any
+ * non-public page, not only this list.
  */
 var XF_PROTECTED_PAGES = [
   'templates.html',
   'skills.html',
   'prompt-library.html',
   'bundles.html',
-    'contact.html',
+  'contact.html',
   'connector-setup.html',
+  'about.html',
+  'skill-builder.html',
+  'account.html',
+  'workflows.html',
+  'use-cases.html',
+  'changelog.html',
 ];
 
 /**
- * Hide protected pages until auth check completes (prevents content flash).
+ * Hide non-public pages until auth check completes (prevents content flash).
  */
 (function () {
   var page = (location.pathname.split('/').pop() || '').split('?')[0];
@@ -32,7 +40,7 @@ var XF_PROTECTED_PAGES = [
  * Localhost always skips auth so you can preview every page while editing.
  */
 var XF_IS_LOCAL_DEV = /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(location.hostname);
-var XF_REQUIRE_AUTH_LIVE = false;
+var XF_REQUIRE_AUTH_LIVE = true;
 
 /**
  * X Freeze Supabase auth config - xfreeze.com

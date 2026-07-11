@@ -139,24 +139,62 @@
   }
 
   function isProtectedPage(page) {
-    return protectedPages().indexOf(page) !== -1;
+    if (!page) return false;
+    if (publicPages().indexOf(page) !== -1) return false;
+    if (page === loginPageName()) return false;
+    /* Any non-public page is gated when auth is required. */
+    if (protectedPages().indexOf(page) !== -1) return true;
+    return true;
   }
 
   function pageFromHref(href) {
-    if (!href || href.indexOf('://') !== -1 || href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0) {
+    if (!href || href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0 || href.indexOf('javascript:') === 0) {
       return '';
     }
-    return href.split('?')[0].split('#')[0].replace(/^\.\//, '');
+    try {
+      if (href.indexOf('://') !== -1) {
+        var abs = new URL(href, window.location.href);
+        if (abs.origin !== window.location.origin) return '';
+        href = abs.pathname.split('/').pop() || '';
+      }
+    } catch (e) {
+      return '';
+    }
+    return href.split('?')[0].split('#')[0].replace(/^\.\//, '').replace(/^\//, '');
   }
 
-  function isProtectedHref(href) {
+  function isExternalHref(href) {
+    if (!href) return false;
+    if (href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0) return true;
+    try {
+      if (href.indexOf('://') !== -1 || href.indexOf('//') === 0) {
+        return new URL(href, window.location.href).origin !== window.location.origin;
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  /**
+   * Logged-out users: any internal navigation or in-page jump goes to login
+   * (no smooth-scroll to sections - open login instead).
+   */
+  function shouldGateHref(href) {
+    if (!href || href === '#' || href.indexOf('javascript:') === 0) return false;
+    if (isExternalHref(href)) return false;
+
+    /* In-page anchors (#skills, #section-...) - do not scroll, send to login */
+    if (href.charAt(0) === '#') return true;
+
     var page = pageFromHref(href);
-    return page ? isProtectedPage(page) : false;
+    if (!page) return false;
+    if (page === loginPageName() || page === 'signup.html') return false;
+    if (publicPages().indexOf(page) !== -1) return false;
+    return true;
   }
 
   function redirectToLogin(returnPath) {
     markSignInIntent();
-    if (returnPath) {
+    if (returnPath && returnPath.charAt(0) !== '#' && returnPath.indexOf('login') === -1) {
       try {
         sessionStorage.setItem('xf-auth-redirect', returnPath);
       } catch (e) {}
@@ -175,19 +213,24 @@
         var link = event.target.closest('a[href]');
         if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
 
-        var href = link.getAttribute('href') || '';
-        if (!isProtectedHref(href)) return;
+        var href = (link.getAttribute('href') || '').trim();
+        if (!shouldGateHref(href)) return;
 
         event.preventDefault();
         event.stopPropagation();
-        redirectToLogin(href.replace(/^\.\//, ''));
+        if (typeof event.stopImmediatePropagation === 'function') {
+          event.stopImmediatePropagation();
+        }
+
+        var returnPath = href.charAt(0) === '#' ? currentPage() : href.replace(/^\.\//, '');
+        redirectToLogin(returnPath);
       },
       true
     );
   }
 
   function shouldRequireAuth() {
-    return isConfigured() && config().requireAuth !== false;
+    return isConfigured() && config().requireAuth === true;
   }
 
   function setPageVisible(visible) {
@@ -223,7 +266,8 @@
   }
 
   function isProtectedDestination() {
-    return shouldRequireAuth() && isProtectedPage(currentPage());
+    /* Gate every page that is not explicitly public. */
+    return shouldRequireAuth() && !isPublicPage();
   }
 
   function getClient() {

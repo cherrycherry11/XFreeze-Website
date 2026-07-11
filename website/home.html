@@ -221,12 +221,69 @@
 
     [data-video-cycle] .artistic-card {
       position: relative;
+      overflow: hidden;
+      /* Soft placeholder while the first frame buffers (no empty white flash) */
+      background:
+        linear-gradient(145deg, #ececf0 0%, #e4e4ea 48%, #dddde5 100%);
+    }
+    html.dark [data-video-cycle] .artistic-card {
+      background:
+        linear-gradient(145deg, #141416 0%, #0c0c0e 50%, #101014 100%);
+    }
+    [data-video-cycle] .artistic-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        110deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.28) 48%,
+        transparent 66%
+      );
+      background-size: 200% 100%;
+      opacity: 0.55;
+      animation: xf-card-shimmer 1.35s ease-in-out infinite;
+      transition: opacity 0.35s ease;
+    }
+    html.dark [data-video-cycle] .artistic-card::after {
+      background: linear-gradient(
+        110deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.06) 48%,
+        transparent 66%
+      );
+    }
+    [data-video-cycle] .artistic-card.is-video-ready::after {
+      opacity: 0;
+      animation: none;
+    }
+    @keyframes xf-card-shimmer {
+      0% { background-position: 100% 0; }
+      100% { background-position: -100% 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      [data-video-cycle] .artistic-card::after {
+        animation: none;
+        opacity: 0.2;
+      }
+    }
+    /* Softer scroll-in for video grids so cards don't "roll" in empty */
+    .scroll-reveal-in:has([data-video-cycle]) {
+      transform: translateY(14px);
+      transition-duration: 0.45s;
+    }
+    .scroll-reveal-in--left:has([data-video-cycle]),
+    .scroll-reveal-in--right:has([data-video-cycle]) {
+      transform: translateY(14px);
     }
     .section-video-stack {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
+      z-index: 1;
     }
     .section-video-stack .section-video {
       position: absolute;
@@ -238,12 +295,15 @@
       visibility: hidden;
       pointer-events: none;
       transition: opacity 480ms ease;
-      background: #0a0a0a;
+      background: transparent;
     }
     .section-video-stack .section-video.is-active {
-      opacity: 1;
       visibility: visible;
       z-index: 1;
+    }
+    /* Only show once a real frame is decoded */
+    .section-video-stack .section-video.is-active.is-frame-ready {
+      opacity: 1;
     }
     .section-video-stack .section-video.is-pending {
       /* Preloading next clip - never show until is-active */
@@ -1587,12 +1647,12 @@
       <div class="scroll-reveal-in scroll-reveal-in--right md:col-span-7" style="transition-delay: 100ms">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-video-cycle="experimental">
           <div class="h-[280px] sm:h-[360px] md:h-[520px] artistic-card">
-            <video class="section-video" muted playsinline preload="none" aria-label="Style video 1">
+            <video class="section-video" muted playsinline preload="metadata" aria-label="Style video 1">
               <source src="assets/videos/style-1.mp4" type="video/mp4">
             </video>
           </div>
           <div class="h-[280px] sm:h-[360px] md:h-[520px] artistic-card">
-            <video class="section-video" muted playsinline preload="none" aria-label="Style edit video 2">
+            <video class="section-video" muted playsinline preload="metadata" aria-label="Style edit video 2">
               <source src="assets/videos/style-edit-2.mp4" type="video/mp4">
             </video>
           </div>
@@ -1608,12 +1668,12 @@
       <div class="scroll-reveal-in scroll-reveal-in--left order-2 md:order-1 md:col-span-7">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-video-cycle="minimal">
           <div class="h-[280px] sm:h-[360px] md:h-[520px] artistic-card">
-            <video class="section-video" muted playsinline preload="none" aria-label="Product video 1">
+            <video class="section-video" muted playsinline preload="metadata" aria-label="Product video 1">
               <source src="assets/videos/product-add-1.mp4" type="video/mp4">
             </video>
           </div>
           <div class="h-[280px] sm:h-[360px] md:h-[520px] artistic-card">
-            <video class="section-video" muted playsinline preload="none" aria-label="Product video 2">
+            <video class="section-video" muted playsinline preload="metadata" aria-label="Product video 2">
               <source src="assets/videos/product-add-2.mp4" type="video/mp4">
             </video>
           </div>
@@ -1651,7 +1711,7 @@
     <div id="xf-category-showcase" class="xf-cat-showcase-grid scroll-reveal-in" data-video-cycle="beforeAfter">
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Change Backgrounds">
+          <video class="section-video" muted loop playsinline preload="metadata" aria-label="Before and after: Change Backgrounds">
             <source src="assets/videos/before-after/change-backgrounds.mp4" type="video/mp4">
           </video>
         </div>
@@ -1661,7 +1721,7 @@
       </div>
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Create Mockup's">
+          <video class="section-video" muted loop playsinline preload="metadata" aria-label="Before and after: Create Mockup's">
             <source src="assets/videos/before-after/create-mokeup-s.mp4" type="video/mp4">
           </video>
         </div>
@@ -1671,7 +1731,7 @@
       </div>
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Professional Headshots">
+          <video class="section-video" muted loop playsinline preload="metadata" aria-label="Before and after: Professional Headshots">
             <source src="assets/videos/before-after/professional-headshots.mp4" type="video/mp4">
           </video>
         </div>
@@ -1681,7 +1741,7 @@
       </div>
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Try on Outfits">
+          <video class="section-video" muted loop playsinline preload="metadata" aria-label="Before and after: Try on Outfits">
             <source src="assets/videos/before-after/try-on-outfits.mp4" type="video/mp4">
           </video>
         </div>
@@ -2587,6 +2647,45 @@
       return card._videoStack;
     }
 
+    /** Decode the first frame so scroll-in never shows empty cards. */
+    function warmFirstFrame(card) {
+      const stack = ensureVideoStack(card);
+      if (!stack || !stack.active || card._firstFrameWarming) return;
+      const video = stack.active;
+      const source = video.querySelector('source');
+      const src = source && (source.getAttribute('src') || source.src);
+      if (!src) return;
+
+      card._firstFrameWarming = true;
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = 'auto';
+
+      const markReady = () => {
+        video.classList.add('is-frame-ready');
+        card.classList.add('is-video-ready');
+        try {
+          if (video.currentTime < 0.04) video.currentTime = 0.05;
+        } catch (e) { /* ignore */ }
+        /* Hold first frame until the section is visible */
+        video.pause();
+      };
+
+      if (video.readyState >= 2) {
+        markReady();
+        return;
+      }
+
+      const onReady = () => {
+        markReady();
+      };
+      video.addEventListener('loadeddata', onReady, { once: true });
+      video.addEventListener('canplay', onReady, { once: true });
+      try {
+        video.load();
+      } catch (e) { /* ignore */ }
+    }
+
     function bootShowcaseVideos() {
       document.querySelectorAll('[data-video-cycle] .artistic-card').forEach((card) => {
         const stack = ensureVideoStack(card);
@@ -2596,7 +2695,6 @@
           video.muted = true;
           video.playsInline = true;
           video.loop = false;
-          video.preload = 'none';
         });
         stack.active.classList.add('is-active');
         stack.active.classList.remove('is-pending');
@@ -2604,10 +2702,27 @@
           stack.idle.classList.remove('is-active');
           stack.idle.classList.add('is-pending');
           stack.idle.pause();
+          stack.idle.preload = 'none';
         }
-        /* Do not play until the cycle container is on-screen (see initSectionVideoCycling). */
-        stack.active.pause();
+        /* Warm first frame ASAP so scroll-reveal is never empty */
+        warmFirstFrame(card);
       });
+
+      /* Also warm when section is still below the fold (large rootMargin) */
+      if (!window._xfWarmVideoIO) {
+        window._xfWarmVideoIO = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.querySelectorAll('.artistic-card').forEach((card) => {
+              warmFirstFrame(card);
+            });
+          });
+        }, { rootMargin: '140% 0px 40% 0px', threshold: 0 });
+
+        document.querySelectorAll('[data-video-cycle]').forEach((el) => {
+          window._xfWarmVideoIO.observe(el);
+        });
+      }
     }
 
     function initSectionVideoCycling() {
@@ -2651,6 +2766,13 @@
         const playIfVisible = (video) => {
           if (!container._isVisible || !video) return;
           video.muted = true;
+          const markFrame = () => {
+            video.classList.add('is-frame-ready');
+            const card = video.closest('.artistic-card');
+            if (card) card.classList.add('is-video-ready');
+          };
+          if (video.readyState >= 2) markFrame();
+          else video.addEventListener('loadeddata', markFrame, { once: true });
           const p = video.play();
           if (p && typeof p.catch === 'function') p.catch(() => {});
         };
@@ -2773,8 +2895,9 @@
                 if (token !== card._swapToken) return;
 
                 idle.classList.remove('is-pending');
-                idle.classList.add('is-active');
+                idle.classList.add('is-active', 'is-frame-ready');
                 active.classList.remove('is-active');
+                card.classList.add('is-video-ready');
                 /* Keep outgoing visible under the fade until opacity hits 0 -
                    do NOT clear its src until fade is fully done. */
                 updateCardCaption(card, src, poolKey);

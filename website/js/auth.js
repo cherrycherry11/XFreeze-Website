@@ -501,12 +501,22 @@
 
     rememberRedirect();
 
+    var oauthOptions = {
+      redirectTo: loginUrl(),
+      skipBrowserRedirect: true,
+    };
+
+    /*
+     * X OAuth 2.0: avoid users.email (often blocked / not granted on free apps).
+     * tweet.read + users.read + offline.access is enough for sign-in.
+     */
+    if (supabaseProviderName(provider) === 'x') {
+      oauthOptions.scopes = 'tweet.read users.read offline.access';
+    }
+
     var result = await sb.auth.signInWithOAuth({
       provider: supabaseProviderName(provider),
-      options: {
-        redirectTo: loginUrl(),
-        skipBrowserRedirect: true,
-      },
+      options: oauthOptions,
     });
 
     if (result.error) {

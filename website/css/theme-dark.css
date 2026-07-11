@@ -1,5 +1,5 @@
 /**
- * X Freeze — dark mode (deep black, not gray)
+ * X Freeze - dark mode (deep black, not gray)
  * Light mode is untouched. Only html.dark rules live here.
  *
  * Palette (true dark):
@@ -168,7 +168,7 @@ html.dark .sb-panel {
   color: var(--text);
 }
 
-/* Dark glass cards — deep + translucent */
+/* Dark glass cards - deep + translucent */
 html.dark .xf-glass-section .xf-spot-card,
 html.dark .xf-glass-section .xf-combo-card,
 html.dark .xf-glass-section .xf-motion-card,

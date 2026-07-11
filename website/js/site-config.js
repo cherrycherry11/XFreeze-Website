@@ -31,7 +31,7 @@
       line1: 'The Ultimate',
       line2: 'AI Resource Hub',
     },
-    heroLead: 'The all-in-one library for creators, developers, and businesses. Ready-made Grok Imagine templates, motion prompts, and AI skills — including tools that turn any image into a cinematic video.',
+    heroLead: 'The all-in-one library for creators, developers, and businesses. Ready-made Grok Imagine templates, motion prompts, and AI skills - including tools that turn any image into a cinematic video.',
 
     templateCategories: {
       Product: 122,

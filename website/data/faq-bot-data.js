@@ -454,7 +454,7 @@
       },
       {
         question: 'What data does X Freeze collect?',
-        answer: 'Only the basics: contact form messages, optional sign-in, and normal website/tech prefs. We don’t sell your info and skills don’t send your Gmail/Drive to us. See the simple <a href="privacy.html">Privacy</a> page. Use the library for your own work — please don’t resell or redistribute it (<a href="terms.html">Terms</a>).',
+        answer: 'Only the basics: contact form messages, optional sign-in, and normal website/tech prefs. We don’t sell your info and skills don’t send your Gmail/Drive to us. See the simple <a href="privacy.html">Privacy</a> page. Use the library for your own work - please don’t resell or redistribute it (<a href="terms.html">Terms</a>).',
         tags: ['privacy', 'data', 'collect', 'tracking', 'terms', 'resale']
       },
       {

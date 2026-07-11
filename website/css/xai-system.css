@@ -195,7 +195,7 @@
   min-width: 5rem;
 }
 
-/* Pseudo dividers off by default — banner uses explicit .skills-hero-stat-divider nodes */
+/* Pseudo dividers off by default - banner uses explicit .skills-hero-stat-divider nodes */
 .skills-hero-stat + .skills-hero-stat::before {
   display: none !important;
 }

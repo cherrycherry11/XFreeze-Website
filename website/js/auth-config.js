@@ -50,5 +50,6 @@ window.X FreezeAuthConfig = {
 
   providers: {
     twitter: true,
+    google: true,
   },
 };

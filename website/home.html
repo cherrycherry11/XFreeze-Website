@@ -246,7 +246,7 @@
       z-index: 1;
     }
     .section-video-stack .section-video.is-pending {
-      /* Preloading next clip — never show until is-active */
+      /* Preloading next clip - never show until is-active */
       opacity: 0 !important;
       visibility: hidden !important;
       z-index: 0;
@@ -377,7 +377,7 @@
       pointer-events: none;
       overflow: hidden;
       perspective: 520px;
-      /* Near-fixed origin — only tiny cursor influence */
+      /* Near-fixed origin - only tiny cursor influence */
       perspective-origin: var(--mx) calc(var(--my) * 0.35 + 28%);
       /* Soft fade so grid lines don't cut off hard at edges */
       -webkit-mask-image: linear-gradient(
@@ -1170,7 +1170,7 @@
     html.dark #section-minimal a {
       color: #f2f2f2 !important;
     }
-    /* No light PNG — pure dark glass amoeba */
+    /* No light PNG - pure dark glass amoeba */
     html.dark .xf-feature-copy__blob {
       left: -30% !important;
       top: -28% !important;
@@ -1265,7 +1265,7 @@
       color: #f0f0f0 !important;
     }
 
-    /* Elevated cards — clearer lift off pure black */
+    /* Elevated cards - clearer lift off pure black */
     html.dark #selected-work .simple-card,
     html.dark #xf-motion-prompts .xf-motion-card,
     html.dark #xf-motion-prompts .xf-motion-flow,
@@ -1468,7 +1468,7 @@
           <span class="hero-headline__line" data-xf-hero-title="1">The Ultimate</span>
           <span class="hero-headline__line hero-headline__line--soft" data-xf-hero-title="2">AI Resource Hub</span>
         </h1>
-        <p class="hero-lead" data-xf-hero-lead>The all-in-one library for creators, developers, and businesses. Ready-made Grok Imagine templates, motion prompts, and AI skills — including tools that turn any image into a cinematic video.</p>
+        <p class="hero-lead" data-xf-hero-lead>The all-in-one library for creators, developers, and businesses. Ready-made Grok Imagine templates, motion prompts, and AI skills - including tools that turn any image into a cinematic video.</p>
         <div class="hero-actions">
           <a href="templates.html" class="hero-btn hero-btn--primary">Browse templates</a>
           <a href="skills.html" class="hero-btn hero-btn--ghost">Browse skills</a>
@@ -2478,7 +2478,7 @@
     }
 
     /* Default clip window. Real duration is read from each video when known.
-       Product clips are ~5s exact — advancing on a hard global timer freezes the
+       Product clips are ~5s exact - advancing on a hard global timer freezes the
        last frame and swaps both cards at once (feels laggy vs longer style clips). */
     const VIDEO_CLIP_MS = 5000;
     const VIDEO_PRELOAD_MS = 1400; /* start loading next earlier */
@@ -2568,7 +2568,7 @@
       layerB.pause();
       layerB.muted = true;
       layerB.playsInline = true;
-      layerB.loop = false; /* freeze last frame until crossfade — no loop flash */
+      layerB.loop = false; /* freeze last frame until crossfade - no loop flash */
       layerA.muted = true;
       layerA.playsInline = true;
       layerA.loop = false;
@@ -2713,7 +2713,7 @@
 
         /**
          * Load `src` onto the idle layer while it stays hidden (is-pending).
-         * Only crossfade once a decoded frame is ready — avoids mid-swap flicker.
+         * Only crossfade once a decoded frame is ready - avoids mid-swap flicker.
          */
         const applyVideo = (card, src, animate) => {
           const stack = ensureVideoStack(card);
@@ -2733,7 +2733,7 @@
             return;
           }
 
-          /* Already loading this exact next clip — just wait for reveal. */
+          /* Already loading this exact next clip - just wait for reveal. */
           if (card._isSwapping && card._pendingSrc === src) return;
 
           clearCardSwap(card);
@@ -2767,7 +2767,7 @@
                 idle.classList.remove('is-pending');
                 idle.classList.add('is-active');
                 active.classList.remove('is-active');
-                /* Keep outgoing visible under the fade until opacity hits 0 —
+                /* Keep outgoing visible under the fade until opacity hits 0 -
                    do NOT clear its src until fade is fully done. */
                 updateCardCaption(card, src, poolKey);
 
@@ -2821,7 +2821,7 @@
             idle.classList.remove('is-active');
           };
 
-          /* Preloaded next clip is already on idle — reveal without reloading */
+          /* Preloaded next clip is already on idle - reveal without reloading */
           if (sourceMatches(idleSource, src) && idle.readyState >= 2) {
             reveal();
             return;
@@ -2934,7 +2934,7 @@
               if (!container._isVisible || !container._cycleReady) return;
               const ok = advanceCard(cardIndex);
               if (!ok) {
-                /* Previous crossfade still running — retry shortly */
+                /* Previous crossfade still running - retry shortly */
                 card._advanceTimer = setTimeout(tryAdvance, 180);
                 return;
               }

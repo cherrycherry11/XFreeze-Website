@@ -137,11 +137,36 @@
           muted
           loop
           playsinline
-          preload="metadata"
+          preload="auto"
           data-banner-light="assets/videos/skills-banner-light.mp4"
           data-banner-dark="assets/videos/skills-banner-dark.mp4"
         ></video>
         <div class="skills-banner__veil"></div>
+        <!-- Set banner src immediately (before heavy scripts) so there is no black flash -->
+        <script>
+          (function () {
+            var video = document.currentScript.parentElement.querySelector('.skills-banner__video');
+            if (!video) return;
+            var isDark = document.documentElement.classList.contains('dark');
+            var src = isDark
+              ? (video.getAttribute('data-banner-dark') || 'assets/videos/skills-banner-dark.mp4')
+              : (video.getAttribute('data-banner-light') || 'assets/videos/skills-banner-light.mp4');
+            video.muted = true;
+            video.playsInline = true;
+            video.setAttribute('src', src);
+            video.load();
+            var markReady = function () {
+              video.classList.add('is-ready');
+              var p = video.play();
+              if (p && typeof p.catch === 'function') p.catch(function () {});
+            };
+            if (video.readyState >= 2) markReady();
+            else {
+              video.addEventListener('loadeddata', markReady, { once: true });
+              video.addEventListener('canplay', markReady, { once: true });
+            }
+          })();
+        </script>
       </div>
       <div class="content-container skills-hero-inner">
         <header class="skills-hero scroll-reveal-in">
@@ -286,23 +311,31 @@
         ? (video.getAttribute('data-banner-dark') || 'assets/videos/skills-banner-dark.mp4')
         : (video.getAttribute('data-banner-light') || 'assets/videos/skills-banner-light.mp4');
       var current = video.currentSrc || video.getAttribute('src') || '';
+      var markReady = function () {
+        video.classList.add('is-ready');
+        var p = video.play();
+        if (p && typeof p.catch === 'function') p.catch(function () {});
+      };
       if (current.indexOf(nextSrc) !== -1) {
         video.muted = true;
         video.playsInline = true;
-        var p0 = video.play();
-        if (p0 && typeof p0.catch === 'function') p0.catch(function () {});
+        if (video.readyState >= 2) markReady();
+        else {
+          video.addEventListener('loadeddata', markReady, { once: true });
+          video.addEventListener('canplay', markReady, { once: true });
+        }
         return;
       }
+      video.classList.remove('is-ready');
       video.muted = true;
       video.playsInline = true;
       video.setAttribute('src', nextSrc);
       video.load();
-      var tryPlay = function () {
-        var p = video.play();
-        if (p && typeof p.catch === 'function') p.catch(function () {});
-      };
-      if (video.readyState >= 2) tryPlay();
-      else video.addEventListener('canplay', tryPlay, { once: true });
+      if (video.readyState >= 2) markReady();
+      else {
+        video.addEventListener('loadeddata', markReady, { once: true });
+        video.addEventListener('canplay', markReady, { once: true });
+      }
     }
 
     function applyTheme(theme) {

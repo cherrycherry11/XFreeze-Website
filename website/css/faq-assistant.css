@@ -22,7 +22,7 @@
   pointer-events: auto;
 }
 
-/* Compact circular icon FAB — does not block hero CTAs */
+/* Compact circular icon FAB - does not block hero CTAs */
 .xf-faq-bot__launcher {
   display: inline-flex;
   align-items: center;
@@ -42,7 +42,7 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.15s ease;
 }
 
-/* Hide label text — icon only (sr-only for a11y) */
+/* Hide label text - icon only (sr-only for a11y) */
 .xf-faq-bot__launcher-label {
   position: absolute;
   width: 1px;

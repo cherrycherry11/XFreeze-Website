@@ -2491,7 +2491,7 @@
           "premium": true
         }
       ],
-      "suitableFor": "Product shots, e-commerce heroes, unboxing teardowns, tech/spec videos — any object you can take apart."
+      "suitableFor": "Product shots, e-commerce heroes, unboxing teardowns, tech/spec videos - any object you can take apart."
     },
     {
       "id": "vehicle-to-robot-transformer",
@@ -2957,7 +2957,7 @@
           "premium": true
         }
       ],
-      "suitableFor": "Pulling out from a close subject through scale jumps — location reveals, epic openers."
+      "suitableFor": "Pulling out from a close subject through scale jumps - location reveals, epic openers."
     },
     {
       "id": "elemental-materialization",
@@ -3059,7 +3059,7 @@
           "premium": true
         }
       ],
-      "suitableFor": "Outfit / look changes on a person — formal, costume, futuristic, period, eveningwear."
+      "suitableFor": "Outfit / look changes on a person - formal, costume, futuristic, period, eveningwear."
     }
   ],
   "layerGuide": {

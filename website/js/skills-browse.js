@@ -99,7 +99,7 @@
         if (full.slash && !skill.slash) skill.slash = full.slash;
         return;
       }
-      /* Pack has a skill the index stub is missing — surface it anyway */
+      /* Pack has a skill the index stub is missing - surface it anyway */
       bundle.skills.push({
         id: full.id,
         slash: full.slash || ('/' + full.id),
@@ -170,7 +170,7 @@
   }
 
   /**
-   * Script-tag load — works when fetch() is blocked (file://, some sandboxes).
+   * Script-tag load - works when fetch() is blocked (file://, some sandboxes).
    * Companion files: data/skills-packs/<id>.js registers window.__XF_SKILL_PACKS__[id].
    */
   function loadPackViaScript(bundleId) {
@@ -607,7 +607,7 @@
       if (typeof console !== 'undefined' && console.warn) {
         console.warn('[X Freeze] skill pack load failed:', b.id, err);
       }
-      /* Keep the skill list visible — only note that full prompts need a retry */
+      /* Keep the skill list visible - only note that full prompts need a retry */
       if (currentBundle && currentBundle.id === b.id && list) {
         renderBundleSkillList(b);
         const note = document.createElement('p');
@@ -795,7 +795,7 @@
     const topicsEl = $('xf-skills-filter-topics');
     if (!el) return;
 
-    // Row 1 — type / access only
+    // Row 1 - type / access only
     const primaryParts = [
       { filter: 'reset', value: 'all', label: 'All', cls: '' },
       { filter: 'access', value: 'free', label: 'Free', cls: '' },
@@ -819,7 +819,7 @@
         if (kind === 'reset') {
           applyFilters({ access: 'all', type: 'all', topic: 'all', sub: 'all' }, true);
         } else if (kind === 'access') {
-          // Combine with topic/type — toggle off if already active
+          // Combine with topic/type - toggle off if already active
           applyFilters({
             access: filters.access === val ? 'all' : val,
             type: filters.type,
@@ -837,7 +837,7 @@
       });
     });
 
-    // Row 2 — topics (Create & marketing, Systems, …)
+    // Row 2 - topics (Create & marketing, Systems, …)
     if (topicsEl) {
       const topicParts = [];
       if (TAX && TAX.CATEGORIES) {

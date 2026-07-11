@@ -1,5 +1,5 @@
 /**
- * Skills browse taxonomy — categories, subcategories, free/premium helpers.
+ * Skills browse taxonomy - categories, subcategories, free/premium helpers.
  * Consumed by js/skills-browse.js (does not replace the auto-generated pack index).
  */
 (function (g) {

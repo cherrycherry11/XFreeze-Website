@@ -41,7 +41,7 @@
   min-width: 0;
 }
 
-/* Hero overlay (home) — same footprint as page-nav (no extra padding) */
+/* Hero overlay (home) - same footprint as page-nav (no extra padding) */
 .site-nav:not(.page-nav) {
   position: absolute;
   top: 0;
@@ -114,7 +114,7 @@ html.dark .site-nav:not(.page-nav).is-scrolled {
   --xf-nav-menu-text: var(--text-secondary, #52525b);
 }
 
-/* Dark solid bar — inverted mirror of light (flat links, solid CTA) */
+/* Dark solid bar - inverted mirror of light (flat links, solid CTA) */
 html.dark .site-nav.is-scrolled,
 html.dark .site-nav.page-nav,
 html.dark .site-nav.page-nav.xf-nav-compact {
@@ -562,7 +562,7 @@ html.dark .hero-header .site-nav-drawer-link--active {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Dark mode: solid nav surfaces (no pill chrome — match light flat links) */
+/* Dark mode: solid nav surfaces (no pill chrome - match light flat links) */
 html.dark .site-nav:not(.page-nav).is-scrolled,
 html.dark .site-nav.page-nav {
   backdrop-filter: none;
@@ -596,7 +596,7 @@ html.dark .site-nav-mobile-panel .site-nav-pill-link--active {
   background: rgba(255, 255, 255, 0.06);
 }
 
-/* Active link emphasis — same weight/color as light, inverted */
+/* Active link emphasis - same weight/color as light, inverted */
 html.dark .site-nav.page-nav .site-nav-pill-link--active,
 html.dark .site-nav.page-nav .site-nav-pill-link[aria-current='page'],
 html.dark .site-nav.is-scrolled .site-nav-pill-link--active,

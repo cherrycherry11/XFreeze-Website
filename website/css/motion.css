@@ -58,7 +58,7 @@ html.lenis body {
   padding-bottom: 0;
 }
 
-/* Keep bar height fixed — only color/background may change on scroll */
+/* Keep bar height fixed - only color/background may change on scroll */
 .site-nav-bar {
   min-height: var(--xf-nav-h, 4rem);
   height: var(--xf-nav-h, 4rem);

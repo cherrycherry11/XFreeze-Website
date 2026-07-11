@@ -22,7 +22,7 @@
     object-position: 42% center !important;
   }
 
-  /* Lighter left wash — more open video, still readable type */
+  /* Lighter left wash - more open video, still readable type */
   .hero-overlay__wash {
     background: linear-gradient(
       102deg,

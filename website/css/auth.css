@@ -276,6 +276,18 @@ html.dark .xf-auth-provider-btn {
   flex-shrink: 0;
 }
 
+.xf-auth-provider-btn--google svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
+.xf-auth-social {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
 .xf-auth-provider-btn {
   position: relative;
   justify-content: flex-start;

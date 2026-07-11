@@ -14,7 +14,7 @@ html.dark .pl-main {
   --pl-hero-bg: #020403;
 }
 
-/* Hero — light theme (default) mirrors dark cinematic layout */
+/* Hero - light theme (default) mirrors dark cinematic layout */
 .pl-hero {
   position: relative;
   overflow: hidden;
@@ -1172,7 +1172,7 @@ html.dark .pl-card--premium {
 }
 
 
-/* Detail panel — above request CTA (10040) + FAQ bot (10050) */
+/* Detail panel - above request CTA (10040) + FAQ bot (10050) */
 .pl-panel-backdrop {
   position: fixed;
   inset: 0;

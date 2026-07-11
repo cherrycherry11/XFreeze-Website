@@ -541,7 +541,7 @@
       }
 
       btn.disabled = true;
-      setStatus(statusEl, 'info', 'Redirecting to X…');
+      setStatus(statusEl, 'info', provider === 'google' ? 'Redirecting to Google...' : 'Redirecting to X...');
 
       if (oauthUrlCache[provider]) {
         window.location.assign(oauthUrlCache[provider]);
@@ -572,6 +572,9 @@
       return;
     }
 
+    var googleBtn = document.getElementById('xf-auth-google');
+    bindProviderButton(googleBtn, 'google', statusEl);
+    prefetchOAuthUrl('google');
     bindProviderButton(twitterBtn, 'x', statusEl);
     prefetchOAuthUrl('x');
 
@@ -726,6 +729,7 @@
     init: init,
     rememberRedirect: rememberRedirect,
     signInWithTwitter: function () { return signInWithOAuth('x'); },
+    signInWithGoogle: function () { return signInWithOAuth('google'); },
     signInWithPassword: signInWithPassword,
     signUpWithPassword: signUpWithPassword,
     signOut: signOut,

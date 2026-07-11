@@ -24,7 +24,8 @@
   min-height: clamp(22rem, 48vw, 32rem);
   padding: clamp(2.5rem, 5vw, 3.5rem) 0;
   border-bottom: 1px solid var(--border, #e5e7eb);
-  background: #0a0a0a;
+  /* Soft slate while video buffers (avoids pure black flash) */
+  background: #12151c;
 }
 
 .skills-banner__media {
@@ -33,6 +34,7 @@
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  background: linear-gradient(135deg, #1a1f2a 0%, #12151c 45%, #161b28 100%);
 }
 
 .skills-banner__video {
@@ -43,25 +45,38 @@
   object-fit: cover;
   object-position: center center;
   display: block;
+  /* Fade in when first frame is ready */
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  filter: none !important;
+  background: transparent;
 }
 
-/* No CSS veil/filters — grading lives in the source videos */
+.skills-banner__video.is-ready {
+  opacity: 1;
+}
+
+/* grading lives in the source videos */
 .skills-banner__veil {
   display: none;
 }
 
-.skills-banner__video {
-  filter: none !important;
-}
-
 html:not(.dark) .skills-hero-section.skills-banner {
-  background: #0a0a0a;
+  background: #e8eaef;
   border-bottom-color: rgba(229, 231, 235, 0.9);
 }
 
+html:not(.dark) .skills-banner__media {
+  background: linear-gradient(135deg, #f0f1f4 0%, #e4e7ec 50%, #f6f5f8 100%);
+}
+
 html.dark .skills-hero-section.skills-banner {
-  background: #000000 !important;
+  background: #0c1018 !important;
   border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark .skills-banner__media {
+  background: linear-gradient(135deg, #141a24 0%, #0c1018 50%, #121820 100%);
 }
 
 .skills-hero-section.skills-banner .skills-hero-inner {
@@ -507,7 +522,7 @@ html.dark .skills-browse-search:focus {
   width: 100%;
 }
 
-/* Second row — topic families */
+/* Second row - topic families */
 .skills-topic-filters {
   display: flex;
   flex-wrap: wrap;
@@ -565,7 +580,7 @@ html.dark .skills-filter-btn.is-active {
   border-color: #f2f5f3;
 }
 
-/* Premium chip — gold treatment (like Prompts) */
+/* Premium chip - gold treatment (like Prompts) */
 .skills-filter-btn--premium {
   border-color: rgba(180, 130, 20, 0.35);
   background: linear-gradient(135deg, rgba(255, 214, 120, 0.14), rgba(255, 180, 50, 0.06));

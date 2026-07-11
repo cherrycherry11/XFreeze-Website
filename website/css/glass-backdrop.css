@@ -1,5 +1,5 @@
 /**
- * X Freeze — pearlescent glass gradients
+ * X Freeze - pearlescent glass gradients
  * Tuned for BOTH light and dark themes.
  *
  * Usage:
@@ -75,7 +75,7 @@ html.dark .xf-glass-section {
   -webkit-backdrop-filter: blur(14px) saturate(1.15);
 }
 
-/* Dark explicit stack — true dark glass, gradient still readable */
+/* Dark explicit stack - true dark glass, gradient still readable */
 html.dark .xf-glass-backdrop__img {
   opacity: 0.38;
   filter: saturate(1.15) brightness(0.38) contrast(1.12);
@@ -93,7 +93,7 @@ html.dark .xf-glass-backdrop__mesh {
 }
 
 html.dark .xf-glass-backdrop__veil {
-  /* Dark glass overlay — keeps field black while gradient glows through */
+  /* Dark glass overlay - keeps field black while gradient glows through */
   background:
     radial-gradient(ellipse 80% 70% at 50% 40%, rgba(0, 0, 0, 0.25) 0%, transparent 65%),
     linear-gradient(
@@ -161,7 +161,7 @@ html.dark .xf-glass-section:not(:has(.xf-glass-backdrop))::after {
   -webkit-backdrop-filter: blur(20px) saturate(1.15);
 }
 
-/* Soft variant — quieter wash */
+/* Soft variant - quieter wash */
 .xf-glass-section--soft {
   background: #f9f8fb !important;
 }
@@ -389,7 +389,7 @@ html.dark .skills-hero-section.xf-glass-section:not(:has(.xf-glass-backdrop))::b
   z-index: 2;
 }
 
-/* Main amoeba blob — larger + softer */
+/* Main amoeba blob - larger + softer */
 .xf-feature-copy__blob {
   position: absolute;
   z-index: 0;
@@ -454,7 +454,7 @@ html.dark .skills-hero-section.xf-glass-section:not(:has(.xf-glass-backdrop))::b
 }
 
 /*
- * Dark mode amoeba — NO light PNG (that washed to a milky circle).
+ * Dark mode amoeba - NO light PNG (that washed to a milky circle).
  * Pure color glass blobs: large, soft, clearly colored on black.
  */
 html.dark .xf-feature-copy__blob {
@@ -491,7 +491,7 @@ html.dark .xf-feature-copy__blob--2 {
   border-radius: 42% 58% 48% 52% / 58% 42% 58% 42% !important;
 }
 
-/* Style / Product sections — deep black + dark glass field */
+/* Style / Product sections - deep black + dark glass field */
 html.dark #section-experimental,
 html.dark #section-minimal {
   background-color: #000000 !important;

@@ -1,7 +1,7 @@
 /* Contact - light mode: bright | dark mode: cinematic */
 
 /*
- * Do NOT override global .content-container here — that was forcing the
+ * Do NOT override global .content-container here - that was forcing the
  * sticky nav (also .content-container) to a different width than the rest
  * of the site and made the bar look like it was “extending” on contact.
  *
@@ -41,7 +41,7 @@
 }
 
 /* ── Hero (glass gradient backdrop, both themes) ── */
-/* Layout only — backdrop comes from shared .xf-glass-hero (same as blog) */
+/* Layout only - backdrop comes from shared .xf-glass-hero (same as blog) */
 .contact-hero {
   display: flex;
   align-items: center;

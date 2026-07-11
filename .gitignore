@@ -38,3 +38,9 @@ website/MOTION-WIRE-INSTRUCTIONS.txt
 
 # original full-res video sources (not needed for deploy)
 website/assets/videos/*-original.mp4
+
+# generated / bulk (not needed in repo if present)
+website/data/skills-browse-data.js
+website/data/skills-catalog.json
+website/assets/videos/*-original.mp4
+website/assets/imagine/

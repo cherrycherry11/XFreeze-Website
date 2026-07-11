@@ -44,6 +44,10 @@ window.XFreezeAuthConfig = {
   loginPath: 'login.html',
   defaultRedirect: 'home.html',
 
+  /* Same Google OAuth Web Client ID as Supabase (for One Tap / GIS). */
+  googleClientId: '420941566311-7ms3q9vd5p6er0j1lmvnumug51c6dsqb.apps.googleusercontent.com',
+  googleOneTap: true,
+
   requireAuth: XF_IS_LOCAL_DEV ? false : XF_REQUIRE_AUTH_LIVE,
   publicPages: XF_PUBLIC_PAGES,
   protectedPages: XF_PROTECTED_PAGES,

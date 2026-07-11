@@ -9,18 +9,22 @@ window.XFreezeAuthConfig = {
   loginPath: 'login.html',
   defaultRedirect: 'home.html',
 
+  /* Google OAuth Web Client ID (same as Supabase) for One Tap */
+  googleClientId: 'YOUR_GOOGLE_OAUTH_WEB_CLIENT_ID.apps.googleusercontent.com',
+  googleOneTap: true,
+
   requireAuth: true,
   publicPages: ['login.html', 'signup.html', 'home.html', 'index.html', 'terms.html', 'privacy.html'],
   protectedPages: [
     'templates.html',
     'skills.html',
     'bundles.html',
-        'contact.html',
+    'contact.html',
     'connector-setup.html',
   ],
 
   providers: {
     twitter: false,
-    google: false,
+    google: true,
   },
 };

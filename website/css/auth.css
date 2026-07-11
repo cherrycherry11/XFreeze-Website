@@ -25,13 +25,18 @@ html.dark.xf-auth-pending::before {
   margin-left: 0.15rem;
 }
 
+/* Coffee lives in the footer only */
+.site-nav-coffee,
+.site-nav-drawer-meta[href*='buymeacoffee'] {
+  display: none !important;
+}
+
 .site-nav-end {
   display: flex;
   align-items: center;
 }
 
-/* Keep coffee / theme / menu before the account circle */
-.site-nav-end > .site-nav-coffee,
+/* Theme / menu before the account circle */
 .site-nav-end > .theme-switch,
 .site-nav-end > .theme-toggle,
 .site-nav-end > .site-nav-menu-btn {

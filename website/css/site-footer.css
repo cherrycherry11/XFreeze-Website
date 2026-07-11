@@ -94,6 +94,38 @@ html.dark .xf-site-footer {
   color: var(--xf-footer-muted);
 }
 
+.xf-footer-coffee {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  min-height: 2.35rem;
+  padding: 0 0.95rem;
+  border-radius: 9999px;
+  border: 1px solid var(--xf-footer-border);
+  background: var(--xf-footer-heading);
+  color: var(--surface, #fff);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+html.dark .xf-footer-coffee {
+  background: #f2f2f2;
+  color: #0a0a0a;
+  border-color: #2a2a2a;
+}
+
+.xf-footer-coffee:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.xf-footer-coffee i {
+  font-size: 0.8rem;
+}
+
 .xf-footer-columns {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

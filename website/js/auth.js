@@ -294,11 +294,10 @@
   function renderNavSlot() {
     var slot = document.getElementById('xf-auth-nav');
     var signedOutNav =
-      '<a href="login.html" class="site-nav-auth-btn" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign in</a>' +
-      '<a href="signup.html" class="site-nav-auth-btn site-nav-auth-btn--ghost" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign up</a>';
+      '<a href="login.html" class="site-nav-auth-btn" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign in</a>';
     var signedOutDrawer =
       '<a href="login.html" class="site-nav-drawer-auth-btn" onclick="toggleMobileMenu && toggleMobileMenu()">Sign in</a>' +
-      '<a href="signup.html" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu && toggleMobileMenu()">Sign up</a>';
+      '<a href="signup.html" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu && toggleMobileMenu()">Create account</a>';
 
     if (!slot && !document.getElementById('xf-auth-drawer')) return;
 
@@ -502,6 +501,7 @@
   }
 
   async function signOut() {
+    cancelGoogleOneTap();
     var sb = getClient();
     if (sb) await sb.auth.signOut();
     session = null;
@@ -742,6 +742,107 @@
     }
   }
 
+  function loadGoogleIdentityServices(done) {
+    if (window.google && window.google.accounts && window.google.accounts.id) {
+      done();
+      return;
+    }
+    if (window.__xfGsiLoading) {
+      window.__xfGsiLoading.push(done);
+      return;
+    }
+    window.__xfGsiLoading = [done];
+    var script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = function () {
+      var queue = window.__xfGsiLoading || [];
+      window.__xfGsiLoading = null;
+      queue.forEach(function (fn) {
+        try {
+          fn();
+        } catch (e) {}
+      });
+    };
+    script.onerror = function () {
+      window.__xfGsiLoading = null;
+    };
+    document.head.appendChild(script);
+  }
+
+  async function handleGoogleOneTap(response) {
+    var sb = getClient();
+    if (!sb || !response || !response.credential) return;
+
+    try {
+      var result = await sb.auth.signInWithIdToken({
+        provider: 'google',
+        token: response.credential,
+      });
+      if (result.error) {
+        console.warn('[xf-auth] Google One Tap failed', result.error);
+        return;
+      }
+      session = result.data.session;
+      renderNavSlot();
+      cancelGoogleOneTap();
+    } catch (err) {
+      console.warn('[xf-auth] Google One Tap error', err);
+    }
+  }
+
+  function cancelGoogleOneTap() {
+    try {
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        window.google.accounts.id.cancel();
+      }
+    } catch (e) {}
+  }
+
+  function maybeShowGoogleOneTap() {
+    var c = config();
+    if (!c.googleOneTap || !c.googleClientId) return;
+    if (!isProviderEnabled('google')) return;
+    if (!isConfigured() || !window.supabase) return;
+    if (session && session.user) return;
+    if (isOAuthCallback()) return;
+
+    /* Avoid stacking prompts on the dedicated login form. */
+    if (document.getElementById('xf-auth-page')) return;
+
+    loadGoogleIdentityServices(function () {
+      if (session && session.user) return;
+      try {
+        window.google.accounts.id.initialize({
+          client_id: c.googleClientId,
+          callback: handleGoogleOneTap,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+          context: 'signin',
+          itp_support: true,
+          use_fedcm_for_prompt: true,
+        });
+        window.google.accounts.id.prompt(function (notification) {
+          if (!notification) return;
+          /* Fallback if FedCM / One Tap is suppressed */
+          try {
+            if (
+              notification.isNotDisplayed &&
+              notification.isNotDisplayed() &&
+              notification.getNotDisplayedReason &&
+              notification.getNotDisplayedReason() === 'suppressed_by_user'
+            ) {
+              return;
+            }
+          } catch (e) {}
+        });
+      } catch (err) {
+        console.warn('[xf-auth] One Tap init failed', err);
+      }
+    });
+  }
+
   async function init() {
     if (!isConfigured()) {
       setPageVisible(true);
@@ -771,6 +872,9 @@
     sb.auth.onAuthStateChange(function (event, nextSession) {
       session = nextSession;
       renderNavSlot();
+      if (event === 'SIGNED_IN' && nextSession && nextSession.user) {
+        cancelGoogleOneTap();
+      }
       if (
         event === 'SIGNED_IN' &&
         nextSession &&
@@ -779,6 +883,9 @@
         isOAuthCallback()
       ) {
         finishLogin(document.getElementById('xf-auth-status'));
+      }
+      if (event === 'SIGNED_OUT') {
+        window.setTimeout(maybeShowGoogleOneTap, 400);
       }
     });
 
@@ -792,6 +899,9 @@
       await handleLoginCallback();
     } else {
       renderNavSlot();
+      if (!(session && session.user)) {
+        window.setTimeout(maybeShowGoogleOneTap, 600);
+      }
     }
   }
 
@@ -806,6 +916,7 @@
     getSession: function () { return session; },
     isConfigured: isConfigured,
     isProviderEnabled: isProviderEnabled,
+    showGoogleOneTap: maybeShowGoogleOneTap,
   };
 
   if (document.readyState === 'loading') {

@@ -147,6 +147,10 @@
       '<p class="xf-footer-eyebrow">AI library for</p>' +
       '<a href="' + base + 'home.html" class="xf-footer-logo">X Freeze</a>' +
       '<p class="xf-footer-tagline" data-xf-tagline>Ready-made AI assets for everything you ship.</p>' +
+      '<a href="https://buymeacoffee.com/xfreeze" class="xf-footer-coffee" target="_blank" rel="noopener noreferrer">' +
+      '<i class="fa-solid fa-mug-hot" aria-hidden="true"></i>' +
+      '<span>Buy me a coffee</span>' +
+      '</a>' +
       '</div>' +
       '<div class="xf-footer-columns">' + columns + '</div>' +
       '</div>' +

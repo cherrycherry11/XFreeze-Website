@@ -526,25 +526,31 @@ html.dark .xf-auth-mode-tabs {
 .site-nav-drawer-auth {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  padding: 0.85rem 1.1rem 0.35rem;
+  gap: 0.5rem;
+  padding: 0.85rem 1.1rem 0.5rem;
 }
 
 .site-nav-drawer-auth-btn {
-  display: inline-flex;
+  display: flex;
+  width: 100%;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  min-height: 2.6rem;
-  padding: 0 1rem;
-  border-radius: 9999px;
+  min-height: 2.75rem;
+  padding: 0.7rem 1rem;
+  /* Rectangle (site box buttons) - not pills */
+  border-radius: 0.5rem;
   border: 1px solid var(--border, #e5e7eb);
   background: var(--text, #0a0a0a);
   color: var(--surface, #fff);
   font-size: 0.875rem;
   font-weight: 600;
+  line-height: 1.2;
   text-decoration: none;
+  text-align: center;
+  white-space: nowrap;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 html.dark .site-nav-drawer-auth-btn {
@@ -562,6 +568,15 @@ html.dark .site-nav-drawer-auth-btn {
 html.dark .site-nav-drawer-auth-btn--ghost {
   color: #f2f2f2 !important;
   border-color: #2a2a2a !important;
+}
+
+/* Top-bar Sign in on small screens: same rectangular shape */
+@media (max-width: 1023px) {
+  .site-nav-auth-btn {
+    border-radius: 0.5rem;
+    padding: 0 0.8rem;
+    height: 2.25rem;
+  }
 }
 
 .site-nav-drawer-auth-email {

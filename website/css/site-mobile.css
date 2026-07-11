@@ -230,11 +230,18 @@ html.dark .hover\:text-black:hover { color: var(--text, #f2f5f3) !important; }
   }
 }
 
-/* Home hero - lock height so iOS chrome show/hide does not grow the video */
+/* Home hero - studio version sizes by content; legacy video rules no longer force 100svh */
 @media (max-width: 767px) {
-  #hero-header,
-  .hero-header {
-    /* Use small viewport only - 100dvh grows when the address bar hides */
+  #hero-header.hero-header--studio,
+  .hero-header--studio {
+    min-height: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+
+  #hero-header:not(.hero-header--studio),
+  .hero-header:not(.hero-header--studio) {
     min-height: 100svh !important;
     height: 100svh !important;
     max-height: 100svh !important;
@@ -260,10 +267,13 @@ html.dark .hover\:text-black:hover { color: var(--text, #f2f5f3) !important; }
   }
 
   #hero-header .hero-content.content-container {
-    padding-top: 0;
-    padding-bottom: max(2.25rem, env(safe-area-inset-bottom, 0px));
     max-width: 100%;
     box-sizing: border-box;
+  }
+
+  #hero-header:not(.hero-header--studio) .hero-content.content-container {
+    padding-top: 0;
+    padding-bottom: max(2.25rem, env(safe-area-inset-bottom, 0px));
   }
 
   #hero-header h1,

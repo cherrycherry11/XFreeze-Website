@@ -101,20 +101,39 @@
   function updateSubfiltersWrap(cats) {
     var wrap = $('pl-subfilters-wrap');
     if (!wrap) return;
+    // Show subcategory chips whenever the active family has 2+ sections
+    // (Camera, Atmosphere, Industry & Scene, Premium, All, etc.)
     var show = cats.length > 1;
-    wrap.hidden = !show;
-    if (!show) closeFilterPanel();
+    if (show) {
+      wrap.hidden = false;
+      wrap.removeAttribute('hidden');
+      wrap.style.display = '';
+      // Keep the chip row open so desktop + mobile always see subcategories
+      var details = $('pl-filter-details');
+      if (details) details.setAttribute('open', '');
+    } else {
+      wrap.hidden = true;
+      wrap.setAttribute('hidden', '');
+      closeFilterPanel();
+    }
   }
 
   function closeFilterPanel() {
     var details = $('pl-filter-details');
-    if (details) details.removeAttribute('open');
+    // Only collapse on mobile; desktop always shows the chip row
+    if (details && isMobileFilters()) details.removeAttribute('open');
   }
 
   function syncFilterPanelState() {
     var details = $('pl-filter-details');
     if (!details) return;
     if (!isMobileFilters()) {
+      details.setAttribute('open', '');
+      return;
+    }
+    // On mobile, leave open if user opened it or a multi-cat family is active
+    var cats = categoriesForActiveGroup();
+    if (cats.length > 1) {
       details.setAttribute('open', '');
       return;
     }
@@ -189,12 +208,20 @@
 
     wrap.classList.remove('is-hidden');
     updateSubfiltersWrap(cats);
-    var html = '<button type="button" class="pl-cat-btn' + (state.categoryId === 'all' ? ' is-active' : '') + '" data-pl-cat="all">All in family</button>';
+    var allLabel = state.group === 'all' ? 'All categories' : 'All in family';
+    var html =
+      '<button type="button" class="pl-cat-btn' +
+      (state.categoryId === 'all' ? ' is-active' : '') +
+      '" data-pl-cat="all">' +
+      escapeHtml(allLabel) +
+      '</button>';
     cats.forEach(function (c) {
       var label = shortCatLabel(c);
       var active = state.categoryId === c.id ? ' is-active' : '';
       html +=
-        '<button type="button" class="pl-cat-btn' + active + '" data-pl-cat="' +
+        '<button type="button" class="pl-cat-btn' +
+        active +
+        '" data-pl-cat="' +
         escapeHtml(c.id) +
         '" data-pl-hue="' +
         c.hue +
@@ -241,6 +268,31 @@
     el.textContent = n === lib.totalPrompts
       ? display.prompts + '+ motion prompts across ' + display.categories + '+ categories'
       : n + ' prompt' + (n === 1 ? '' : 's') + ' matching your filters';
+    renderSuitableNote();
+  }
+
+  function renderSuitableNote() {
+    var wrap = $('pl-suitable');
+    var textEl = $('pl-suitable-text');
+    if (!wrap || !textEl) return;
+
+    // Only when a specific category is selected (not All / All in family)
+    if (state.categoryId === 'all') {
+      wrap.hidden = true;
+      textEl.textContent = '';
+      return;
+    }
+
+    var cat = catById[state.categoryId];
+    var note = cat && (cat.suitableFor || cat.desc || cat.intro);
+    if (!note) {
+      wrap.hidden = true;
+      textEl.textContent = '';
+      return;
+    }
+
+    textEl.textContent = note;
+    wrap.hidden = false;
   }
 
   function renderGrid() {
@@ -396,6 +448,16 @@
     panel.setAttribute('aria-hidden', 'false');
     document.body.classList.add('pl-panel-open');
     document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    // Stop smooth-scroll hijacking so the panel body can scroll
+    if (window.XFreezeLenis && typeof window.XFreezeLenis.stop === 'function') {
+      window.XFreezeLenis.stop();
+    }
+
+    var bodyEl = $('pl-panel-body') || panel.querySelector('.pl-panel__body');
+    if (bodyEl) bodyEl.scrollTop = 0;
+
     panel.focus();
   }
 
@@ -412,7 +474,12 @@
     }
     document.body.classList.remove('pl-panel-open');
     document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
     state.panelIndex = -1;
+
+    if (window.XFreezeLenis && typeof window.XFreezeLenis.start === 'function') {
+      window.XFreezeLenis.start();
+    }
   }
 
   function panelNav(delta) {

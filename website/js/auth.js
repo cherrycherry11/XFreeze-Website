@@ -94,11 +94,17 @@
   }
 
   function shouldStayOnLoginPage() {
-    if (currentPage() !== loginPageName()) return false;
+    var page = currentPage();
+    if (page === 'signup.html') return true;
+    if (page !== loginPageName()) return false;
     if (isOAuthCallback()) return true;
-    if ((window.location.search || '').indexOf('signin=1') !== -1) return true;
+    var search = window.location.search || '';
+    if (search.indexOf('signin=1') !== -1) return true;
+    if (search.indexOf('signup=1') !== -1) return true;
+    if (search.indexOf('mode=signup') !== -1 || search.indexOf('mode=signin') !== -1) return true;
     try {
-      return sessionStorage.getItem('xf-auth-intent') === 'signin';
+      var intent = sessionStorage.getItem('xf-auth-intent');
+      return intent === 'signin' || intent === 'signup';
     } catch (e) {
       return false;
     }
@@ -118,7 +124,7 @@
 
   function publicPages() {
     var c = config();
-    return c.publicPages || ['login.html', 'home.html'];
+    return c.publicPages || ['login.html', 'signup.html', 'home.html'];
   }
 
   function protectedPages() {
@@ -128,8 +134,7 @@
         'templates.html',
         'skills.html',
         'bundles.html',
-        'blog.html',
-        'contact.html',
+                'contact.html',
         'connector-setup.html',
       ]
     );
@@ -286,13 +291,15 @@
 
     if (!isConfigured()) {
       slot.innerHTML =
-        '<a href="login.html?signin=1" class="site-nav-auth-btn" title="Auth not configured yet">Sign in</a>';
+        '<a href="login.html?signin=1" class="site-nav-auth-btn" title="Auth not configured yet">Sign in</a>' +
+        '<a href="signup.html" class="site-nav-auth-btn site-nav-auth-btn--ghost">Sign up</a>';
       return;
     }
 
     if (!session || !session.user) {
       slot.innerHTML =
-        '<a href="login.html?signin=1" class="site-nav-auth-btn" onclick="window.X FreezeAuth && window.X FreezeAuth.rememberRedirect()">Sign in</a>';
+        '<a href="login.html?signin=1" class="site-nav-auth-btn" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign in</a>' +
+        '<a href="signup.html" class="site-nav-auth-btn site-nav-auth-btn--ghost" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign up</a>';
       return;
     }
 
@@ -429,7 +436,7 @@
       email: email,
       password: password,
       options: {
-        emailRedirectTo: loginUrl(),
+        emailRedirectTo: loginPageUrl(),
       },
     });
 
@@ -442,8 +449,21 @@
     if (sb) await sb.auth.signOut();
     session = null;
     renderNavSlot();
-    if (window.location.pathname.indexOf('login') !== -1) return;
+    if (window.location.pathname.indexOf('login') !== -1 || window.location.pathname.indexOf('signup') !== -1) return;
     window.location.reload();
+  }
+
+  function detectAuthMode() {
+    var page = currentPage();
+    if (page === 'signup.html') return 'signup';
+    var params = new URLSearchParams(window.location.search || '');
+    if (params.get('mode') === 'signup' || params.get('signup') === '1') return 'signup';
+    var attr = document.documentElement.getAttribute('data-xf-auth-mode');
+    if (attr === 'signup') return 'signup';
+    try {
+      if (sessionStorage.getItem('xf-auth-intent') === 'signup') return 'signup';
+    } catch (e) {}
+    return 'signin';
   }
 
   function setAuthMode(mode) {
@@ -455,12 +475,14 @@
     var tabSignUp = document.getElementById('xf-auth-tab-signup');
     var submit = document.getElementById('xf-auth-password-submit');
     var passwordInput = document.getElementById('xf-auth-password');
+    var confirmWrap = document.getElementById('xf-auth-password-confirm');
+    var confirmLabel = document.querySelector('label[for="xf-auth-password-confirm"]');
 
     if (heading) heading.textContent = authMode === 'signup' ? 'Create your account' : 'Sign in to X Freeze';
     if (subheading) {
       subheading.textContent =
         authMode === 'signup'
-          ? 'Set up email and password, or use X when it is enabled.'
+          ? 'Set up email and password to save progress. Free to start.'
           : 'Use your email and password, or sign in with X.';
     }
     if (tabSignIn) {
@@ -476,6 +498,16 @@
       passwordInput.autocomplete = authMode === 'signup' ? 'new-password' : 'current-password';
       passwordInput.placeholder = authMode === 'signup' ? 'At least 6 characters' : 'Your password';
     }
+    if (confirmWrap) {
+      confirmWrap.hidden = authMode !== 'signup';
+      confirmWrap.required = authMode === 'signup';
+      if (authMode !== 'signup') confirmWrap.value = '';
+    }
+    if (confirmLabel) confirmLabel.hidden = authMode !== 'signup';
+
+    try {
+      sessionStorage.setItem('xf-auth-intent', authMode);
+    } catch (e) {}
   }
 
   function bindProviderButton(btn, provider, statusEl) {
@@ -543,10 +575,14 @@
     bindProviderButton(twitterBtn, 'x', statusEl);
     prefetchOAuthUrl('x');
 
-    if (tabSignIn) tabSignIn.addEventListener('click', function () { setAuthMode('signin'); });
-    if (tabSignUp) tabSignUp.addEventListener('click', function () { setAuthMode('signup'); });
+    if (tabSignIn && tabSignIn.tagName === 'BUTTON') {
+      tabSignIn.addEventListener('click', function () { setAuthMode('signin'); });
+    }
+    if (tabSignUp && tabSignUp.tagName === 'BUTTON') {
+      tabSignUp.addEventListener('click', function () { setAuthMode('signup'); });
+    }
 
-    setAuthMode('signin');
+    setAuthMode(detectAuthMode());
 
     if (passwordForm) {
       passwordForm.addEventListener('submit', async function (event) {
@@ -554,9 +590,11 @@
 
         var emailInput = document.getElementById('xf-auth-email');
         var passwordInput = document.getElementById('xf-auth-password');
+        var confirmInput = document.getElementById('xf-auth-password-confirm');
         var submit = document.getElementById('xf-auth-password-submit');
         var email = emailInput && emailInput.value ? emailInput.value.trim() : '';
         var password = passwordInput ? passwordInput.value : '';
+        var confirm = confirmInput ? confirmInput.value : '';
 
         if (!email) {
           setStatus(statusEl, 'error', 'Enter your email address.');
@@ -564,6 +602,10 @@
         }
         if (!password || password.length < 6) {
           setStatus(statusEl, 'error', 'Password must be at least 6 characters.');
+          return;
+        }
+        if (authMode === 'signup' && confirmInput && password !== confirm) {
+          setStatus(statusEl, 'error', 'Passwords do not match.');
           return;
         }
 
@@ -584,6 +626,16 @@
               'success',
               'Account created. Check your email to confirm, then sign in.'
             );
+            /* Offer a clear path to sign-in after email confirmation */
+            window.setTimeout(function () {
+              if (!session) {
+                setStatus(
+                  statusEl,
+                  'success',
+                  'Account created. Confirm your email if asked, then go to Sign in.'
+                );
+              }
+            }, 50);
           } else {
             await signInWithPassword(email, password);
             finishLogin(statusEl);
@@ -592,6 +644,9 @@
           var msg = err.message || 'Something went wrong.';
           if (msg.indexOf('Invalid login credentials') !== -1) {
             msg = 'Wrong email or password. Try again or create an account.';
+          }
+          if (msg.indexOf('User already registered') !== -1) {
+            msg = 'That email already has an account. Sign in instead.';
           }
           setStatus(statusEl, 'error', msg);
         } finally {

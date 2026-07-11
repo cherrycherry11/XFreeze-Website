@@ -111,7 +111,7 @@
       },
       {
         question: 'How do I find the right template fast?',
-        answer: 'Go to <a href="templates.html">Templates</a>, pick a category tab, use <strong>search</strong> (name or code like P-15), or filter <strong>Free / Premium</strong>. Subcategory sections narrow results further.',
+        answer: 'Go to <a href="templates.html">Templates</a>, pick a category tab, use <strong>search</strong> (try words like perfume, laptop, or headshot), or filter <strong>Free / Premium</strong>. Subcategory sections narrow results further.',
         tags: ['find', 'search', 'browse', 'filter', 'template', 'fast']
       },
       {
@@ -427,7 +427,7 @@
       },
       {
         question: 'How do I follow updates?',
-        answer: 'Follow <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer">@XFreeze</a>, read the <a href="changelog.html">changelog</a>, or check the Blog for guides.',
+        answer: 'Follow <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer">@XFreeze</a>, read the <a href="changelog.html">changelog</a>, or check the About and Help pages.',
         tags: ['follow', 'updates', 'twitter', 'news']
       },
       {
@@ -454,8 +454,8 @@
       },
       {
         question: 'What data does X Freeze collect?',
-        answer: 'Basic analytics, optional <strong>Supabase account</strong> data if you sign in, and contact form messages. Connector skills never send your app data to us. Read <a href="privacy.html">Privacy</a>.',
-        tags: ['privacy', 'data', 'collect', 'tracking']
+        answer: 'Only the basics: contact form messages, optional sign-in, and normal website/tech prefs. We don’t sell your info and skills don’t send your Gmail/Drive to us. See the simple <a href="privacy.html">Privacy</a> page. Use the library for your own work — please don’t resell or redistribute it (<a href="terms.html">Terms</a>).',
+        tags: ['privacy', 'data', 'collect', 'tracking', 'terms', 'resale']
       },
       {
         question: 'Is the library provided with warranties?',

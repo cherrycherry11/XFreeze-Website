@@ -11,7 +11,6 @@
     'skills.html': 'skills',
     'skill-builder.html': 'skills',
     'prompt-library.html': 'prompts',
-    'blog.html': 'blog',
     'contact.html': 'contact',
     'changelog.html': 'changelog',
     'workflows.html': 'workflows',
@@ -36,7 +35,6 @@
         { href: 'prompt-library.html', label: 'Motion prompts', nav: 'prompts' },
         { href: 'skills.html', label: 'Skills', nav: 'skills' },
         { href: 'about.html', label: 'About', nav: 'about' },
-        { href: 'blog.html', label: 'Blog', nav: 'blog' },
         { href: 'contact.html', label: 'Contact', nav: 'contact' },
       ],
     },
@@ -78,7 +76,7 @@
 
   function basePath() {
     var path = location.pathname || '';
-    return path.indexOf('/blog/') !== -1 ? '../' : '';
+    return (path.indexOf('/blog/') !== -1) ? '../' : '';
   }
 
   function currentPageKey() {
@@ -191,7 +189,6 @@
       templates: 'templates.html',
       about: 'about.html',
       skills: 'skills.html',
-      blog: 'blog.html',
       contact: 'contact.html',
       changelog: 'changelog.html',
       workflows: 'workflows.html',

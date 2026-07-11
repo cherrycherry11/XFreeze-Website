@@ -89,6 +89,7 @@ html.dark {
 .xf-prose p { margin: 0 0 1rem; }
 .xf-prose p:last-child { margin-bottom: 0; }
 .xf-prose h2 { font-size: 1.05rem; font-weight: 600; color: var(--text); margin: 1.75rem 0 0.65rem; }
+.xf-prose h3 { font-size: 0.9375rem; font-weight: 600; color: var(--text); margin: 1.25rem 0 0.5rem; }
 .xf-prose ul { margin: 0 0 1rem; padding-left: 1.2rem; }
 .xf-prose li { margin-bottom: 0.35rem; }
 .xf-prose a { color: var(--text); text-decoration: underline; text-underline-offset: 2px; }
@@ -202,6 +203,12 @@ html.dark {
 @media (min-width: 768px) {
   .xf-about-library-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .xf-about-library-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 

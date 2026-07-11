@@ -7,9 +7,9 @@
   var DISPLAY_TEMPLATE_COUNT = 500;
   var DISPLAY_SKILL_COUNT = 1200;
   var DISPLAY_INSTANT_SKILL_COUNT = 980;
-  var MOTION_PROMPT_COUNT = 438;
+  var MOTION_PROMPT_COUNT = 393;
   var MOTION_CATEGORY_COUNT = 39;
-  var DISPLAY_MOTION_PROMPT_COUNT = 430;
+  var DISPLAY_MOTION_PROMPT_COUNT = 390;
   var DISPLAY_MOTION_CATEGORY_COUNT = 37;
 
   var config = {
@@ -31,7 +31,7 @@
       line1: 'The Ultimate',
       line2: 'AI Resource Hub',
     },
-    heroLead: 'The all-in-one library for creators, developers, and businesses. Ready-made Grok Imagine templates, AI skills, and prompt packs, including tools that turn any image into a cinematic video.',
+    heroLead: 'The all-in-one library for creators, developers, and businesses. Ready-made Grok Imagine templates, motion prompts, and AI skills — including tools that turn any image into a cinematic video.',
 
     templateCategories: {
       Product: 122,

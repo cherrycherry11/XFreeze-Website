@@ -12,14 +12,18 @@
         search.indexOf('code=') !== -1;
       if (isOAuthReturn) return;
       if (search.indexOf('signin=1') !== -1) return;
+      if (search.indexOf('signup=1') !== -1) return;
+      if (search.indexOf('mode=signup') !== -1 || search.indexOf('mode=signin') !== -1) return;
       try {
         if (sessionStorage.getItem('xf-auth-intent') === 'signin') return;
+        if (sessionStorage.getItem('xf-auth-intent') === 'signup') return;
       } catch (e) {}
       location.replace('home.html');
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign in - X Freeze</title>
+  <script>document.documentElement.setAttribute('data-xf-auth-mode', (location.search.indexOf('mode=signup') !== -1 || location.search.indexOf('signup=1') !== -1) ? 'signup' : 'signin');</script>
   <script>
     (function () {
       var stored = localStorage.getItem('xfreeze-theme');
@@ -75,7 +79,7 @@
   <nav id="site-nav" class="site-nav page-nav" aria-label="Main">
     <div class="content-container">
       <div class="site-nav-bar">
-        <a href="login.html" class="site-nav-logo">X Freeze</a>
+        <a href="home.html" class="site-nav-logo">X Freeze</a>
         <div class="site-nav-end">
           <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee">
             <i class="fa-solid fa-mug-hot text-xs" aria-hidden="true"></i>
@@ -118,7 +122,7 @@
 
         <div class="xf-auth-mode-tabs" role="tablist" aria-label="Account mode">
           <button type="button" id="xf-auth-tab-signin" class="xf-auth-mode-tab is-active" role="tab" aria-selected="true">Sign in</button>
-          <button type="button" id="xf-auth-tab-signup" class="xf-auth-mode-tab" role="tab" aria-selected="false">Create account</button>
+          <a href="signup.html" id="xf-auth-tab-signup" class="xf-auth-mode-tab" role="tab" aria-selected="false">Create account</a>
         </div>
 
         <form id="xf-auth-password-form" class="xf-auth-email-form">
@@ -130,6 +134,11 @@
 
           <button type="submit" id="xf-auth-password-submit" class="xf-auth-submit">Sign in</button>
         </form>
+
+        <p class="xf-auth-switch">
+          New here?
+          <a href="signup.html">Create a free account</a>
+        </p>
 
         <div id="xf-auth-status" class="xf-auth-status" hidden></div>
       </div>

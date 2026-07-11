@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-xf-meta-title="330+ Motion Prompts for AI Video - X Freeze" data-xf-meta-desc="Copy-paste image-to-video motion prompts for Grok Imagine, Runway, Kling, and more. 30+ categories, 330+ shot-ready prompts." data-xf-meta-path="prompt-library.html">
+<html lang="en" data-xf-meta-title="390+ Motion Prompts for AI Video - X Freeze" data-xf-meta-desc="Copy-paste image-to-video motion prompts for Grok Imagine, Runway, Kling, and more. 30+ categories, 390+ shot-ready prompts including premium transformations." data-xf-meta-path="prompt-library.html">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -66,7 +66,6 @@
           <a href="prompt-library.html" class="site-nav-pill-link site-nav-pill-link--active" aria-current="page">Prompts</a>
           <a href="skills.html" class="site-nav-pill-link">Skills</a>
           <a href="about.html" class="site-nav-pill-link">About</a>
-          <a href="blog.html" class="site-nav-pill-link">Blog</a>
           <a href="contact.html" class="site-nav-pill-link">Contact</a>
         </div>
         <div class="site-nav-end">
@@ -101,7 +100,6 @@
         <a href="prompt-library.html" class="site-nav-drawer-link site-nav-drawer-link--active" onclick="toggleMobileMenu()">Prompts</a>
         <a href="skills.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Skills</a>
         <a href="about.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">About</a>
-        <a href="blog.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Blog</a>
         <a href="contact.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Contact</a>
       </nav>
       <footer class="site-nav-drawer-footer">
@@ -135,15 +133,15 @@
             <p class="pl-hero__eyebrow"><i class="fa-solid fa-film"></i> Image-to-video motion prompts</p>
             <h1>Prompt Library</h1>
             <p class="pl-hero__lead">
-              330+ shot-ready prompts that turn still images into believable video motion. Four layers - combo recipes, camera moves, subject motion, and style - so you can paste one prompt or stack your own. Works with Grok Imagine, Runway, Kling, Luma, and similar tools.
+              390+ shot-ready prompts that turn still images into believable video motion. Free motion blocks plus premium multi-phase transformations - paste-ready and photo-native. Works with Grok Imagine, Runway, Kling, Luma, and similar tools.
             </p>
             <div class="pl-hero__stats" role="list">
               <div role="listitem">
-                <span class="pl-hero__stat-num" data-xf-motion-prompt-count>330+</span>
+                <span class="pl-hero__stat-num" data-xf-motion-prompt-count>390</span>
                 <span class="pl-hero__stat-label">Motion prompts</span>
               </div>
               <div role="listitem">
-                <span class="pl-hero__stat-num" data-xf-motion-category-count>25+</span>
+                <span class="pl-hero__stat-num" data-xf-motion-category-count>37</span>
                 <span class="pl-hero__stat-label">Categories</span>
               </div>
               <div role="listitem">
@@ -212,13 +210,17 @@
         </div>
       </div>
 
-      <p class="pl-results-meta" id="pl-results-meta">330+ motion prompts across 30+ categories</p>
+      <p class="pl-results-meta" id="pl-results-meta">390+ motion prompts across 30+ categories</p>
+      <div class="pl-suitable" id="pl-suitable" hidden>
+        <p class="pl-suitable__label">Prompt suitable for</p>
+        <p class="pl-suitable__text" id="pl-suitable-text"></p>
+      </div>
       <div class="pl-grid" id="pl-grid"></div>
     </div>
   </main>
 
   <div class="pl-panel-backdrop" id="pl-panel-backdrop" aria-hidden="true"></div>
-  <aside class="pl-panel" id="pl-panel" aria-hidden="true" aria-labelledby="pl-panel-title" role="dialog">
+  <aside class="pl-panel" id="pl-panel" aria-hidden="true" aria-labelledby="pl-panel-title" role="dialog" data-lenis-prevent>
     <header class="pl-panel__head">
       <div class="pl-panel__head-top">
         <span class="pl-panel__cat" id="pl-panel-cat">Category</span>
@@ -227,7 +229,7 @@
       </div>
       <h2 class="pl-panel__title" id="pl-panel-title">Prompt title</h2>
     </header>
-    <div class="pl-panel__body">
+    <div class="pl-panel__body" id="pl-panel-body" data-lenis-prevent data-lenis-prevent-wheel data-lenis-prevent-touch>
       <p class="pl-panel__shot" id="pl-panel-shot"></p>
       <p class="pl-panel__text" id="pl-panel-text"></p>
       <div class="pl-panel__built" id="pl-panel-built" style="display:none">

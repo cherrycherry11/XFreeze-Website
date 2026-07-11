@@ -1,7 +1,7 @@
 /**
  * Public pages - no login required.
  */
-var XF_PUBLIC_PAGES = ['login.html', 'home.html', 'index.html'];
+var XF_PUBLIC_PAGES = ['login.html', 'signup.html', 'home.html', 'index.html', 'terms.html', 'privacy.html'];
 
 /**
  * Protected pages - login required (direct URL or link from home).
@@ -11,8 +11,7 @@ var XF_PROTECTED_PAGES = [
   'skills.html',
   'prompt-library.html',
   'bundles.html',
-  'blog.html',
-  'contact.html',
+    'contact.html',
   'connector-setup.html',
 ];
 

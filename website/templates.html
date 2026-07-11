@@ -124,11 +124,23 @@
       position: relative;
       display: block;
       overflow: hidden;
-      border-radius: 1rem;
-      border: 1px solid var(--border);
-      background: var(--surface-muted);
+      isolation: isolate;
+      border-radius: 1.35rem;
+      border: 0 !important;
+      outline: none;
+      /* White fill so subpixel gaps never flash as a gray hairline */
+      background: #fff;
       aspect-ratio: 4 / 5;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      /* Far, soft ambient only — near rings look like fine edges */
+      box-shadow: 0 24px 52px -30px rgba(15, 23, 42, 0.26);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+    html.dark .template-gallery-tile {
+      background: #0a0a0a;
+      box-shadow: 0 26px 58px -30px rgba(0, 0, 0, 0.78);
     }
     .template-gallery-open {
       position: absolute;
@@ -136,21 +148,51 @@
       display: block;
       text-decoration: none;
       color: inherit;
+      overflow: hidden;
+      border-radius: inherit;
+      z-index: 1;
+      /*
+       * Soft-feather only the outermost rim (not the product).
+       * Kills hard right-side + corner hairlines without oval vignette.
+       */
+      -webkit-mask-image:
+        linear-gradient(to right, transparent 0, #000 10px, #000 calc(100% - 10px), transparent 100%),
+        linear-gradient(to bottom, transparent 0, #000 10px, #000 calc(100% - 10px), transparent 100%);
+      -webkit-mask-composite: source-in;
+      mask-image:
+        linear-gradient(to right, transparent 0, #000 10px, #000 calc(100% - 10px), transparent 100%),
+        linear-gradient(to bottom, transparent 0, #000 10px, #000 calc(100% - 10px), transparent 100%);
+      mask-composite: intersect;
     }
     .template-gallery-tile:hover {
-      transform: translateY(-2px);
-      border-color: var(--border-hover);
-      box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-3px) translateZ(0);
+      box-shadow: 0 30px 58px -28px rgba(15, 23, 42, 0.3);
+    }
+    html.dark .template-gallery-tile:hover {
+      box-shadow: 0 32px 62px -26px rgba(0, 0, 0, 0.88);
     }
     .template-gallery-tile img {
-      width: 100%;
-      height: 100%;
+      /* Bleed past rounded clip — kills 1px fringe on right + corners */
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: calc(100% + 10px);
+      height: calc(100% + 10px);
+      max-width: none;
       object-fit: cover;
+      object-position: center;
       display: block;
+      border: 0;
+      outline: none;
+      transform: translate(-50%, -50%);
+      transform-origin: center;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
       transition: transform 0.45s ease;
+      image-rendering: auto;
     }
     .template-gallery-tile:hover img {
-      transform: scale(1.03);
+      transform: translate(-50%, -50%) scale(1.06);
     }
     .template-gallery-overlay {
       position: absolute;
@@ -405,7 +447,7 @@
       position: absolute;
       top: 0.5rem;
       left: 0.5rem;
-      z-index: 2;
+      z-index: 4;
       padding: 0.2rem 0.45rem;
       border-radius: 9999px;
       background: rgba(0, 0, 0, 0.52);
@@ -414,6 +456,7 @@
       font-weight: 600;
       letter-spacing: 0.02em;
       pointer-events: none;
+      border: none;
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
     }
@@ -421,7 +464,7 @@
       position: absolute;
       top: 0.5rem;
       right: 0.5rem;
-      z-index: 3;
+      z-index: 4;
       padding: 0.2rem 0.45rem;
       border-radius: 9999px;
       font-size: 0.5625rem;
@@ -429,28 +472,26 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
       pointer-events: none;
+      border: none;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
     }
     .template-gallery-tier.is-free {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.92);
       color: #0a0a0a;
-      border: 1px solid rgba(0, 0, 0, 0.08);
     }
     .template-gallery-tier.is-premium {
-      background: rgba(6, 37, 29, 0.88);
+      background: rgba(6, 37, 29, 0.9);
       color: #d1fae5;
-      border: 1px solid rgba(110, 231, 183, 0.35);
     }
     html.dark .template-gallery-tier.is-free {
-      background: rgba(15, 19, 17, 0.92);
+      background: rgba(15, 19, 17, 0.94);
       color: #f2f5f3;
-      border-color: rgba(255, 255, 255, 0.12);
     }
     html.dark .template-gallery-tier.is-premium {
-      background: rgba(209, 250, 229, 0.92);
+      background: rgba(209, 250, 229, 0.94);
       color: #04130f;
-      border-color: rgba(110, 231, 183, 0.45);
     }
     /*
      * Templates video banner — Getty stock collage backdrop,
@@ -787,7 +828,6 @@
           <a href="prompt-library.html" class="site-nav-pill-link">Prompts</a>
           <a href="skills.html" class="site-nav-pill-link">Skills</a>
           <a href="about.html" class="site-nav-pill-link">About</a>
-          <a href="blog.html" class="site-nav-pill-link">Blog</a>
           <a href="contact.html" class="site-nav-pill-link">Contact</a>
         </div>
         <div class="site-nav-end">
@@ -832,7 +872,6 @@
         <a href="prompt-library.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Prompts</a>
         <a href="skills.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Skills</a>
         <a href="about.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">About</a>
-        <a href="blog.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Blog</a>
         <a href="contact.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Contact</a>
       </nav>
 

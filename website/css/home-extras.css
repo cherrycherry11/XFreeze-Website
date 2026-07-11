@@ -1034,6 +1034,9 @@ html.dark .xf-faq-item[open] {
 }
 
 .xf-final-cta-box {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   margin-top: 0.5rem;
   padding: 3.25rem 1.75rem;
   border-radius: 1.375rem;
@@ -1043,6 +1046,11 @@ html.dark .xf-faq-item[open] {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 12px 30px -18px rgba(0, 0, 0, 0.08);
 }
 
+.xf-final-cta-box > * {
+  position: relative;
+  z-index: 1;
+}
+
 @media (min-width: 768px) {
   .xf-final-cta-box {
     padding: 3.375rem 2.5rem;
@@ -1050,7 +1058,36 @@ html.dark .xf-faq-item[open] {
 }
 
 html.dark .xf-final-cta-box {
+  /* Dark box + soft dark-blue circle (same feel as skills cards glow) */
+  background: #0a0a0a !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 18px 40px -20px rgba(0, 0, 0, 0.55);
+}
+
+/* Soft dark-blue circle only — no pink / purple */
+html.dark .xf-final-cta-box::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  z-index: 0;
+  width: min(48rem, 115%);
+  height: min(32rem, 150%);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 1;
+  filter: blur(48px);
+  background: radial-gradient(
+    circle at center,
+    rgba(35, 70, 140, 0.55) 0%,
+    rgba(25, 55, 120, 0.32) 38%,
+    rgba(15, 40, 90, 0.14) 62%,
+    transparent 78%
+  );
+}
+
+html.dark .xf-final-cta-box::after {
+  content: none;
 }
 
 .xf-final-cta-eyebrow {

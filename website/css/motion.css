@@ -166,21 +166,17 @@ html.lenis body {
   will-change: transform;
 }
 
-/* Template gallery tile - premium hover */
+/* Template gallery tile - premium hover (soft edges, no hard border flash) */
 .template-gallery-tile {
   transition:
     transform 0.35s var(--xf-ease-out),
-    border-color 0.25s ease,
     box-shadow 0.35s var(--xf-ease-out);
 }
 .template-gallery-tile:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 16px 40px -12px rgba(0, 0, 0, 0.18),
-    0 0 0 1px var(--xf-accent-glow);
+  transform: translateY(-4px) translateZ(0);
 }
 .template-gallery-tile:hover img {
-  transform: scale(1.06);
+  transform: translate(-50%, -50%) scale(1.06);
 }
 .template-gallery-tile:hover .template-gallery-label {
   opacity: 1;
@@ -252,7 +248,9 @@ html.lenis body {
   [data-xf-magnetic] {
     transform: none !important;
   }
-  .template-gallery-tile:hover img,
+  .template-gallery-tile:hover img {
+    transform: translate(-50%, -50%) !important;
+  }
   #selected-work-marquee img:hover {
     transform: none !important;
   }

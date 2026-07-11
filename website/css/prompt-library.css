@@ -698,6 +698,12 @@ html.dark .pl-hero__tool {
   .pl-filters-bar__subcats {
     align-self: stretch;
     width: 100%;
+    display: block;
+  }
+
+  /* Never collapse subcategory chips on desktop */
+  .pl-filters-bar__subcats[hidden] {
+    display: none !important;
   }
 
   .pl-filter-panel__summary {
@@ -705,11 +711,26 @@ html.dark .pl-hero__tool {
   }
 
   .pl-filter-panel__body {
-    display: block;
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: transparent !important;
   }
 
   .pl-filter-panel__lede {
     display: none;
+  }
+
+  .pl-cat-scroll {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    overflow: visible;
   }
 }
 
@@ -896,7 +917,38 @@ html.dark .pl-filter-btn.is-active {
 .pl-results-meta {
   font-size: 0.8125rem;
   color: var(--text-secondary);
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.85rem;
+}
+
+/* Shown when a specific category is selected */
+.pl-suitable {
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--border);
+  background: var(--surface-muted, rgba(255, 255, 255, 0.03));
+}
+
+.pl-suitable__label {
+  margin: 0 0 0.3rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.pl-suitable__text {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--text);
+  max-width: 46rem;
+}
+
+html.dark .pl-suitable {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.035);
 }
 
 .pl-grid {
@@ -1120,11 +1172,11 @@ html.dark .pl-card--premium {
 }
 
 
-/* Detail panel */
+/* Detail panel — above request CTA (10040) + FAQ bot (10050) */
 .pl-panel-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: 10100;
   background: rgba(0, 0, 0, 0.55);
   opacity: 0;
   pointer-events: none;
@@ -1141,8 +1193,9 @@ html.dark .pl-card--premium {
   top: 0;
   right: 0;
   bottom: 0;
-  z-index: 210;
+  z-index: 10110;
   width: min(32rem, 100vw);
+  max-height: 100dvh;
   background: var(--surface);
   border-left: 1px solid var(--border);
   transform: translateX(100%);
@@ -1150,6 +1203,9 @@ html.dark .pl-card--premium {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  /* Let nested wheel/touch scroll work with Lenis */
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 .pl-panel.is-open {
@@ -1210,9 +1266,15 @@ html.dark .pl-card--premium {
 }
 
 .pl-panel__body {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0; /* critical: allow flex child to scroll */
+  overflow-x: hidden;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   padding: 1.35rem;
+  padding-bottom: max(1.35rem, env(safe-area-inset-bottom, 0px));
 }
 
 .pl-panel__shot {
@@ -1298,6 +1360,15 @@ html.dark .pl-panel__copy-btn {
 
 body.pl-panel-open .site-nav {
   z-index: 40;
+}
+
+/* Hide floating chrome while reading a prompt */
+body.pl-panel-open .xf-request-cta,
+body.pl-panel-open .xf-faq-bot,
+body.pl-panel-open .xf-support-toast {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
 }
 
 .pl-cat-scroll.is-hidden {

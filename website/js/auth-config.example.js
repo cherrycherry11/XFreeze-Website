@@ -10,13 +10,12 @@ window.X FreezeAuthConfig = {
   defaultRedirect: 'home.html',
 
   requireAuth: true,
-  publicPages: ['login.html', 'home.html'],
+  publicPages: ['login.html', 'signup.html', 'home.html', 'index.html', 'terms.html', 'privacy.html'],
   protectedPages: [
     'templates.html',
     'skills.html',
     'bundles.html',
-    'blog.html',
-    'contact.html',
+        'contact.html',
     'connector-setup.html',
   ],
 

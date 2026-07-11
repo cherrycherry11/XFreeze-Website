@@ -71,7 +71,6 @@
           <a href="prompt-library.html" class="site-nav-pill-link">Prompts</a>
           <a href="skills.html" class="site-nav-pill-link site-nav-pill-link--active" aria-current="page">Skills</a>
           <a href="about.html" class="site-nav-pill-link">About</a>
-          <a href="blog.html" class="site-nav-pill-link">Blog</a>
           <a href="contact.html" class="site-nav-pill-link">Contact</a>
         </div>
         <div class="site-nav-end">
@@ -107,7 +106,6 @@
         <a href="prompt-library.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Prompts</a>
         <a href="skills.html" class="site-nav-drawer-link site-nav-drawer-link--active" onclick="toggleMobileMenu()">Skills</a>
         <a href="about.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">About</a>
-        <a href="blog.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Blog</a>
         <a href="contact.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Contact</a>
       </nav>
 
@@ -178,11 +176,20 @@
 
     <div class="content-container skills-body">
     <div id="xf-skills-view-home">
-      <div class="skills-search-wrap scroll-reveal-in" data-scroll-reveal>
-        <input type="search" id="xf-skills-search" class="skills-browse-search" placeholder="Search skills or packs…" aria-label="Search skills">
+      <div class="skills-toolbar scroll-reveal-in" data-scroll-reveal>
+        <div class="skills-search-wrap">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input type="search" id="xf-skills-search" class="skills-browse-search" placeholder="Search skills or packs…" autocomplete="off" aria-label="Search skills">
+        </div>
+        <div class="skills-filters-bar">
+          <div class="skills-group-filters" id="xf-skills-filter-primary" role="group" aria-label="Filter by type"></div>
+          <div class="skills-topic-filters" id="xf-skills-filter-topics" role="group" aria-label="Filter by topic"></div>
+          <div id="xf-skills-filter-sub-wrap" class="skills-cat-scroll-wrap skills-browse-hidden">
+            <div class="skills-cat-scroll" id="xf-skills-filter-sub" role="group" aria-label="Sections"></div>
+          </div>
+        </div>
+        <p id="xf-skills-results-meta" class="skills-results-meta" aria-live="polite"></p>
       </div>
-
-      <div id="xf-skills-filter-pills" class="skills-filter-pills scroll-reveal-in" data-scroll-reveal role="tablist" aria-label="Skill categories"></div>
 
       <div class="skills-grid-wrap scroll-reveal-in" data-scroll-reveal>
         <div id="xf-skills-bundle-grid" class="skills-browse-grid"></div>
@@ -195,7 +202,7 @@
           <div class="skills-how-path">
             <h3>Instant skills <span class="skills-how-path-tag">no setup</span></h3>
             <ol class="skills-how-steps">
-              <li><span class="skills-how-step-num">1</span><span class="skills-how-step-text">Filter <strong>Instant only</strong> or pick a pack tagged Instant.</span></li>
+              <li><span class="skills-how-step-num">1</span><span class="skills-how-step-text">Set <strong>Type → Instant</strong> (and Free if you want) or open a pack tagged Instant.</span></li>
               <li><span class="skills-how-step-num">2</span><span class="skills-how-step-text"><strong>Copy prompt</strong> - includes the full SKILL.md file.</span></li>
               <li><span class="skills-how-step-num">3</span><span class="skills-how-step-text">Paste into Grok, Cursor, or Claude. It creates the skill file for you.</span></li>
               <li><span class="skills-how-step-num">4</span><span class="skills-how-step-text">Run the slash command (e.g. <code>/meeting-notes</code>) or describe the task.</span></li>
@@ -263,6 +270,7 @@
   <script src="js/scroll-reveal.js"></script>
   <script src="js/support-toast.js"></script>
   <script src="data/skills-browse-index.js"></script>
+  <script src="data/skills-taxonomy.js"></script>
   <script src="js/skills-browse.js"></script>
   <script>
     function getPreferredTheme() {

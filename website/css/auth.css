@@ -327,6 +327,9 @@ html.dark .xf-auth-mode-tabs {
 }
 
 .xf-auth-mode-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 2.25rem;
   border: none;
   border-radius: 0.55rem;
@@ -335,10 +338,58 @@ html.dark .xf-auth-mode-tabs {
   font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
   transition:
     background-color 0.15s ease,
     color 0.15s ease,
     box-shadow 0.15s ease;
+}
+
+.site-nav-auth {
+  gap: 0.4rem;
+}
+
+.site-nav-auth-btn--ghost {
+  background: transparent !important;
+  border-color: transparent !important;
+  font-weight: 600;
+}
+
+.site-nav-auth-btn--ghost:hover {
+  background: var(--surface-muted, #f8f8f8) !important;
+  border-color: var(--border, #e5e7eb) !important;
+}
+
+html.dark .site-nav-auth-btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: var(--border-hover, #2a2a2a) !important;
+}
+
+.xf-auth-switch,
+.xf-auth-legal {
+  margin: 1rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-secondary, #52525b);
+  text-align: center;
+}
+
+.xf-auth-legal {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.xf-auth-switch a,
+.xf-auth-legal a {
+  color: var(--text, #0a0a0a);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+html.dark .xf-auth-switch a,
+html.dark .xf-auth-legal a {
+  color: #f2f2f2;
 }
 
 .xf-auth-mode-tab.is-active {

@@ -485,7 +485,11 @@
     if (!sb) throw new Error('Auth is not configured.');
 
     if (!isProviderEnabled(provider)) {
-      throw new Error('This sign-in method is not enabled yet. Use email and password for now.');
+      throw new Error(
+        provider === 'x' || provider === 'twitter'
+          ? 'Sign in with X is not available yet. Use Google or email for now.'
+          : 'This sign-in method is not enabled yet. Use email and password for now.'
+      );
     }
 
     rememberRedirect();
@@ -498,18 +502,29 @@
       },
     });
 
-    if (result.error) throw result.error;
+    if (result.error) {
+      var msg = result.error.message || 'Sign-in failed.';
+      if (/not enabled|unsupported provider/i.test(msg)) {
+        msg =
+          provider === 'x' || provider === 'twitter'
+            ? 'Sign in with X is not available yet. Use Google or email for now.'
+            : 'That sign-in method is not available yet. Try Google or email.';
+      }
+      throw new Error(msg);
+    }
     return result.data;
   }
 
   async function signInWithOAuth(provider) {
     /* Always start a fresh OAuth request (PKCE verifier must match this attempt). */
     var data = await fetchOAuthUrl(provider);
-    if (data && data.url) {
-      window.location.assign(data.url);
+    var url = data && data.url;
+    if (url && /^https?:\/\//i.test(url) && url.indexOf('error') === -1) {
+      /* Avoid navigating to Supabase JSON error pages (e.g. provider disabled). */
+      window.location.assign(url);
       return data;
     }
-    throw new Error('Could not start sign-in. Try again.');
+    throw new Error('Could not start sign-in. Try Google or email instead.');
   }
 
   async function signInWithPassword(email, password) {
@@ -584,7 +599,9 @@
       subheading.textContent =
         authMode === 'signup'
           ? 'Set up email and password to save progress. Free to start.'
-          : 'Use your email and password, or sign in with X.';
+          : isProviderEnabled('google')
+            ? 'Use Google, or email and password.'
+            : 'Use your email and password.';
     }
     if (tabSignIn) {
       tabSignIn.classList.toggle('is-active', authMode === 'signin');

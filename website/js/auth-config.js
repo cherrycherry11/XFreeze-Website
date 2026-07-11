@@ -61,7 +61,8 @@ window.XFreezeAuthConfig = {
   protectedPages: XF_PROTECTED_PAGES,
 
   providers: {
-    twitter: true,
+    /* Twitter/X must be ON in Supabase Auth → Providers before setting true */
+    twitter: false,
     google: true,
   },
 };

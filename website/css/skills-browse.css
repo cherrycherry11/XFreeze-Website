@@ -24,7 +24,7 @@
   min-height: clamp(22rem, 48vw, 32rem);
   padding: clamp(2.5rem, 5vw, 3.5rem) 0;
   border-bottom: 1px solid var(--border, #e5e7eb);
-  /* Soft slate while video buffers (avoids pure black flash) */
+  /* Soft slate while poster/video buffers (avoids pure black flash) */
   background: #12151c;
 }
 
@@ -37,7 +37,8 @@
   background: linear-gradient(135deg, #1a1f2a 0%, #12151c 45%, #161b28 100%);
 }
 
-.skills-banner__video {
+/* Static first paint — shows before video buffers */
+.skills-banner__poster {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -45,9 +46,21 @@
   object-fit: cover;
   object-position: center center;
   display: block;
-  /* Fade in when first frame is ready */
+  z-index: 0;
+}
+
+.skills-banner__video {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  /* Fade in over poster when first frame is ready */
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.4s ease;
   filter: none !important;
   background: transparent;
 }
@@ -77,6 +90,40 @@ html.dark .skills-hero-section.skills-banner {
 
 html.dark .skills-banner__media {
   background: linear-gradient(135deg, #141a24 0%, #0c1018 50%, #121820 100%);
+}
+
+/* Above-the-fold hero must never wait on scroll-reveal */
+.skills-hero-section .skills-hero,
+.skills-hero-section .scroll-reveal-in.skills-hero,
+.skills-toolbar.scroll-reveal-in {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Grid skeleton while skills index parses */
+.skills-browse-grid:empty::before {
+  content: '';
+  display: block;
+  grid-column: 1 / -1;
+  min-height: 12rem;
+  border-radius: 1rem;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent),
+    var(--surface-muted, #f8f8f8);
+  background-size: 200% 100%, 100% 100%;
+  animation: skills-grid-shimmer 1.2s ease-in-out infinite;
+}
+
+html.dark .skills-browse-grid:empty::before {
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent),
+    var(--surface-muted, #0f1311);
+  background-size: 200% 100%, 100% 100%;
+}
+
+@keyframes skills-grid-shimmer {
+  0% { background-position: 100% 0, 0 0; }
+  100% { background-position: -100% 0, 0 0; }
 }
 
 .skills-hero-section.skills-banner .skills-hero-inner {

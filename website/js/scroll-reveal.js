@@ -80,11 +80,42 @@
     });
   }
 
+  /**
+   * Immediately reveal anything already in (or near) the viewport so first
+   * paint isn't a blank page while observers warm up after navigation.
+   */
+  function revealInViewNow() {
+    if (REDUCED) {
+      revealAll();
+      return;
+    }
+    var vh = window.innerHeight || document.documentElement.clientHeight || 0;
+    var topPad = vh * 0.08;
+    var bottomPad = vh * 0.12;
+
+    function inView(el) {
+      var r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) return false;
+      return r.bottom > topPad && r.top < vh - bottomPad;
+    }
+
+    document.querySelectorAll('.scroll-reveal-in:not(.is-revealed), [data-scroll-reveal]:not(.is-revealed), [data-scroll-stagger]:not(.is-revealed)').forEach(function (el) {
+      if (inView(el)) reveal(el);
+    });
+  }
+
   function init() {
+    revealInViewNow();
     observeNew();
+    /* Second pass after layout/fonts settle */
+    window.requestAnimationFrame(function () {
+      revealInViewNow();
+      observeNew();
+    });
   }
 
   function refresh() {
+    revealInViewNow();
     observeNew();
   }
 

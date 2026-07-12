@@ -12,15 +12,32 @@
       var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
       document.documentElement.classList.toggle('dark', isDark);
+      /* Preload theme-correct banner poster + video so first paint isn't empty */
+      var poster = isDark
+        ? 'assets/images/skills-banner-poster-dark.jpg'
+        : 'assets/images/skills-banner-poster-light.jpg';
+      var video = isDark
+        ? 'assets/videos/skills-banner-dark.mp4'
+        : 'assets/videos/skills-banner-light.mp4';
+      function preload(href, asType, type) {
+        var l = document.createElement('link');
+        l.rel = 'preload';
+        l.as = asType;
+        l.href = href;
+        if (type) l.type = type;
+        if (asType === 'video') l.setAttribute('type', 'video/mp4');
+        document.head.appendChild(l);
+      }
+      preload(poster, 'image');
+      preload(video, 'video');
     })();
   </script>
   <script src="js/auth-config.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>tailwind.config = { darkMode: 'class' };</script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="css/site-fonts.css">
-<link rel="stylesheet" href="css/theme-switch.css">
-  <link rel="stylesheet" href="css/dark-nebula-bg.css">
+  <link rel="stylesheet" href="css/site-fonts.css">
+  <link rel="stylesheet" href="css/theme-switch.css">
   <link rel="stylesheet" href="css/scroll-reveal.css">
   <link rel="stylesheet" href="css/motion.css">
   <link rel="stylesheet" href="css/site-footer.css">
@@ -48,7 +65,10 @@
       --surface:#020403; --surface-elevated:#0a0d0b; --surface-muted:#0f1311;
       --surface-subtle:#161a18; --nav-bg:rgba(2,4,3,0.94); --border-hover:#2d3632;
     }
-    body { font-family: var(--font-sans); background:var(--surface); color:var(--text); }
+    /* Instant paint so skills never flashes blank while CSS/JS catch up */
+    html { background: var(--surface, #fff); }
+    html.dark { background: #020403; }
+    body { font-family: var(--font-sans); background:var(--surface); color:var(--text); margin: 0; }
     .content-container {
       width:100%; max-width:min(var(--page-max),calc(100% - var(--page-gutter)*2));
       margin-inline:auto; padding-inline:var(--page-gutter);
@@ -121,30 +141,51 @@
   </div>
 
   <main class="skills-main">
-    <section class="skills-hero-section skills-banner" data-scroll-reveal>
+    <!-- No scroll-reveal on hero: above-the-fold must paint immediately -->
+    <section class="skills-hero-section skills-banner">
       <div class="skills-banner__media" aria-hidden="true">
+        <img
+          class="skills-banner__poster"
+          alt=""
+          width="1280"
+          height="720"
+          decoding="async"
+          fetchpriority="high"
+          data-poster-light="assets/images/skills-banner-poster-light.jpg"
+          data-poster-dark="assets/images/skills-banner-poster-dark.jpg"
+        >
         <video
           class="skills-banner__video"
           autoplay
           muted
           loop
           playsinline
-          preload="metadata"
+          preload="auto"
           data-banner-light="assets/videos/skills-banner-light.mp4"
           data-banner-dark="assets/videos/skills-banner-dark.mp4"
         ></video>
         <div class="skills-banner__veil"></div>
-        <!-- Set banner src immediately (before heavy scripts) so there is no black flash -->
+        <!-- Set poster + video src immediately (before heavy scripts) -->
         <script>
           (function () {
-            var video = document.currentScript.parentElement.querySelector('.skills-banner__video');
-            if (!video) return;
+            var media = document.currentScript.parentElement;
+            var video = media.querySelector('.skills-banner__video');
+            var poster = media.querySelector('.skills-banner__poster');
             var isDark = document.documentElement.classList.contains('dark');
+            if (poster) {
+              poster.src = isDark
+                ? (poster.getAttribute('data-poster-dark') || 'assets/images/skills-banner-poster-dark.jpg')
+                : (poster.getAttribute('data-poster-light') || 'assets/images/skills-banner-poster-light.jpg');
+            }
+            if (!video) return;
             var src = isDark
               ? (video.getAttribute('data-banner-dark') || 'assets/videos/skills-banner-dark.mp4')
               : (video.getAttribute('data-banner-light') || 'assets/videos/skills-banner-light.mp4');
             video.muted = true;
+            video.defaultMuted = true;
             video.playsInline = true;
+            video.setAttribute('muted', '');
+            video.setAttribute('playsinline', '');
             video.setAttribute('src', src);
             video.load();
             var markReady = function () {
@@ -156,12 +197,16 @@
             else {
               video.addEventListener('loadeddata', markReady, { once: true });
               video.addEventListener('canplay', markReady, { once: true });
+              /* Fallback: don't leave hero empty if play never fires */
+              window.setTimeout(function () {
+                if (!video.classList.contains('is-ready') && video.readyState >= 1) markReady();
+              }, 1200);
             }
           })();
         </script>
       </div>
       <div class="content-container skills-hero-inner">
-        <header class="skills-hero scroll-reveal-in">
+        <header class="skills-hero">
           <p class="skills-hero-eyebrow">AI skill command library</p>
           <h1>Skip the prompt writing<br>Start with a ready-made skill.</h1>
           <p class="skills-hero-lead">
@@ -193,7 +238,7 @@
 
     <div class="content-container skills-body">
     <div id="xf-skills-view-home">
-      <div class="skills-toolbar scroll-reveal-in" data-scroll-reveal>
+      <div class="skills-toolbar">
         <div class="skills-search-wrap">
           <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
           <input type="search" id="xf-skills-search" class="skills-browse-search" placeholder="Search skills or packs…" autocomplete="off" aria-label="Search skills">
@@ -297,8 +342,15 @@
     }
     function syncSkillsBannerVideo() {
       var video = document.querySelector('.skills-banner__video');
-      if (!video) return;
+      var poster = document.querySelector('.skills-banner__poster');
       var isDark = document.documentElement.classList.contains('dark');
+      if (poster) {
+        var nextPoster = isDark
+          ? (poster.getAttribute('data-poster-dark') || 'assets/images/skills-banner-poster-dark.jpg')
+          : (poster.getAttribute('data-poster-light') || 'assets/images/skills-banner-poster-light.jpg');
+        if (poster.getAttribute('src') !== nextPoster) poster.src = nextPoster;
+      }
+      if (!video) return;
       var nextSrc = isDark
         ? (video.getAttribute('data-banner-dark') || 'assets/videos/skills-banner-dark.mp4')
         : (video.getAttribute('data-banner-light') || 'assets/videos/skills-banner-light.mp4');
@@ -308,7 +360,8 @@
         var p = video.play();
         if (p && typeof p.catch === 'function') p.catch(function () {});
       };
-      if (current.indexOf(nextSrc) !== -1) {
+      /* Same source already loading/playing — don't reset (causes empty flash) */
+      if (current.indexOf(nextSrc) !== -1 || (video.getAttribute('src') || '').indexOf(nextSrc) !== -1) {
         video.muted = true;
         video.playsInline = true;
         if (video.readyState >= 2) markReady();
@@ -318,6 +371,7 @@
         }
         return;
       }
+      /* Theme switch: keep poster visible while new video buffers */
       video.classList.remove('is-ready');
       video.muted = true;
       video.playsInline = true;

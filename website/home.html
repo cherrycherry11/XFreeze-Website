@@ -1612,12 +1612,12 @@
       <div class="scroll-reveal-in scroll-reveal-in--right md:col-span-7" style="transition-delay: 100ms">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-video-cycle="experimental">
           <div class="h-[280px] sm:h-[360px] md:h-[520px] artistic-card">
-            <video class="section-video" muted playsinline preload="metadata" aria-label="Style video 1">
+            <video class="section-video" muted playsinline preload="none" aria-label="Style video 1">
               <source src="assets/videos/style-1.mp4" type="video/mp4">
             </video>
           </div>
           <div class="h-[280px] sm:h-[360px] md:h-[520px] artistic-card">
-            <video class="section-video" muted playsinline preload="metadata" aria-label="Style edit video 2">
+            <video class="section-video" muted playsinline preload="none" aria-label="Style edit video 2">
               <source src="assets/videos/style-edit-2.mp4" type="video/mp4">
             </video>
           </div>
@@ -1633,12 +1633,12 @@
       <div class="scroll-reveal-in scroll-reveal-in--left order-2 md:order-1 md:col-span-7">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-video-cycle="minimal">
           <div class="h-[280px] sm:h-[360px] md:h-[520px] artistic-card">
-            <video class="section-video" muted playsinline preload="metadata" aria-label="Product video 1">
+            <video class="section-video" muted playsinline preload="none" aria-label="Product video 1">
               <source src="assets/videos/product-add-1.mp4" type="video/mp4">
             </video>
           </div>
           <div class="h-[280px] sm:h-[360px] md:h-[520px] artistic-card">
-            <video class="section-video" muted playsinline preload="metadata" aria-label="Product video 2">
+            <video class="section-video" muted playsinline preload="none" aria-label="Product video 2">
               <source src="assets/videos/product-add-2.mp4" type="video/mp4">
             </video>
           </div>
@@ -1676,7 +1676,7 @@
     <div id="xf-category-showcase" class="xf-cat-showcase-grid scroll-reveal-in" data-video-cycle="beforeAfter">
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="metadata" aria-label="Before and after: Change Backgrounds">
+          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Change Backgrounds">
             <source src="assets/videos/before-after/change-backgrounds.mp4" type="video/mp4">
           </video>
         </div>
@@ -1686,7 +1686,7 @@
       </div>
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="metadata" aria-label="Before and after: Create Mockup's">
+          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Create Mockup's">
             <source src="assets/videos/before-after/create-mokeup-s.mp4" type="video/mp4">
           </video>
         </div>
@@ -1696,7 +1696,7 @@
       </div>
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="metadata" aria-label="Before and after: Professional Headshots">
+          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Professional Headshots">
             <source src="assets/videos/before-after/professional-headshots.mp4" type="video/mp4">
           </video>
         </div>
@@ -1706,7 +1706,7 @@
       </div>
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="metadata" aria-label="Before and after: Try on Outfits">
+          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Try on Outfits">
             <source src="assets/videos/before-after/try-on-outfits.mp4" type="video/mp4">
           </video>
         </div>
@@ -2002,7 +2002,10 @@
       const inactiveSrc = inactive.querySelector('source')?.getAttribute('src') || '';
       if (inactiveSrc === altSrc) return;
 
-      prepareHeroVideo(inactive, altSrc);
+      /* Defer alternate theme clip until idle so first paint stays light */
+      const run = () => prepareHeroVideo(inactive, altSrc);
+      if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 2500 });
+      else setTimeout(run, 1200);
     }
 
     function revealHeroLayer(video) {

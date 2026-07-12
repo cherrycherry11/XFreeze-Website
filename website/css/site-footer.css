@@ -152,6 +152,35 @@ html.dark .xf-footer-coffee {
   font-size: 0.8rem;
 }
 
+/* Dark / Light switch under coffee */
+.xf-footer-theme {
+  display: flex;
+  align-items: center;
+  margin-top: 0.85rem;
+}
+
+.xf-footer-theme .theme-switch--footer {
+  transform: scale(0.92);
+  transform-origin: left center;
+}
+
+/* Glass track contrast on solid footer surfaces */
+.xf-footer-theme .theme-switch-track {
+  border-color: rgba(15, 23, 42, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.06),
+    0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+html.dark .xf-footer-theme .theme-switch-track {
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
 .xf-footer-columns {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

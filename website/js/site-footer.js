@@ -151,6 +151,7 @@
       '<i class="fa-solid fa-mug-hot" aria-hidden="true"></i>' +
       '<span>Buy me a coffee</span>' +
       '</a>' +
+      renderFooterThemeSwitch() +
       '</div>' +
       '<div class="xf-footer-columns">' + columns + '</div>' +
       '</div>' +
@@ -169,9 +170,42 @@
       });
     });
 
+    syncFooterThemeSwitch(root);
+
     if (window.XFreezeSite && window.XFreezeSite.applyCounts) {
       window.XFreezeSite.applyCounts();
     }
+  }
+
+  function renderFooterThemeSwitch() {
+    return (
+      '<div class="xf-footer-theme">' +
+      '<button type="button" onclick="typeof toggleTheme===\'function\'&&toggleTheme()" ' +
+      'class="theme-switch theme-switch--hero theme-switch--footer theme-toggle" ' +
+      'role="switch" aria-checked="false" aria-label="Switch to dark mode" title="Dark mode">' +
+      '<span class="theme-switch-track" aria-hidden="true">' +
+      '<span class="theme-switch-label theme-switch-label--auto"></span>' +
+      '<span class="theme-switch-thumb">' +
+      '<span class="theme-switch-icon theme-switch-icon--sun" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12zM4.22 4.22l2.12 2.12-1.06 1.06L3.16 5.28l1.06-1.06zm15.56 15.56 2.12 2.12-1.06 1.06-2.12-2.12 1.06-1.06zM19.78 4.22l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12zM6.34 17.66l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12z"/></svg>' +
+      '</span>' +
+      '<span class="theme-switch-icon theme-switch-icon--moon" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg>' +
+      '</span>' +
+      '</span></span></button></div>'
+    );
+  }
+
+  function syncFooterThemeSwitch(root) {
+    var isDark = document.documentElement.classList.contains('dark');
+    var btns = (root || document).querySelectorAll('.xf-footer-theme .theme-toggle');
+    btns.forEach(function (btn) {
+      btn.setAttribute('aria-checked', isDark ? 'true' : 'false');
+      btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+      btn.setAttribute('title', isDark ? 'Light mode' : 'Dark mode');
+      var label = btn.querySelector('.theme-switch-label--auto');
+      if (label) label.textContent = '';
+    });
   }
 
   function initFooterNav() {

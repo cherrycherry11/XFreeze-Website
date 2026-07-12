@@ -7,6 +7,10 @@
   var client = null;
   var session = null;
   var authMode = 'signin';
+  /* Raw nonce for signInWithIdToken; hashed version is sent to Google GIS. */
+  var googleOneTapNonce = null;
+  var googleOneTapBusy = false;
+  var googleOneTapInited = false;
 
   function config() {
     return window.XFreezeAuthConfig || {};
@@ -936,24 +940,183 @@
     document.head.appendChild(script);
   }
 
+  /**
+   * Supabase expects the raw nonce in signInWithIdToken; Google GIS gets the
+   * SHA-256 hex digest (see Supabase Google One Tap docs).
+   */
+  async function generateGoogleOneTapNonce() {
+    if (!window.crypto || !window.crypto.getRandomValues || !window.crypto.subtle) {
+      return null;
+    }
+    var bytes = new Uint8Array(32);
+    window.crypto.getRandomValues(bytes);
+    var raw = btoa(String.fromCharCode.apply(null, bytes));
+    var hashBuffer = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
+    var hashArray = Array.from(new Uint8Array(hashBuffer));
+    var hashed = hashArray
+      .map(function (b) {
+        return ('0' + b.toString(16)).slice(-2);
+      })
+      .join('');
+    return { raw: raw, hashed: hashed };
+  }
+
+  function showAuthNotice(type, message, actionHref, actionLabel) {
+    var existing = document.getElementById('xf-auth-notice');
+    if (existing) existing.remove();
+    if (!message) return;
+
+    var el = document.createElement('div');
+    el.id = 'xf-auth-notice';
+    el.className = 'xf-auth-notice xf-auth-notice--' + (type || 'info');
+    el.setAttribute('role', type === 'error' ? 'alert' : 'status');
+
+    var copy = document.createElement('span');
+    copy.className = 'xf-auth-notice-text';
+    copy.textContent = message;
+    el.appendChild(copy);
+
+    if (actionHref && actionLabel) {
+      var link = document.createElement('a');
+      link.className = 'xf-auth-notice-action';
+      link.href = actionHref;
+      link.textContent = actionLabel;
+      if (actionHref.indexOf('login') !== -1) {
+        link.addEventListener('click', function () {
+          rememberRedirect();
+        });
+      }
+      el.appendChild(link);
+    }
+
+    var close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'xf-auth-notice-close';
+    close.setAttribute('aria-label', 'Dismiss');
+    close.innerHTML = '&times;';
+    close.addEventListener('click', function () {
+      el.remove();
+    });
+    el.appendChild(close);
+
+    document.body.appendChild(el);
+    window.requestAnimationFrame(function () {
+      el.classList.add('is-visible');
+    });
+
+    if (type !== 'error') {
+      window.setTimeout(function () {
+        if (el.parentNode) {
+          el.classList.remove('is-visible');
+          window.setTimeout(function () {
+            if (el.parentNode) el.remove();
+          }, 280);
+        }
+      }, 4200);
+    }
+  }
+
+  function friendlyOneTapError(err) {
+    var msg = (err && (err.message || err.error_description || err.msg)) || '';
+    if (/audience|client.?id|unacceptable/i.test(msg)) {
+      return 'Google sign-in is misconfigured (client ID). Use Sign in → Google, or fix Google provider Client IDs in Supabase.';
+    }
+    if (/nonce/i.test(msg)) {
+      return 'Google sign-in failed a security check (nonce). Try Sign in → Google, or enable “Skip nonce check” for Google in Supabase.';
+    }
+    if (/provider|not enabled|unsupported/i.test(msg)) {
+      return 'Google sign-in is not enabled in Supabase yet. Use email or try again later.';
+    }
+    if (/network|fetch|Failed to fetch/i.test(msg)) {
+      return 'Could not reach the sign-in server. Check your connection and try again.';
+    }
+    return msg || 'Google One Tap failed. Use Sign in → Google instead.';
+  }
+
   async function handleGoogleOneTap(response) {
+    if (googleOneTapBusy) return;
+
     var sb = getClient();
-    if (!sb || !response || !response.credential) return;
+    if (!sb) {
+      showAuthNotice('error', 'Auth is not configured.', 'login.html', 'Sign in');
+      return;
+    }
+    if (!response || !response.credential) {
+      showAuthNotice('error', 'Google did not return a credential. Try Sign in → Google.', 'login.html', 'Sign in');
+      return;
+    }
+
+    googleOneTapBusy = true;
+    showAuthNotice('info', 'Signing you in…');
 
     try {
-      var result = await sb.auth.signInWithIdToken({
+      var payload = {
         provider: 'google',
         token: response.credential,
-      });
+      };
+      if (googleOneTapNonce) {
+        payload.nonce = googleOneTapNonce;
+      }
+
+      var result = await sb.auth.signInWithIdToken(payload);
+
+      /* Retry without nonce if the dashboard has skip_nonce_check / token has no nonce. */
+      if (
+        result.error &&
+        googleOneTapNonce &&
+        /nonce/i.test(result.error.message || '')
+      ) {
+        result = await sb.auth.signInWithIdToken({
+          provider: 'google',
+          token: response.credential,
+        });
+      }
+
       if (result.error) {
         console.warn('[xf-auth] Google One Tap failed', result.error);
+        showAuthNotice('error', friendlyOneTapError(result.error), 'login.html', 'Sign in');
         return;
       }
-      session = result.data.session;
-      renderNavSlot();
+
+      session =
+        result.data && result.data.session
+          ? result.data.session
+          : null;
+
+      if (!session || !session.user) {
+        await refreshSession();
+      }
+
+      if (!session || !session.user) {
+        showAuthNotice(
+          'error',
+          'Google accepted the sign-in, but no session was saved. Try Sign in → Google.',
+          'login.html',
+          'Sign in'
+        );
+        return;
+      }
+
       cancelGoogleOneTap();
+      renderNavSlot();
+      clearSignInIntent();
+      showAuthNotice('success', 'Signed in as ' + (session.user.email || 'you') + '.');
+
+      /* Honor pending redirect (gated resource / deep link). */
+      var stored = '';
+      try {
+        stored = sessionStorage.getItem('xf-auth-redirect') || '';
+      } catch (e) {}
+      if (stored && stored.indexOf('login') === -1) {
+        window.setTimeout(function () {
+          window.location.href = redirectAfterLogin();
+        }, 250);
+      }
     } catch (err) {
       console.warn('[xf-auth] Google One Tap error', err);
+      showAuthNotice('error', friendlyOneTapError(err), 'login.html', 'Sign in');
+    } finally {
+      googleOneTapBusy = false;
     }
   }
 
@@ -978,33 +1141,55 @@
 
     loadGoogleIdentityServices(function () {
       if (session && session.user) return;
-      try {
-        window.google.accounts.id.initialize({
-          client_id: c.googleClientId,
-          callback: handleGoogleOneTap,
-          auto_select: false,
-          cancel_on_tap_outside: true,
-          context: 'signin',
-          itp_support: true,
-          use_fedcm_for_prompt: true,
-        });
-        window.google.accounts.id.prompt(function (notification) {
-          if (!notification) return;
-          /* Fallback if FedCM / One Tap is suppressed */
+
+      generateGoogleOneTapNonce()
+        .then(function (pair) {
+          if (session && session.user) return;
+
+          googleOneTapNonce = pair ? pair.raw : null;
+
+          var initOpts = {
+            client_id: c.googleClientId,
+            callback: handleGoogleOneTap,
+            auto_select: false,
+            cancel_on_tap_outside: true,
+            context: 'signin',
+            itp_support: true,
+            /* FedCM required as third-party cookies phase out */
+            use_fedcm_for_prompt: true,
+          };
+          if (pair && pair.hashed) {
+            initOpts.nonce = pair.hashed;
+          }
+
           try {
-            if (
-              notification.isNotDisplayed &&
-              notification.isNotDisplayed() &&
-              notification.getNotDisplayedReason &&
-              notification.getNotDisplayedReason() === 'suppressed_by_user'
-            ) {
-              return;
-            }
-          } catch (e) {}
+            window.google.accounts.id.initialize(initOpts);
+            googleOneTapInited = true;
+            window.google.accounts.id.prompt();
+          } catch (err) {
+            console.warn('[xf-auth] One Tap init failed', err);
+          }
+        })
+        .catch(function (err) {
+          console.warn('[xf-auth] One Tap nonce failed', err);
+          /* Last resort: init without nonce */
+          try {
+            googleOneTapNonce = null;
+            window.google.accounts.id.initialize({
+              client_id: c.googleClientId,
+              callback: handleGoogleOneTap,
+              auto_select: false,
+              cancel_on_tap_outside: true,
+              context: 'signin',
+              itp_support: true,
+              use_fedcm_for_prompt: true,
+            });
+            googleOneTapInited = true;
+            window.google.accounts.id.prompt();
+          } catch (e2) {
+            console.warn('[xf-auth] One Tap init failed', e2);
+          }
         });
-      } catch (err) {
-        console.warn('[xf-auth] One Tap init failed', err);
-      }
     });
   }
 

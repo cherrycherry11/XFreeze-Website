@@ -38,11 +38,18 @@ html {
     filter: blur(36px) !important;
   }
 
-  /* Infinite marquees cost continuous compositing on mobile */
-  .animate-marquee,
-  .bundles-wall-drift,
-  #selected-work-marquee.animate-marquee {
+  /*
+   * Template marquee must run on phones (was paused for GPU cost).
+   * Ambient bundles wall drift stays paused - pure decoration.
+   * Speed is set in home.js via --marquee-duration (slower on mobile).
+   */
+  .bundles-wall-drift {
     animation-play-state: paused !important;
+  }
+
+  #selected-work-marquee.animate-marquee,
+  .animate-marquee {
+    animation-play-state: running !important;
   }
 
   /* Prefer content-visibility for below-fold sections */

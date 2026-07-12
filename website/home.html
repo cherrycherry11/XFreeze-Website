@@ -342,15 +342,17 @@
     .animate-marquee {
       animation: marquee-train var(--marquee-duration, 45s) linear infinite;
     }
-    .animate-marquee:hover {
-      animation-play-state: paused;
-    }
 
     .animate-marquee-reverse {
       animation: marquee-train 55s linear infinite reverse;
     }
-    .animate-marquee-reverse:hover {
-      animation-play-state: paused;
+
+    /* Hover-pause only when a real pointer can hover (touch "hover" sticks paused) */
+    @media (hover: hover) and (pointer: fine) {
+      .animate-marquee:hover,
+      .animate-marquee-reverse:hover {
+        animation-play-state: paused;
+      }
     }
 
     @keyframes marquee-train {
@@ -2218,10 +2220,18 @@
       if (!track || track._xfMarqueeReady) return;
 
       const halfWidth = track.scrollWidth / 2;
-      if (!halfWidth) return;
+      if (!halfWidth) {
+        /* Layout not ready yet (common when DevTools resizes to mobile) */
+        window.setTimeout(function () {
+          startSelectedWorkMarquee(track);
+        }, 120);
+        return;
+      }
 
-      const pxPerSecond = 42;
-      const duration = Math.max(70, Math.round(halfWidth / pxPerSecond));
+      const isNarrow = window.matchMedia('(max-width: 1023px)').matches;
+      /* Slightly slower on mobile for smoother compositing */
+      const pxPerSecond = isNarrow ? 32 : 42;
+      const duration = Math.max(isNarrow ? 55 : 70, Math.round(halfWidth / pxPerSecond));
       track.style.setProperty('--marquee-shift', halfWidth + 'px');
       track.style.setProperty('--marquee-duration', duration + 's');
       track.classList.add('is-marquee-ready', 'animate-marquee');

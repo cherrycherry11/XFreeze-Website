@@ -880,6 +880,21 @@ html.dark .xf-auth-support-coffee {
   margin-top: 0;
 }
 
+/* Login / signup: fixed Dark/Light switch, bottom-left */
+.xf-auth-theme {
+  position: fixed;
+  z-index: 40;
+  left: max(1rem, env(safe-area-inset-left, 0px));
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  pointer-events: auto;
+}
+
+.xf-auth-theme .theme-switch--hero {
+  /* Slightly smaller than home hero so it doesn’t dominate the form */
+  transform: scale(0.92);
+  transform-origin: left bottom;
+}
+
 /* One Tap / in-page auth feedback (home and public pages) */
 .xf-auth-notice {
   position: fixed;

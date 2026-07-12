@@ -28,12 +28,12 @@
   }
 
   var TOPIC_PLACEHOLDERS = {
-    general: 'Tell us what you need help with…',
+    general: 'Tell me what you need help with…',
     support: 'Describe the issue and where you saw it…',
     template: 'Describe the template you need (category, style, product type, use case)…',
     skill: 'Describe the skill or workflow you want (tool, task, integrations)…',
     prompt: 'Describe the motion prompt or category you need (camera move, subject, mood)…',
-    partnership: 'Tell us about your partnership idea…',
+    partnership: 'Tell me about your partnership idea…',
   };
 
   function setTopic(value) {
@@ -156,12 +156,12 @@
       } catch (err) {}
 
       if (!res.ok) {
-        throw new Error(json.error || json.message || 'Could not send message. Try again or email us directly.');
+        throw new Error(json.error || json.message || 'Could not send message. Try again or email me directly.');
       }
 
       form.reset();
       setTopic('general');
-      showStatus("Message sent. We'll reply within 24-48 hours.", 'success');
+      showStatus("Message sent. I'll reply within 24-48 hours.", 'success');
     } catch (error) {
       showStatus(error.message || 'Something went wrong. Email contact@xfreeze.com directly.', 'error');
     } finally {

@@ -21,7 +21,12 @@ html.dark {
 .xf-site-footer {
   position: relative;
   z-index: 20;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: clip;
   background: var(--surface, #fff);
+  /* Section divider — full page width (background edge), not a content frame */
   border-top: 1px solid var(--xf-footer-border);
 }
 
@@ -29,13 +34,30 @@ html.dark .xf-site-footer {
   background: var(--surface, #020403);
 }
 
-.xf-site-footer__inner {
-  padding: 2.5rem 0 2rem;
+/*
+ * Footer content column.
+ * Menu columns + bottom bar stay inside the same width as the rest of the site.
+ * Horizontal padding/max-width come from .content-container when present;
+ * we only lock box model + vertical rhythm so nothing can spill out.
+ */
+.xf-site-footer__inner,
+.xf-site-footer .content-container.xf-site-footer__inner {
+  box-sizing: border-box !important;
+  width: 100%;
+  max-width: min(var(--page-max, 1520px), calc(100% - var(--page-gutter, 1rem) * 2)) !important;
+  margin-inline: auto;
+  padding-top: 2.5rem;
+  padding-bottom: 2rem;
+  padding-inline: var(--page-gutter, 1rem) !important;
+  overflow: hidden;
+  min-width: 0;
 }
 
 @media (min-width: 1024px) {
-  .xf-site-footer__inner {
-    padding: 3.25rem 0 2.25rem;
+  .xf-site-footer__inner,
+  .xf-site-footer .content-container.xf-site-footer__inner {
+    padding-top: 3.25rem;
+    padding-bottom: 2.25rem;
   }
 }
 
@@ -43,6 +65,10 @@ html.dark .xf-site-footer {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 1024px) {
@@ -132,6 +158,9 @@ html.dark .xf-footer-coffee {
   gap: 1.75rem 1.25rem;
   width: 100%;
   min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  flex: 1 1 auto;
 }
 
 @media (min-width: 768px) {
@@ -172,11 +201,13 @@ html.dark .xf-footer-coffee {
 
 .xf-footer-list a {
   display: inline-block;
+  max-width: 100%;
   font-size: 0.8125rem;
   line-height: var(--line-small);
   color: var(--xf-footer-link);
   text-decoration: none;
   transition: color 0.2s ease;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
@@ -273,8 +304,13 @@ html.dark .xf-footer-coffee {
   flex-direction: column;
   align-items: flex-start;
   gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   margin-top: 2.25rem;
   padding-top: 1.5rem;
+  /* Divider stays inside the content column — same width as the menu */
   border-top: 1px solid var(--xf-footer-border);
 }
 

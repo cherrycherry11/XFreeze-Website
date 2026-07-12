@@ -6,15 +6,15 @@
 
 
 :root {
-  --xf-accent: #00c8d4;
-  --xf-accent-glow: rgba(0, 200, 212, 0.35);
+  --xf-accent: #3a4e66;
+  --xf-accent-glow: rgba(58, 78, 102, 0.25);
   --xf-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --xf-nav-duration: 0.35s;
 }
 
 html.dark {
-  --xf-accent: #00f0ff;
-  --xf-accent-glow: rgba(0, 240, 255, 0.4);
+  --xf-accent: #b9cbe2;
+  --xf-accent-glow: rgba(185, 203, 226, 0.3);
 }
 
 /* Display typography */

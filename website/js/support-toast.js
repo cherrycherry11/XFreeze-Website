@@ -1,5 +1,5 @@
 /**
- * X Freeze - slide-in "Support our work" tab after copy / valuable actions.
+ * X Freeze - slide-in "Support my work" tab after copy / valuable actions.
  */
 (function (global) {
   var SUPPORT_URL = 'https://buymeacoffee.com/xfreeze';
@@ -38,7 +38,7 @@
     if (!subtitle) {
       subtitle = context === 'open'
         ? 'Enjoying the templates? A coffee keeps them free.'
-        : 'Free skills & templates - tips help us build more.';
+        : 'Free skills & templates - tips help me build more.';
     }
 
     var toast = document.createElement('div');
@@ -49,7 +49,7 @@
       '<div class="xf-support-toast-inner">' +
         '<span class="xf-support-toast-icon" aria-hidden="true"><i class="fa-solid fa-mug-hot"></i></span>' +
         '<div class="xf-support-toast-copy">' +
-          '<span class="xf-support-toast-title">Support our work</span>' +
+          '<span class="xf-support-toast-title">Support my work</span>' +
           '<span class="xf-support-toast-sub">' + subtitle + '</span>' +
         '</div>' +
         '<a class="xf-support-toast-cta" href="' + SUPPORT_URL + '" target="_blank" rel="noopener noreferrer">' +

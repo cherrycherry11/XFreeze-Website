@@ -1,103 +1,212 @@
 /* X Freeze - Motion Prompt Library */
 
 .pl-main {
-  --pl-accent: #00a8b5;
-  --pl-accent-soft: rgba(0, 168, 181, 0.12);
+  --pl-accent: #4682d2;
+  --pl-accent-soft: rgba(70, 130, 210, 0.12);
   --pl-hero-bg: #f3f5f8;
   --pl-card-radius: 1rem;
   padding-bottom: 5rem;
 }
 
 html.dark .pl-main {
-  --pl-accent: #00c8d4;
-  --pl-accent-soft: rgba(0, 200, 212, 0.14);
+  --pl-accent: #6490dc;
+  --pl-accent-soft: rgba(100, 160, 230, 0.14);
   --pl-hero-bg: #020403;
 }
 
-/* Hero - light theme (default) mirrors dark cinematic layout */
+/*
+ * Hero — full-bleed glass over dual droplet plates.
+ * Frost is done with (1) filter:blur on the photo itself + (2) a solid
+ * translucent glass sheet. That paints immediately — no backdrop-filter lag.
+ */
 .pl-hero {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse 55% 70% at 88% 35%, rgba(0, 180, 195, 0.1) 0%, transparent 62%),
-    radial-gradient(ellipse 50% 65% at 8% 70%, rgba(120, 90, 220, 0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 50% at 50% 100%, rgba(255, 255, 255, 0.9) 0%, transparent 55%),
-    var(--pl-hero-bg);
+  min-height: clamp(28rem, 62vh, 40rem);
+  /* Fallback fills match new silk / abstract plates */
+  background: #f4f7fc;
   color: #0a0a0a;
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 html.dark .pl-hero {
-  background: var(--pl-hero-bg);
+  background: #0a1018;
   color: #f2f5f3;
   border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
-.pl-hero__grain {
-  position: absolute;
-  inset: 0;
-  opacity: 0.18;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-  pointer-events: none;
-  mix-blend-mode: multiply;
+/* Never hide the hero while scroll-reveal boots */
+.pl-hero .scroll-reveal-in,
+.pl-hero.pl-hero--glass {
+  opacity: 1 !important;
+  transform: none !important;
 }
 
-html.dark .pl-hero__grain {
+/* Full-bleed dual photo backdrops */
+.pl-hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Full-bleed still plates (no scale/blur crop needed) */
+.pl-hero__media-blur {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.pl-hero__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  /* Light plate is already soft — no extra blur */
+  filter: none;
+  transform: none;
+  transform-origin: center center;
+  transition: none;
+  will-change: opacity;
+}
+
+.pl-hero__bg--light {
+  opacity: 1;
+}
+
+.pl-hero__bg--dark {
+  opacity: 0;
+}
+
+html.dark .pl-hero__bg--light {
+  opacity: 0;
+}
+
+html.dark .pl-hero__bg--dark {
+  opacity: 1;
+  /* Dark plate can stay sharp; wash adds 20% black below */
+  filter: none;
+}
+
+/*
+ * Full-hero glass sheet — solid translucent fill (always looks frosted).
+ * Light mode: stronger white wash so the section reads bright / premium.
+ */
+.pl-hero__glass-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.03);
+  /* Light silk plate is already bright — light frost only */
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.42) 0%,
+      rgba(255, 255, 255, 0.18) 32%,
+      rgba(255, 255, 255, 0.12) 58%,
+      rgba(255, 255, 255, 0.28) 100%
+    ),
+    linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.38) 0%,
+      rgba(255, 255, 255, 0.2) 45%,
+      rgba(248, 252, 255, 0.3) 100%
+    );
+}
+
+html.dark .pl-hero__glass-sheet {
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.02) 30%,
+      transparent 55%
+    ),
+    linear-gradient(
+      155deg,
+      rgba(16, 22, 34, 0.55) 0%,
+      rgba(6, 10, 18, 0.42) 48%,
+      rgba(10, 16, 26, 0.5) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/*
+ * Premium film-grain noise on the glass.
+ * SVG fractal noise (no extra asset) — soft monochrome texture.
+ */
+.pl-hero__noise {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  /* Lighter grain so light mode stays bright */
+  opacity: 0.28;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+}
+
+/* Second pass: finer grain for that “etched glass” feel */
+.pl-hero__noise::after {
+  content: "";
+  position: absolute;
+  inset: 0;
   opacity: 0.35;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n2)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 120px 120px;
+}
+
+html.dark .pl-hero__noise {
+  opacity: 0.5;
   mix-blend-mode: overlay;
 }
 
-.pl-hero__perfs {
+html.dark .pl-hero__noise::after {
+  opacity: 0.4;
+  mix-blend-mode: soft-light;
+}
+
+/* Soft readability wash — light only (no extra blur on the plate) */
+.pl-hero__media-shade {
   position: absolute;
-  left: 0;
-  right: 0;
-  height: 14px;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0,
-    transparent 10px,
-    rgba(15, 23, 42, 0.1) 10px,
-    rgba(15, 23, 42, 0.1) 18px
-  );
-  pointer-events: none;
-}
-.pl-hero__perfs--top { top: 0; }
-.pl-hero__perfs--bottom { bottom: 0; }
-
-html.dark .pl-hero__perfs {
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0,
-    transparent 10px,
-    rgba(255, 255, 255, 0.08) 10px,
-    rgba(255, 255, 255, 0.08) 18px
-  );
+  inset: 0;
+  z-index: 3;
+  background:
+    radial-gradient(ellipse 100% 90% at 50% 40%, rgba(255, 255, 255, 0.2) 0%, transparent 70%),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.22) 0%,
+      rgba(255, 255, 255, 0.08) 45%,
+      rgba(255, 255, 255, 0.18) 100%
+    );
 }
 
-.pl-hero__glow {
-  position: absolute;
-  width: 50%;
-  height: 75%;
-  top: 8%;
-  right: 8%;
-  background: radial-gradient(ellipse, rgba(0, 180, 195, 0.18) 0%, transparent 70%);
-  pointer-events: none;
+/* Dark mode: flat 20% black overlay */
+html.dark .pl-hero__media-shade {
+  background: rgba(0, 0, 0, 0.2);
 }
 
-.pl-hero__glow--2 {
-  left: -15%;
-  right: auto;
-  top: 30%;
-  width: 45%;
-  background: radial-gradient(ellipse, rgba(120, 90, 220, 0.12) 0%, transparent 70%);
-}
-
-html.dark .pl-hero__glow {
-  background: radial-gradient(ellipse, rgba(0, 200, 212, 0.24) 0%, transparent 70%);
-}
-
-html.dark .pl-hero__glow--2 {
-  background: radial-gradient(ellipse, rgba(120, 80, 255, 0.15) 0%, transparent 70%);
+/* Legacy layers no longer in markup — keep inert if present */
+.pl-hero__grain,
+.pl-hero__perfs,
+.pl-hero__glow,
+.pl-hero__glass {
+  display: none !important;
 }
 
 .pl-hero__marquee {
@@ -105,7 +214,7 @@ html.dark .pl-hero__glow--2 {
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 1;
+  z-index: 4;
   overflow: hidden;
   opacity: 0.22;
   color: rgba(15, 23, 42, 0.55);
@@ -143,10 +252,34 @@ html.dark .pl-hero__marquee {
   to { transform: translateX(-50%); }
 }
 
+/* Content frame — same layout/spacing as pre-backdrop work */
 .pl-hero__inner {
   position: relative;
-  z-index: 2;
+  z-index: 5;
   padding: 5.5rem 0 5.5rem;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+@media (max-width: 639px) {
+  .pl-hero {
+    min-height: 0;
+  }
+}
+
+/* Reduced motion: quieter grain */
+@media (prefers-reduced-motion: reduce) {
+  .pl-hero__noise {
+    opacity: 0.28;
+  }
+
+  html.dark .pl-hero__noise {
+    opacity: 0.32;
+  }
+
+  .pl-hero__marquee-track {
+    animation: none;
+  }
 }
 
 .pl-hero__layout {
@@ -183,6 +316,7 @@ html.dark .pl-hero__marquee {
   }
 }
 
+/* Typewriter card — original chrome (backdrop-only work must not restyle this) */
 .pl-hero__typewriter {
   position: relative;
   display: flex;
@@ -212,7 +346,7 @@ html.dark .pl-hero__typewriter {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 100% 0%, rgba(0, 180, 195, 0.12) 0%, transparent 58%),
+    radial-gradient(ellipse 80% 60% at 100% 0%, rgba(70, 130, 210, 0.12) 0%, transparent 58%),
     linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
   background-size: auto, 18px 18px, 18px 18px;
@@ -222,7 +356,7 @@ html.dark .pl-hero__typewriter {
 
 html.dark .pl-hero__typewriter::before {
   background:
-    radial-gradient(ellipse 80% 60% at 100% 0%, rgba(0, 200, 212, 0.14) 0%, transparent 58%),
+    radial-gradient(ellipse 80% 60% at 100% 0%, rgba(100, 160, 220, 0.14) 0%, transparent 58%),
     linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: auto, 18px 18px, 18px 18px;
@@ -256,8 +390,8 @@ html.dark .pl-hero__tw-chrome {
   align-items: center;
   padding: 0.22rem 0.5rem;
   border-radius: 999px;
-  border: 1px solid rgba(0, 168, 181, 0.28);
-  background: rgba(0, 168, 181, 0.1);
+  border: 1px solid rgba(70, 130, 210, 0.28);
+  background: rgba(70, 130, 210, 0.1);
   font-family: var(--font-sans);
   font-size: 0.56rem;
   font-weight: 700;
@@ -267,8 +401,8 @@ html.dark .pl-hero__tw-chrome {
 }
 
 html.dark .pl-hero__tw-tag {
-  border-color: rgba(0, 200, 212, 0.28);
-  background: rgba(0, 200, 212, 0.1);
+  border-color: rgba(100, 160, 230, 0.28);
+  background: rgba(100, 160, 230, 0.1);
 }
 
 .pl-hero__tw-meta {
@@ -297,11 +431,11 @@ html.dark .pl-hero__tw-meta {
   bottom: 0.85rem;
   width: 2px;
   border-radius: 0 2px 2px 0;
-  background: linear-gradient(180deg, var(--pl-accent) 0%, rgba(0, 168, 181, 0.15) 100%);
+  background: linear-gradient(180deg, var(--pl-accent) 0%, rgba(55, 110, 185, 0.15) 100%);
 }
 
 html.dark .pl-hero__tw-main::before {
-  background: linear-gradient(180deg, var(--pl-accent) 0%, rgba(0, 200, 212, 0.15) 100%);
+  background: linear-gradient(180deg, var(--pl-accent) 0%, rgba(100, 160, 220, 0.15) 100%);
 }
 
 .pl-hero__tw-title {
@@ -363,7 +497,7 @@ html.dark .pl-hero__tw-best {
 }
 
 html.dark .pl-hero__tw-best strong {
-  color: rgba(0, 200, 212, 0.75);
+  color: rgba(100, 160, 230, 0.75);
 }
 
 .pl-hero__tw-best span.is-typing::after {
@@ -1060,19 +1194,19 @@ html.dark .pl-card__badge {
   padding: 0.18rem 0.45rem;
   border-radius: 999px;
   border: 1px solid rgba(180, 130, 20, 0.35);
-  background: linear-gradient(135deg, rgba(255, 214, 120, 0.18), rgba(255, 180, 50, 0.08));
+  background: linear-gradient(135deg, rgba(200, 222, 245, 0.18), rgba(150, 195, 240, 0.08));
   font-size: 0.58rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #9a6700;
+  color: #2f5fad;
 }
 .pl-card__premium i {
   font-size: 0.5rem;
 }
 html.dark .pl-card__premium {
-  border-color: rgba(255, 210, 100, 0.28);
-  background: linear-gradient(135deg, rgba(255, 210, 100, 0.14), rgba(255, 180, 50, 0.06));
+  border-color: rgba(120, 175, 235, 0.28);
+  background: linear-gradient(135deg, rgba(200, 222, 245, 0.14), rgba(150, 195, 240, 0.06));
   color: #e8c56a;
 }
 .pl-card--premium {
@@ -1080,7 +1214,7 @@ html.dark .pl-card__premium {
   box-shadow: 0 1px 0 rgba(255, 220, 140, 0.12) inset;
 }
 html.dark .pl-card--premium {
-  border-color: rgba(255, 210, 100, 0.18);
+  border-color: rgba(120, 175, 235, 0.18);
 }
 
 .pl-card__num {
@@ -1386,23 +1520,23 @@ body.pl-panel-open .xf-support-toast {
 .pl-filter-btn--premium {
   font-weight: 600;
   border-color: rgba(180, 130, 20, 0.35);
-  background: linear-gradient(135deg, rgba(255, 214, 120, 0.14), rgba(255, 180, 50, 0.06));
-  color: #9a6700;
+  background: linear-gradient(135deg, rgba(200, 222, 245, 0.14), rgba(150, 195, 240, 0.06));
+  color: #2f5fad;
 }
 .pl-filter-btn--premium:hover {
   border-color: rgba(180, 130, 20, 0.5);
-  background: linear-gradient(135deg, rgba(255, 214, 120, 0.22), rgba(255, 180, 50, 0.1));
+  background: linear-gradient(135deg, rgba(200, 222, 245, 0.22), rgba(150, 195, 240, 0.1));
   color: #7a5200;
 }
 .pl-filter-btn--premium.is-active {
-  background: linear-gradient(135deg, #c9920a 0%, #9a6700 100%);
-  border-color: #9a6700;
+  background: linear-gradient(135deg, #64a0dc 0%, #376eb9 100%);
+  border-color: #2f5fad;
   color: #fff;
   box-shadow: none;
 }
 .pl-filter-btn--premium.is-active:hover {
-  background: linear-gradient(135deg, #b88409 0%, #8a5c00 100%);
-  border-color: #8a5c00;
+  background: linear-gradient(135deg, #376eb9 0%, #234682 100%);
+  border-color: #2a5499;
   color: #fff;
 }
 .pl-filter-btn--premium:focus-visible {
@@ -1412,12 +1546,12 @@ body.pl-panel-open .xf-support-toast {
   box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px rgba(154, 103, 0, 0.45);
 }
 html.dark .pl-filter-btn--premium {
-  border-color: rgba(255, 210, 100, 0.28);
+  border-color: rgba(120, 175, 235, 0.28);
   color: #e8c56a;
 }
 html.dark .pl-filter-btn--premium.is-active {
-  background: linear-gradient(135deg, #c9920a 0%, #a67c00 100%);
-  border-color: #c9920a;
+  background: linear-gradient(135deg, #64a0dc 0%, #376eb9 100%);
+  border-color: #4682d2;
   color: #1a1408;
 }
 html.dark .pl-filter-btn--premium.is-active:hover {
@@ -1427,7 +1561,7 @@ html.dark .pl-filter-btn--premium.is-active:hover {
 #pl-panel-cat.is-premium::after {
   content: ' · Premium';
   font-weight: 700;
-  color: #c9920a;
+  color: #4682d2;
 }
 html.dark #pl-panel-cat.is-premium::after {
   color: #e8c56a;

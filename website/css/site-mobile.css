@@ -81,8 +81,16 @@ body {
   #hero-header,
   #section-experimental,
   #section-minimal,
-  .xf-feature-copy {
+  .xf-feature-copy,
+  .xf-site-footer {
     overflow-x: hidden;
+  }
+
+  .xf-site-footer__inner,
+  .xf-site-footer .content-container.xf-site-footer__inner {
+    max-width: 100% !important;
+    padding-inline: var(--page-gutter, 1rem) !important;
+    box-sizing: border-box !important;
   }
 
   .xf-feature-copy__blob,

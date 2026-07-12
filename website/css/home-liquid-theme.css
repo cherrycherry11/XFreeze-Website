@@ -1,0 +1,552 @@
+/*
+ * X Freeze home liquid theme
+ * Late-loading polish layer for the dark water / smoked glass direction.
+ */
+
+:root {
+  --xf-ink: #080d12;
+  --xf-ink-2: #0d151c;
+  --xf-ink-3: #121d26;
+  --xf-paper: #f4f7f8;
+  --xf-paper-2: #edf3f5;
+  --xf-glass: rgba(255, 255, 255, 0.68);
+  --xf-glass-strong: rgba(255, 255, 255, 0.82);
+  --xf-line: rgba(42, 58, 71, 0.14);
+  --xf-line-strong: rgba(42, 58, 71, 0.24);
+  --xf-text-soft: #5a6873;
+  --xf-water: #9eb6ca;
+  --xf-water-deep: #405b70;
+  --xf-water-pale: #dce8ef;
+  --xf-shadow-soft: 0 22px 60px -34px rgba(18, 34, 46, 0.34);
+  --text: #091017;
+  --text-secondary: var(--xf-text-soft);
+  --border: var(--xf-line);
+  --surface: var(--xf-paper);
+  --surface-elevated: var(--xf-paper-2);
+  --surface-muted: rgba(255, 255, 255, 0.62);
+  --surface-subtle: #e7eef1;
+  --nav-bg: rgba(245, 249, 250, 0.76);
+  --border-hover: var(--xf-line-strong);
+}
+
+html.dark {
+  --xf-ink: #010305;
+  --xf-ink-2: #03070b;
+  --xf-ink-3: #071019;
+  --xf-paper: #010305;
+  --xf-paper-2: #03070b;
+  --xf-glass: rgba(4, 10, 15, 0.72);
+  --xf-glass-strong: rgba(6, 14, 21, 0.86);
+  --xf-line: rgba(219, 238, 249, 0.14);
+  --xf-line-strong: rgba(231, 245, 252, 0.3);
+  --xf-text-soft: #a8b6c0;
+  --xf-water: #afc4d7;
+  --xf-water-deep: #5d7890;
+  --xf-water-pale: #e7f2f8;
+  --xf-shadow-soft: 0 28px 72px -34px rgba(0, 0, 0, 0.92);
+  --text: #f3f8fb;
+  --text-secondary: var(--xf-text-soft);
+  --border: var(--xf-line);
+  --surface: var(--xf-paper);
+  --surface-elevated: var(--xf-paper-2);
+  --surface-muted: rgba(4, 10, 15, 0.82);
+  --surface-subtle: #09121a;
+  --nav-bg: rgba(1, 3, 5, 0.84);
+  --border-hover: var(--xf-line-strong);
+}
+
+html,
+body {
+  background: var(--surface) !important;
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Use 100% (not 100vw) so scrollbar width never pushes sections / footer outside */
+.content-container {
+  max-width: min(var(--page-max), calc(100% - var(--page-gutter) * 2)) !important;
+}
+
+.hero-header--studio .hero-content.content-container {
+  width: 100%;
+  max-width: 100vw !important;
+}
+
+.hero-header--studio .hero-layout {
+  width: min(100%, calc(100vw - 2rem)) !important;
+}
+
+.hero-header--studio .hero-copy,
+.hero-header--studio .hero-headline,
+.hero-header--studio .hero-lead {
+  max-width: min(100%, calc(100vw - 2rem)) !important;
+}
+
+html.dark,
+html.dark body {
+  background: #010204 !important;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background-image:
+    linear-gradient(rgba(8, 13, 18, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(8, 13, 18, 0.025) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 16%, #000 86%, transparent 100%);
+}
+
+html.dark body::before {
+  opacity: 0.22;
+  background-image:
+    linear-gradient(rgba(231, 242, 248, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(231, 242, 248, 0.035) 1px, transparent 1px);
+}
+
+.hero-header--studio,
+.hero-stage__base {
+  background: var(--xf-paper) !important;
+}
+
+html.dark .hero-header--studio,
+html.dark .hero-stage__base,
+html.dark .hero-video-stack {
+  background: #000102 !important;
+}
+
+.hero-stage__vignette {
+  background:
+    radial-gradient(ellipse 76% 62% at 50% 48%, rgba(246, 250, 251, 0.7) 0%, rgba(246, 250, 251, 0.28) 48%, transparent 76%),
+    linear-gradient(180deg, rgba(244, 247, 248, 0.22) 0%, transparent 32%, rgba(244, 247, 248, 0.36) 100%) !important;
+}
+
+html.dark .hero-stage__vignette {
+  background:
+    radial-gradient(ellipse 70% 58% at 50% 48%, rgba(0, 1, 2, 0.9) 0%, rgba(1, 4, 7, 0.62) 48%, transparent 78%),
+    radial-gradient(ellipse 32% 22% at 17% 14%, rgba(204, 229, 245, 0.07) 0%, rgba(70, 103, 130, 0.035) 45%, transparent 70%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.62) 0%, transparent 34%, rgba(0, 0, 0, 0.78) 100%) !important;
+}
+
+html.dark .hero-header--studio .hero-headline,
+html.dark .hero-header--studio .hero-headline__line {
+  color: var(--xf-water-pale) !important;
+  text-shadow: 0 18px 54px rgba(175, 196, 215, 0.14);
+}
+
+html.dark .hero-header--studio .hero-headline__line--soft {
+  color: rgba(217, 231, 240, 0.86) !important;
+}
+
+html.dark .hero-header--studio .hero-lead {
+  color: rgba(221, 233, 240, 0.76) !important;
+}
+
+html.dark .hero-header--studio .hero-kicker,
+html.dark .hero-proof__chip {
+  color: rgba(218, 232, 240, 0.72) !important;
+}
+
+.hero-proof__chip,
+html:not(.dark) .hero-header--studio .hero-btn--ghost {
+  border-color: rgba(42, 58, 71, 0.13) !important;
+  background: rgba(255, 255, 255, 0.54) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.62) inset;
+  backdrop-filter: blur(16px) saturate(1.12);
+  -webkit-backdrop-filter: blur(16px) saturate(1.12);
+}
+
+html.dark .hero-proof__chip,
+html.dark .hero-btn--ghost {
+  border-color: rgba(220, 238, 248, 0.16) !important;
+  background: rgba(8, 15, 21, 0.5) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  backdrop-filter: blur(18px) saturate(1.18);
+  -webkit-backdrop-filter: blur(18px) saturate(1.18);
+}
+
+html.dark .hero-btn--primary,
+html.dark #xf-newsletter-cta .xf-newsletter-btn--primary,
+html.dark #xf-final-cta .xf-final-cta-btn--primary,
+html.dark #xf-motion-prompts .xf-motion-btn--primary,
+html.dark #xf-motion-prompts .xf-motion-cta-link {
+  background: linear-gradient(180deg, #f1f8fb 0%, #b9ccd9 100%) !important;
+  border-color: rgba(236, 247, 253, 0.82) !important;
+  color: #061016 !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.76) inset,
+    0 18px 38px -22px rgba(175, 196, 215, 0.72);
+}
+
+html.dark .hero-btn--primary:hover,
+html.dark #xf-newsletter-cta .xf-newsletter-btn--primary:hover,
+html.dark #xf-final-cta .xf-final-cta-btn--primary:hover,
+html.dark #xf-motion-prompts .xf-motion-btn--primary:hover,
+html.dark #xf-motion-prompts .xf-motion-cta-link:hover {
+  background: linear-gradient(180deg, #ffffff 0%, #d1e1ea 100%) !important;
+  transform: translateY(-1px);
+}
+
+section,
+.xf-glass-section,
+#creator-library,
+#section-experimental,
+#section-minimal,
+#xf-motion-prompts,
+#xf-skills-spotlight-section,
+#xf-newsletter-cta,
+#xf-final-cta {
+  border-color: var(--border) !important;
+}
+
+/* Light: solid sections only — no multi-section gradient wash */
+.xf-glass-section,
+#section-experimental,
+#section-minimal,
+#xf-skills-spotlight-section,
+#xf-newsletter-cta {
+  background: #f7f7f9 !important;
+}
+
+/* Final CTA keeps a quiet solid base; soft wash from glass-backdrop selective rules */
+html:not(.dark) #xf-final-cta {
+  background: #f4f6f8 !important;
+}
+
+/* Creator library keeps a clean base so the perspective grid stays readable */
+#creator-library {
+  background: #f7f7f9 !important;
+}
+
+/* Dark section fills: solid base only — nebula plate handled in dark-nebula-bg.css */
+html.dark .xf-glass-section,
+html.dark #section-experimental,
+html.dark #section-minimal,
+html.dark #xf-motion-prompts,
+html.dark #xf-skills-spotlight-section,
+html.dark #xf-newsletter-cta,
+html.dark #xf-final-cta {
+  background: #010204 !important;
+}
+
+html.dark #creator-library {
+  background: #000000 !important;
+}
+
+/* Light glass layers: no forced multi-section gradients */
+
+/* Dark glass layers use nebula plate (dark-nebula-bg.css) — no competing CSS gradients */
+
+/*
+ * Creator Library interactive spotlight — MUST track --spot-x / --spot-y.
+ * Do not replace with fixed radials or ambient animations.
+ */
+/* Interactive spotlight — deep muted blue, low opacity (like Final CTA) */
+#creator-library .bundles-spotlight {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+  display: block !important;
+  background:
+    radial-gradient(
+      ellipse 62% 54% at var(--spot-x, 50%) var(--spot-y, 42%),
+      rgba(70, 110, 150, 0.14) 0%,
+      rgba(50, 85, 125, 0.08) 32%,
+      rgba(35, 60, 95, 0.04) 58%,
+      transparent 82%
+    ) !important;
+  background-size: auto !important;
+  filter: none !important;
+  animation: none !important;
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+html.dark #creator-library .bundles-spotlight {
+  background:
+    radial-gradient(
+      ellipse 64% 56% at var(--spot-x, 50%) var(--spot-y, 42%),
+      rgba(55, 95, 140, 0.16) 0%,
+      rgba(35, 70, 110, 0.1) 30%,
+      rgba(20, 45, 80, 0.05) 55%,
+      transparent 80%
+    ) !important;
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+/* Light veils: only page heroes + final CTA (set in glass-backdrop.css) */
+
+html.dark .xf-glass-backdrop__veil,
+html.dark .xf-glass-section:not(:has(.xf-glass-backdrop))::after,
+html.dark .xf-glass-hero::after,
+html.dark #selected-work .xf-glass-backdrop__veil,
+html.dark #xf-motion-prompts .xf-glass-backdrop__veil,
+html.dark #xf-newsletter-cta .xf-glass-backdrop__veil,
+html.dark #xf-final-cta .xf-glass-backdrop__veil {
+  background: linear-gradient(180deg, rgba(0, 1, 2, 0.86), rgba(2, 7, 11, 0.68) 48%, rgba(0, 1, 2, 0.9)) !important;
+  backdrop-filter: blur(18px) saturate(1.12) contrast(1.08) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.12) contrast(1.08) !important;
+}
+
+#section-experimental,
+#section-minimal,
+#xf-motion-prompts {
+  background: #f7f7f9 !important;
+}
+
+html.dark #section-experimental,
+html.dark #section-minimal,
+html.dark #xf-motion-prompts {
+  background: #000102 !important;
+}
+
+/* Card frames, borders, and drop shadows: leave to home.html / original CSS.
+   This file is for backdrops only. */
+
+html.dark #creator-library .bundles-stat-col {
+  border-color: rgba(228, 243, 251, 0.11) !important;
+}
+
+.xf-spot-tag,
+.xf-combo-tag,
+.xf-motion-card__cat,
+.xf-motion-chip,
+.pro-badge {
+  border: 1px solid rgba(64, 91, 112, 0.16);
+  background: rgba(214, 228, 237, 0.68) !important;
+  color: #365267 !important;
+}
+
+html.dark .xf-spot-tag,
+html.dark .xf-combo-tag,
+html.dark .xf-motion-card__cat,
+html.dark .xf-motion-chip,
+html.dark .pro-badge {
+  border-color: rgba(207, 226, 239, 0.14) !important;
+  background: rgba(175, 196, 215, 0.1) !important;
+  color: #c6d9e6 !important;
+}
+
+.xf-motion-btn--primary,
+.xf-motion-cta-link,
+.xf-newsletter-btn--primary,
+.xf-final-cta-btn--primary,
+html:not(.dark) .hero-header--studio .hero-btn--primary {
+  background: linear-gradient(180deg, #0c151c 0%, #192937 100%) !important;
+  border-color: rgba(12, 21, 28, 0.92) !important;
+  color: #f6fbfd !important;
+  box-shadow: 0 16px 34px -24px rgba(18, 34, 46, 0.5);
+}
+
+.xf-motion-btn--ghost,
+.xf-newsletter-btn--secondary,
+.xf-final-cta-btn--ghost,
+html.dark #xf-newsletter-cta .xf-newsletter-btn--secondary,
+html.dark #xf-final-cta .xf-final-cta-btn--ghost,
+html.dark #xf-motion-prompts .xf-motion-btn--ghost {
+  border-color: var(--border) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text) !important;
+}
+
+html.dark .xf-motion-btn--ghost,
+html.dark .xf-newsletter-btn--secondary,
+html.dark .xf-final-cta-btn--ghost {
+  background: rgba(10, 18, 25, 0.42) !important;
+}
+
+.bundles-edge-fade {
+  background: linear-gradient(to right, var(--surface) 0%, transparent 10%, transparent 90%, var(--surface) 100%) !important;
+}
+
+#creator-library {
+  --grid-line: rgba(64, 91, 112, 0.16) !important;
+}
+
+html.dark #creator-library {
+  --grid-line: rgba(207, 226, 239, 0.13) !important;
+}
+
+#creator-library::after,
+html.dark #creator-library::after {
+  background: linear-gradient(180deg, transparent 0%, rgba(3, 7, 10, 0.34) 44%, var(--surface) 100%) !important;
+}
+
+html:not(.dark) #creator-library::after {
+  background: linear-gradient(180deg, transparent 0%, rgba(244, 247, 248, 0.58) 44%, var(--surface) 100%) !important;
+}
+
+/* Card frames/shadows stay in home.html — do not override artistic-card here */
+
+.xf-section-title,
+.xf-library-title,
+.xf-final-cta-title,
+.xf-faq-title {
+  text-wrap: balance;
+}
+
+.xf-section-lead,
+.xf-final-cta-lead,
+.xf-combo-desc,
+.xf-motion-card__preview {
+  text-wrap: pretty;
+}
+
+/* Nebula plate uses static CSS transforms (scale/rotate) per section — no ambient drift */
+
+/* spotlight interaction is driven by JS --spot-x/--spot-y; no ambient animation */
+
+html.dark .xf-feature-copy__blob,
+html.dark .xf-feature-copy__blob--2,
+html.dark .xf-final-cta-box::before {
+  animation: xf-liquid-breathe 16s ease-in-out infinite alternate;
+  will-change: transform, opacity, filter;
+}
+
+@keyframes xf-liquid-gradient-drift {
+  0% {
+    opacity: 0.36;
+    transform: translate3d(-1.2%, -0.7%, 0) scale(1.02);
+    background-position: 0% 42%, 100% 58%;
+  }
+  50% {
+    opacity: 0.5;
+    transform: translate3d(1.1%, 0.8%, 0) scale(1.045);
+    background-position: 42% 52%, 62% 44%;
+  }
+  100% {
+    opacity: 0.4;
+    transform: translate3d(0.4%, -1%, 0) scale(1.035);
+    background-position: 78% 36%, 28% 72%;
+  }
+}
+
+@keyframes xf-liquid-spotlight {
+  0% {
+    opacity: 0.28;
+    filter: blur(1px) saturate(0.95) contrast(1.05);
+    background-position: 0% 48%, 100% 52%;
+  }
+  100% {
+    opacity: 0.44;
+    filter: blur(2px) saturate(1.08) contrast(1.14);
+    background-position: 74% 44%, 24% 66%;
+  }
+}
+
+@keyframes xf-liquid-breathe {
+  0% {
+    opacity: 0.24;
+    transform: translate3d(-1%, 0, 0) scale(0.98);
+    filter: blur(30px) saturate(0.98) contrast(1.08);
+  }
+  100% {
+    opacity: 0.38;
+    transform: translate3d(1.2%, -0.8%, 0) scale(1.06);
+    filter: blur(38px) saturate(1.08) contrast(1.16);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.dark .xf-glass-backdrop__img,
+  html.dark .xf-glass-section:not(:has(.xf-glass-backdrop))::before,
+  html.dark .xf-glass-hero::before,
+  html.dark .xf-feature-copy__blob,
+  html.dark .xf-feature-copy__blob--2,
+  html.dark .xf-final-cta-box::before {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .hero-header--studio .hero-content {
+    padding-inline: 1rem;
+  }
+
+  .content-container {
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .site-nav .content-container,
+  .hero-header--studio .hero-content.content-container {
+    max-width: 100% !important;
+    padding-inline: 1rem !important;
+  }
+
+  /* Footer keeps gutters; never flush to viewport edge */
+  .xf-site-footer .content-container.xf-site-footer__inner {
+    max-width: 100% !important;
+    padding-inline: var(--page-gutter, 1rem) !important;
+  }
+
+  .hero-header--studio .hero-layout,
+  .hero-header--studio .hero-copy,
+  .hero-header--studio .hero-headline,
+  .hero-header--studio .hero-lead,
+  .hero-header--studio .hero-actions,
+  .hero-header--studio .hero-proof {
+    max-width: 100%;
+  }
+
+  .hero-header--studio .hero-headline__line,
+  .hero-header--studio .hero-headline__sans,
+  .hero-header--studio .hero-headline em {
+    font-size: clamp(2.15rem, 9.4vw, 2.65rem) !important;
+    line-height: 1.08 !important;
+    letter-spacing: -0.035em !important;
+    overflow-wrap: anywhere;
+  }
+
+  .hero-header--studio .hero-lead {
+    font-size: 0.9375rem !important;
+    line-height: 1.55 !important;
+    overflow-wrap: break-word;
+  }
+
+  .hero-header--studio .hero-actions {
+    gap: 0.6rem;
+  }
+
+  .hero-header--studio .hero-btn {
+    min-height: 2.65rem;
+    padding-inline: 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .hero-header--studio .hero-proof {
+    justify-content: center;
+    gap: 0.45rem;
+  }
+
+  .hero-proof__chip {
+    max-width: 100%;
+    min-height: 1.75rem;
+    padding-inline: 0.56rem;
+    font-size: 0.625rem;
+  }
+
+  .hero-stage__vignette {
+    background:
+      radial-gradient(ellipse 108% 78% at 50% 50%, rgba(246, 250, 251, 0.76) 0%, rgba(246, 250, 251, 0.36) 54%, transparent 82%),
+      linear-gradient(180deg, rgba(244, 247, 248, 0.3) 0%, transparent 36%, rgba(244, 247, 248, 0.42) 100%) !important;
+  }
+
+  html.dark .hero-stage__vignette {
+    background:
+      radial-gradient(ellipse 104% 78% at 50% 50%, rgba(0, 1, 2, 0.9) 0%, rgba(1, 4, 7, 0.7) 54%, transparent 82%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.66) 0%, transparent 34%, rgba(0, 0, 0, 0.82) 100%) !important;
+  }
+}

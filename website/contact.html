@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/site-fonts.css">
 <link rel="stylesheet" href="css/theme-switch.css">
+  <link rel="stylesheet" href="css/dark-nebula-bg.css">
   <link rel="stylesheet" href="css/scroll-reveal.css">
   <link rel="stylesheet" href="css/motion.css">
   <link rel="stylesheet" href="css/site-footer.css">
@@ -77,19 +78,15 @@
           <a href="contact.html" class="site-nav-pill-link site-nav-pill-link--active" aria-current="page">Contact</a>
         </div>
         <div class="site-nav-end">
-          <div id="xf-auth-nav" class="site-nav-auth"></div>
-<button type="button" id="theme-toggle" onclick="toggleTheme()" class="theme-switch theme-toggle" role="switch" aria-checked="false" aria-label="Switch to dark mode">
-            <span class="theme-switch-track" aria-hidden="true">
-              <span class="theme-switch-thumb">
-                <span class="theme-switch-icon theme-switch-icon--sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12zM4.22 4.22l2.12 2.12-1.06 1.06L3.16 5.28l1.06-1.06zm15.56 15.56 2.12 2.12-1.06 1.06-2.12-2.12 1.06-1.06zM19.78 4.22l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12zM6.34 17.66l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12z"/></svg></span>
-                <span class="theme-switch-icon theme-switch-icon--moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg></span>
-              </span>
-            </span>
-          </button>
-          <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+            <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee" aria-label="Buy me a coffee">
+              <i class="fa-solid fa-mug-hot text-xs" aria-hidden="true"></i>
+              <span class="site-nav-coffee__label hidden lg:inline">Buy me a coffee</span>
+            </a>
+            <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
             <i class="fa-solid fa-bars text-sm" aria-hidden="true"></i>
           </button>
-        </div>
+            <div id="xf-auth-nav" class="site-nav-auth"><a href="login.html" class="site-nav-auth-btn">Sign in</a></div>
+          </div>
       </div>
     </div>
   </nav>
@@ -130,8 +127,8 @@
 
   <header class="xf-glass-hero contact-hero">
     <div class="contact-hero__content">
-      <h1 class="contact-hero__title">Connect with us</h1>
-      <p class="contact-hero__tagline">We&apos;d love to hear what you think</p>
+      <h1 class="contact-hero__title">Connect with me</h1>
+      <p class="contact-hero__tagline">I&apos;d love to hear what you think</p>
     </div>
   </header>
 
@@ -139,11 +136,11 @@
     <div class="contact-panel__inner content-container">
       <aside class="contact-info">
         <div class="contact-info__block">
-          <span class="contact-info__label">Email us</span>
+          <span class="contact-info__label">Email me</span>
           <a href="mailto:contact@xfreeze.com" class="contact-info__value">contact@xfreeze.com</a>
         </div>
         <div class="contact-info__block">
-          <span class="contact-info__label">Message us</span>
+          <span class="contact-info__label">Message me</span>
           <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer" class="contact-info__value">@XFreeze</a>
         </div>
         <div class="contact-info__block">
@@ -158,8 +155,8 @@
       </aside>
 
       <div class="contact-form-col">
-        <h2 class="contact-form-col__title">Help us improve better</h2>
-        <p class="contact-form-col__sub">Share your experience with us</p>
+        <h2 class="contact-form-col__title">Help me improve</h2>
+        <p class="contact-form-col__sub">Share your experience with me</p>
         <div id="contact-form-status" class="contact-form-status" role="alert" aria-live="polite"></div>
         <form id="contact-form" class="contact-form" novalidate>
           <div class="contact-form__row">

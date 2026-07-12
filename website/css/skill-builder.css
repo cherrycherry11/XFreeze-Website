@@ -17,6 +17,38 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
+/*
+ * Footer promo on Skills library (and any page reusing this class).
+ * Must beat the base `.skills-builder-promo` margin:0 so it is not
+ * stuck to the How-to card above.
+ */
+.skills-builder-promo.skills-builder-promo--footer {
+  display: flex;
+  width: 100%;
+  max-width: min(44rem, 100%);
+  margin: 2.75rem auto 2rem;
+}
+
+@media (min-width: 768px) {
+  .skills-builder-promo.skills-builder-promo--footer {
+    margin-top: 3.5rem;
+    margin-bottom: 2.25rem;
+  }
+}
+
+/* Pack detail open: keep the same breathing room under the skill list */
+.skills-detail-panel:not(.skills-browse-hidden) ~ .skills-builder-promo.skills-builder-promo--footer,
+#xf-skills-view-detail:not(.skills-browse-hidden) + .skills-builder-promo.skills-builder-promo--footer {
+  margin-top: 3.75rem;
+}
+
+@media (min-width: 768px) {
+  .skills-detail-panel:not(.skills-browse-hidden) ~ .skills-builder-promo.skills-builder-promo--footer,
+  #xf-skills-view-detail:not(.skills-browse-hidden) + .skills-builder-promo.skills-builder-promo--footer {
+    margin-top: 4.75rem;
+  }
+}
+
 .skills-builder-promo:hover {
   border-color: var(--border-hover, #d4d4d8);
   box-shadow: 0 10px 28px -12px rgba(0, 0, 0, 0.12);

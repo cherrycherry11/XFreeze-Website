@@ -131,8 +131,9 @@ html:not(.dark) .hero-header--studio .site-nav:not(.is-scrolled) {
 
 /* ── Centered copy layout (no product cards) ── */
 .hero-header--studio .hero-content {
-  padding-top: 6.5rem;
-  padding-bottom: 3.5rem;
+  /* Clear sticky nav + breathing room before headline */
+  padding-top: 8.25rem;
+  padding-bottom: 3.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -140,8 +141,15 @@ html:not(.dark) .hero-header--studio .site-nav:not(.is-scrolled) {
 
 @media (min-width: 768px) {
   .hero-header--studio .hero-content {
-    padding-top: 7.5rem;
-    padding-bottom: 4.5rem;
+    padding-top: 9.5rem;
+    padding-bottom: 5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-header--studio .hero-content {
+    padding-top: 10.5rem;
+    padding-bottom: 5.5rem;
   }
 }
 
@@ -265,7 +273,7 @@ html.dark .hero-header--studio .hero-lead {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 1.35rem;
+  margin-top: 1.5rem;
 }
 
 .hero-proof__chip {
@@ -434,8 +442,8 @@ html.dark .hero-float-chip__dot {
 
 @media (max-width: 639px) {
   .hero-header--studio .hero-content {
-    padding-top: 5.75rem;
-    padding-bottom: 2.5rem;
+    padding-top: 7.5rem;
+    padding-bottom: 3rem;
   }
 
   .hero-layout {

@@ -1,0 +1,225 @@
+/**
+ * Dark mode nebula gradient — selective only.
+ * Used on a few high-impact spots so the rest of the site stays clean black.
+ *
+ * Where it appears:
+ *   1. Login / signup full page
+ *   2. Final CTA section
+ *   3. Page intro heroes (about, contact, etc.) — soft, once per page
+ *
+ * Everywhere else: plain black. No default glass-section nebula.
+ */
+
+html.dark {
+  --xf-nebula: url("../assets/images/dark-gradient-nebula.png");
+}
+
+/* ── 1. Auth (login / signup) ── */
+html.dark body.xf-auth-body {
+  background: #010204 !important;
+}
+
+html.dark .xf-auth-bg.xf-glass-backdrop .xf-glass-backdrop__img {
+  display: block !important;
+  background-image: var(--xf-nebula) !important;
+  background-size: cover !important;
+  background-position: 42% 32% !important;
+  background-repeat: no-repeat !important;
+  filter: blur(18px) saturate(1.04) brightness(0.88) !important;
+  transform: scale(1.18) rotate(-2deg) !important;
+  opacity: 1 !important;
+}
+
+html.dark .xf-auth-bg.xf-glass-backdrop .xf-glass-backdrop__mesh {
+  display: none !important;
+}
+
+html.dark .xf-auth-bg.xf-glass-backdrop .xf-glass-backdrop__veil {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 1, 4, 0.48) 0%,
+    rgba(0, 1, 4, 0.28) 45%,
+    rgba(0, 1, 4, 0.55) 100%
+  ) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+/* ── 2. Final CTA only (home + glass accent) ── */
+html.dark #xf-final-cta {
+  background: #010204 !important;
+  position: relative;
+  overflow: hidden;
+}
+
+html.dark #xf-final-cta .xf-glass-backdrop__img {
+  background-image: var(--xf-nebula) !important;
+  background-size: cover !important;
+  background-position: 68% 30% !important;
+  background-repeat: no-repeat !important;
+  filter: blur(12px) saturate(1.08) brightness(0.92) !important;
+  transform: scale(1.22) rotate(5deg) !important;
+  opacity: 0.9 !important;
+  animation: none !important;
+}
+
+html.dark #xf-final-cta .xf-glass-backdrop__mesh {
+  display: none !important;
+}
+
+html.dark #xf-final-cta .xf-glass-backdrop__veil {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 1, 4, 0.5) 0%,
+    rgba(0, 1, 4, 0.32) 50%,
+    rgba(0, 1, 4, 0.58) 100%
+  ) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+/* When final CTA has no explicit backdrop stack */
+html.dark #xf-final-cta.xf-glass-section:not(:has(.xf-glass-backdrop))::before {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  inset: -10% !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background-image: var(--xf-nebula) !important;
+  background-size: cover !important;
+  background-position: 68% 30% !important;
+  background-repeat: no-repeat !important;
+  filter: blur(12px) saturate(1.08) brightness(0.92) !important;
+  transform: scale(1.22) rotate(5deg) !important;
+  opacity: 0.9 !important;
+  animation: none !important;
+}
+
+html.dark #xf-final-cta.xf-glass-section:not(:has(.xf-glass-backdrop))::after {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 1, 4, 0.5) 0%,
+    rgba(0, 1, 4, 0.32) 50%,
+    rgba(0, 1, 4, 0.58) 100%
+  ) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+/* CTA card: quiet glass, no second full nebula */
+html.dark .xf-final-cta-box::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* Style Edit + Product: plain (no nebula) */
+html.dark #section-experimental::before,
+html.dark #section-experimental::after,
+html.dark #section-minimal::before,
+html.dark #section-minimal::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* ── 3. Page intro heroes (not Contact — contact uses silk plates) ── */
+html.dark .xf-glass-hero:not(.contact-hero) {
+  background: #010204 !important;
+  overflow: hidden;
+}
+
+html.dark .xf-glass-hero:not(.contact-hero)::before {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  inset: -8% !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background-image: var(--xf-nebula) !important;
+  background-size: cover !important;
+  background-position: 55% 35% !important;
+  background-repeat: no-repeat !important;
+  filter: blur(16px) saturate(1.04) brightness(0.9) !important;
+  transform: scale(1.15) rotate(-3deg) !important;
+  opacity: 0.72 !important;
+  animation: none !important;
+}
+
+html.dark .xf-glass-hero:not(.contact-hero)::after {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 1, 4, 0.48) 0%,
+    rgba(0, 1, 4, 0.3) 50%,
+    rgba(0, 1, 4, 0.55) 100%
+  ) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+html.dark .xf-glass-hero:not(.contact-hero) > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Explicitly off: general glass sections, creator library, motion, skills banner, etc. ── */
+html.dark .xf-glass-section:not(#xf-final-cta):not(:has(.xf-glass-backdrop))::before,
+html.dark .xf-glass-section:not(#xf-final-cta):not(:has(.xf-glass-backdrop))::after {
+  /* leave glass-backdrop.css defaults — no nebula forced here */
+}
+
+html.dark #selected-work .xf-glass-backdrop__img,
+html.dark #xf-motion-prompts .xf-glass-backdrop__img,
+html.dark #xf-newsletter-cta .xf-glass-backdrop__img,
+html.dark #creator-library .xf-glass-backdrop__img {
+  background-image: none !important;
+}
+
+html.dark #creator-library::before {
+  content: none !important;
+  display: none !important;
+}
+
+html.dark .skills-banner__media::before,
+html.dark .templates-banner__media::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* Prompt library uses its own photo backdrops + glass panel — never inject nebula */
+html.dark .pl-hero::before,
+html.dark .pl-hero::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+
+html.dark .hero-stage__base::after {
+  content: none !important;
+  display: none !important;
+}
+
+html.dark .xf-feature-copy__blob,
+html.dark .xf-feature-copy__blob--2 {
+  /* no nebula fragments on every feature block */
+  background-image: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.dark #xf-final-cta .xf-glass-backdrop__img,
+  html.dark .xf-glass-hero::before,
+  html.dark .xf-auth-bg .xf-glass-backdrop__img {
+    transform: scale(1.08) !important;
+  }
+}

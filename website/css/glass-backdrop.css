@@ -1,5 +1,5 @@
 /**
- * X Freeze - pearlescent glass gradients
+ * X Freeze - neutral glass backdrops (monochrome)
  * Tuned for BOTH light and dark themes.
  *
  * Usage:
@@ -21,7 +21,7 @@
   isolation: isolate;
   overflow: hidden;
   z-index: 0;
-  background: #f6f5f8 !important;
+  background: #f7f7f8 !important;
   border-color: rgba(229, 231, 235, 0.75) !important;
 }
 
@@ -39,168 +39,117 @@ html.dark .xf-glass-section {
   overflow: hidden;
 }
 
+/* Light: no default gradient wash on glass stacks (selective only) */
 .xf-glass-backdrop__img {
   position: absolute;
-  inset: -10% -6%;
-  background: url("../assets/images/glass-gradient.png") center 42% / cover no-repeat;
-  opacity: 0.58;
-  filter: saturate(1.08) brightness(1.04);
-  transform: scale(1.03);
-  animation: xf-glass-drift 32s ease-in-out infinite alternate;
+  inset: -8% -4%;
+  background: none;
+  opacity: 0;
+  filter: none;
+  transform: none;
+  animation: none;
 }
 
 .xf-glass-backdrop__mesh {
-  position: absolute;
-  inset: 0;
-  opacity: 0.75;
-  mix-blend-mode: soft-light;
-  background:
-    radial-gradient(ellipse 58% 52% at 16% 28%, rgba(180, 215, 255, 0.42) 0%, transparent 58%),
-    radial-gradient(ellipse 52% 48% at 84% 22%, rgba(255, 205, 235, 0.36) 0%, transparent 56%),
-    radial-gradient(ellipse 48% 44% at 72% 78%, rgba(190, 250, 230, 0.28) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 60% at 50% 50%, rgba(255, 255, 255, 0.28) 0%, transparent 70%);
-  animation: xf-glass-mesh 26s ease-in-out infinite alternate;
+  display: none;
 }
 
 .xf-glass-backdrop__veil {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.58) 0%,
-    rgba(255, 255, 255, 0.32) 45%,
-    rgba(255, 255, 255, 0.55) 100%
-  );
-  backdrop-filter: blur(14px) saturate(1.15);
-  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-/* Dark explicit stack - true dark glass, gradient still readable */
+/* Dark: no default wash on every glass stack (selective via dark-nebula-bg.css) */
 html.dark .xf-glass-backdrop__img {
-  opacity: 0.38;
-  filter: saturate(1.15) brightness(0.38) contrast(1.12);
-  mix-blend-mode: soft-light;
+  display: block;
+  background: none;
+  opacity: 0;
+  filter: none;
+  mix-blend-mode: normal;
 }
 
 html.dark .xf-glass-backdrop__mesh {
-  opacity: 0.55;
-  mix-blend-mode: screen;
-  background:
-    radial-gradient(ellipse 60% 55% at 14% 26%, rgba(60, 110, 180, 0.35) 0%, transparent 58%),
-    radial-gradient(ellipse 55% 50% at 86% 20%, rgba(140, 70, 140, 0.28) 0%, transparent 56%),
-    radial-gradient(ellipse 50% 46% at 70% 80%, rgba(40, 130, 110, 0.22) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 60% at 48% 48%, rgba(255, 255, 255, 0.04) 0%, transparent 70%);
+  display: none;
 }
 
 html.dark .xf-glass-backdrop__veil {
-  /* Dark glass overlay - keeps field black while gradient glows through */
-  background:
-    radial-gradient(ellipse 80% 70% at 50% 40%, rgba(0, 0, 0, 0.25) 0%, transparent 65%),
-    linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.72) 0%,
-      rgba(0, 0, 0, 0.55) 45%,
-      rgba(0, 0, 0, 0.78) 100%
-    );
-  backdrop-filter: blur(20px) saturate(1.2);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-/* ── Auto layers (no explicit backdrop markup) ── */
-.xf-glass-section:not(:has(.xf-glass-backdrop))::before {
+/* ── Auto layers: off by default in light (no gradient on every section) ── */
+.xf-glass-section:not(:has(.xf-glass-backdrop))::before,
+.xf-glass-section:not(:has(.xf-glass-backdrop))::after {
+  content: none;
+  display: none;
+}
+
+/* Dark: also no auto wash on every glass section (nebula is selective) */
+html.dark .xf-glass-section:not(:has(.xf-glass-backdrop))::before,
+html.dark .xf-glass-section:not(:has(.xf-glass-backdrop))::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Final CTA light: one selective soft deep-blue wash (same policy as dark) */
+html:not(.dark) #xf-final-cta .xf-glass-backdrop__img {
+  opacity: 1;
+  background:
+    radial-gradient(ellipse 62% 54% at 70% 30%, rgba(70, 110, 150, 0.12) 0%, transparent 62%),
+    radial-gradient(ellipse 48% 42% at 20% 75%, rgba(50, 85, 125, 0.07) 0%, transparent 58%);
+}
+
+html:not(.dark) #xf-final-cta .xf-glass-backdrop__veil {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0.52) 100%
+  );
+  backdrop-filter: blur(10px) saturate(1.02);
+  -webkit-backdrop-filter: blur(10px) saturate(1.02);
+}
+
+html:not(.dark) #xf-final-cta.xf-glass-section:not(:has(.xf-glass-backdrop))::before {
   content: "";
+  display: block;
   position: absolute;
-  inset: -10% -6%;
+  inset: -6% -3%;
   z-index: 0;
   pointer-events: none;
-  background: url("../assets/images/glass-gradient.png") center 42% / cover no-repeat;
-  opacity: 0.52;
-  filter: saturate(1.08) brightness(1.04);
-  transform: scale(1.03);
-  animation: xf-glass-drift 32s ease-in-out infinite alternate;
+  background:
+    radial-gradient(ellipse 62% 54% at 70% 30%, rgba(70, 110, 150, 0.12) 0%, transparent 62%),
+    radial-gradient(ellipse 48% 42% at 20% 75%, rgba(50, 85, 125, 0.07) 0%, transparent 58%);
 }
 
-.xf-glass-section:not(:has(.xf-glass-backdrop))::after {
+html:not(.dark) #xf-final-cta.xf-glass-section:not(:has(.xf-glass-backdrop))::after {
   content: "";
+  display: block;
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse 58% 52% at 16% 28%, rgba(180, 215, 255, 0.38) 0%, transparent 58%),
-    radial-gradient(ellipse 52% 48% at 84% 22%, rgba(255, 205, 235, 0.3) 0%, transparent 56%),
-    radial-gradient(ellipse 48% 44% at 72% 78%, rgba(190, 250, 230, 0.22) 0%, transparent 55%),
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.55) 0%,
-      rgba(255, 255, 255, 0.3) 48%,
-      rgba(255, 255, 255, 0.52) 100%
-    );
-  backdrop-filter: blur(14px) saturate(1.12);
-  -webkit-backdrop-filter: blur(14px) saturate(1.12);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0.52) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-html.dark .xf-glass-section:not(:has(.xf-glass-backdrop))::before {
-  opacity: 0.36;
-  filter: saturate(1.15) brightness(0.38) contrast(1.12);
-  mix-blend-mode: soft-light;
-}
-
-html.dark .xf-glass-section:not(:has(.xf-glass-backdrop))::after {
-  background:
-    radial-gradient(ellipse 60% 55% at 14% 26%, rgba(60, 110, 180, 0.32) 0%, transparent 58%),
-    radial-gradient(ellipse 55% 50% at 86% 20%, rgba(140, 70, 140, 0.24) 0%, transparent 56%),
-    radial-gradient(ellipse 50% 46% at 70% 80%, rgba(40, 130, 110, 0.18) 0%, transparent 55%),
-    linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.7) 0%,
-      rgba(0, 0, 0, 0.52) 48%,
-      rgba(0, 0, 0, 0.78) 100%
-    );
-  backdrop-filter: blur(20px) saturate(1.15);
-  -webkit-backdrop-filter: blur(20px) saturate(1.15);
-}
-
-/* Soft variant - quieter wash */
+/* Soft variant: solid only */
 .xf-glass-section--soft {
-  background: #f9f8fb !important;
+  background: #fafafa !important;
 }
 
 html.dark .xf-glass-section--soft {
   background: #000000 !important;
-}
-
-html:not(.dark) .xf-glass-section--soft:not(:has(.xf-glass-backdrop))::before {
-  opacity: 0.38;
-}
-
-html.dark .xf-glass-section--soft:not(:has(.xf-glass-backdrop))::before {
-  opacity: 0.28;
-  filter: saturate(1.12) brightness(0.36) contrast(1.1);
-  mix-blend-mode: soft-light;
-}
-
-html:not(.dark) .xf-glass-section--soft:not(:has(.xf-glass-backdrop))::after {
-  background:
-    radial-gradient(ellipse 55% 50% at 20% 30%, rgba(180, 215, 255, 0.28) 0%, transparent 55%),
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.68) 0%,
-      rgba(255, 255, 255, 0.42) 50%,
-      rgba(255, 255, 255, 0.7) 100%
-    );
-}
-
-html.dark .xf-glass-section--soft:not(:has(.xf-glass-backdrop))::after {
-  background:
-    radial-gradient(ellipse 55% 50% at 20% 30%, rgba(60, 110, 180, 0.22) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 45% at 80% 70%, rgba(120, 60, 120, 0.16) 0%, transparent 55%),
-    linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.68) 0%,
-      rgba(0, 0, 0, 0.5) 50%,
-      rgba(0, 0, 0, 0.76) 100%
-    );
 }
 
 /* ── Page intro hero band ── */
@@ -212,7 +161,7 @@ html.dark .xf-glass-section--soft:not(:has(.xf-glass-backdrop))::after {
   padding-block: clamp(2.5rem, 5vw, 3.75rem);
   margin-bottom: 0;
   border-bottom: 1px solid rgba(229, 231, 235, 0.8);
-  background: #f6f5f8;
+  background: #f7f7f8;
 }
 
 html.dark .xf-glass-hero {
@@ -220,52 +169,52 @@ html.dark .xf-glass-hero {
   border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
-.xf-glass-hero::before {
+/* Light page heroes (not Contact silk plate) */
+.xf-glass-hero:not(.contact-hero)::before {
   content: "";
   position: absolute;
-  inset: -12% -8%;
+  inset: -6% -3%;
   z-index: 0;
   pointer-events: none;
-  background: url("../assets/images/glass-gradient.png") center 38% / cover no-repeat;
-  opacity: 0.5;
-  filter: saturate(1.08) brightness(1.04);
-  animation: xf-glass-drift 34s ease-in-out infinite alternate;
+  background:
+    radial-gradient(ellipse 55% 50% at 18% 35%, rgba(70, 110, 150, 0.08) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 40% at 88% 20%, rgba(50, 85, 125, 0.05) 0%, transparent 60%);
+  opacity: 1;
+  filter: none;
+  animation: none;
 }
 
-.xf-glass-hero::after {
+.xf-glass-hero:not(.contact-hero)::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse 60% 55% at 18% 35%, rgba(180, 215, 255, 0.34) 0%, transparent 56%),
-    radial-gradient(ellipse 52% 48% at 82% 28%, rgba(255, 205, 235, 0.28) 0%, transparent 55%),
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.52) 0%,
-      rgba(255, 255, 255, 0.3) 50%,
-      rgba(255, 255, 255, 0.58) 100%
-    );
-  backdrop-filter: blur(14px) saturate(1.12);
-  -webkit-backdrop-filter: blur(14px) saturate(1.12);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0.52) 100%
+  );
+  backdrop-filter: blur(8px) saturate(1.02);
+  -webkit-backdrop-filter: blur(8px) saturate(1.02);
 }
 
-html.dark .xf-glass-hero::before {
-  opacity: 0.34;
-  filter: saturate(1.15) brightness(0.36) contrast(1.12);
-  mix-blend-mode: soft-light;
+html.dark .xf-glass-hero:not(.contact-hero)::before {
+  background:
+    radial-gradient(ellipse 50% 45% at 16% 30%, rgba(164, 186, 214, 0.16) 0%, transparent 62%);
+  opacity: 1;
+  filter: none;
+  mix-blend-mode: normal;
 }
 
-html.dark .xf-glass-hero::after {
+html.dark .xf-glass-hero:not(.contact-hero)::after {
   background:
-    radial-gradient(ellipse 60% 55% at 18% 35%, rgba(60, 110, 180, 0.3) 0%, transparent 56%),
-    radial-gradient(ellipse 52% 48% at 82% 28%, rgba(140, 70, 140, 0.22) 0%, transparent 55%),
     linear-gradient(
       180deg,
-      rgba(0, 0, 0, 0.7) 0%,
-      rgba(0, 0, 0, 0.52) 50%,
-      rgba(0, 0, 0, 0.78) 100%
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.38) 50%,
+      rgba(0, 0, 0, 0.62) 100%
     );
   backdrop-filter: blur(20px) saturate(1.15);
   -webkit-backdrop-filter: blur(20px) saturate(1.15);
@@ -389,109 +338,13 @@ html.dark .skills-hero-section.xf-glass-section:not(:has(.xf-glass-backdrop))::b
   z-index: 2;
 }
 
-/* Main amoeba blob - larger + softer */
-.xf-feature-copy__blob {
-  position: absolute;
-  z-index: 0;
-  pointer-events: none;
-  display: block;
-  left: -22%;
-  top: -18%;
-  width: min(36rem, 175%);
-  height: min(28rem, 160%);
-  border-radius: 60% 40% 55% 45% / 45% 55% 45% 55%;
-  background:
-    url("../assets/images/glass-gradient.png") center / cover no-repeat,
-    radial-gradient(circle at 35% 40%,
-      rgba(170, 215, 255, 0.55) 0%,
-      rgba(255, 200, 235, 0.38) 38%,
-      rgba(190, 245, 225, 0.22) 62%,
-      transparent 88%
-    );
-  background-blend-mode: soft-light, normal;
-  filter: blur(42px) saturate(1.05);
-  opacity: 0.55;
-  transform-origin: center center;
-  animation: xf-amoeba-soft 20s ease-in-out infinite;
-  will-change: border-radius, transform;
-}
-
-/* Second blob for soft depth */
+/* Feature blobs off — keep Style/Product clean */
+.xf-feature-copy__blob,
 .xf-feature-copy__blob--2 {
-  left: 8%;
-  top: 18%;
-  width: min(28rem, 145%);
-  height: min(24rem, 140%);
-  border-radius: 40% 60% 50% 50% / 60% 40% 55% 45%;
-  background:
-    radial-gradient(circle at 55% 50%,
-      rgba(255, 210, 240, 0.45) 0%,
-      rgba(185, 225, 255, 0.28) 42%,
-      rgba(200, 245, 230, 0.14) 68%,
-      transparent 88%
-    );
-  filter: blur(48px) saturate(1.02);
-  opacity: 0.42;
-  animation: xf-amoeba-soft-alt 24s ease-in-out infinite reverse;
-  animation-delay: -3s;
-  background-blend-mode: normal;
+  display: none !important;
 }
 
-/* Product column */
-#section-minimal .xf-feature-copy__blob {
-  left: -28%;
-  top: -20%;
-}
-
-#section-minimal .xf-feature-copy__blob--2 {
-  left: 0%;
-  top: 22%;
-}
-
-/* Style edit column */
-#section-experimental .xf-feature-copy__blob {
-  left: -18%;
-}
-
-/*
- * Dark mode amoeba - NO light PNG (that washed to a milky circle).
- * Pure color glass blobs: large, soft, clearly colored on black.
- */
-html.dark .xf-feature-copy__blob {
-  left: -30% !important;
-  top: -25% !important;
-  width: min(42rem, 200%) !important;
-  height: min(34rem, 180%) !important;
-  opacity: 0.38 !important;
-  filter: blur(56px) saturate(1.15) !important;
-  background:
-    radial-gradient(ellipse 75% 70% at 40% 42%,
-      rgba(90, 150, 255, 0.4) 0%,
-      rgba(170, 90, 200, 0.26) 32%,
-      rgba(50, 160, 140, 0.12) 55%,
-      rgba(0, 0, 0, 0) 78%
-    ) !important;
-  background-blend-mode: normal !important;
-  border-radius: 62% 38% 58% 42% / 48% 52% 48% 52% !important;
-}
-
-html.dark .xf-feature-copy__blob--2 {
-  left: 5% !important;
-  top: 20% !important;
-  width: min(32rem, 160%) !important;
-  height: min(28rem, 150%) !important;
-  opacity: 0.28 !important;
-  filter: blur(60px) saturate(1.1) !important;
-  background:
-    radial-gradient(ellipse 70% 75% at 55% 50%,
-      rgba(180, 90, 200, 0.28) 0%,
-      rgba(70, 130, 230, 0.16) 40%,
-      transparent 82%
-    ) !important;
-  border-radius: 42% 58% 48% 52% / 58% 42% 58% 42% !important;
-}
-
-/* Style / Product sections - deep black + dark glass field */
+/* Style / Product: solid only */
 html.dark #section-experimental,
 html.dark #section-minimal {
   background-color: #000000 !important;
@@ -500,34 +353,12 @@ html.dark #section-minimal {
   overflow: hidden !important;
 }
 
-/* Ambient dark glass gradient across the whole section */
 html.dark #section-experimental::before,
-html.dark #section-minimal::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  z-index: 0 !important;
-  pointer-events: none !important;
-  background:
-    radial-gradient(ellipse 55% 70% at 12% 50%, rgba(70, 120, 220, 0.2) 0%, transparent 62%),
-    radial-gradient(ellipse 50% 65% at 88% 45%, rgba(150, 70, 170, 0.14) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 50% at 50% 100%, rgba(40, 120, 110, 0.1) 0%, transparent 55%) !important;
-  opacity: 1 !important;
-  filter: none !important;
-  mix-blend-mode: normal !important;
-  animation: none !important;
-}
-
 html.dark #section-experimental::after,
+html.dark #section-minimal::before,
 html.dark #section-minimal::after {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  z-index: 0 !important;
-  pointer-events: none !important;
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  content: none !important;
+  display: none !important;
 }
 
 html.dark #section-experimental > .content-container,
@@ -558,12 +389,7 @@ html.dark #section-minimal a:hover {
   color: #c9c9c9 !important;
 }
 
-html.dark #section-experimental .artistic-card,
-html.dark #section-minimal .artistic-card {
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.07),
-    0 24px 50px -14px rgba(0, 0, 0, 0.85) !important;
-}
+/* artistic-card shadows: leave to home.html / theme-dark.css */
 
 @keyframes xf-amoeba-soft {
   0% {

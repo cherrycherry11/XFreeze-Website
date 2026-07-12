@@ -97,21 +97,21 @@
   z-index: 10;
   flex: 0 0 auto;
   width: 100%;
-  padding-top: 5.5rem;
+  padding-top: 7.5rem;
   padding-bottom: max(2.5rem, env(safe-area-inset-bottom, 0px));
 }
 
 @media (min-width: 768px) {
   .hero-content {
-    /* Optical center: slightly above true middle, clear of nav */
-    padding-top: 6.5rem;
+    /* Clear sticky nav with breathing room above the headline */
+    padding-top: 9rem;
     padding-bottom: 5rem;
   }
 }
 
 @media (min-width: 1024px) {
   .hero-content {
-    padding-top: 7rem;
+    padding-top: 10.5rem;
     padding-bottom: 5.5rem;
   }
 }

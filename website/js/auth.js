@@ -148,10 +148,9 @@
   function isProtectedPage(page) {
     if (!page) return false;
     if (publicPages().indexOf(page) !== -1) return false;
-    if (page === loginPageName()) return false;
-    /* Any non-public page is gated when auth is required. */
-    if (protectedPages().indexOf(page) !== -1) return true;
-    return true;
+    if (page === loginPageName() || page === 'signup.html') return false;
+    /* Only pages listed in protectedPages require sign-in on load. */
+    return protectedPages().indexOf(page) !== -1;
   }
 
   function pageFromHref(href) {
@@ -182,21 +181,18 @@
   }
 
   /**
-   * Logged-out users: any internal navigation or in-page jump goes to login
-   * (no smooth-scroll to sections - open login instead).
+   * Page navigation is free. Only explicit protected pages (e.g. account)
+   * still use page-level login on load.
    */
   function shouldGateHref(href) {
     if (!href || href === '#' || href.indexOf('javascript:') === 0) return false;
     if (isExternalHref(href)) return false;
-
-    /* In-page anchors (#skills, #section-...) - do not scroll, send to login */
-    if (href.charAt(0) === '#') return true;
+    if (href.charAt(0) === '#') return false;
 
     var page = pageFromHref(href);
     if (!page) return false;
     if (page === loginPageName() || page === 'signup.html') return false;
-    if (publicPages().indexOf(page) !== -1) return false;
-    return true;
+    return isProtectedPage(page);
   }
 
   function redirectToLogin(returnPath) {
@@ -209,13 +205,50 @@
     window.location.href = loginPageUrl();
   }
 
+  /**
+   * Resource actions that require sign-in (copy / open / use).
+   * Browsing pages and catalogs stays free.
+   */
+  var RESOURCE_ACTION_SELECTORS = [
+    '[data-copy-skill]',
+    '#xf-skill-modal-copy',
+    '[data-preview-skill]',
+    '[data-pl-copy]',
+    '#pl-panel-copy',
+    '[data-motion-copy]',
+    '[data-xf-copy-motion]',
+    '[data-sb-copy]',
+    '[data-template-open]',
+  ].join(',');
+
+  function isLoggedIn() {
+    return Boolean(session && session.user);
+  }
+
+  /**
+   * Returns true if the user may proceed. If login is required and they
+   * are signed out, redirects to login and returns false.
+   */
+  function requireLoginForResource(returnPath) {
+    if (!shouldRequireAuth()) return true;
+    if (isLoggedIn()) return true;
+    redirectToLogin(returnPath || currentPage() + window.location.search + window.location.hash);
+    return false;
+  }
+
+  function isResourceActionTarget(el) {
+    if (!el || !el.closest) return null;
+    return el.closest(RESOURCE_ACTION_SELECTORS);
+  }
+
   function bindProtectedLinks() {
     if (!shouldRequireAuth()) return;
 
+    /* Rare: links to pages that still require login on load (account). */
     document.addEventListener(
       'click',
       function (event) {
-        if (session && session.user) return;
+        if (isLoggedIn()) return;
 
         var link = event.target.closest('a[href]');
         if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
@@ -229,8 +262,30 @@
           event.stopImmediatePropagation();
         }
 
-        var returnPath = href.charAt(0) === '#' ? currentPage() : href.replace(/^\.\//, '');
-        redirectToLogin(returnPath);
+        redirectToLogin(href.replace(/^\.\//, ''));
+      },
+      true
+    );
+  }
+
+  function bindResourceActions() {
+    if (!shouldRequireAuth()) return;
+
+    document.addEventListener(
+      'click',
+      function (event) {
+        if (isLoggedIn()) return;
+
+        var target = isResourceActionTarget(event.target);
+        if (!target) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        if (typeof event.stopImmediatePropagation === 'function') {
+          event.stopImmediatePropagation();
+        }
+
+        redirectToLogin(currentPage() + window.location.search + window.location.hash);
       },
       true
     );
@@ -254,7 +309,7 @@
   }
 
   async function enforceAuth() {
-    if (!shouldRequireAuth() || isPublicPage()) {
+    if (!shouldRequireAuth() || !isProtectedPage(currentPage())) {
       setPageVisible(true);
       return true;
     }
@@ -273,8 +328,8 @@
   }
 
   function isProtectedDestination() {
-    /* Gate every page that is not explicitly public. */
-    return shouldRequireAuth() && !isPublicPage();
+    /* Only pages listed as protected (e.g. account) gate on load. */
+    return shouldRequireAuth() && isProtectedPage(currentPage());
   }
 
   function getClient() {
@@ -353,7 +408,28 @@
     if (!slot && !document.getElementById('xf-auth-drawer')) return;
 
     if (!isConfigured() || !session || !session.user) {
-      if (slot) slot.innerHTML = signedOutNav;
+      /*
+       * Avoid wiping/rebuilding identical Sign in HTML on every page load
+       * (that remount was making coffee + Sign in glitch between pages).
+       */
+      if (slot) {
+        var existingSignIn = slot.querySelector('a.site-nav-auth-btn');
+        var hasUserMenu = slot.querySelector('.site-nav-user');
+        if (slot.getAttribute('data-auth-state') === 'signed-out' && existingSignIn) {
+          /* already stable */
+        } else if (existingSignIn && !hasUserMenu) {
+          slot.setAttribute('data-auth-state', 'signed-out');
+          if (!existingSignIn.getAttribute('onclick')) {
+            existingSignIn.setAttribute(
+              'onclick',
+              'window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()'
+            );
+          }
+        } else {
+          slot.innerHTML = signedOutNav;
+          slot.setAttribute('data-auth-state', 'signed-out');
+        }
+      }
       renderDrawerAuth(null, signedOutDrawer);
       return;
     }
@@ -362,8 +438,13 @@
     var email = user.email || 'Signed in';
     var avatar = avatarUrl(user);
     var initials = initialsFromUser(user);
+    var userKey = user.id || email;
 
     if (slot) {
+      /* Skip rebuild if already showing this signed-in user */
+      if (slot.getAttribute('data-auth-state') === 'signed-in' && slot.getAttribute('data-auth-user') === userKey) {
+        /* still refresh drawer below */
+      } else {
       slot.innerHTML =
         '<div class="site-nav-user">' +
         '<button type="button" class="site-nav-user-trigger" id="xf-auth-user-trigger" aria-expanded="false" aria-haspopup="true" aria-label="Account" title="' +
@@ -380,6 +461,8 @@
         '<button type="button" id="xf-auth-sign-out"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Sign out</button>' +
         '</div>' +
         '</div>';
+      slot.setAttribute('data-auth-state', 'signed-in');
+      slot.setAttribute('data-auth-user', userKey);
 
       var trigger = document.getElementById('xf-auth-user-trigger');
       var menu = document.getElementById('xf-auth-user-menu');
@@ -403,6 +486,7 @@
         signOutBtn.addEventListener('click', function () {
           signOut();
         });
+      }
       }
     }
 
@@ -943,6 +1027,7 @@
 
     bindLoginPage();
     bindProtectedLinks();
+    bindResourceActions();
 
     var sb = getClient();
     if (!sb) {
@@ -991,6 +1076,9 @@
   window.XFreezeAuth = {
     init: init,
     rememberRedirect: rememberRedirect,
+    redirectToLogin: redirectToLogin,
+    requireLoginForResource: requireLoginForResource,
+    isLoggedIn: isLoggedIn,
     signInWithTwitter: function () { return signInWithOAuth('x'); },
     signInWithGoogle: function () { return signInWithOAuth('google'); },
     signInWithPassword: signInWithPassword,

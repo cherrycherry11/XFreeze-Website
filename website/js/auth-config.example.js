@@ -1,6 +1,9 @@
 /**
  * Copy to js/auth-config.js and fill in your Supabase values.
  * See docs/AUTH-SETUP.md
+ *
+ * requireAuth: when true on live, resource use (copy/open) needs login.
+ * Pages are free to browse; only protectedPages gate on load.
  */
 window.XFreezeAuthConfig = {
   supabaseUrl: 'https://YOUR_PROJECT_REF.supabase.co',
@@ -14,17 +17,29 @@ window.XFreezeAuthConfig = {
   googleOneTap: true,
 
   requireAuth: true,
-  publicPages: ['login.html', 'signup.html', 'home.html', 'index.html', 'terms.html', 'privacy.html'],
-  protectedPages: [
+  publicPages: [
+    'login.html',
+    'signup.html',
+    'home.html',
+    'index.html',
+    'terms.html',
+    'privacy.html',
     'templates.html',
     'skills.html',
+    'prompt-library.html',
     'bundles.html',
     'contact.html',
     'connector-setup.html',
+    'about.html',
+    'skill-builder.html',
+    'workflows.html',
+    'use-cases.html',
+    'changelog.html',
   ],
+  protectedPages: ['account.html'],
 
   providers: {
-    twitter: false,
+    x: false,
     google: true,
   },
 };

@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="css/site-fonts.css">
   <link rel="stylesheet" href="css/theme-switch.css">
+  <link rel="stylesheet" href="css/dark-nebula-bg.css">
   <link rel="stylesheet" href="css/scroll-reveal.css">
   <link rel="stylesheet" href="css/motion.css">
   <link rel="stylesheet" href="css/site-footer.css">
@@ -454,7 +455,7 @@
     }
     .template-gallery-tier.is-premium {
       background: rgba(6, 37, 29, 0.9);
-      color: #d1fae5;
+      color: #dceaf8;
     }
     html.dark .template-gallery-tier.is-free {
       background: rgba(15, 19, 17, 0.94);
@@ -505,31 +506,28 @@
       object-fit: cover;
       object-position: center center;
       display: block;
-      filter: contrast(1.1);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      filter: none;
+      background: transparent;
     }
 
-    /* Light: full white overlay + inverted center so video peeks through slightly */
+    .templates-banner__video.is-ready {
+      opacity: 1;
+    }
+
+    /* Light: soft veil so liquid video shows, type stays readable */
     .templates-banner__veil {
       position: absolute;
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      background:
-        /* Inverted radial - thinner white in the middle so backdrop shows */
-        radial-gradient(
-          ellipse 58% 62% at 50% 48%,
-          rgba(255, 255, 255, 0.42) 0%,
-          rgba(255, 255, 255, 0.62) 38%,
-          rgba(255, 255, 255, 0.88) 72%,
-          rgba(255, 255, 255, 0.94) 100%
-        ),
-        /* Even white base across the whole banner */
-        rgba(255, 255, 255, 0.72);
+      background: rgba(255, 255, 255, 0.42);
     }
 
-    /* Dark: even 30% black overlay across the banner */
+    /* Dark: soft black veil over dark liquid video */
     html.dark .templates-banner__veil {
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.42);
     }
 
     .templates-banner__content {
@@ -632,17 +630,10 @@
         max-width: 100%;
       }
       .templates-banner__veil {
-        background:
-          radial-gradient(
-            ellipse 70% 55% at 50% 42%,
-            rgba(255, 255, 255, 0.4) 0%,
-            rgba(255, 255, 255, 0.68) 45%,
-            rgba(255, 255, 255, 0.9) 100%
-          ),
-          rgba(255, 255, 255, 0.72);
+        background: rgba(255, 255, 255, 0.48);
       }
       html.dark .templates-banner__veil {
-        background: rgba(0, 0, 0, 0.3);
+        background: rgba(0, 0, 0, 0.48);
       }
     }
 
@@ -802,23 +793,15 @@
           <a href="contact.html" class="site-nav-pill-link">Contact</a>
         </div>
         <div class="site-nav-end">
-          <div id="xf-auth-nav" class="site-nav-auth"></div>
-<button type="button" id="theme-toggle" onclick="toggleTheme()" class="theme-switch theme-toggle" role="switch" aria-checked="false" aria-label="Switch to dark mode" title="Dark mode">
-            <span class="theme-switch-track" aria-hidden="true">
-              <span class="theme-switch-thumb">
-                <span class="theme-switch-icon theme-switch-icon--sun" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12zM4.22 4.22l2.12 2.12-1.06 1.06L3.16 5.28l1.06-1.06zm15.56 15.56 2.12 2.12-1.06 1.06-2.12-2.12 1.06-1.06zM19.78 4.22l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12zM6.34 17.66l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12z"/></svg>
-                </span>
-                <span class="theme-switch-icon theme-switch-icon--moon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg>
-                </span>
-              </span>
-            </span>
-          </button>
-          <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+            <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee" aria-label="Buy me a coffee">
+              <i class="fa-solid fa-mug-hot text-xs" aria-hidden="true"></i>
+              <span class="site-nav-coffee__label hidden lg:inline">Buy me a coffee</span>
+            </a>
+            <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
             <i class="fa-solid fa-bars text-sm" aria-hidden="true"></i>
           </button>
-        </div>
+            <div id="xf-auth-nav" class="site-nav-auth"><a href="login.html" class="site-nav-auth-btn">Sign in</a></div>
+          </div>
       </div>
     </div>
   </nav>
@@ -865,10 +848,35 @@
         muted
         loop
         playsinline
-        preload="metadata"
-        src="assets/videos/templates-banner.mp4"
+        preload="auto"
+        data-banner-light="assets/videos/templates-banner-light.mp4"
+        data-banner-dark="assets/videos/templates-banner-dark.mp4"
       ></video>
       <div class="templates-banner__veil"></div>
+      <script>
+        (function () {
+          var video = document.currentScript.parentElement.querySelector('.templates-banner__video');
+          if (!video) return;
+          var isDark = document.documentElement.classList.contains('dark');
+          var src = isDark
+            ? (video.getAttribute('data-banner-dark') || 'assets/videos/templates-banner-dark.mp4')
+            : (video.getAttribute('data-banner-light') || 'assets/videos/templates-banner-light.mp4');
+          video.muted = true;
+          video.playsInline = true;
+          video.setAttribute('src', src);
+          video.load();
+          var markReady = function () {
+            video.classList.add('is-ready');
+            var p = video.play();
+            if (p && typeof p.catch === 'function') p.catch(function () {});
+          };
+          if (video.readyState >= 2) markReady();
+          else {
+            video.addEventListener('loadeddata', markReady, { once: true });
+            video.addEventListener('canplay', markReady, { once: true });
+          }
+        })();
+      </script>
     </div>
     <div class="content-container templates-banner__content">
       <div class="scroll-reveal-in">
@@ -941,6 +949,42 @@
       document.querySelectorAll('.theme-toggle-label').forEach(el => {
         el.textContent = isDark ? 'Light mode' : 'Dark mode';
       });
+      syncTemplatesBannerVideo();
+    }
+
+    function syncTemplatesBannerVideo() {
+      var video = document.querySelector('.templates-banner__video');
+      if (!video) return;
+      var isDark = document.documentElement.classList.contains('dark');
+      var nextSrc = isDark
+        ? (video.getAttribute('data-banner-dark') || 'assets/videos/templates-banner-dark.mp4')
+        : (video.getAttribute('data-banner-light') || 'assets/videos/templates-banner-light.mp4');
+      var current = video.currentSrc || video.getAttribute('src') || '';
+      var markReady = function () {
+        video.classList.add('is-ready');
+        var p = video.play();
+        if (p && typeof p.catch === 'function') p.catch(function () {});
+      };
+      if (current.indexOf(nextSrc) !== -1) {
+        video.muted = true;
+        video.playsInline = true;
+        if (video.readyState >= 2) markReady();
+        else {
+          video.addEventListener('loadeddata', markReady, { once: true });
+          video.addEventListener('canplay', markReady, { once: true });
+        }
+        return;
+      }
+      video.classList.remove('is-ready');
+      video.muted = true;
+      video.playsInline = true;
+      video.setAttribute('src', nextSrc);
+      video.load();
+      if (video.readyState >= 2) markReady();
+      else {
+        video.addEventListener('loadeddata', markReady, { once: true });
+        video.addEventListener('canplay', markReady, { once: true });
+      }
     }
 
     function toggleTheme() {
@@ -1266,7 +1310,7 @@
         var openLink = e.target.closest('[data-template-open]');
         if (openLink && window.XFreezeSupportToast) {
           window.XFreezeSupportToast.afterAction({
-            subtitle: 'Opening in Grok - support our work if this helped.',
+            subtitle: 'Opening in Grok - support my work if this helped.',
           });
         }
       });
@@ -1285,18 +1329,9 @@
       }
     }
 
-    /** Ensure Getty banner video plays (muted loop) */
+    /** Theme-aware banner videos (light + dark liquid stills) */
     function initTemplatesBannerVideo() {
-      var video = document.querySelector('.templates-banner__video');
-      if (!video) return;
-      video.muted = true;
-      video.playsInline = true;
-      var tryPlay = function () {
-        var p = video.play();
-        if (p && typeof p.catch === 'function') p.catch(function () {});
-      };
-      if (video.readyState >= 2) tryPlay();
-      else video.addEventListener('canplay', tryPlay, { once: true });
+      syncTemplatesBannerVideo();
     }
 
     function initTheme() {

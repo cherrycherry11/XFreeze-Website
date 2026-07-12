@@ -41,6 +41,7 @@
   <link rel="stylesheet" href="css/home.css">
   <link rel="stylesheet" href="css/home-desktop.css">
   <link rel="stylesheet" href="css/home-extras.css">
+  <link rel="stylesheet" href="css/glass-backdrop.css">
   <link rel="stylesheet" href="css/home-hero-studio.css">
   <link rel="stylesheet" href="css/auth.css">
   <link rel="stylesheet" href="css/support-toast.css">
@@ -530,35 +531,36 @@
     }
 
     /*
-     * Color gradient follows cursor (--spot-x / --spot-y)
-     * light = soft white · dark = #00072D navy (~50% of prior intensity)
+     * Spotlight follows cursor — deep muted blue, low opacity (CTA-like)
      */
     .bundles-spotlight {
+      position: absolute;
+      inset: 0;
       z-index: 1;
+      pointer-events: none;
       background:
         radial-gradient(
-          ellipse 68% 58% at var(--spot-x) var(--spot-y),
-          rgba(255, 255, 255, 0.49) 0%,
-          rgba(255, 255, 255, 0.36) 28%,
-          rgba(255, 255, 255, 0.16) 52%,
-          rgba(255, 255, 255, 0.04) 72%,
-          transparent 88%
+          ellipse 62% 54% at var(--spot-x, 50%) var(--spot-y, 42%),
+          rgba(70, 110, 150, 0.14) 0%,
+          rgba(50, 85, 125, 0.08) 32%,
+          rgba(35, 60, 95, 0.04) 58%,
+          transparent 82%
         );
       mix-blend-mode: normal;
-      opacity: 0.95;
+      opacity: 1;
       transition: opacity 0.2s ease;
     }
 
     html.dark .bundles-spotlight {
       background:
         radial-gradient(
-          ellipse 70% 60% at var(--spot-x) var(--spot-y),
-          rgba(0, 7, 45, 0.44) 0%,
-          rgba(0, 7, 45, 0.31) 30%,
-          rgba(0, 7, 45, 0.14) 54%,
-          rgba(0, 7, 45, 0.04) 74%,
-          transparent 90%
+          ellipse 64% 56% at var(--spot-x, 50%) var(--spot-y, 42%),
+          rgba(55, 95, 140, 0.16) 0%,
+          rgba(35, 70, 110, 0.1) 30%,
+          rgba(20, 45, 80, 0.05) 55%,
+          transparent 80%
         );
+      mix-blend-mode: normal;
       opacity: 1;
     }
 
@@ -1201,16 +1203,11 @@
       overflow: hidden !important;
     }
     html.dark #section-experimental::before,
-    html.dark #section-minimal::before {
-      content: "" !important;
-      position: absolute !important;
-      inset: 0 !important;
-      z-index: 0 !important;
-      pointer-events: none !important;
-      background:
-        radial-gradient(ellipse 55% 70% at 12% 50%, rgba(70, 130, 230, 0.1) 0%, transparent 62%),
-        radial-gradient(ellipse 48% 60% at 90% 42%, rgba(160, 70, 180, 0.07) 0%, transparent 58%),
-        radial-gradient(ellipse 40% 45% at 55% 100%, rgba(40, 130, 120, 0.05) 0%, transparent 55%) !important;
+    html.dark #section-experimental::after,
+    html.dark #section-minimal::before,
+    html.dark #section-minimal::after {
+      content: none !important;
+      display: none !important;
     }
     html.dark #section-experimental > .content-container,
     html.dark #section-minimal > .content-container {
@@ -1231,38 +1228,9 @@
     html.dark #section-minimal a {
       color: #f2f2f2 !important;
     }
-    /* No light PNG - pure dark glass amoeba */
-    html.dark .xf-feature-copy__blob {
-      left: -30% !important;
-      top: -28% !important;
-      width: min(44rem, 210%) !important;
-      height: min(36rem, 190%) !important;
-      opacity: 0.38 !important;
-      filter: blur(56px) saturate(1.15) !important;
-      background-image: radial-gradient(ellipse 75% 70% at 38% 42%,
-          rgba(90, 150, 255, 0.4) 0%,
-          rgba(175, 90, 205, 0.26) 34%,
-          rgba(45, 155, 135, 0.12) 58%,
-          transparent 80%
-        ) !important;
-      background-color: transparent !important;
-      background-blend-mode: normal !important;
-      border-radius: 64% 36% 58% 42% / 48% 54% 46% 52% !important;
-    }
+    html.dark .xf-feature-copy__blob,
     html.dark .xf-feature-copy__blob--2 {
-      left: 2% !important;
-      top: 18% !important;
-      width: min(34rem, 170%) !important;
-      height: min(30rem, 160%) !important;
-      opacity: 0.28 !important;
-      filter: blur(60px) saturate(1.1) !important;
-      background-image: radial-gradient(ellipse 70% 75% at 55% 48%,
-          rgba(185, 90, 205, 0.28) 0%,
-          rgba(70, 135, 235, 0.16) 42%,
-          transparent 80%
-        ) !important;
-      background-color: transparent !important;
-      border-radius: 40% 60% 48% 52% / 58% 40% 60% 40% !important;
+      display: none !important;
     }
 
     /* ── Home glass sections: higher dark-mode contrast ── */
@@ -1282,9 +1250,9 @@
     html.dark #xf-final-cta .xf-glass-backdrop__veil {
       background: linear-gradient(
         180deg,
-        rgba(0, 0, 0, 0.82) 0%,
-        rgba(0, 0, 0, 0.7) 45%,
-        rgba(0, 0, 0, 0.88) 100%
+        rgba(0, 0, 0, 0.6) 0%,
+        rgba(0, 0, 0, 0.45) 45%,
+        rgba(0, 0, 0, 0.66) 100%
       ) !important;
     }
 
@@ -1292,8 +1260,8 @@
     html.dark #xf-motion-prompts .xf-glass-backdrop__img,
     html.dark #xf-newsletter-cta .xf-glass-backdrop__img,
     html.dark #xf-final-cta .xf-glass-backdrop__img {
-      opacity: 0.22 !important;
-      filter: saturate(1.1) brightness(0.32) contrast(1.15) !important;
+      opacity: 0.6 !important;
+      filter: none !important;
     }
 
     html.dark #selected-work .xf-section-title,
@@ -1381,6 +1349,8 @@
       border-color: #ffffff !important;
     }
   </style>
+  <link rel="stylesheet" href="css/home-liquid-theme.css">
+  <link rel="stylesheet" href="css/dark-nebula-bg.css">
 </head>
 <body>
 
@@ -1455,24 +1425,14 @@
         </div>
 
           <div class="site-nav-end">
-<button type="button" id="theme-toggle" onclick="toggleTheme()" class="theme-switch theme-toggle" role="switch" aria-checked="false" aria-label="Switch to dark mode" title="Dark mode">
-              <span class="theme-switch-track" aria-hidden="true">
-                <span class="theme-switch-thumb">
-                  <span class="theme-switch-icon theme-switch-icon--sun" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12zM4.22 4.22l2.12 2.12-1.06 1.06L3.16 5.28l1.06-1.06zm15.56 15.56 2.12 2.12-1.06 1.06-2.12-2.12 1.06-1.06zM19.78 4.22l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12zM6.34 17.66l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12z"/></svg>
-                  </span>
-                  <span class="theme-switch-icon theme-switch-icon--moon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg>
-                  </span>
-                </span>
-              </span>
-            </button>
+            <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee" aria-label="Buy me a coffee">
+              <i class="fa-solid fa-mug-hot text-xs" aria-hidden="true"></i>
+              <span class="site-nav-coffee__label hidden lg:inline">Buy me a coffee</span>
+            </a>
             <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
               <i class="fa-solid fa-bars text-sm" aria-hidden="true"></i>
             </button>
-            <div id="xf-auth-nav" class="site-nav-auth">
-              <a href="login.html" class="site-nav-auth-btn">Sign in</a>
-</div>
+            <div id="xf-auth-nav" class="site-nav-auth"><a href="login.html" class="site-nav-auth-btn">Sign in</a></div>
           </div>
         </div>
       </div>
@@ -1501,20 +1461,6 @@
           <a href="login.html" class="site-nav-drawer-auth-btn" onclick="toggleMobileMenu()">Sign in</a>
           <a href="signup.html" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu()">Create account</a>
         </div>
-
-        <footer class="site-nav-drawer-footer">
-<div class="site-nav-drawer-theme">
-            <span class="site-nav-drawer-theme__label">Dark mode</span>
-            <button type="button" onclick="toggleTheme()" class="site-nav-drawer-theme__switch theme-switch theme-switch--sm" role="switch" aria-checked="false" aria-label="Switch to dark mode">
-              <span class="theme-switch-track" aria-hidden="true">
-                <span class="theme-switch-thumb">
-                  <span class="theme-switch-icon theme-switch-icon--sun"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12z"/></svg></span>
-                  <span class="theme-switch-icon theme-switch-icon--moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg></span>
-                </span>
-              </span>
-            </button>
-          </div>
-        </footer>
       </div>
     </div>
 
@@ -1535,6 +1481,21 @@
             <span class="hero-proof__chip"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Instant templates</span>
             <span class="hero-proof__chip"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Motion prompts</span>
             <span class="hero-proof__chip"><i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i> Portable skills</span>
+          </div>
+          <div class="hero-theme">
+            <button type="button" id="theme-toggle" onclick="toggleTheme()" class="theme-switch theme-switch--hero theme-toggle" role="switch" aria-checked="false" aria-label="Switch to dark mode" title="Dark mode">
+              <span class="theme-switch-track" aria-hidden="true">
+                <span class="theme-switch-label">Light</span>
+                <span class="theme-switch-thumb">
+                  <span class="theme-switch-icon theme-switch-icon--sun" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12zM4.22 4.22l2.12 2.12-1.06 1.06L3.16 5.28l1.06-1.06zm15.56 15.56 2.12 2.12-1.06 1.06-2.12-2.12 1.06-1.06zM19.78 4.22l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12zM6.34 17.66l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12z"/></svg>
+                  </span>
+                  <span class="theme-switch-icon theme-switch-icon--moon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg>
+                  </span>
+                </span>
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -1588,7 +1549,7 @@
       <div class="scroll-reveal-in max-w-3xl">
         <p class="xf-section-eyebrow">Creator library</p>
         <h2 class="xf-section-title">
-          The complete AI creator library,<br>built by creators.
+          The complete AI creator library,<br>built by a creator.
         </h2>
         <a href="about.html" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#0a0a0a] hover:text-[#27272a] transition">
           About the library <i class="fa-solid fa-arrow-right text-xs"></i>
@@ -1915,7 +1876,7 @@
     <div class="scroll-reveal-in xf-newsletter-box xf-glass-panel">
       <div>
         <h3>Stay in the loop</h3>
-        <p>New templates, motion prompts, skills, and guides - follow @XFreeze or send a request. We post updates on the changelog every week.</p>
+        <p>New templates, motion prompts, skills, and guides - follow @XFreeze or send a request. I post updates on the changelog every week.</p>
       </div>
       <div class="xf-newsletter-actions">
         <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer" class="xf-newsletter-btn xf-newsletter-btn--primary"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i> Follow @XFreeze</a>
@@ -2123,10 +2084,17 @@
       document.documentElement.classList.toggle('dark', isDark);
       document.documentElement.style.backgroundColor = isDark ? '#000000' : '#f6f5f8';
       localStorage.setItem('xfreeze-theme', theme);
-      document.querySelectorAll('.theme-toggle, .theme-toggle-mobile, .site-nav-drawer-theme__switch, .site-nav-drawer-theme__switch').forEach(btn => {
+      document.querySelectorAll('.theme-toggle, .theme-toggle-mobile, .site-nav-drawer-theme__switch').forEach(btn => {
         btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
         btn.setAttribute('title', isDark ? 'Light mode' : 'Dark mode');
         btn.setAttribute('aria-checked', isDark ? 'true' : 'false');
+      });
+      /* Skip --auto labels (footer): those use CSS ::before only */
+      document.querySelectorAll('.theme-switch-label:not(.theme-switch-label--auto)').forEach(el => {
+        el.textContent = isDark ? 'Dark' : 'Light';
+      });
+      document.querySelectorAll('.theme-switch-label--auto').forEach(el => {
+        el.textContent = '';
       });
       document.querySelectorAll('.theme-toggle-label').forEach(el => {
         el.textContent = isDark ? 'Light mode' : 'Dark mode';
@@ -2433,15 +2401,16 @@
     function initBundlesBackground() {
       const section = document.getElementById('creator-library');
       if (!section) return;
+      if (section._xfBundlesBgBound) return;
+      section._xfBundlesBgBound = true;
 
       let frame = null;
-      // Grid perspective: almost fixed (color gradient still tracks cursor)
+      // Grid perspective: almost fixed; spotlight follows cursor fully
       const GRID_DAMP = 0.03;
       const BASE_X = 50;
       const BASE_Y = 42;
       let gridX = BASE_X;
       let gridY = BASE_Y;
-      // Color gradient: follows cursor fully
       let spotX = BASE_X;
       let spotY = BASE_Y;
 
@@ -2453,18 +2422,20 @@
         section.style.setProperty('--spot-y', spotY.toFixed(2) + '%');
       };
 
-      section.addEventListener('mousemove', (event) => {
+      const onMove = (event) => {
         const rect = section.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
         const rawX = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
         const rawY = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100));
-        // Color wash tracks the pointer
         spotX = rawX;
         spotY = rawY;
-        // Grid barely moves
         gridX = BASE_X + (rawX - BASE_X) * GRID_DAMP;
         gridY = BASE_Y + (rawY - BASE_Y) * GRID_DAMP;
         if (!frame) frame = requestAnimationFrame(applyPosition);
-      });
+      };
+
+      section.addEventListener('mousemove', onMove, { passive: true });
+      section.addEventListener('pointermove', onMove, { passive: true });
 
       section.addEventListener('mouseleave', () => {
         spotX = BASE_X;

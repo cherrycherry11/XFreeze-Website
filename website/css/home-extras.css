@@ -193,8 +193,8 @@
 }
 
 .xf-spot-tag--instant {
-  background: #ecfdf5;
-  color: #047857;
+  background: #eef5fc;
+  color: #2f5fad;
 }
 
 .xf-spot-tag--connector {
@@ -204,7 +204,7 @@
 
 html.dark .xf-spot-tag--instant {
   background: rgba(4, 120, 87, 0.2);
-  color: #6ee7b7;
+  color: #8eb8e8;
 }
 
 html.dark .xf-spot-tag--connector {
@@ -357,8 +357,8 @@ html.dark .xf-glass-section .xf-combo-card {
 }
 
 .xf-combo-tag--instant {
-  background: #ecfdf5;
-  color: #047857;
+  background: #eef5fc;
+  color: #2f5fad;
 }
 
 .xf-combo-tag--connector {
@@ -367,13 +367,13 @@ html.dark .xf-glass-section .xf-combo-card {
 }
 
 .xf-combo-tag--premium {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  color: #92400e;
+  background: #dfe7f0;
+  color: #33465e;
 }
 
 html.dark .xf-combo-tag--instant {
   background: rgba(4, 120, 87, 0.2);
-  color: #6ee7b7;
+  color: #8eb8e8;
 }
 
 html.dark .xf-combo-tag--connector {
@@ -890,13 +890,13 @@ html.dark .xf-motion-row__copy {
 }
 
 .xf-motion-row__copy.is-copied {
-  color: #047857;
-  text-decoration-color: #047857;
+  color: #2f5fad;
+  text-decoration-color: #2f5fad;
 }
 
 html.dark .xf-motion-row__copy.is-copied {
-  color: #6ee7b7;
-  text-decoration-color: #6ee7b7;
+  color: #8eb8e8;
+  text-decoration-color: #8eb8e8;
 }
 
 /* ── FAQ (mockup-style) ── */
@@ -1077,11 +1077,12 @@ html.dark .xf-final-cta-box::before {
   pointer-events: none;
   opacity: 1;
   filter: blur(48px);
+  /* Liquid-steel glow to match the hero videos */
   background: radial-gradient(
     circle at center,
-    rgba(35, 70, 140, 0.55) 0%,
-    rgba(25, 55, 120, 0.32) 38%,
-    rgba(15, 40, 90, 0.14) 62%,
+    rgba(45, 70, 100, 0.5) 0%,
+    rgba(35, 55, 85, 0.28) 38%,
+    rgba(25, 35, 50, 0.12) 62%,
     transparent 78%
   );
 }

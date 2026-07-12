@@ -19,28 +19,38 @@ html.dark.xf-auth-pending::before {
 .site-nav-auth {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   flex-shrink: 0;
-  /* Always sit at the far right of the top nav */
-  order: 100;
-  margin-left: 0.15rem;
-}
-
-/* Coffee lives in the footer only */
-.site-nav-coffee,
-.site-nav-drawer-meta[href*='buymeacoffee'] {
-  display: none !important;
+  /* Stable slot so Sign in / avatar never shoves coffee around */
+  order: 3;
+  margin-left: 0;
+  min-width: 5.25rem;
+  min-height: 2.25rem;
 }
 
 .site-nav-end {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
+  /* Prevent reflows from painting partial children */
+  flex-wrap: nowrap;
 }
 
-/* Theme / menu before the account circle */
-.site-nav-end > .theme-switch,
-.site-nav-end > .theme-toggle,
-.site-nav-end > .site-nav-menu-btn {
+/* Fixed visual order on every page: coffee → menu → auth */
+.site-nav-end > .site-nav-coffee {
   order: 1;
+  flex-shrink: 0;
+}
+
+.site-nav-end > .theme-switch,
+.site-nav-end > .theme-toggle {
+  order: 2;
+  flex-shrink: 0;
+}
+
+.site-nav-end > .site-nav-menu-btn {
+  order: 2;
+  flex-shrink: 0;
 }
 
 .site-nav-auth-btn {
@@ -237,15 +247,40 @@ html.dark .site-nav-user-menu button:hover {
 
 /*
  * Login / signup backgrounds
- * - Light: site pearlescent glass stack (glass-backdrop.css)
- * - Dark: pure black + soft dark-blue ambient glow (same feel as
- *   home Skills / final CTA - glow outside the form card only)
+ * Light: soft deep-blue wash (selective, matches site policy)
+ * Dark: handled by dark-nebula-bg.css
  */
 body.xf-auth-body {
   position: relative;
   min-height: 100vh;
-  background: #f6f5f8;
+  background: #f4f6f8;
   color: var(--text, #0a0a0a);
+}
+
+/* Light auth: one quiet deep-blue gradient */
+html:not(.dark) .xf-auth-bg.xf-glass-backdrop .xf-glass-backdrop__img {
+  display: block;
+  opacity: 1;
+  background:
+    radial-gradient(ellipse 70% 60% at 30% 25%, rgba(70, 110, 150, 0.14) 0%, transparent 62%),
+    radial-gradient(ellipse 55% 50% at 80% 70%, rgba(50, 85, 125, 0.08) 0%, transparent 58%);
+  filter: none;
+  transform: none;
+}
+
+html:not(.dark) .xf-auth-bg.xf-glass-backdrop .xf-glass-backdrop__mesh {
+  display: none;
+}
+
+html:not(.dark) .xf-auth-bg.xf-glass-backdrop .xf-glass-backdrop__veil {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.32) 45%,
+    rgba(255, 255, 255, 0.52) 100%
+  );
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 html.dark body.xf-auth-body {
@@ -270,25 +305,26 @@ html.dark .xf-auth-bg.xf-glass-backdrop .xf-glass-backdrop__img {
   display: none;
 }
 
+/* Dark auth glow matches liquid-dark hero: steel blue on pure black */
 html.dark .xf-auth-bg.xf-glass-backdrop .xf-glass-backdrop__mesh {
   opacity: 1;
   mix-blend-mode: normal;
   background:
     radial-gradient(
       ellipse 70% 75% at 12% 35%,
-      rgba(35, 70, 140, 0.5) 0%,
-      rgba(25, 55, 120, 0.28) 38%,
-      rgba(15, 40, 90, 0.12) 62%,
+      rgba(45, 70, 100, 0.55) 0%,
+      rgba(20, 40, 75, 0.32) 38%,
+      rgba(20, 28, 40, 0.14) 62%,
       transparent 78%
     ),
     radial-gradient(
       ellipse 55% 60% at 88% 70%,
-      rgba(30, 60, 120, 0.22) 0%,
+      rgba(55, 85, 115, 0.24) 0%,
       transparent 70%
     ),
     radial-gradient(
       ellipse 50% 45% at 55% 100%,
-      rgba(20, 45, 95, 0.14) 0%,
+      rgba(40, 60, 80, 0.16) 0%,
       transparent 65%
     );
   filter: blur(48px);

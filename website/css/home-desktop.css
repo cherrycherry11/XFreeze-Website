@@ -36,8 +36,13 @@
   .hero-content {
     flex: 0 0 auto;
     width: 100%;
-    /* Sit optically in the left-center of the frame */
-    padding-top: 6.5rem !important;
+    /* Clear nav + generous air above headline */
+    padding-top: 10.5rem !important;
+    padding-bottom: 5.5rem !important;
+  }
+
+  .hero-header--studio .hero-content {
+    padding-top: 10.5rem !important;
     padding-bottom: 5.5rem !important;
   }
 
@@ -52,7 +57,7 @@
   }
 
   .hero-headline {
-    margin-bottom: 1.65rem;
+    margin-bottom: 1.85rem;
   }
 
   .hero-headline__line,
@@ -67,7 +72,7 @@
     max-width: 36rem !important;
     font-size: 1.0625rem !important;
     line-height: 1.65 !important;
-    margin-bottom: 2.5rem !important;
+    margin-bottom: 2.65rem !important;
   }
 
   .hero-actions {

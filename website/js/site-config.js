@@ -290,7 +290,7 @@
       {
         step: 3,
         title: 'Learn the library',
-        desc: 'See how X Freeze is built, what updates weekly, and how we relate to Grok Imagine.',
+        desc: 'See how X Freeze is built, what updates weekly, and how it relates to Grok Imagine.',
         cta: 'About X Freeze',
         href: 'about.html',
         icon: 'fa-circle-info',

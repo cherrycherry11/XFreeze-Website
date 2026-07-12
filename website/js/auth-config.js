@@ -1,14 +1,15 @@
 /**
- * Public pages - no login required (landing + legal + auth only).
- * Everything else requires a signed-in account on the live site.
+ * Browse freely - all content pages are public.
+ * Login is required only when using a resource (copy prompt, open template, etc.).
+ * account.html is the only page that still requires sign-in on load.
  */
-var XF_PUBLIC_PAGES = ['login.html', 'signup.html', 'home.html', 'index.html', 'terms.html', 'privacy.html'];
-
-/**
- * Explicit protected list (kept for clarity). Live auth also gates any
- * non-public page, not only this list.
- */
-var XF_PROTECTED_PAGES = [
+var XF_PUBLIC_PAGES = [
+  'login.html',
+  'signup.html',
+  'home.html',
+  'index.html',
+  'terms.html',
+  'privacy.html',
   'templates.html',
   'skills.html',
   'prompt-library.html',
@@ -17,19 +18,28 @@ var XF_PROTECTED_PAGES = [
   'connector-setup.html',
   'about.html',
   'skill-builder.html',
-  'account.html',
   'workflows.html',
   'use-cases.html',
   'changelog.html',
+  'checkout-success.html',
+  'checkout-cancel.html',
 ];
 
 /**
- * Hide non-public pages until auth check completes (prevents content flash).
+ * Pages that redirect to login on load when requireAuth is on.
+ * Resource actions are gated separately in auth.js (copy / open / use).
+ */
+var XF_PROTECTED_PAGES = [
+  'account.html',
+];
+
+/**
+ * Hide only account until auth check completes (prevents private content flash).
  */
 (function () {
   var page = (location.pathname.split('/').pop() || '').split('?')[0];
   if (!page || page === 'index.html') page = 'home.html';
-  if (XF_PUBLIC_PAGES.indexOf(page) === -1) {
+  if (XF_PROTECTED_PAGES.indexOf(page) !== -1) {
     document.documentElement.classList.add('xf-auth-pending');
   }
 })();
@@ -38,6 +48,7 @@ var XF_PROTECTED_PAGES = [
  * BUILD MODE: set XF_REQUIRE_AUTH_LIVE to false while finishing the site.
  * LAUNCH: set XF_REQUIRE_AUTH_LIVE to true before going public.
  * Localhost always skips auth so you can preview every page while editing.
+ * When true: resource use (copy/open) requires login on the live site.
  */
 var XF_IS_LOCAL_DEV = /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(location.hostname);
 var XF_REQUIRE_AUTH_LIVE = true;

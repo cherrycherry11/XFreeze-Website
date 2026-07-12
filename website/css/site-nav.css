@@ -241,6 +241,8 @@ html.dark .site-nav.page-nav.xf-nav-compact {
   align-items: center;
   gap: 0.5rem;
   min-height: 2.25rem;
+  /* Stable cluster so coffee / sign-in never jump between pages */
+  flex-wrap: nowrap;
 }
 
 .site-nav-coffee {
@@ -258,20 +260,22 @@ html.dark .site-nav.page-nav.xf-nav-compact {
   background: var(--xf-nav-coffee-bg);
   text-decoration: none;
   white-space: nowrap;
+  flex-shrink: 0;
+  /* Reserve width so label show/hide doesn’t shove neighbors */
+  box-sizing: border-box;
   transition:
     opacity 0.15s ease,
-    transform 0.15s ease;
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .site-nav:not(.is-scrolled):not(.page-nav) .site-nav-coffee:hover {
-  transform: translateY(-1px);
-  opacity: 0.95;
+  opacity: 0.92;
 }
 
 .site-nav.is-scrolled .site-nav-coffee:hover,
 .site-nav.page-nav .site-nav-coffee:hover {
   opacity: 0.88;
-  transform: none;
 }
 
 .site-nav-end .theme-switch.theme-toggle {

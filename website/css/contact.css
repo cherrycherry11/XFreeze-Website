@@ -40,24 +40,76 @@
   box-sizing: border-box;
 }
 
-/* ── Hero (glass gradient backdrop, both themes) ── */
-/* Layout only - backdrop comes from shared .xf-glass-hero (same as blog) */
+/* ── Hero: silk gradient plates (light + dark) ── */
 .contact-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: max(36vh, 260px);
   text-align: center;
   margin-bottom: 0;
+  background: #f4f6f9;
+}
+
+/* Light silk gradient (user plate) */
+.contact-hero::before {
+  content: "";
+  position: absolute;
+  inset: -6%;
+  z-index: 0;
+  pointer-events: none;
+  background: url("../assets/images/contact-gradient-light.jpg") center / cover no-repeat;
+  filter: blur(2px) saturate(1.02);
+  transform: scale(1.06);
+  opacity: 0.95;
+}
+
+.contact-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.2) 45%,
+    rgba(255, 255, 255, 0.42) 100%
+  );
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 html:not(.dark) .contact-hero {
   color: var(--text, #0a0a0a);
 }
 
+/* Dark silk gradient (matched plate) */
 html.dark .contact-hero {
   min-height: max(36vh, 260px);
   color: #f2f2f2;
+  background: #010204;
+}
+
+html.dark .contact-hero::before {
+  background: url("../assets/images/contact-gradient-dark.jpg") center / cover no-repeat;
+  filter: blur(4px) saturate(1.05) brightness(0.92);
+  transform: scale(1.1) rotate(-1deg);
+  opacity: 0.9;
+}
+
+html.dark .contact-hero::after {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 1, 4, 0.42) 0%,
+    rgba(0, 1, 4, 0.28) 45%,
+    rgba(0, 1, 4, 0.5) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .contact-hero__content {
@@ -240,7 +292,7 @@ html.dark .contact-form-col__sub {
 .contact-form-status.is-visible { display: block; }
 
 html:not(.dark) .contact-form-status.is-success {
-  background: #ecfdf5;
+  background: #eef5fc;
   border: 1px solid #a7f3d0;
   color: #065f46;
 }
@@ -252,9 +304,9 @@ html:not(.dark) .contact-form-status.is-error {
 }
 
 html.dark .contact-form-status.is-success {
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  color: #6ee7b7;
+  background: rgba(70, 130, 210, 0.15);
+  border: 1px solid rgba(70, 130, 210, 0.35);
+  color: #8eb8e8;
 }
 
 html.dark .contact-form-status.is-error {

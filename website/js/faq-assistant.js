@@ -24,7 +24,7 @@
       picks: [
         { id: 'skill-builder', label: 'Skill Builder', href: 'skill-builder.html', desc: 'Free wizard - answer five questions and get a meta-prompt for your AI.' },
         { id: 'create-skill', label: 'Build with your AI', href: 'skill-builder.html', desc: 'Your AI drafts, tests, and refines a SKILL.md with you - no backend.' },
-        { id: 'contact', label: 'Done-for-you request', href: 'contact.html?topic=skill', desc: 'Prefer hands-off? Request a custom skill from the X Freeze team.' }
+        { id: 'contact', label: 'Done-for-you request', href: 'contact.html?topic=skill', desc: 'Prefer hands-off? Request a custom skill from me.' }
       ]
     },
     {

@@ -14,7 +14,7 @@
       },
       {
         question: 'Is X Freeze affiliated with xAI or Grok?',
-        answer: 'No. X Freeze is an <strong>independent fan library</strong> - not affiliated with xAI, Grok, X, or SpaceX. We curate links and prompts; Grok and other tools are run on their own platforms.',
+        answer: 'No. X Freeze is an <strong>independent fan library</strong> - not affiliated with xAI, Grok, X, or SpaceX. I curate links and prompts; Grok and other tools are run on their own platforms.',
         tags: ['affiliated', 'xai', 'grok', 'official', 'fan', 'unofficial']
       },
       {
@@ -66,12 +66,12 @@
       },
       {
         question: 'Do templates run inside X Freeze or in Grok?',
-        answer: 'Templates run in <strong>Grok Imagine</strong> - not inside X Freeze. We provide the curated link; generation happens on Grok with your own image.',
+        answer: 'Templates run in <strong>Grok Imagine</strong> - not inside X Freeze. I provide the curated link; generation happens on Grok with your own image.',
         tags: ['where', 'run', 'grok', 'inside', 'imagine']
       },
       {
         question: "Why didn't my template open or work?",
-        answer: 'Common fixes: confirm you have <strong>Super Grok or Super Grok Heavy</strong>, try another browser, disable pop-up blockers, and make sure you are signed into Grok. If a link is broken, contact us via <a href="contact.html">contact.html</a>.',
+        answer: 'Common fixes: confirm you have <strong>Super Grok or Super Grok Heavy</strong>, try another browser, disable pop-up blockers, and make sure you are signed into Grok. If a link is broken, contact me via <a href="contact.html">contact.html</a>.',
         tags: ['broken', 'not working', 'failed', 'open', 'template', 'link']
       },
       {
@@ -131,7 +131,7 @@
       },
       {
         question: 'How do I request a new template?',
-        answer: 'Use <a href="contact.html?topic=template">Request a template</a> on the contact page, the floating button on the Templates page, or the homepage newsletter section. We review requests weekly.',
+        answer: 'Use <a href="contact.html?topic=template">Request a template</a> on the contact page, the floating button on the Templates page, or the homepage newsletter section. I review requests weekly.',
         tags: ['request', 'new template', 'missing', 'suggest']
       },
 
@@ -158,7 +158,7 @@
       },
       {
         question: 'What is SKILL.md?',
-        answer: '<strong>SKILL.md</strong> is the skill definition file your AI creates when you paste our install prompt. It holds instructions, triggers, and guardrails for that task.',
+        answer: '<strong>SKILL.md</strong> is the skill definition file your AI creates when you paste the install prompt. It holds instructions, triggers, and guardrails for that task.',
         tags: ['skill.md', 'file', 'format', 'install']
       },
       {
@@ -422,7 +422,7 @@
       },
       {
         question: 'What is the response time for the contact form?',
-        answer: 'We aim to reply within <strong>24-48 hours</strong> on business days. Template and skill requests are reviewed for weekly drops.',
+        answer: 'I aim to reply within <strong>24-48 hours</strong> on business days. Template and skill requests are reviewed for weekly drops.',
         tags: ['response', 'time', 'contact', 'wait']
       },
       {
@@ -437,7 +437,7 @@
       },
       {
         question: 'How do I request a new skill?',
-        answer: 'Use <a href="contact.html?topic=skill">contact.html?topic=skill</a> or the floating <strong>Request skill</strong> button on the Skills page. Tell us the task you want automated.',
+        answer: 'Use <a href="contact.html?topic=skill">contact.html?topic=skill</a> or the floating <strong>Request skill</strong> button on the Skills page. Tell me the task you want automated.',
         tags: ['request', 'skill', 'new', 'missing']
       },
       {
@@ -454,7 +454,7 @@
       },
       {
         question: 'What data does X Freeze collect?',
-        answer: 'Only the basics: contact form messages, optional sign-in, and normal website/tech prefs. We don’t sell your info and skills don’t send your Gmail/Drive to us. See the simple <a href="privacy.html">Privacy</a> page. Use the library for your own work - please don’t resell or redistribute it (<a href="terms.html">Terms</a>).',
+        answer: 'Only the basics: contact form messages, optional sign-in, and normal website/tech prefs. I don’t sell your info and skills don’t send your Gmail/Drive to me. See the simple <a href="privacy.html">Privacy</a> page. Use the library for your own work - please don’t resell or redistribute it (<a href="terms.html">Terms</a>).',
         tags: ['privacy', 'data', 'collect', 'tracking', 'terms', 'resale']
       },
       {
@@ -469,7 +469,7 @@
       },
       {
         question: 'What if Grok changes template URLs or features?',
-        answer: 'We update links when we catch breaks - report via <a href="contact.html">contact</a>. Grok controls Imagine features and pricing; we curate on top of their platform.',
+        answer: 'I update links when I catch breaks - report via <a href="contact.html">contact</a>. Grok controls Imagine features and pricing; I curate on top of their platform.',
         tags: ['grok', 'broken', 'url', 'change', 'update']
       },
 

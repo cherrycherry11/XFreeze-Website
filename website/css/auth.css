@@ -21,19 +21,34 @@ html.dark.xf-auth-pending::before {
   align-items: center;
   justify-content: flex-end;
   flex-shrink: 0;
-  /* Stable slot so Sign in / avatar never shoves coffee around */
   order: 3;
   margin-left: 0;
-  min-width: 5.25rem;
+  min-width: 0;
   min-height: 2.25rem;
+}
+
+/* Only reserve Sign-in pill width when signed out (avoids coffee jump).
+   Signed-in avatar is ~2rem — do not keep the wide empty slot. */
+.site-nav-auth[data-auth-state='signed-out'] {
+  min-width: 5.25rem;
+}
+
+.site-nav-auth[data-auth-state='signed-in'] {
+  min-width: 0;
+  justify-content: center;
 }
 
 .site-nav-end {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   /* Prevent reflows from painting partial children */
   flex-wrap: nowrap;
+}
+
+/* Coffee + avatar sit closer when logged in */
+.site-nav-end:has(.site-nav-auth[data-auth-state='signed-in']) {
+  gap: 0.35rem;
 }
 
 /* Fixed visual order on every page: coffee → menu → auth */

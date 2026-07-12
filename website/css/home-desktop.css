@@ -109,7 +109,11 @@
   }
 
   .hero-header .site-nav-end {
-    gap: 0.5rem !important;
+    gap: 0.4rem !important;
+  }
+
+  .hero-header .site-nav-end:has(.site-nav-auth[data-auth-state='signed-in']) {
+    gap: 0.35rem !important;
   }
 
   .hero-header .site-nav-mobile-backdrop,

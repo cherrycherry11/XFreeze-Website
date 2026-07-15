@@ -392,12 +392,13 @@ html.dark .xf-start-card:hover {
   font-weight: 500 !important;
 }
 
-.xf-newsletter-box,
-.xf-final-cta-box {
+.xf-newsletter-box {
   border-radius: var(--xf-radius-lg) !important;
   border: 1px solid var(--border) !important;
   box-shadow: none !important;
 }
+
+/* Final CTA glass is styled in home-extras.css — do not flatten it here */
 
 .sb-hero {
   padding: clamp(4rem, 10vw, 6rem) 0 clamp(2rem, 4vw, 3rem);

@@ -53,6 +53,7 @@ html.dark {
 .xf-content-hero {
   padding-top: 0;
   margin-bottom: 2rem;
+  text-align: left;
 }
 
 .xf-content-hero--wide .xf-content-lead {
@@ -66,14 +67,28 @@ html.dark {
   text-transform: uppercase;
   color: var(--text-secondary);
   margin-bottom: 0.65rem;
+  text-align: left;
 }
 
 .xf-content-title {
   margin: 0 0 0.75rem;
+  text-align: left;
+}
+
+/* Word-split lines on about (and other content heroes) stay left-aligned */
+.xf-content-hero h1.is-split,
+.xf-content-hero .xf-content-title.is-split,
+.xf-content-hero .xf-hero-line {
+  display: block;
+  width: 100%;
+  text-align: left !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
 .xf-content-lead {
   margin: 0;
+  text-align: left;
 }
 
 .xf-section-title {

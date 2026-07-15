@@ -12,7 +12,6 @@
     'skill-builder.html': 'skills',
     'prompt-library.html': 'prompts',
     'contact.html': 'contact',
-    'changelog.html': 'changelog',
     'workflows.html': 'workflows',
     'use-cases.html': 'use-cases',
     'account.html': 'account',
@@ -56,7 +55,6 @@
         { href: 'connector-setup.html', label: 'Connector setup' },
         { href: 'use-cases.html', label: 'Use cases', nav: 'use-cases' },
         { href: 'workflows.html', label: 'Workflow combos', nav: 'workflows' },
-        { href: 'changelog.html', label: 'Changelog', nav: 'changelog' },
         { href: 'account.html', label: 'My Library', nav: 'account' },
       ],
     },
@@ -157,12 +155,10 @@
       '</div>' +
       '<div class="xf-footer-bottom">' +
       '<p class="xf-footer-copy">© 2026 X Freeze</p>' +
-      '<div class="xf-footer-badge xf-footer-badge--static">' +
-      '<span class="xf-footer-badge--compliance">' +
-      '<span>Unofficial fan library</span>' +
-      '<span class="xf-footer-badge__sub">Not affiliated with xAI · Opens in ' +
-      '<a href="https://grok.com/imagine" target="_blank" rel="noopener noreferrer">Grok Imagine</a></span>' +
-      '</span></div></div></div>';
+      '<p class="xf-footer-note">' +
+      'Not affiliated with xAI. Templates open in ' +
+      '<a href="https://grok.com/imagine" target="_blank" rel="noopener noreferrer">Grok Imagine</a>.' +
+      '</p></div></div>';
 
     root.querySelectorAll('[data-xf-crypto]').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -178,20 +174,23 @@
   }
 
   function renderFooterThemeSwitch() {
+    /* Simple iOS-style toggle — plain track + white thumb with sun/moon, no label */
     return (
       '<div class="xf-footer-theme">' +
       '<button type="button" onclick="typeof toggleTheme===\'function\'&&toggleTheme()" ' +
-      'class="theme-switch theme-switch--hero theme-switch--footer theme-toggle" ' +
+      'class="xf-footer-theme-switch theme-toggle" ' +
       'role="switch" aria-checked="false" aria-label="Switch to dark mode" title="Dark mode">' +
-      '<span class="theme-switch-track" aria-hidden="true">' +
-      '<span class="theme-switch-label theme-switch-label--auto"></span>' +
-      '<span class="theme-switch-thumb">' +
-      '<span class="theme-switch-icon theme-switch-icon--sun" aria-hidden="true">' +
-      '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12zM4.22 4.22l2.12 2.12-1.06 1.06L3.16 5.28l1.06-1.06zm15.56 15.56 2.12 2.12-1.06 1.06-2.12-2.12 1.06-1.06zM19.78 4.22l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12zM6.34 17.66l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12z"/></svg>' +
-      '</span>' +
-      '<span class="theme-switch-icon theme-switch-icon--moon" aria-hidden="true">' +
-      '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg>' +
-      '</span>' +
+      '<span class="xf-footer-theme-switch__track" aria-hidden="true">' +
+      '<span class="xf-footer-theme-switch__thumb">' +
+      '<span class="xf-footer-theme-switch__icon xf-footer-theme-switch__icon--sun">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">' +
+      '<circle cx="12" cy="12" r="4"/>' +
+      '<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>' +
+      '</svg></span>' +
+      '<span class="xf-footer-theme-switch__icon xf-footer-theme-switch__icon--moon">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z"/>' +
+      '</svg></span>' +
       '</span></span></button></div>'
     );
   }
@@ -203,8 +202,6 @@
       btn.setAttribute('aria-checked', isDark ? 'true' : 'false');
       btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
       btn.setAttribute('title', isDark ? 'Light mode' : 'Dark mode');
-      var label = btn.querySelector('.theme-switch-label--auto');
-      if (label) label.textContent = '';
     });
   }
 
@@ -228,7 +225,6 @@
       about: 'about.html',
       skills: 'skills.html',
       contact: 'contact.html',
-      changelog: 'changelog.html',
       workflows: 'workflows.html',
       'use-cases': 'use-cases.html',
       account: 'account.html',

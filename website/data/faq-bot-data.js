@@ -193,8 +193,8 @@
       },
       {
         question: 'How often is new stuff added?',
-        answer: 'New templates, skills, and motion prompts drop <strong>every week</strong>. Follow <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer">@XFreeze</a> or check the <a href="changelog.html">changelog</a>.',
-        tags: ['updates', 'new', 'weekly', 'often', 'changelog']
+        answer: 'New templates, skills, and motion prompts drop <strong>every week</strong>. Follow <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer">@XFreeze</a> for the latest drops.',
+        tags: ['updates', 'new', 'weekly', 'often']
       },
       {
         question: 'Can I use skills outside of Grok Imagine?',
@@ -427,7 +427,7 @@
       },
       {
         question: 'How do I follow updates?',
-        answer: 'Follow <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer">@XFreeze</a>, read the <a href="changelog.html">changelog</a>, or check the About and Help pages.',
+        answer: 'Follow <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer">@XFreeze</a>, or check the About and Help pages.',
         tags: ['follow', 'updates', 'twitter', 'news']
       },
       {

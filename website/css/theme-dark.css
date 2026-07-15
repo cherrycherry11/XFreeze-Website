@@ -156,7 +156,6 @@ html.dark .xf-motion-card,
 html.dark .xf-motion-flow,
 html.dark .bundles-stats-panel,
 html.dark .xf-newsletter-box,
-html.dark .xf-final-cta-box,
 html.dark .skills-builder-promo,
 html.dark .skill-bundle-card,
 html.dark .templates-subscription-note,
@@ -175,9 +174,8 @@ html.dark .xf-glass-section .xf-motion-card,
 html.dark .xf-glass-section .xf-motion-flow,
 html.dark .xf-glass-section .bundles-stats-panel,
 html.dark .xf-glass-section .xf-newsletter-box,
-html.dark .xf-glass-section .xf-final-cta-box,
 html.dark .xf-glass-hero .xf-glass-panel,
-html.dark .xf-glass-panel {
+html.dark .xf-glass-panel:not(.xf-final-cta-box) {
   background: rgba(0, 0, 0, 0.55) !important;
   border-color: rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: blur(20px) saturate(1.15) !important;

@@ -36,11 +36,90 @@ html.dark .pl-hero {
   border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
-/* Never hide the hero while scroll-reveal boots */
+/* Never hide the hero shell while scroll-reveal / cinematic boots */
 .pl-hero .scroll-reveal-in,
 .pl-hero.pl-hero--glass {
   opacity: 1 !important;
   transform: none !important;
+}
+
+/*
+ * Lock backdrop / chrome: never inherit GSAP thrash.
+ * Dual .pl-hero__bg plates keep their own light/dark opacity rules.
+ */
+.pl-hero__media,
+.pl-hero__media-blur,
+.pl-hero__glass-sheet,
+.pl-hero__noise,
+.pl-hero__media-shade,
+.pl-hero__marquee,
+.pl-hero__inner {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Grid shell stays solid — cards use pl-card-in once */
+.pl-grid {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/*
+ * Home-style word flow: pre-hide title words + supports (no FOUC flash).
+ * Layout structure is unchanged — only opacity/y for the intro timeline.
+ */
+html.xf-cinematic .pl-hero h1:not(.is-split),
+html.xf-cinematic-pending .pl-hero h1:not(.is-split),
+html.xf-cinematic .pl-hero:not(.pl-hero--ready) .pl-hero__eyebrow,
+html.xf-cinematic .pl-hero:not(.pl-hero--ready) .pl-hero__lead,
+html.xf-cinematic .pl-hero:not(.pl-hero--ready) .pl-hero__stats,
+html.xf-cinematic .pl-hero:not(.pl-hero--ready) .pl-hero__tools,
+html.xf-cinematic .pl-hero:not(.pl-hero--ready) .pl-hero__typewriter,
+html.xf-cinematic-pending .pl-hero:not(.pl-hero--ready) .pl-hero__eyebrow,
+html.xf-cinematic-pending .pl-hero:not(.pl-hero--ready) .pl-hero__lead,
+html.xf-cinematic-pending .pl-hero:not(.pl-hero--ready) .pl-hero__stats,
+html.xf-cinematic-pending .pl-hero:not(.pl-hero--ready) .pl-hero__tools,
+html.xf-cinematic-pending .pl-hero:not(.pl-hero--ready) .pl-hero__typewriter {
+  opacity: 0;
+  transform: translateY(22px);
+}
+
+html.xf-cinematic .pl-hero h1.is-split {
+  opacity: 1;
+  transform: none;
+}
+
+html.xf-cinematic .pl-hero h1.is-split .xf-word__inner {
+  opacity: 0;
+  transform: translateY(110%);
+}
+
+html.xf-cinematic .pl-hero.pl-hero--ready .pl-hero__eyebrow,
+html.xf-cinematic .pl-hero.pl-hero--ready .pl-hero__lead,
+html.xf-cinematic .pl-hero.pl-hero--ready .pl-hero__stats,
+html.xf-cinematic .pl-hero.pl-hero--ready .pl-hero__tools,
+html.xf-cinematic .pl-hero.pl-hero--ready .pl-hero__typewriter:not(.is-swapping),
+html.xf-cinematic .pl-hero.pl-hero--ready h1.is-split .xf-word__inner {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.xf-cinematic .pl-hero h1,
+  html.xf-cinematic .pl-hero .pl-hero__eyebrow,
+  html.xf-cinematic .pl-hero .pl-hero__lead,
+  html.xf-cinematic .pl-hero .pl-hero__stats,
+  html.xf-cinematic .pl-hero .pl-hero__tools,
+  html.xf-cinematic .pl-hero .pl-hero__typewriter,
+  html.xf-cinematic-pending .pl-hero h1,
+  html.xf-cinematic-pending .pl-hero .pl-hero__eyebrow,
+  html.xf-cinematic-pending .pl-hero .pl-hero__lead,
+  html.xf-cinematic-pending .pl-hero .pl-hero__stats,
+  html.xf-cinematic-pending .pl-hero .pl-hero__tools,
+  html.xf-cinematic-pending .pl-hero .pl-hero__typewriter {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* Full-bleed dual photo backdrops */
@@ -316,7 +395,7 @@ html.dark .pl-hero__marquee {
   }
 }
 
-/* Typewriter card — original chrome (backdrop-only work must not restyle this) */
+/* Typewriter card — restored to pre-cinematic layout (as of 2026-07-12) */
 .pl-hero__typewriter {
   position: relative;
   display: flex;
@@ -527,27 +606,43 @@ html.dark .pl-hero__tw-best strong {
   50% { opacity: 0; }
 }
 
+/* Copy stack — tight vertical rhythm, ~60–70ch measure for easy reading */
+.pl-hero__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  max-width: 32rem;
+}
+
 .pl-hero__eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  gap: 0.45rem;
+  margin: 0 0 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--pl-accent);
-  margin-bottom: 1rem;
+  line-height: 1.3;
 }
 
 .pl-hero__eyebrow i {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
+  opacity: 0.9;
 }
 
 .pl-hero h1,
 .pl-hero__copy h1 {
-  max-width: 14ch;
+  max-width: none;
   margin: 0;
   color: #0a0a0a !important;
+  font-size: clamp(2rem, 4.2vw, 2.75rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+  text-wrap: balance;
 }
 
 html.dark .pl-hero h1,
@@ -556,34 +651,46 @@ html.dark .pl-hero__copy h1 {
 }
 
 .pl-hero__lead {
-  margin-top: var(--space-after-title);
-  max-width: 36rem;
-  color: rgba(15, 23, 42, 0.62);
+  margin: 0.85rem 0 0;
+  max-width: 30rem;
+  font-size: 0.9875rem;
+  font-weight: 400;
+  line-height: 1.58;
+  letter-spacing: -0.011em;
+  color: rgba(15, 23, 42, 0.58);
+  text-wrap: pretty;
 }
 
 html.dark .pl-hero__lead {
-  color: rgba(242, 245, 243, 0.72);
+  color: rgba(242, 245, 243, 0.7);
 }
 
 .pl-hero__stats {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem 2.5rem;
-  margin-top: 2rem;
-  padding-top: 1.75rem;
-  border-top: 1px solid rgba(15, 23, 42, 0.1);
+  align-items: flex-start;
+  gap: 1.15rem 1.85rem;
+  width: 100%;
+  margin: 1.35rem 0 0;
+  padding: 1.15rem 0 0;
+  border-top: 1px solid rgba(15, 23, 42, 0.09);
 }
 
 html.dark .pl-hero__stats {
   border-top-color: rgba(255, 255, 255, 0.08);
 }
 
+.pl-hero__stats > [role='listitem'] {
+  min-width: 4.5rem;
+}
+
 .pl-hero__stat-num {
   display: block;
   font-family: var(--font-sans);
-  font-size: 1.75rem;
+  font-size: clamp(1.5rem, 2.4vw, 1.75rem);
   font-weight: 600;
   letter-spacing: -0.03em;
+  line-height: 1.15;
   color: #0a0a0a;
 }
 
@@ -593,10 +700,12 @@ html.dark .pl-hero__stat-num {
 
 .pl-hero__stat-label {
   display: block;
-  margin-top: 0.2rem;
+  margin-top: 0.25rem;
   font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.3;
   color: rgba(15, 23, 42, 0.48);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.01em;
 }
 
 html.dark .pl-hero__stat-label {
@@ -606,19 +715,20 @@ html.dark .pl-hero__stat-label {
 .pl-hero__tools {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
-  margin-top: 1.5rem;
+  gap: 0.4rem;
+  margin-top: 1.15rem;
 }
 
 .pl-hero__tool {
-  padding: 0.35rem 0.7rem;
+  padding: 0.32rem 0.65rem;
   border-radius: 999px;
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: rgba(255, 255, 255, 0.72);
   font-size: 0.72rem;
-  font-weight: 600;
-  color: rgba(15, 23, 42, 0.62);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  font-weight: 500;
+  line-height: 1.25;
+  color: rgba(15, 23, 42, 0.58);
+  box-shadow: none;
 }
 
 html.dark .pl-hero__tool {
@@ -1095,20 +1205,27 @@ html.dark .pl-suitable {
   min-height: 12rem;
 }
 
-.pl-grid.is-ready .pl-card {
-  animation: pl-card-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+/* First paint only — re-filtering must not re-trigger card y-motion (feels like flicker) */
+.pl-grid.is-ready.pl-grid--enter .pl-card {
+  animation: pl-card-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.pl-grid.is-ready .pl-card:nth-child(1) { animation-delay: 0ms; }
-.pl-grid.is-ready .pl-card:nth-child(2) { animation-delay: 35ms; }
-.pl-grid.is-ready .pl-card:nth-child(3) { animation-delay: 70ms; }
-.pl-grid.is-ready .pl-card:nth-child(4) { animation-delay: 105ms; }
-.pl-grid.is-ready .pl-card:nth-child(n+5) { animation-delay: 140ms; }
+.pl-grid.is-ready.pl-grid--enter .pl-card:nth-child(1) { animation-delay: 0ms; }
+.pl-grid.is-ready.pl-grid--enter .pl-card:nth-child(2) { animation-delay: 30ms; }
+.pl-grid.is-ready.pl-grid--enter .pl-card:nth-child(3) { animation-delay: 60ms; }
+.pl-grid.is-ready.pl-grid--enter .pl-card:nth-child(4) { animation-delay: 90ms; }
+.pl-grid.is-ready.pl-grid--enter .pl-card:nth-child(n+5) { animation-delay: 110ms; }
+
+.pl-grid.is-ready:not(.pl-grid--enter) .pl-card {
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
 
 @keyframes pl-card-in {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;

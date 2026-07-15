@@ -34,7 +34,7 @@ window.XFreezeAuthConfig = {
     'skill-builder.html',
     'workflows.html',
     'use-cases.html',
-    'changelog.html',
+
   ],
   protectedPages: ['account.html'],
 

@@ -19,6 +19,12 @@
           : 'assets/videos/hero-liquid/liquid-light.mp4'
       );
       document.documentElement.style.backgroundColor = isDark ? '#000000' : '#f6f5f8';
+      /* Flag early: pin hero + GSAP (desktop / tablet landscape) */
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var desktop = window.matchMedia('(min-width: 768px)').matches;
+      if (!reduce && desktop) {
+        document.documentElement.classList.add('xf-cinematic-pending', 'xf-cinematic-home');
+      }
     })();
   </script>
   <style>
@@ -43,6 +49,7 @@
   <link rel="stylesheet" href="css/home-extras.css">
   <link rel="stylesheet" href="css/glass-backdrop.css">
   <link rel="stylesheet" href="css/home-hero-studio.css">
+  <link rel="stylesheet" href="css/cinematic.css">
   <link rel="stylesheet" href="css/auth.css">
   <link rel="stylesheet" href="css/support-toast.css">
 
@@ -532,38 +539,9 @@
       opacity: 1;
     }
 
-    /*
-     * Spotlight follows cursor — deep muted blue, low opacity (CTA-like)
-     */
+    /* Cursor color wash removed — too gimmicky */
     .bundles-spotlight {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      background:
-        radial-gradient(
-          ellipse 62% 54% at var(--spot-x, 50%) var(--spot-y, 42%),
-          rgba(70, 110, 150, 0.14) 0%,
-          rgba(50, 85, 125, 0.08) 32%,
-          rgba(35, 60, 95, 0.04) 58%,
-          transparent 82%
-        );
-      mix-blend-mode: normal;
-      opacity: 1;
-      transition: opacity 0.2s ease;
-    }
-
-    html.dark .bundles-spotlight {
-      background:
-        radial-gradient(
-          ellipse 64% 56% at var(--spot-x, 50%) var(--spot-y, 42%),
-          rgba(55, 95, 140, 0.16) 0%,
-          rgba(35, 70, 110, 0.1) 30%,
-          rgba(20, 45, 80, 0.05) 55%,
-          transparent 80%
-        );
-      mix-blend-mode: normal;
-      opacity: 1;
+      display: none !important;
     }
 
     @keyframes bundles-floor-scroll {
@@ -589,7 +567,7 @@
        the light site theme. */
     .artistic-card {
       overflow: hidden;
-      border-radius: 24px;
+      border-radius: 24px !important;
       box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.06), 0 2px 6px -2px rgb(0 0 0 / 0.04);
       transition: box-shadow 200ms ease, transform 200ms ease;
     }
@@ -599,6 +577,7 @@
     }
     .artistic-card img,
     .artistic-card video {
+      border-radius: inherit;
       transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
       display: block;
       width: 100%;
@@ -1300,8 +1279,7 @@
     html.dark #selected-work .simple-card,
     html.dark #xf-motion-prompts .xf-motion-card,
     html.dark #xf-motion-prompts .xf-motion-flow,
-    html.dark #xf-newsletter-cta .xf-newsletter-box,
-    html.dark #xf-final-cta .xf-final-cta-box {
+    html.dark #xf-newsletter-cta .xf-newsletter-box {
       background: rgba(18, 18, 18, 0.92) !important;
       border: 1px solid rgba(255, 255, 255, 0.14) !important;
       box-shadow:
@@ -1309,6 +1287,7 @@
         0 18px 40px -16px rgba(0, 0, 0, 0.8) !important;
       color: #f2f2f2 !important;
     }
+    /* Final CTA uses frosted glass (home-extras.css) — do not force opaque fill */
 
     html.dark #creator-library .bundles-stats-panel {
       color: #f2f2f2 !important;
@@ -1357,11 +1336,17 @@
 <body>
 
   <!-- ==================== HERO (studio - no video; local WIP) ==================== -->
-  <header id="hero-header" class="hero-header hero-header--studio relative overflow-hidden">
+  <!-- sticky/fixed pin shell: next sections slide over the hero -->
+  <header id="hero-header" class="hero-header hero-header--studio">
 
-    <!-- Liquid glass hero videos (local WIP - light/dark) -->
+    <!-- Liquid glass hero — layered stage for parallax depth -->
     <div class="hero-stage" aria-hidden="true">
       <div class="hero-stage__base"></div>
+      <div class="hero-stage__depth">
+        <span class="hero-stage__orb hero-stage__orb--a"></span>
+        <span class="hero-stage__orb hero-stage__orb--b"></span>
+        <span class="hero-stage__orb hero-stage__orb--c"></span>
+      </div>
       <div id="hero-video-stack" class="hero-video-stack hero-stage__video">
         <video
           id="hero-video-a"
@@ -1386,6 +1371,7 @@
         </video>
       </div>
       <div class="hero-stage__vignette"></div>
+      <div class="hero-stage__grain"></div>
     </div>
     <script>
       (function () {
@@ -1476,8 +1462,8 @@
           </h1>
           <p class="hero-lead" data-xf-hero-lead>Ready-made Imagine templates, motion prompts, and portable AI skills - built for creators, agencies, and product teams who need pro results without the prompt grind.</p>
           <div class="hero-actions">
-            <a href="templates.html" class="hero-btn hero-btn--primary">Browse templates</a>
-            <a href="skills.html" class="hero-btn hero-btn--ghost">Browse skills</a>
+            <a href="templates.html" class="hero-btn hero-btn--primary" data-xf-magnetic="0.32">Browse templates</a>
+            <a href="skills.html" class="hero-btn hero-btn--ghost" data-xf-magnetic="0.28">Browse skills</a>
           </div>
           <div class="hero-proof" aria-label="Highlights">
             <span class="hero-proof__chip"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Instant templates</span>
@@ -1503,6 +1489,8 @@
       </div>
     </div>
   </header>
+  <!-- Holds document flow height while hero is fixed/pinned -->
+  <div class="xf-hero-pin-spacer" aria-hidden="true"></div>
 
   <!-- ==================== SELECTED WORK ==================== -->
   <section id="selected-work" class="xf-glass-section border-t border-[#e5e7eb] bg-[#fafafa]" data-scroll-reveal>
@@ -1826,9 +1814,9 @@
   </section>
 
   <!-- ==================== SKILLS SPOTLIGHT ==================== -->
-  <section id="xf-skills-spotlight-section" class="xf-glass-section xf-glass-section--soft section border-t border-[#e5e7eb] py-20 md:py-24">
+  <section id="xf-skills-spotlight-section" class="xf-glass-section xf-glass-section--soft section border-t border-[#e5e7eb] py-20 md:py-24" data-scroll-reveal data-xf-skills-section>
     <div class="content-container">
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 max-w-3xl md:max-w-none">
+    <div class="scroll-reveal-in flex flex-col md:flex-row md:items-end md:justify-between gap-4 max-w-3xl md:max-w-none">
       <div class="max-w-2xl">
         <p class="xf-section-eyebrow">Skills</p>
         <h2 class="xf-section-title">Portable skills for every task<br>beyond Imagine.</h2>
@@ -1839,52 +1827,29 @@
         <a href="skill-builder.html" class="xf-explore-link">Skill Builder</a>
       </div>
     </div>
-    <div id="xf-skills-spotlight" class="xf-spotlight-grid xf-spotlight-grid--dynamic"></div>
+    <div id="xf-skills-spotlight" class="xf-spotlight-grid xf-spotlight-grid--dynamic" data-xf-stagger-in></div>
 
-    <div class="xf-combos-block">
+    <div class="xf-combos-block scroll-reveal-in" style="transition-delay: 80ms">
       <div class="xf-combos-block__head">
         <h3 class="xf-combos-block__title">Best workflow combos</h3>
         <p class="xf-combos-block__lead">Multi-step stacks that chain apps together - pick a combo, copy the skill, and run it in Grok or Cursor.</p>
       </div>
       <div class="xf-combos-group">
         <p class="xf-combos-label">Free combos</p>
-        <div id="xf-combos-free" class="xf-combos-grid xf-combos-grid--dynamic"></div>
+        <div id="xf-combos-free" class="xf-combos-grid xf-combos-grid--dynamic" data-xf-stagger-in></div>
       </div>
       <div class="xf-combos-group">
         <p class="xf-combos-label">Premium combos</p>
-        <div id="xf-combos-premium" class="xf-combos-grid xf-combos-grid--dynamic"></div>
+        <div id="xf-combos-premium" class="xf-combos-grid xf-combos-grid--dynamic" data-xf-stagger-in></div>
       </div>
     </div>
 
-    <div class="xf-spotlight-links mt-6 flex flex-wrap gap-3 text-sm">
+    <div class="xf-spotlight-links scroll-reveal-in mt-6 flex flex-wrap gap-3 text-sm" style="transition-delay: 120ms">
       <a href="workflows.html" class="font-semibold underline-offset-2 hover:underline">Workflow combos</a>
       <span class="xf-spotlight-links__sep" aria-hidden="true">·</span>
       <a href="connector-setup.html" class="font-semibold underline-offset-2 hover:underline">Connector setup</a>
       <span class="xf-spotlight-links__sep" aria-hidden="true">·</span>
       <a href="use-cases.html" class="font-semibold underline-offset-2 hover:underline">Use cases</a>
-    </div>
-    </div>
-  </section>
-
-  <!-- ==================== NEWSLETTER / UPDATES ==================== -->
-  <section id="xf-newsletter-cta" class="xf-glass-section section py-16 md:py-20 border-t border-[#e5e7eb]" data-scroll-reveal>
-    <div class="xf-glass-backdrop" aria-hidden="true">
-      <div class="xf-glass-backdrop__img"></div>
-      <div class="xf-glass-backdrop__mesh"></div>
-      <div class="xf-glass-backdrop__veil"></div>
-    </div>
-
-<div class="content-container">
-    <div class="scroll-reveal-in xf-newsletter-box xf-glass-panel">
-      <div>
-        <h3>Stay in the loop</h3>
-        <p>New templates, motion prompts, skills, and guides - follow @XFreeze or send a request. I post updates on the changelog every week.</p>
-      </div>
-      <div class="xf-newsletter-actions">
-        <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer" class="xf-newsletter-btn xf-newsletter-btn--primary"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i> Follow @XFreeze</a>
-        <a href="contact.html?topic=template" class="xf-newsletter-btn xf-newsletter-btn--secondary">Request a template</a>
-        <a href="changelog.html" class="xf-newsletter-btn xf-newsletter-btn--secondary">Changelog</a>
-      </div>
     </div>
     </div>
   </section>
@@ -1897,16 +1862,22 @@
       <div class="xf-glass-backdrop__veil"></div>
     </div>
 
-<div class="content-container">
-    <div class="scroll-reveal-in xf-final-cta-box">
-      <p class="xf-final-cta-eyebrow">Start creating faster</p>
-      <h2 class="xf-section-title">Skip the trial and error.<br>Copy the result.</h2>
-      <p class="xf-final-cta-lead">Open the library, find the look or task you need, and paste it in. Your next post, product shot, or clip is a click away - and browsing is completely free.</p>
-      <div class="xf-final-cta-actions">
-        <a href="templates.html" class="xf-final-cta-btn xf-final-cta-btn--primary">Browse the full library</a>
-        <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer" class="xf-final-cta-btn xf-final-cta-btn--ghost">Follow @XFreeze for weekly drops</a>
+    <div class="content-container">
+      <!-- Orbs sit behind the glass card so backdrop-filter has something to frost -->
+      <div class="xf-final-cta-stage scroll-reveal-in">
+        <span class="xf-final-cta-orb xf-final-cta-orb--a" aria-hidden="true"></span>
+        <span class="xf-final-cta-orb xf-final-cta-orb--b" aria-hidden="true"></span>
+        <span class="xf-final-cta-orb xf-final-cta-orb--c" aria-hidden="true"></span>
+        <div class="xf-final-cta-box">
+          <p class="xf-final-cta-eyebrow">Start creating faster</p>
+          <h2 class="xf-section-title">Skip the trial and error.<br>Copy the result.</h2>
+          <p class="xf-final-cta-lead">Open the library, find the look or task you need, and paste it in. Your next post, product shot, or clip is a click away - and browsing is completely free.</p>
+          <div class="xf-final-cta-actions">
+            <a href="templates.html" class="xf-final-cta-btn xf-final-cta-btn--primary">Browse the full library</a>
+            <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer" class="xf-final-cta-btn xf-final-cta-btn--ghost">Follow @XFreeze for weekly drops</a>
+          </div>
+        </div>
       </div>
-    </div>
     </div>
   </section>
 
@@ -2345,16 +2316,22 @@
       observer.observe(stack);
     }
 
-    /** Play only active section videos when visible; pause everything else. */
+    /**
+     * Standalone section videos (not dual-stack cycle). Cycle containers
+     * manage their own play/pause — observing both causes scroll thrash.
+     */
     function initSectionVideos() {
-      const videos = document.querySelectorAll('#section-experimental .section-video, #section-minimal .section-video, #xf-more-categories .section-video');
+      const videos = document.querySelectorAll(
+        '#section-experimental .section-video, #section-minimal .section-video, #xf-more-categories .section-video'
+      );
       if (!videos.length) return;
 
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           const video = entry.target;
+          /* Cycle stacks are owned by initSectionVideoCycling */
+          if (video.closest('[data-video-cycle]')) return;
           if (entry.isIntersecting) {
-            /* Dual-layer stacks only play the active layer */
             if (video.classList.contains('is-active') || !video.closest('.section-video-stack')) {
               video.play().catch(() => {});
             }
@@ -2362,9 +2339,10 @@
             video.pause();
           }
         });
-      }, { threshold: 0.35, rootMargin: '0px 0px -10% 0px' });
+      }, { threshold: 0.05, rootMargin: '15% 0px 15% 0px' });
 
       videos.forEach((video) => {
+        if (video.closest('[data-video-cycle]')) return;
         video.preload = 'none';
         observer.observe(video);
       });
@@ -2418,21 +2396,17 @@
       section._xfBundlesBgBound = true;
 
       let frame = null;
-      // Grid perspective: almost fixed; spotlight follows cursor fully
+      /* Subtle grid only — no cursor color spotlight */
       const GRID_DAMP = 0.03;
       const BASE_X = 50;
       const BASE_Y = 42;
       let gridX = BASE_X;
       let gridY = BASE_Y;
-      let spotX = BASE_X;
-      let spotY = BASE_Y;
 
       const applyPosition = () => {
         frame = null;
         section.style.setProperty('--mx', gridX.toFixed(2) + '%');
         section.style.setProperty('--my', gridY.toFixed(2) + '%');
-        section.style.setProperty('--spot-x', spotX.toFixed(2) + '%');
-        section.style.setProperty('--spot-y', spotY.toFixed(2) + '%');
       };
 
       const onMove = (event) => {
@@ -2440,8 +2414,6 @@
         if (!rect.width || !rect.height) return;
         const rawX = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
         const rawY = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100));
-        spotX = rawX;
-        spotY = rawY;
         gridX = BASE_X + (rawX - BASE_X) * GRID_DAMP;
         gridY = BASE_Y + (rawY - BASE_Y) * GRID_DAMP;
         if (!frame) frame = requestAnimationFrame(applyPosition);
@@ -2451,8 +2423,6 @@
       section.addEventListener('pointermove', onMove, { passive: true });
 
       section.addEventListener('mouseleave', () => {
-        spotX = BASE_X;
-        spotY = BASE_Y;
         gridX = BASE_X;
         gridY = BASE_Y;
         if (!frame) frame = requestAnimationFrame(applyPosition);
@@ -3108,32 +3078,78 @@
             if (card._isSwapping) return;
             stack.active.classList.add('is-active');
             stack.active.classList.remove('is-pending');
-            playIfVisible(stack.active);
+            /* Force play while container is considered visible */
+            stack.active.muted = true;
+            const p = stack.active.play();
+            if (p && typeof p.catch === 'function') p.catch(() => {});
           });
         };
 
+        /*
+         * Keep playing while cards are roughly on screen. Previous 0.35 threshold
+         * + negative rootMargin paused clips mid-scroll (Lenis smooth scroll).
+         * Debounce leave so brief intersection flickers don't stop playback.
+         */
+        let hideTimer = null;
         const visObserver = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
-            container._isVisible = entry.isIntersecting;
             if (entry.isIntersecting) {
+              if (hideTimer) {
+                clearTimeout(hideTimer);
+                hideTimer = null;
+              }
+              container._isVisible = true;
               startCycle();
               if (container._cycleReady) {
                 resumeVisibleVideos();
                 scheduleAllCards(120);
               }
             } else {
-              cards.forEach((card) => {
-                clearCardSchedule(card);
-              });
-              /* Pause only; keep swap state so we don't flash on return */
-              container.querySelectorAll('.section-video').forEach((video) => {
-                video.pause();
-              });
+              if (hideTimer) clearTimeout(hideTimer);
+              hideTimer = setTimeout(() => {
+                /* Still off-screen after grace period */
+                if (container._isVisible === false) return;
+                /* Re-check geometry — Lenis can fire stale leave events */
+                const rect = container.getBoundingClientRect();
+                const vh = window.innerHeight || 0;
+                const stillNear =
+                  rect.bottom > -80 && rect.top < vh + 80;
+                if (stillNear) {
+                  container._isVisible = true;
+                  resumeVisibleVideos();
+                  return;
+                }
+                container._isVisible = false;
+                cards.forEach((card) => {
+                  clearCardSchedule(card);
+                });
+                container.querySelectorAll('.section-video').forEach((video) => {
+                  video.pause();
+                });
+              }, 280);
             }
           });
-        }, { threshold: 0.35, rootMargin: '-8% 0px -12% 0px' });
+        }, { threshold: 0, rootMargin: '25% 0px 25% 0px' });
 
         visObserver.observe(container);
+
+        /* Safety: if user scrolls while still near section, keep clips alive */
+        const onScrollNudge = () => {
+          if (!container._cycleReady) return;
+          const rect = container.getBoundingClientRect();
+          const vh = window.innerHeight || 0;
+          if (rect.bottom > 40 && rect.top < vh - 40) {
+            if (!container._isVisible) {
+              container._isVisible = true;
+              startCycle();
+            }
+            resumeVisibleVideos();
+          }
+        };
+        window.addEventListener('scroll', onScrollNudge, { passive: true });
+        if (window.XFreezeLenis && typeof window.XFreezeLenis.on === 'function') {
+          window.XFreezeLenis.on('scroll', onScrollNudge);
+        }
       });
     }
 
@@ -3146,6 +3162,8 @@
     });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/auth.js"></script>
   <script src="js/site-nav.js"></script>
@@ -3190,6 +3208,8 @@
     })();
   </script>
   <script src="js/motion.js"></script>
+  <!-- Local cinematic layer — do not ship until finalized -->
+  <script src="js/cinematic.js"></script>
 
 </body>
 </html>

@@ -95,12 +95,12 @@ html.dark .xf-glass-section:not(:has(.xf-glass-backdrop))::after {
   display: none !important;
 }
 
-/* Final CTA light: one selective soft deep-blue wash (same policy as dark) */
+/* Final CTA light: quiet neutral wash (no heavy blue) */
 html:not(.dark) #xf-final-cta .xf-glass-backdrop__img {
   opacity: 1;
   background:
-    radial-gradient(ellipse 62% 54% at 70% 30%, rgba(70, 110, 150, 0.12) 0%, transparent 62%),
-    radial-gradient(ellipse 48% 42% at 20% 75%, rgba(50, 85, 125, 0.07) 0%, transparent 58%);
+    radial-gradient(ellipse 62% 54% at 70% 30%, rgba(226, 232, 240, 0.35) 0%, transparent 62%),
+    radial-gradient(ellipse 48% 42% at 20% 75%, rgba(241, 245, 249, 0.25) 0%, transparent 58%);
 }
 
 html:not(.dark) #xf-final-cta .xf-glass-backdrop__veil {
@@ -122,8 +122,8 @@ html:not(.dark) #xf-final-cta.xf-glass-section:not(:has(.xf-glass-backdrop))::be
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 62% 54% at 70% 30%, rgba(70, 110, 150, 0.12) 0%, transparent 62%),
-    radial-gradient(ellipse 48% 42% at 20% 75%, rgba(50, 85, 125, 0.07) 0%, transparent 58%);
+    radial-gradient(ellipse 62% 54% at 70% 30%, rgba(226, 232, 240, 0.3) 0%, transparent 62%),
+    radial-gradient(ellipse 48% 42% at 20% 75%, rgba(241, 245, 249, 0.22) 0%, transparent 58%);
 }
 
 html:not(.dark) #xf-final-cta.xf-glass-section:not(:has(.xf-glass-backdrop))::after {
@@ -259,8 +259,7 @@ html:not(.dark) .xf-glass-section .xf-motion-card,
 html:not(.dark) .xf-glass-section .xf-motion-flow,
 html:not(.dark) .xf-glass-section .bundles-stats-panel,
 html:not(.dark) .xf-glass-section .xf-newsletter-box,
-html:not(.dark) .xf-glass-section .xf-final-cta-box,
-html:not(.dark) .xf-glass-section .xf-glass-panel {
+html:not(.dark) .xf-glass-section .xf-glass-panel:not(.xf-final-cta-box) {
   border-color: rgba(255, 255, 255, 0.58);
   background: rgba(255, 255, 255, 0.52);
   backdrop-filter: blur(16px) saturate(1.15);
@@ -273,8 +272,7 @@ html.dark .xf-glass-section .xf-motion-card,
 html.dark .xf-glass-section .xf-motion-flow,
 html.dark .xf-glass-section .bundles-stats-panel,
 html.dark .xf-glass-section .xf-newsletter-box,
-html.dark .xf-glass-section .xf-final-cta-box,
-html.dark .xf-glass-section .xf-glass-panel {
+html.dark .xf-glass-section .xf-glass-panel:not(.xf-final-cta-box) {
   border-color: rgba(255, 255, 255, 0.09);
   background: rgba(0, 0, 0, 0.52);
   backdrop-filter: blur(20px) saturate(1.15);
@@ -283,6 +281,8 @@ html.dark .xf-glass-section .xf-glass-panel {
     0 1px 0 rgba(255, 255, 255, 0.05) inset,
     0 16px 36px -14px rgba(0, 0, 0, 0.7);
 }
+
+/* Final CTA uses dedicated glass styling in home-extras.css */
 
 /* Skills hero soft glass under existing chrome */
 .skills-hero-section.xf-glass-section {

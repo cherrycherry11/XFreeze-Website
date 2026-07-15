@@ -92,14 +92,22 @@ html.dark .site-nav.page-nav {
   background: var(--nav-bg, rgba(255, 255, 255, 0.94));
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border, #e5e7eb);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  /* Soft hairline — never a hard black edge in light mode */
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
 }
 
 html.dark .site-nav:not(.page-nav).is-scrolled {
-  background: var(--nav-bg, rgba(0, 0, 0, 0.94));
-  border-bottom-color: var(--border, #1a1a1a);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  background: var(--nav-bg, rgba(0, 0, 0, 0.96));
+  /* Avoid light/white under-nav edge on dark surfaces */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Soften page-nav bottom edge in light mode too */
+html:not(.dark) .site-nav.page-nav {
+  border-bottom-color: rgba(15, 23, 42, 0.06);
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.03);
 }
 
 /* Solid theme tokens when bar has background (light + dark use same structure) */

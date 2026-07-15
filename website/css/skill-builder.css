@@ -112,6 +112,16 @@ html.dark .skills-builder-promo__icon {
   text-align: center;
 }
 
+/* Centered stack — never side-by-side (word-split / GSAP used to shove lead right) */
+.sb-hero .content-container,
+.sb-hero .sb-hero__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
 .sb-hero__eyebrow {
   margin: 0 0 0.5rem;
   font-size: 0.75rem;
@@ -122,18 +132,49 @@ html.dark .skills-builder-promo__icon {
 }
 
 .sb-hero h1 {
-  margin: 0;
+  margin: 0 auto;
+  max-width: none;
   font-size: clamp(1.75rem, 4vw, 2.25rem);
   font-weight: 500;
   letter-spacing: -0.03em;
+  line-height: 1.12;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .sb-hero h1 {
+    white-space: normal;
+  }
 }
 
 .sb-hero__lead {
   margin: var(--space-after-title, 0.75rem) auto 0;
-  max-width: 36rem;
+  max-width: 34rem;
+  width: 100%;
   font-size: var(--type-sub-size, 0.9375rem);
   line-height: var(--line-body, 1.6);
   color: var(--text-secondary, #52525b);
+  text-align: center;
+}
+
+/* Lock against cinematic word-split leftovers */
+html.xf-skill-builder-page .sb-hero,
+html.xf-skill-builder-page .sb-hero h1,
+html.xf-skill-builder-page .sb-hero .xf-word,
+html.xf-skill-builder-page .sb-hero .xf-word__inner,
+html.xf-skill-builder-page .sb-hero__eyebrow,
+html.xf-skill-builder-page .sb-hero__lead,
+html.xf-cinematic .sb-hero h1,
+html.xf-cinematic .sb-hero .xf-word__inner {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+html.xf-skill-builder-page .sb-body .scroll-reveal-in,
+html.xf-skill-builder-page .sb-panel {
+  opacity: 1 !important;
+  transform: none !important;
 }
 
 .sb-body {

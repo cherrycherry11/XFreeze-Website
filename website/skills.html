@@ -12,6 +12,12 @@
       var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
       document.documentElement.classList.toggle('dark', isDark);
+      try {
+        var reduceM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var desktopM = window.matchMedia('(min-width: 768px)').matches;
+        if (!reduceM && desktopM) document.documentElement.classList.add('xf-cinematic-pending');
+      } catch (e) {}
+
       /* Preload theme-correct banner poster + video so first paint isn't empty */
       var poster = isDark
         ? 'assets/images/skills-banner-poster-dark.jpg'
@@ -40,6 +46,7 @@
   <link rel="stylesheet" href="css/theme-switch.css">
   <link rel="stylesheet" href="css/scroll-reveal.css">
   <link rel="stylesheet" href="css/motion.css">
+  <link rel="stylesheet" href="css/cinematic.css">
   <link rel="stylesheet" href="css/site-footer.css">
   <link rel="stylesheet" href="css/site-nav.css">
   <link rel="stylesheet" href="css/site-mobile.css">
@@ -401,12 +408,18 @@
     syncSkillsBannerVideo();
 
     XFreezeSkillsBrowse.init();
+    if (window.XFreezeCinematic && window.XFreezeCinematic.refresh) {
+      window.setTimeout(function () { window.XFreezeCinematic.refresh(); }, 200);
+    }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/auth.js"></script>
   <script src="js/site-nav.js"></script>
   <script src="js/site-footer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script src="js/motion.js"></script>
+  <script src="js/cinematic.js"></script>
 </body>
 </html>

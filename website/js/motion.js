@@ -16,11 +16,16 @@
     var saveData = navigator.connection && navigator.connection.saveData;
     if (isCoarse || isNarrow || saveData) return null;
 
+    /* Cinematic: lower lerp = heavier, smoother glide */
     var lenis = new Lenis({
-      lerp: 0.12,
+      lerp: 0.075,
       smoothWheel: true,
-      wheelMultiplier: 0.85,
+      wheelMultiplier: 0.78,
       touchMultiplier: 1,
+      duration: 1.15,
+      easing: function (t) {
+        return Math.min(1, 1.001 - Math.pow(2, -10 * t));
+      },
     });
     function raf(time) {
       lenis.raf(time);
@@ -72,7 +77,23 @@
     function measure() {
       ticking = false;
       var scrolled;
-      if (hero) {
+      /*
+       * Sticky cinematic hero stays in view (bottom ~ 100vh), so "hero bottom"
+       * never leaves the viewport. Detect cover via next section instead.
+       */
+      var stickyHero =
+        hero &&
+        (document.documentElement.classList.contains('xf-cinematic') ||
+          document.documentElement.classList.contains('xf-cinematic-pending'));
+      if (stickyHero) {
+        var next = document.getElementById('selected-work');
+        /* Solid bar as soon as the next panel starts covering the hero */
+        var top = next ? next.getBoundingClientRect().top : hero.getBoundingClientRect().bottom;
+        var coverThreshold = Math.max(SCROLL_ON, window.innerHeight * 0.12);
+        if (!isScrolled && top <= coverThreshold) isScrolled = true;
+        else if (isScrolled && top > coverThreshold + 40) isScrolled = false;
+        scrolled = isScrolled;
+      } else if (hero) {
         var bottom = hero.getBoundingClientRect().bottom;
         if (!isScrolled && bottom <= SCROLL_ON) isScrolled = true;
         else if (isScrolled && bottom > SCROLL_OFF) isScrolled = false;

@@ -11,7 +11,7 @@
  */
 
 html.dark {
-  --xf-nebula: url("../assets/images/dark-gradient-nebula.jpg");
+  --xf-nebula: url("../assets/images/dark-gradient-nebula.png");
 }
 
 /* ── 1. Auth (login / signup) ── */
@@ -113,11 +113,7 @@ html.dark #xf-final-cta.xf-glass-section:not(:has(.xf-glass-backdrop))::after {
   -webkit-backdrop-filter: blur(14px) !important;
 }
 
-/* CTA card: quiet glass, no second full nebula */
-html.dark .xf-final-cta-box::before {
-  content: none !important;
-  display: none !important;
-}
+/* CTA card glass sheen lives in home-extras.css (do not kill ::before) */
 
 /* Style Edit + Product: plain (no nebula) */
 html.dark #section-experimental::before,

@@ -305,6 +305,7 @@
       return;
     }
 
+    var firstPaint = !grid.classList.contains('is-ready');
     grid.innerHTML = state.filtered
       .map(function (row, idx) {
         var p = row.prompt;
@@ -351,6 +352,14 @@
       .join('');
 
     grid.classList.add('is-ready');
+    if (firstPaint) {
+      grid.classList.add('pl-grid--enter');
+      window.setTimeout(function () {
+        grid.classList.remove('pl-grid--enter');
+      }, 700);
+    } else {
+      grid.classList.remove('pl-grid--enter');
+    }
     if (window.XFreezeScrollReveal && window.XFreezeScrollReveal.reveal) {
       window.XFreezeScrollReveal.reveal(grid);
     }

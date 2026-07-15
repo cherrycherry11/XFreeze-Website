@@ -56,6 +56,12 @@
       })
       .join('');
     el.classList.add('is-ready');
+    /* Let cinematic layer rebind stagger after inject */
+    if (window.XFreezeCinematic && typeof window.XFreezeCinematic.refresh === 'function') {
+      window.setTimeout(function () {
+        window.XFreezeCinematic.refresh();
+      }, 40);
+    }
   }
 
   function renderComboCard(combo, tier) {
@@ -91,21 +97,11 @@
       premEl.innerHTML = combos.premium.map(function (c) { return renderComboCard(c, 'premium'); }).join('');
       premEl.classList.add('is-ready');
     }
-  }
-
-  function renderChangelogTeaser() {
-    var el = document.getElementById('xf-changelog-teaser');
-    if (!el || !site.changelog || !site.changelog.length) return;
-    var latest = site.changelog[0];
-    el.innerHTML =
-      '<article class="xf-changelog-teaser-card">' +
-      '<time datetime="' + esc(latest.date) + '">' + esc(latest.date) + '</time>' +
-      '<h3>' + esc(latest.title) + '</h3>' +
-      '<ul>' +
-      latest.items.map(function (i) { return '<li>' + esc(i) + '</li>'; }).join('') +
-      '</ul>' +
-      '<a href="changelog.html" class="xf-changelog-teaser-link">Full changelog <i class="fa-solid fa-arrow-right text-xs" aria-hidden="true"></i></a>' +
-      '</article>';
+    if (window.XFreezeCinematic && typeof window.XFreezeCinematic.refresh === 'function') {
+      window.setTimeout(function () {
+        window.XFreezeCinematic.refresh();
+      }, 40);
+    }
   }
 
 
@@ -175,7 +171,6 @@
     renderStartHere();
     renderSkillsSpotlight();
     renderFeaturedCombos();
-    renderChangelogTeaser();
     renderMotionPrompts();
     if (window.XFreezeScrollReveal) window.XFreezeScrollReveal.refresh();
   }

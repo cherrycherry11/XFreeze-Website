@@ -163,21 +163,104 @@ html.dark .skills-browse-grid:empty::before {
   }
 }
 
-/* Hero (shared) */
+/*
+ * Hero stack — dead-center on the page.
+ * Title is always 2 lines (via <br>) and always text-align: center,
+ * including after cinematic word-split wraps each line.
+ */
 .skills-hero {
-  text-align: center;
+  text-align: center !important;
   max-width: 42rem;
-  margin-inline: auto;
-  padding-bottom: 0;
-}
-
-.skills-banner .skills-hero {
-  max-width: min(48rem, 100%);
   width: 100%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-bottom: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+}
+
+.skills-banner .skills-hero {
+  max-width: min(44rem, 100%);
+  width: 100%;
+}
+
+.skills-banner .skills-hero-eyebrow {
+  margin: 0 0 0.85rem;
+  line-height: 1.3;
+  text-align: center !important;
+  width: 100%;
+}
+
+.skills-banner .skills-hero h1,
+.skills-hero-section .skills-hero h1,
+.skills-hero h1 {
+  display: block;
+  margin: 0 auto !important;
+  width: 100%;
+  max-width: 100%;
+  line-height: 1.12;
+  text-align: center !important;
+  text-wrap: unset;
+}
+
+/* Word-split structure: each <br> line is one full-width centered row */
+.skills-hero h1.is-split,
+.skills-hero h1.is-split .xf-hero-line,
+.skills-banner .skills-hero h1.is-split,
+.skills-banner .skills-hero h1.is-split .xf-hero-line {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+}
+
+.skills-hero h1.is-split .xf-hero-line {
+  white-space: nowrap;
+}
+
+.skills-hero h1.is-split .xf-word {
+  display: inline-block !important;
+  float: none !important;
+  vertical-align: baseline;
   text-align: center;
+}
+
+.skills-hero h1.is-split .xf-hero-line .xf-word:last-child {
+  margin-right: 0 !important;
+}
+
+.skills-banner .skills-hero-lead {
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  width: 100%;
+}
+
+.skills-banner .skills-hero-actions {
+  justify-content: center !important;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 640px) {
+  .skills-hero h1.is-split .xf-hero-line {
+    white-space: normal;
+  }
+}
+
+.skills-banner .skills-hero-lead {
+  margin: 0.9rem auto 0 !important;
+  max-width: 34rem;
+  width: 100%;
+  font-size: 0.9875rem;
+  line-height: 1.58;
+  letter-spacing: -0.011em;
+  text-align: center !important;
+  text-wrap: pretty;
 }
 
 html:not(.dark) .skills-banner .skills-hero-eyebrow {
@@ -205,7 +288,7 @@ html.dark .skills-banner .skills-hero-lead {
 }
 
 .skills-banner .skills-hero-actions {
-  margin-top: 1.75rem;
+  margin-top: 1.5rem;
   gap: 0.75rem;
 }
 
@@ -243,8 +326,8 @@ html.dark .skills-banner .skills-hero-actions .xf-btn--ghost-on-light {
   justify-items: center;
   width: min(34rem, 100%);
   max-width: 100%;
-  margin: 2.25rem auto 0 !important;
-  padding: 1.25rem 0 0 !important;
+  margin: 1.75rem auto 0 !important;
+  padding: 1.15rem 0 0 !important;
   gap: 0 !important;
   border: none !important;
   border-top: 1px solid var(--border, #e5e7eb) !important;

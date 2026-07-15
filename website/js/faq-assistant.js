@@ -152,7 +152,7 @@
     { terms: ['click template', 'happens when', 'open template', 'use template'], index: 1 },
     { terms: ['free', 'cost', 'price', 'pay money', 'charge'], index: 2 },
     { terms: ['difference', 'template vs', 'template and skill', 'skill vs', 'motion prompt'], index: 3 },
-    { terms: ['how often', 'new stuff', 'updates', 'weekly', 'changelog'], index: 4 },
+    { terms: ['how often', 'new stuff', 'updates', 'weekly'], index: 4 },
     { terms: ['claude', 'cursor', 'outside grok', 'other ai'], index: 5 },
     { terms: ['connector', 'gmail', 'notion', 'slack', 'drive'], index: 6 },
     { terms: ['combo', 'workflow', 'chain skills'], index: 7 },

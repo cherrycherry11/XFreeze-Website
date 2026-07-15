@@ -104,17 +104,29 @@
     });
   }
 
+  function cinematicOwnsReveals() {
+    var root = document.documentElement;
+    return (
+      root.classList.contains('xf-cinematic') ||
+      root.classList.contains('xf-cinematic-pending')
+    );
+  }
+
   function init() {
+    /* Home cinematic (GSAP) owns entrance motion — skip CSS reveals there */
+    if (cinematicOwnsReveals()) return;
     revealInViewNow();
     observeNew();
     /* Second pass after layout/fonts settle */
     window.requestAnimationFrame(function () {
+      if (cinematicOwnsReveals()) return;
       revealInViewNow();
       observeNew();
     });
   }
 
   function refresh() {
+    if (cinematicOwnsReveals()) return;
     revealInViewNow();
     observeNew();
   }

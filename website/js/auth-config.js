@@ -20,7 +20,6 @@ var XF_PUBLIC_PAGES = [
   'skill-builder.html',
   'workflows.html',
   'use-cases.html',
-  'changelog.html',
   'checkout-success.html',
   'checkout-cancel.html',
 ];

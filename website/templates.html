@@ -10,6 +10,12 @@
       var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
       document.documentElement.classList.toggle('dark', isDark);
+      try {
+        var reduceM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var desktopM = window.matchMedia('(min-width: 768px)').matches;
+        if (!reduceM && desktopM) document.documentElement.classList.add('xf-cinematic-pending');
+      } catch (e) {}
+
     })();
   </script>
   <script src="js/site-config.js"></script>
@@ -23,6 +29,7 @@
   <link rel="stylesheet" href="css/dark-nebula-bg.css">
   <link rel="stylesheet" href="css/scroll-reveal.css">
   <link rel="stylesheet" href="css/motion.css">
+  <link rel="stylesheet" href="css/cinematic.css">
   <link rel="stylesheet" href="css/site-footer.css">
   <link rel="stylesheet" href="css/site-nav.css">
   <link rel="stylesheet" href="css/site-mobile.css">
@@ -917,7 +924,8 @@
         </details>
       </div>
     </div>
-    <div id="visual-templates-grid" data-scroll-stagger></div>
+    <!-- No data-scroll-stagger: opacity:0 children fought dynamic re-renders -->
+    <div id="visual-templates-grid"></div>
   </main>
 
   <a href="contact.html?topic=template" class="xf-request-cta" title="Missing a template? Request one">
@@ -1285,10 +1293,10 @@
 
       grid._xfSupportBound = false;
       bindTemplateActions(grid);
+      grid.classList.add('is-revealed', 'is-cinematic-revealed');
 
       if (window.XFreezeScrollReveal) {
         window.XFreezeScrollReveal.reveal(grid);
-        window.XFreezeScrollReveal.refresh();
       }
     }
 
@@ -1324,8 +1332,14 @@
       initTierFilters();
       initVisualTemplates();
       initTemplateSearch();
-      if (window.XFreezeScrollReveal) {
-        window.XFreezeScrollReveal.refresh();
+      /* Keep filters/search solid; mark grid revealed (no GSAP re-bind thrash) */
+      document.querySelectorAll('.templates-main .scroll-reveal-in').forEach(function (el) {
+        el.classList.add('is-revealed', 'is-cinematic-revealed');
+      });
+      var gridEl = document.getElementById('visual-templates-grid');
+      if (gridEl) gridEl.classList.add('is-revealed', 'is-cinematic-revealed');
+      if (window.XFreezeCinematic && window.XFreezeCinematic.refresh) {
+        window.XFreezeCinematic.refresh();
       }
     }
 
@@ -1350,6 +1364,9 @@
   <script src="js/auth.js"></script>
   <script src="js/site-nav.js"></script>
   <script src="js/site-footer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script src="js/motion.js"></script>
+  <script src="js/cinematic.js"></script>
 </body>
 </html>

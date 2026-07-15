@@ -32,13 +32,20 @@
     html.dark { background-color: #000000; }
   </style>
   <script src="js/auth-config.js"></script>
+  <!-- Faster CDN handshakes -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = { darkMode: 'class' };
   </script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
   <link rel="stylesheet" href="css/site-fonts.css">
-<link rel="stylesheet" href="css/theme-switch.css">
+  <link rel="stylesheet" href="css/theme-switch.css">
   <link rel="stylesheet" href="css/scroll-reveal.css">
   <link rel="stylesheet" href="css/motion.css">
   <link rel="stylesheet" href="css/site-footer.css">
@@ -52,6 +59,18 @@
   <link rel="stylesheet" href="css/cinematic.css">
   <link rel="stylesheet" href="css/auth.css">
   <link rel="stylesheet" href="css/support-toast.css">
+  <style>
+    /* Skip layout work for off-screen showcase sections */
+    #section-experimental,
+    #section-minimal,
+    #xf-more-categories,
+    #xf-motion-prompts,
+    #xf-skills-spotlight-section,
+    #xf-final-cta {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 520px;
+    }
+  </style>
 
 
 
@@ -1884,10 +1903,11 @@
   <footer class="xf-site-footer" data-scroll-reveal data-xf-footer-root></footer>
 
 
-  <script src="js/scroll-reveal.js"></script>
-  <script src="js/support-toast.js"></script>
-  <script src="data/visual-templates-data.js"></script>
-  <script src="data/before-after-videos.js"></script>
+  <script src="js/scroll-reveal.js" defer></script>
+  <script src="js/support-toast.js" defer></script>
+  <!-- Heavy catalog data: load after first paint (marquee only) -->
+  <script src="data/visual-templates-data.js" defer></script>
+  <script src="data/before-after-videos.js" defer></script>
   <script>
     // Tailwind script (optional config)
     function initTailwind() {
@@ -2138,7 +2158,8 @@
     function buildCollectionMarqueeImages() {
       if (typeof visualTemplates === 'undefined' || !visualTemplates.length) return [];
 
-      const target = 56;
+      /* Fewer slides = fewer image requests (duplicated for seamless loop) */
+      const target = 24;
       const productPool = randomShuffle(
         visualTemplates.filter(function (t) { return t && t.img && t.cat === 'Product'; })
       );
@@ -2217,16 +2238,19 @@
       track1.classList.remove('animate-marquee', 'is-marquee-ready');
       track1._xfMarqueeReady = false;
 
-      const imagesHTML = images.map(function (item) {
+      const imagesHTML = images.map(function (item, i) {
         const catHref = 'templates.html?cat=' + encodeURIComponent(item.cat);
+        /* Only first few need early decode; rest stay lazy */
+        const loadAttr = i < 6 ? 'loading="eager" fetchpriority="low"' : 'loading="lazy"';
         return (
           '<div class="xf-marquee-slide py-4">' +
           '<a href="' + escMarqueeAttr(catHref) + '"' +
           ' class="block rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0a0a0a]"' +
           ' aria-label="Browse ' + escMarqueeAttr(item.cat) + ' templates">' +
           '<img src="' + escMarqueeAttr(item.src) + '"' +
-          ' loading="lazy"' +
+          ' ' + loadAttr +
           ' decoding="async"' +
+          ' width="400" height="533"' +
           ' class="rounded-2xl border border-[#e5e7eb] shadow-sm"' +
           ' alt="' + escMarqueeAttr(item.alt) + '">' +
           '</a></div>'
@@ -2607,7 +2631,7 @@
       return card._videoStack;
     }
 
-    /** Decode the first frame so scroll-in never shows empty cards. */
+    /** Decode first frame only when card is near view (keeps HQ files, avoids full-page video download). */
     function warmFirstFrame(card) {
       const stack = ensureVideoStack(card);
       if (!stack || !stack.active || card._firstFrameWarming) return;
@@ -2616,18 +2640,25 @@
       const src = source && (source.getAttribute('src') || source.src);
       if (!src) return;
 
+      /* Save-Data / slow links: skip eager decode entirely */
+      try {
+        if (navigator.connection && (navigator.connection.saveData || /2g/.test(navigator.connection.effectiveType || ''))) {
+          card.classList.add('is-video-ready');
+          return;
+        }
+      } catch (e) { /* ignore */ }
+
       card._firstFrameWarming = true;
       video.muted = true;
       video.playsInline = true;
-      video.preload = 'auto';
+      video.preload = 'metadata';
 
       const markReady = () => {
         video.classList.add('is-frame-ready');
         card.classList.add('is-video-ready');
         try {
-          if (video.currentTime < 0.04) video.currentTime = 0.05;
+          if (video.readyState >= 2 && video.currentTime < 0.04) video.currentTime = 0.05;
         } catch (e) { /* ignore */ }
-        /* Hold first frame until the section is visible */
         video.pause();
       };
 
@@ -2641,6 +2672,7 @@
       };
       video.addEventListener('loadeddata', onReady, { once: true });
       video.addEventListener('canplay', onReady, { once: true });
+      /* Only force network when close; cycle start will raise preload to auto */
       try {
         video.load();
       } catch (e) { /* ignore */ }
@@ -2664,11 +2696,11 @@
           stack.idle.pause();
           stack.idle.preload = 'none';
         }
-        /* Warm first frame ASAP so scroll-reveal is never empty */
-        warmFirstFrame(card);
+        /* Keep HQ files on disk — do NOT warm every video on load (was ~250MB download) */
+        if (stack.active) stack.active.preload = 'none';
       });
 
-      /* Also warm when section is still below the fold (large rootMargin) */
+      /* Only decode when a showcase section is near the viewport */
       if (!window._xfWarmVideoIO) {
         window._xfWarmVideoIO = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
@@ -2677,7 +2709,7 @@
               warmFirstFrame(card);
             });
           });
-        }, { rootMargin: '140% 0px 40% 0px', threshold: 0 });
+        }, { rootMargin: '35% 0px 25% 0px', threshold: 0.01 });
 
         document.querySelectorAll('[data-video-cycle]').forEach((el) => {
           window._xfWarmVideoIO.observe(el);
@@ -3161,14 +3193,15 @@
       bootShowcaseVideos();
     });
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/site-nav.js"></script>
-  <script src="js/site-footer.js"></script>
-  <script src="js/home-extras.js"></script>
+  <!-- Heavy motion libs: defer so hero paints first (order preserved) -->
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="js/auth.js" defer></script>
+  <script src="js/site-nav.js" defer></script>
+  <script src="js/site-footer.js" defer></script>
+  <script src="js/home-extras.js" defer></script>
   <script>
     (function () {
       var root = document.getElementById('xf-motion-showcase');
@@ -3207,9 +3240,8 @@
       });
     })();
   </script>
-  <script src="js/motion.js"></script>
-  <!-- Local cinematic layer — do not ship until finalized -->
-  <script src="js/cinematic.js"></script>
+  <script src="js/motion.js" defer></script>
+  <script src="js/cinematic.js" defer></script>
 
 </body>
 </html>

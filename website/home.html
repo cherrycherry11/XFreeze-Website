@@ -12,12 +12,14 @@
       var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
       document.documentElement.classList.toggle('dark', isDark);
-      document.documentElement.setAttribute(
-        'data-hero-video',
-        isDark
-          ? 'assets/videos/hero-liquid/liquid-dark.mp4'
-          : 'assets/videos/hero-liquid/liquid-light.mp4'
-      );
+      var heroVideo = isDark
+        ? 'assets/videos/hero-liquid/liquid-dark.mp4'
+        : 'assets/videos/hero-liquid/liquid-light.mp4';
+      var heroPoster = isDark
+        ? 'assets/images/hero/hero-liquid-poster-dark.jpg'
+        : 'assets/images/hero/hero-liquid-poster-light.jpg';
+      document.documentElement.setAttribute('data-hero-video', heroVideo);
+      document.documentElement.setAttribute('data-hero-poster', heroPoster);
       document.documentElement.style.backgroundColor = isDark ? '#000000' : '#f6f5f8';
       /* Flag early: pin hero + GSAP (desktop / tablet landscape) */
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -25,6 +27,20 @@
       if (!reduce && desktop) {
         document.documentElement.classList.add('xf-cinematic-pending', 'xf-cinematic-home');
       }
+      /* Inject preload as early as possible so backdrop starts downloading immediately */
+      var prePoster = document.createElement('link');
+      prePoster.rel = 'preload';
+      prePoster.as = 'image';
+      prePoster.href = heroPoster;
+      prePoster.fetchPriority = 'high';
+      document.head.appendChild(prePoster);
+      var preVid = document.createElement('link');
+      preVid.rel = 'preload';
+      preVid.as = 'video';
+      preVid.href = heroVideo;
+      preVid.type = 'video/mp4';
+      preVid.fetchPriority = 'high';
+      document.head.appendChild(preVid);
     })();
   </script>
   <style>
@@ -1358,9 +1374,9 @@
   <!-- sticky/fixed pin shell: next sections slide over the hero -->
   <header id="hero-header" class="hero-header hero-header--studio">
 
-    <!-- Liquid glass hero — layered stage for parallax depth -->
+    <!-- Liquid glass hero — poster paints instantly; video streams after (faststart) -->
     <div class="hero-stage" aria-hidden="true">
-      <div class="hero-stage__base"></div>
+      <div class="hero-stage__base" id="hero-stage-base"></div>
       <div class="hero-stage__depth">
         <span class="hero-stage__orb hero-stage__orb--a"></span>
         <span class="hero-stage__orb hero-stage__orb--b"></span>
@@ -1373,7 +1389,7 @@
           muted
           loop
           playsinline
-          preload="metadata"
+          preload="auto"
           class="hero-video-layer is-active"
         >
           <source type="video/mp4">
@@ -1395,18 +1411,35 @@
     <script>
       (function () {
         var src = document.documentElement.getAttribute('data-hero-video');
+        var poster = document.documentElement.getAttribute('data-hero-poster');
+        var base = document.getElementById('hero-stage-base');
         var hero = document.getElementById('hero-video-a');
         var source = hero && hero.querySelector('source');
         if (!hero || !source || !src) return;
+
+        /* Instant backdrop: paint still frame under the video while it streams */
+        if (poster) {
+          if (base) {
+            base.style.backgroundImage = 'url("' + poster + '")';
+            base.style.backgroundSize = 'cover';
+            base.style.backgroundPosition = 'center';
+          }
+          hero.setAttribute('poster', poster);
+        }
+
         source.setAttribute('src', src);
         hero.setAttribute('data-active-src', src);
         hero.muted = true;
+        hero.defaultMuted = true;
+        hero.playsInline = true;
         hero.loop = true;
+        hero.preload = 'auto';
         hero.load();
         function reveal() {
           if (hero.getAttribute('data-active-src') !== src) return;
           hero.classList.add('hero-ready', 'is-active');
-          hero.play().catch(function () {});
+          var p = hero.play();
+          if (p && typeof p.catch === 'function') p.catch(function () {});
         }
         if (hero.readyState >= 2) reveal();
         else {
@@ -1924,6 +1957,10 @@
       light: 'assets/videos/hero-liquid/liquid-light.mp4',
       dark: 'assets/videos/hero-liquid/liquid-dark.mp4',
     };
+    const HERO_POSTERS = {
+      light: 'assets/images/hero/hero-liquid-poster-light.jpg',
+      dark: 'assets/images/hero/hero-liquid-poster-dark.jpg',
+    };
     const HERO_CROSSFADE_MS = 650;
     let heroActiveKey = 'a';
     let heroThemeBootstrapped = false;
@@ -1995,10 +2032,10 @@
       const inactiveSrc = inactive.querySelector('source')?.getAttribute('src') || '';
       if (inactiveSrc === altSrc) return;
 
-      /* Defer alternate theme clip until idle so first paint stays light */
+      /* Alternate theme only after first hero is fully idle — never compete with backdrop */
       const run = () => prepareHeroVideo(inactive, altSrc);
-      if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 2500 });
-      else setTimeout(run, 1200);
+      if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 8000 });
+      else setTimeout(run, 5000);
     }
 
     function revealHeroLayer(video) {
@@ -2070,7 +2107,18 @@
       const { stack } = heroLayers();
       if (!stack) return;
       const nextSrc = isDark ? HERO_VIDEOS.dark : HERO_VIDEOS.light;
+      const nextPoster = isDark ? HERO_POSTERS.dark : HERO_POSTERS.light;
       document.documentElement.setAttribute('data-hero-video', nextSrc);
+      document.documentElement.setAttribute('data-hero-poster', nextPoster);
+      const base = document.getElementById('hero-stage-base');
+      if (base && nextPoster) {
+        base.style.backgroundImage = 'url("' + nextPoster + '")';
+        base.style.backgroundSize = 'cover';
+        base.style.backgroundPosition = 'center';
+      }
+      const { active, inactive } = heroLayers();
+      if (active) active.setAttribute('poster', nextPoster);
+      if (inactive) inactive.setAttribute('poster', nextPoster);
       crossfadeHeroTo(nextSrc);
     }
 

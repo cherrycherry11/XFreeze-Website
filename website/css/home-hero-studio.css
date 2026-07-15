@@ -54,11 +54,16 @@ html.dark .hero-header--studio {
 .hero-stage__base {
   position: absolute;
   inset: 0;
-  background: #f4f2f6;
+  background-color: #f4f2f6;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  /* Still poster shows instantly while HQ liquid video streams */
+  z-index: 0;
 }
 
 html.dark .hero-stage__base {
-  background: #000000;
+  background-color: #000000;
 }
 
 .hero-stage__video.hero-video-stack {
@@ -82,7 +87,9 @@ html.dark .hero-stage__base {
   opacity: 0;
   filter: none;
   transform: none;
-  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  /* GPU layer for smoother first frame */
+  will-change: opacity;
 }
 
 .hero-header--studio .hero-video-layer.is-active.hero-ready {

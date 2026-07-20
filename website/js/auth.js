@@ -463,7 +463,7 @@
         '<div class="site-nav-user-menu" id="xf-auth-user-menu" hidden>' +
         '<div class="site-nav-user-email">' + escapeHtml(email) + '</div>' +
         '<a href="account.html" class="site-nav-user-menu-link"><i class="fa-regular fa-user" aria-hidden="true"></i> Account</a>' +
-        '<a href="pricing.html" class="site-nav-user-menu-link"><i class="fa-solid fa-crown" aria-hidden="true"></i> Subscription</a>' +
+        '<a href="account.html#billing" class="site-nav-user-menu-link"><i class="fa-regular fa-credit-card" aria-hidden="true"></i> Billing</a>' +
         '<button type="button" id="xf-auth-sign-out"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Sign out</button>' +
         '</div>' +
         '</div>';
@@ -1261,6 +1261,52 @@
     }
   }
 
+  /**
+   * Persist subscription on the signed-in user so Account shows Pro
+   * after checkout even on a new browser / cleared localStorage.
+   */
+  async function syncSubscriptionMetadata(sub) {
+    var sb = getClient();
+    if (!sb || !session || !session.user) {
+      return { ok: false, reason: 'not-signed-in' };
+    }
+    if (!sub || typeof sub !== 'object') {
+      return { ok: false, reason: 'no-sub' };
+    }
+    var payload = {
+      planId: sub.planId,
+      name: sub.name,
+      price: sub.price,
+      interval: sub.interval || 'month',
+      status: sub.status || 'active',
+      startedAt: sub.startedAt || null,
+      expiresAt: sub.expiresAt || null,
+      paymentId: sub.paymentId || null,
+      orderId: sub.orderId || null,
+    };
+    var data = {};
+    data[window.XFreezeUsage && window.XFreezeUsage.META_KEY
+      ? window.XFreezeUsage.META_KEY
+      : 'xf_subscription'] = payload;
+    /* Flat mirrors help debugging in Supabase dashboard */
+    data.xf_plan_id = payload.planId;
+    data.xf_plan_status = payload.status;
+    data.xf_plan_name = payload.name;
+
+    var result = await sb.auth.updateUser({ data: data });
+    if (result.error) {
+      console.warn('[xf-auth] syncSubscriptionMetadata failed', result.error);
+      return { ok: false, error: result.error };
+    }
+    if (result.data && result.data.user) {
+      /* Keep in-memory session.user in sync without full refresh */
+      if (session) {
+        session.user = result.data.user;
+      }
+    }
+    return { ok: true, user: result.data && result.data.user };
+  }
+
   window.XFreezeAuth = {
     init: init,
     rememberRedirect: rememberRedirect,
@@ -1273,6 +1319,9 @@
     signUpWithPassword: signUpWithPassword,
     signOut: signOut,
     getSession: function () { return session; },
+    getClient: getClient,
+    refreshSession: refreshSession,
+    syncSubscriptionMetadata: syncSubscriptionMetadata,
     isConfigured: isConfigured,
     isProviderEnabled: isProviderEnabled,
     showGoogleOneTap: maybeShowGoogleOneTap,

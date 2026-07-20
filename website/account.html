@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-xf-meta-title="Account - X Freeze" data-xf-meta-desc="Your X Freeze account: subscription, usage, and profile." data-xf-meta-path="account.html">
+<html lang="en" data-xf-meta-title="Account - X Freeze" data-xf-meta-desc="Your X Freeze account: plan, billing, usage, and profile." data-xf-meta-path="account.html">
 <head>
   <link rel="icon" href="/favicon.ico?v=share2" type="image/x-icon">
   <link rel="icon" href="/favicon.png?v=share2" type="image/png" sizes="48x48">
@@ -52,7 +52,7 @@
       --nav-bg:rgba(10,10,10,0.92);
     }
     body { font-family: var(--font-sans); background: var(--surface); color: var(--text); margin: 0; }
-    .content-container { width:100%; max-width:min(1100px,calc(100% - var(--page-gutter)*2)); margin-inline:auto; padding-inline:var(--page-gutter); }
+    .content-container { width:100%; max-width:min(960px,calc(100% - var(--page-gutter)*2)); margin-inline:auto; padding-inline:var(--page-gutter); }
   </style>
 </head>
 <body>
@@ -112,7 +112,7 @@
     <!-- Signed out -->
     <div id="xf-account-gate" class="xf-account-gate" hidden>
       <h1>Your account</h1>
-      <p>Sign in to see your plan, usage, and subscription details.</p>
+      <p>Sign in to see your plan, billing, usage, and profile.</p>
       <a class="xf-account-btn xf-account-btn--primary" href="login.html">Sign in</a>
     </div>
 
@@ -121,52 +121,140 @@
       <header class="xf-account-header">
         <div class="xf-account-header__identity">
           <div class="xf-account-avatar" id="xf-account-avatar">?</div>
-          <div>
-            <h1 id="xf-account-name">Account</h1>
+          <div class="xf-account-header__text">
+            <div class="xf-account-header__title-row">
+              <h1 id="xf-account-name">Account</h1>
+              <span class="xf-account-badge" id="xf-header-badge">Free</span>
+            </div>
             <p class="xf-account-header__email" id="xf-account-email"></p>
           </div>
         </div>
       </header>
 
-      <div class="xf-account-stats xf-account-card--span" style="margin-bottom:1rem">
-        <div class="xf-account-stat">
-          <p class="xf-account-stat__value" id="xf-stat-prompts">0</p>
-          <p class="xf-account-stat__label">Prompts used</p>
-        </div>
-        <div class="xf-account-stat">
-          <p class="xf-account-stat__value" id="xf-stat-templates">0</p>
-          <p class="xf-account-stat__label">Templates opened</p>
-        </div>
-        <div class="xf-account-stat">
-          <p class="xf-account-stat__value" id="xf-stat-skills">0</p>
-          <p class="xf-account-stat__label">Skills copied</p>
-        </div>
-        <div class="xf-account-stat">
-          <p class="xf-account-stat__value" id="xf-stat-month">—</p>
-          <p class="xf-account-stat__label">Period</p>
-        </div>
-      </div>
+      <nav class="xf-account-tabs" role="tablist" aria-label="Account sections">
+        <button type="button" class="xf-account-tab is-active" role="tab" aria-selected="true" data-tab="overview" id="tab-overview">Overview</button>
+        <button type="button" class="xf-account-tab" role="tab" aria-selected="false" data-tab="billing" id="tab-billing">Billing</button>
+        <button type="button" class="xf-account-tab" role="tab" aria-selected="false" data-tab="usage" id="tab-usage">Usage</button>
+        <button type="button" class="xf-account-tab" role="tab" aria-selected="false" data-tab="settings" id="tab-settings">Settings</button>
+      </nav>
 
-      <div class="xf-account-grid">
-        <section class="xf-account-card">
+      <!-- Overview -->
+      <section class="xf-account-panel is-active" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
+        <div class="xf-account-grid">
+          <article class="xf-account-card xf-account-card--hero">
+            <div class="xf-account-card__head">
+              <h2 class="xf-account-card__title">Current plan</h2>
+              <span class="xf-account-badge" id="xf-ov-badge">Free</span>
+            </div>
+            <h3 class="xf-account-plan-name" id="xf-ov-plan-name">Free</h3>
+            <p class="xf-account-plan-meta" id="xf-ov-plan-meta">Browse free templates &amp; skills.</p>
+            <p class="xf-account-plan-price" id="xf-ov-plan-price">$0 <span>/ forever</span></p>
+            <div class="xf-account-actions">
+              <a class="xf-account-btn xf-account-btn--primary" id="xf-ov-cta" href="pricing.html">Upgrade to Pro</a>
+              <a class="xf-account-btn" href="templates.html">Open library</a>
+            </div>
+          </article>
+
+          <article class="xf-account-card">
+            <div class="xf-account-card__head">
+              <h2 class="xf-account-card__title">This month</h2>
+            </div>
+            <div class="xf-account-stats xf-account-stats--compact">
+              <div class="xf-account-stat">
+                <p class="xf-account-stat__value" id="xf-ov-stat-prompts">0</p>
+                <p class="xf-account-stat__label">Prompts</p>
+              </div>
+              <div class="xf-account-stat">
+                <p class="xf-account-stat__value" id="xf-ov-stat-templates">0</p>
+                <p class="xf-account-stat__label">Templates</p>
+              </div>
+              <div class="xf-account-stat">
+                <p class="xf-account-stat__value" id="xf-ov-stat-skills">0</p>
+                <p class="xf-account-stat__label">Skills</p>
+              </div>
+            </div>
+            <p class="xf-account-note" id="xf-ov-period">—</p>
+          </article>
+        </div>
+
+        <article class="xf-account-card xf-account-card--span" style="margin-top:1rem">
           <div class="xf-account-card__head">
-            <h2 class="xf-account-card__title">Subscription</h2>
-            <span class="xf-account-badge" id="xf-plan-badge">Free</span>
+            <h2 class="xf-account-card__title">Quick links</h2>
           </div>
-          <h3 class="xf-account-plan-name" id="xf-plan-name">Free</h3>
-          <p class="xf-account-plan-meta" id="xf-plan-meta">Browse free templates &amp; skills.</p>
-          <p class="xf-account-plan-price" id="xf-plan-price">$0 <span>/ forever</span></p>
-          <div class="xf-account-actions">
-            <a class="xf-account-btn xf-account-btn--primary" id="xf-plan-upgrade" href="pricing.html">Upgrade to Pro</a>
-            <a class="xf-account-btn" href="templates.html">Open library</a>
-            <button type="button" class="xf-account-btn" id="xf-restore-plan">I already paid — refresh plan</button>
+          <div class="xf-account-quick">
+            <a class="xf-account-quick-link" href="templates.html">
+              <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+              <span>Templates</span>
+            </a>
+            <a class="xf-account-quick-link" href="prompt-library.html">
+              <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+              <span>Prompts</span>
+            </a>
+            <a class="xf-account-quick-link" href="skills.html">
+              <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+              <span>Skills</span>
+            </a>
+            <a class="xf-account-quick-link" href="pricing.html">
+              <i class="fa-solid fa-crown" aria-hidden="true"></i>
+              <span>Plans</span>
+            </a>
           </div>
-          <p class="xf-account-note">Plan unlocks right after checkout on this browser. If you paid but still see Free, use “I already paid”.</p>
-        </section>
+        </article>
+      </section>
 
-        <section class="xf-account-card">
+      <!-- Billing -->
+      <section class="xf-account-panel" id="panel-billing" role="tabpanel" aria-labelledby="tab-billing" hidden>
+        <div class="xf-account-grid">
+          <article class="xf-account-card">
+            <div class="xf-account-card__head">
+              <h2 class="xf-account-card__title">Subscription</h2>
+              <span class="xf-account-badge" id="xf-bill-badge">Free</span>
+            </div>
+            <h3 class="xf-account-plan-name" id="xf-bill-plan-name">Free</h3>
+            <p class="xf-account-plan-meta" id="xf-bill-plan-meta">No paid plan yet.</p>
+            <p class="xf-account-plan-price" id="xf-bill-plan-price">$0 <span>/ forever</span></p>
+            <div class="xf-account-actions">
+              <a class="xf-account-btn xf-account-btn--primary" id="xf-bill-cta" href="pricing.html">Upgrade to Pro</a>
+            </div>
+          </article>
+
+          <article class="xf-account-card">
+            <div class="xf-account-card__head">
+              <h2 class="xf-account-card__title">Payment</h2>
+            </div>
+            <dl class="xf-account-dl">
+              <div>
+                <dt>Status</dt>
+                <dd id="xf-bill-status">—</dd>
+              </div>
+              <div>
+                <dt>Billing cycle</dt>
+                <dd id="xf-bill-cycle">—</dd>
+              </div>
+              <div>
+                <dt>Active since</dt>
+                <dd id="xf-bill-started">—</dd>
+              </div>
+              <div>
+                <dt>Renews / ends</dt>
+                <dd id="xf-bill-expires">—</dd>
+              </div>
+              <div>
+                <dt>Last payment</dt>
+                <dd id="xf-bill-payment">—</dd>
+              </div>
+            </dl>
+            <p class="xf-account-note">Payments are processed securely via Razorpay in USD. Need a receipt or help? <a href="contact.html">Contact us</a>.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Usage -->
+      <section class="xf-account-panel" id="panel-usage" role="tabpanel" aria-labelledby="tab-usage" hidden>
+        <article class="xf-account-card">
           <div class="xf-account-card__head">
             <h2 class="xf-account-card__title">Usage this month</h2>
+            <span class="xf-account-badge" id="xf-use-period-badge">—</span>
           </div>
           <div class="xf-usage-list">
             <div>
@@ -191,33 +279,59 @@
               <div class="xf-usage-bar"><div class="xf-usage-bar__fill" id="xf-bar-skills" style="width:0%"></div></div>
             </div>
           </div>
-          <p class="xf-account-note">Usage is tracked when you copy prompts or open templates on this browser. Pro unlocks higher limits.</p>
-        </section>
+          <p class="xf-account-note">Usage is counted when you copy prompts or open templates in this browser. Pro unlocks higher limits.</p>
+        </article>
 
-        <section class="xf-account-card xf-account-card--span">
+        <div class="xf-account-stats" style="margin-top:1rem">
+          <div class="xf-account-stat">
+            <p class="xf-account-stat__value" id="xf-stat-prompts">0</p>
+            <p class="xf-account-stat__label">Prompts used</p>
+          </div>
+          <div class="xf-account-stat">
+            <p class="xf-account-stat__value" id="xf-stat-templates">0</p>
+            <p class="xf-account-stat__label">Templates opened</p>
+          </div>
+          <div class="xf-account-stat">
+            <p class="xf-account-stat__value" id="xf-stat-skills">0</p>
+            <p class="xf-account-stat__label">Skills copied</p>
+          </div>
+          <div class="xf-account-stat">
+            <p class="xf-account-stat__value" id="xf-stat-month">—</p>
+            <p class="xf-account-stat__label">Period</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section class="xf-account-panel" id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" hidden>
+        <article class="xf-account-card">
           <div class="xf-account-card__head">
-            <h2 class="xf-account-card__title">Account details</h2>
+            <h2 class="xf-account-card__title">Profile</h2>
           </div>
           <dl class="xf-account-dl">
             <div>
+              <dt>Name</dt>
+              <dd id="xf-set-name">—</dd>
+            </div>
+            <div>
               <dt>Email</dt>
-              <dd id="xf-detail-email">—</dd>
+              <dd id="xf-set-email">—</dd>
             </div>
             <div>
               <dt>Member since</dt>
-              <dd id="xf-detail-member">—</dd>
+              <dd id="xf-set-member">—</dd>
             </div>
             <div>
               <dt>Current plan</dt>
-              <dd id="xf-detail-plan">Free</dd>
-            </div>
-            <div>
-              <dt>Last payment ref</dt>
-              <dd id="xf-detail-payment">—</dd>
+              <dd id="xf-set-plan">Free</dd>
             </div>
           </dl>
-        </section>
-      </div>
+          <div class="xf-account-actions">
+            <button type="button" class="xf-account-btn" id="xf-set-signout">Sign out</button>
+            <a class="xf-account-btn" href="contact.html">Contact support</a>
+          </div>
+        </article>
+      </section>
     </div>
   </main>
 

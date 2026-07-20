@@ -245,9 +245,25 @@
               btn.disabled = false;
               return;
             }
-            /* Activate plan immediately so Account never stays Free after a good pay */
+            /* Activate plan locally + Supabase metadata so Account shows Pro */
             try {
-              if (currentProduct && currentProduct.type === 'subscription') {
+              if (
+                currentProduct &&
+                currentProduct.type === 'subscription' &&
+                global.XFreezeUsage &&
+                global.XFreezeUsage.buildFromProduct
+              ) {
+                var subPayload = global.XFreezeUsage.buildFromProduct(
+                  currentProduct,
+                  response.razorpay_payment_id,
+                  response.razorpay_order_id
+                );
+                if (subPayload && global.XFreezeUsage.activateSubscription) {
+                  await global.XFreezeUsage.activateSubscription(subPayload);
+                } else if (subPayload) {
+                  global.XFreezeUsage.setSubscription(subPayload);
+                }
+              } else if (currentProduct && currentProduct.type === 'subscription') {
                 var started = new Date();
                 var expires = new Date(started);
                 if (currentProduct.interval === 'year') {
@@ -255,7 +271,7 @@
                 } else {
                   expires.setMonth(expires.getMonth() + 1);
                 }
-                var subPayload = {
+                var fallbackSub = {
                   planId: currentProduct.id,
                   name: currentProduct.name,
                   price: currentProduct.price,
@@ -266,10 +282,7 @@
                   paymentId: response.razorpay_payment_id || null,
                   orderId: response.razorpay_order_id || null,
                 };
-                localStorage.setItem('xf_subscription', JSON.stringify(subPayload));
-                if (global.XFreezeUsage && global.XFreezeUsage.setSubscription) {
-                  global.XFreezeUsage.setSubscription(subPayload);
-                }
+                localStorage.setItem('xf_subscription', JSON.stringify(fallbackSub));
               }
               localStorage.setItem(
                 'xf_pending_product',

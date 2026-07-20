@@ -46,3 +46,5 @@ website/assets/videos/*-original.mp4
 website/assets/imagine/
 node_modules
 website/node_modules/
+payment-server/VERCEL-ENV-COPY.txt
+.env*

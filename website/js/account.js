@@ -1,8 +1,11 @@
 /**
- * Account dashboard renderer
+ * Account dashboard — Overview / Billing / Usage / Settings
+ * Plan source: Supabase user_metadata first, then localStorage.
  */
 (function () {
   'use strict';
+
+  var TABS = ['overview', 'billing', 'usage', 'settings'];
 
   function $(id) {
     return document.getElementById(id);
@@ -27,9 +30,23 @@
     }
   }
 
+  function formatPrice(price, interval) {
+    if (price == null) return '$0';
+    var n = Number(price);
+    var label = Number.isInteger(n) ? String(n) : n.toFixed(2);
+    var unit = interval === 'year' ? 'year' : 'month';
+    return '$' + label + ' <span>/ ' + unit + '</span>';
+  }
+
   function pct(used, limit) {
     if (!limit || limit >= 99999) return Math.min(12, used > 0 ? 8 + used * 0.05 : 0);
     return Math.min(100, Math.round((used / limit) * 100));
+  }
+
+  function setBadge(el, pro) {
+    if (!el) return;
+    el.textContent = pro ? 'Pro' : 'Free';
+    el.className = 'xf-account-badge ' + (pro ? 'xf-account-badge--pro' : 'xf-account-badge--free');
   }
 
   function waitForAuth(cb) {
@@ -40,7 +57,7 @@
         cb();
         return;
       }
-      if (tries > 40) {
+      if (tries > 50) {
         cb();
         return;
       }
@@ -48,19 +65,86 @@
     })();
   }
 
+  function getUser() {
+    try {
+      if (window.XFreezeAuth && window.XFreezeAuth.getSession) {
+        var session = window.XFreezeAuth.getSession();
+        return session && session.user ? session.user : null;
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  /**
+   * If user paid on this device but metadata never wrote (guest checkout),
+   * push local Pro into Supabase once they're signed in.
+   */
+  function maybeBackfillMetadata(user, sub) {
+    if (!user || !sub || !window.XFreezeUsage || !window.XFreezeUsage.isPro(sub)) return;
+    var remote = window.XFreezeUsage.fromUserMetadata
+      ? window.XFreezeUsage.fromUserMetadata(user)
+      : null;
+    if (remote && window.XFreezeUsage.isPro(remote)) return;
+    if (
+      window.XFreezeAuth &&
+      typeof window.XFreezeAuth.syncSubscriptionMetadata === 'function'
+    ) {
+      window.XFreezeAuth.syncSubscriptionMetadata(sub).catch(function () {});
+    }
+  }
+
+  function showTab(name) {
+    if (TABS.indexOf(name) === -1) name = 'overview';
+    TABS.forEach(function (tab) {
+      var btn = document.querySelector('.xf-account-tab[data-tab="' + tab + '"]');
+      var panel = $('panel-' + tab);
+      var on = tab === name;
+      if (btn) {
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      }
+      if (panel) {
+        panel.hidden = !on;
+        panel.classList.toggle('is-active', on);
+      }
+    });
+    try {
+      var url = new URL(window.location.href);
+      if (name === 'overview') {
+        url.hash = '';
+      } else {
+        url.hash = name;
+      }
+      window.history.replaceState({}, '', url.pathname + url.search + (url.hash || ''));
+    } catch (e) {}
+  }
+
+  function tabFromHash() {
+    var h = (window.location.hash || '').replace(/^#/, '').toLowerCase();
+    if (h === 'subscription') h = 'billing';
+    if (TABS.indexOf(h) !== -1) return h;
+    return 'overview';
+  }
+
+  function fillMeter(usedId, limitId, barId, used, limit, pro) {
+    var u = $(usedId);
+    var l = $(limitId);
+    var b = $(barId);
+    var limLabel = window.XFreezeUsage ? window.XFreezeUsage.formatLimit(limit) : String(limit);
+    if (u) u.textContent = used;
+    if (l) l.textContent = limLabel;
+    if (b) {
+      b.style.width = pct(used, limit) + '%';
+      b.classList.toggle('xf-usage-bar__fill--pro', !!pro);
+    }
+  }
+
   function render() {
     var gate = $('xf-account-gate');
     var dash = $('xf-account-dash');
     if (!gate || !dash) return;
 
-    var session = null;
-    try {
-      if (window.XFreezeAuth && window.XFreezeAuth.getSession) {
-        session = window.XFreezeAuth.getSession();
-      }
-    } catch (e) {}
-
-    var user = session && session.user;
+    var user = getUser();
     if (!user) {
       gate.hidden = false;
       dash.hidden = true;
@@ -92,177 +176,209 @@
       }
     }
 
-    var sub = (window.XFreezeUsage && window.XFreezeUsage.getSubscription()) || null;
-    /* Recover Pro if user paid but plan was never written (e.g. old success page) */
-    if ((!sub || !window.XFreezeUsage.isPro(sub)) && window.location.search.indexOf('restore') !== -1) {
-      try {
-        var p = new URLSearchParams(window.location.search);
-        if (p.get('restore') === 'pro' || p.get('restore') === 'pro-monthly') {
-          var now = new Date();
-          var exp = new Date(now);
-          exp.setMonth(exp.getMonth() + 1);
-          sub = {
-            planId: 'pro-monthly',
-            name: 'Pro Monthly',
-            price: 1,
-            interval: 'month',
-            status: 'active',
-            startedAt: now.toISOString(),
-            expiresAt: exp.toISOString(),
-            paymentId: p.get('payment_id') || localStorage.getItem('xf_last_payment_id') || null,
-          };
-          window.XFreezeUsage.setSubscription(sub);
-        }
-      } catch (e) {}
+    /* Resolve plan: metadata > localStorage */
+    var sub = null;
+    if (window.XFreezeUsage && window.XFreezeUsage.resolveSubscription) {
+      sub = window.XFreezeUsage.resolveSubscription(user);
+    } else if (window.XFreezeUsage) {
+      sub = window.XFreezeUsage.getSubscription();
     }
-    /* If last payment id exists and no active sub, assume monthly pro (same device recovery) */
-    if ((!sub || !window.XFreezeUsage.isPro(sub))) {
-      try {
-        var lastPay = localStorage.getItem('xf_last_payment_id');
-        if (lastPay && String(lastPay).indexOf('pay_') === 0) {
-          var now2 = new Date();
-          var exp2 = new Date(now2);
-          exp2.setMonth(exp2.getMonth() + 1);
-          sub = {
-            planId: 'pro-monthly',
-            name: 'Pro Monthly',
-            price: 1,
-            interval: 'month',
-            status: 'active',
-            startedAt: now2.toISOString(),
-            expiresAt: exp2.toISOString(),
-            paymentId: lastPay,
-          };
-          window.XFreezeUsage.setSubscription(sub);
-        }
-      } catch (e2) {}
-    }
+
+    maybeBackfillMetadata(user, sub);
+
     var pro = window.XFreezeUsage ? window.XFreezeUsage.isPro(sub) : false;
-    var usage = window.XFreezeUsage ? window.XFreezeUsage.getUsage() : { prompts: 0, templates: 0, skills: 0 };
-    var limits = window.XFreezeUsage ? window.XFreezeUsage.getLimits(sub) : { prompts: 50, templates: 30, skills: 40 };
+    var usage = window.XFreezeUsage
+      ? window.XFreezeUsage.getUsage()
+      : { prompts: 0, templates: 0, skills: 0 };
+    var limits = window.XFreezeUsage
+      ? window.XFreezeUsage.getLimits(sub)
+      : { prompts: 50, templates: 30, skills: 40 };
 
-    var badge = $('xf-plan-badge');
-    var planName = $('xf-plan-name');
-    var planMeta = $('xf-plan-meta');
-    var planPrice = $('xf-plan-price');
-    var upgradeBtn = $('xf-plan-upgrade');
+    var planLabel = pro
+      ? (sub && sub.name) || (sub && sub.interval === 'year' ? 'Pro Yearly' : 'Pro Monthly')
+      : 'Free';
+    var planMeta = '';
+    if (pro && sub) {
+      planMeta =
+        (sub.interval === 'year' ? 'Billed yearly' : 'Billed monthly') +
+        ' · Active since ' +
+        formatDate(sub.startedAt) +
+        (sub.expiresAt ? ' · Renews / ends ' + formatDate(sub.expiresAt) : '');
+    } else {
+      planMeta = 'Browse free templates & skills. Upgrade anytime for full library access.';
+    }
+    var priceHtml = pro && sub ? formatPrice(sub.price, sub.interval) : '$0 <span>/ forever</span>';
 
-    if (badge) {
-      badge.textContent = pro ? 'Pro' : 'Free';
-      badge.className = 'xf-account-badge ' + (pro ? 'xf-account-badge--pro' : 'xf-account-badge--free');
-    }
-    if (planName) {
-      planName.textContent = pro
-        ? sub.name || (sub.interval === 'year' ? 'Pro Yearly' : 'Pro Monthly')
-        : 'Free';
-    }
-    if (planMeta) {
+    setBadge($('xf-header-badge'), pro);
+    setBadge($('xf-ov-badge'), pro);
+    setBadge($('xf-bill-badge'), pro);
+
+    /* Overview */
+    var ovName = $('xf-ov-plan-name');
+    var ovMeta = $('xf-ov-plan-meta');
+    var ovPrice = $('xf-ov-plan-price');
+    var ovCta = $('xf-ov-cta');
+    if (ovName) ovName.textContent = planLabel;
+    if (ovMeta) ovMeta.textContent = planMeta;
+    if (ovPrice) ovPrice.innerHTML = priceHtml;
+    if (ovCta) {
       if (pro) {
-        var started = formatDate(sub.startedAt);
-        var exp = sub.expiresAt ? formatDate(sub.expiresAt) : '—';
-        planMeta.textContent =
-          (sub.interval === 'year' ? 'Billed yearly' : 'Billed monthly') +
-          ' · Active since ' +
-          started +
-          (sub.expiresAt ? ' · Renews / ends ' + exp : '');
+        ovCta.textContent = 'Manage plan';
+        ovCta.href = 'account.html#billing';
+        ovCta.onclick = function (e) {
+          e.preventDefault();
+          showTab('billing');
+        };
       } else {
-        planMeta.textContent = 'Browse free templates & skills. Upgrade anytime for full library access.';
-      }
-    }
-    if (planPrice) {
-      if (pro && sub.price != null) {
-        planPrice.innerHTML =
-          '$' +
-          (Number.isInteger(Number(sub.price)) ? Number(sub.price) : Number(sub.price).toFixed(2)) +
-          ' <span>/ ' +
-          (sub.interval === 'year' ? 'year' : 'month') +
-          '</span>';
-      } else {
-        planPrice.innerHTML = '$0 <span>/ forever</span>';
-      }
-    }
-    if (upgradeBtn) {
-      upgradeBtn.textContent = pro ? 'Manage plan' : 'Upgrade to Pro';
-      upgradeBtn.href = 'pricing.html';
-    }
-
-    function fillMeter(usedId, limitId, barId, used, limit) {
-      var u = $(usedId);
-      var l = $(limitId);
-      var b = $(barId);
-      var limLabel = window.XFreezeUsage ? window.XFreezeUsage.formatLimit(limit) : String(limit);
-      if (u) u.textContent = used;
-      if (l) l.textContent = limLabel;
-      if (b) {
-        b.style.width = pct(used, limit) + '%';
-        b.classList.toggle('xf-usage-bar__fill--pro', pro);
+        ovCta.textContent = 'Upgrade to Pro';
+        ovCta.href = 'pricing.html';
+        ovCta.onclick = null;
       }
     }
 
-    fillMeter('xf-use-prompts', 'xf-lim-prompts', 'xf-bar-prompts', usage.prompts || 0, limits.prompts);
-    fillMeter('xf-use-templates', 'xf-lim-templates', 'xf-bar-templates', usage.templates || 0, limits.templates);
-    fillMeter('xf-use-skills', 'xf-lim-skills', 'xf-bar-skills', usage.skills || 0, limits.skills);
+    var periodLabel = '—';
+    try {
+      periodLabel = new Date().toLocaleString(undefined, { month: 'short', year: 'numeric' });
+    } catch (e) {
+      periodLabel = usage.month || '—';
+    }
+
+    var ovP = $('xf-ov-stat-prompts');
+    var ovT = $('xf-ov-stat-templates');
+    var ovS = $('xf-ov-stat-skills');
+    var ovPeriod = $('xf-ov-period');
+    if (ovP) ovP.textContent = usage.prompts || 0;
+    if (ovT) ovT.textContent = usage.templates || 0;
+    if (ovS) ovS.textContent = usage.skills || 0;
+    if (ovPeriod) ovPeriod.textContent = 'Period: ' + periodLabel;
+
+    /* Billing */
+    var bName = $('xf-bill-plan-name');
+    var bMeta = $('xf-bill-plan-meta');
+    var bPrice = $('xf-bill-plan-price');
+    var bCta = $('xf-bill-cta');
+    if (bName) bName.textContent = planLabel;
+    if (bMeta) {
+      bMeta.textContent = pro
+        ? 'Your Pro access is active on this account.'
+        : 'No paid plan yet. Upgrade to unlock the full library.';
+    }
+    if (bPrice) bPrice.innerHTML = priceHtml;
+    if (bCta) {
+      bCta.textContent = pro ? 'View pricing' : 'Upgrade to Pro';
+      bCta.href = 'pricing.html';
+    }
+
+    var bStatus = $('xf-bill-status');
+    var bCycle = $('xf-bill-cycle');
+    var bStarted = $('xf-bill-started');
+    var bExpires = $('xf-bill-expires');
+    var bPay = $('xf-bill-payment');
+    if (bStatus) bStatus.textContent = pro ? 'Active' : 'Free plan';
+    if (bCycle) {
+      bCycle.textContent = pro
+        ? sub.interval === 'year'
+          ? 'Yearly'
+          : 'Monthly'
+        : '—';
+    }
+    if (bStarted) bStarted.textContent = pro && sub ? formatDate(sub.startedAt) : '—';
+    if (bExpires) bExpires.textContent = pro && sub ? formatDate(sub.expiresAt) : '—';
+    if (bPay) bPay.textContent = (sub && sub.paymentId) || '—';
+
+    /* Usage */
+    fillMeter(
+      'xf-use-prompts',
+      'xf-lim-prompts',
+      'xf-bar-prompts',
+      usage.prompts || 0,
+      limits.prompts,
+      pro
+    );
+    fillMeter(
+      'xf-use-templates',
+      'xf-lim-templates',
+      'xf-bar-templates',
+      usage.templates || 0,
+      limits.templates,
+      pro
+    );
+    fillMeter(
+      'xf-use-skills',
+      'xf-lim-skills',
+      'xf-bar-skills',
+      usage.skills || 0,
+      limits.skills,
+      pro
+    );
 
     var s1 = $('xf-stat-prompts');
     var s2 = $('xf-stat-templates');
     var s3 = $('xf-stat-skills');
     var s4 = $('xf-stat-month');
+    var useBadge = $('xf-use-period-badge');
     if (s1) s1.textContent = usage.prompts || 0;
     if (s2) s2.textContent = usage.templates || 0;
     if (s3) s3.textContent = usage.skills || 0;
-    if (s4) {
-      try {
-        s4.textContent = new Date().toLocaleString(undefined, { month: 'short', year: 'numeric' });
-      } catch (e) {
-        s4.textContent = usage.month || '—';
-      }
-    }
+    if (s4) s4.textContent = periodLabel;
+    if (useBadge) useBadge.textContent = periodLabel;
 
-    var dEmail = $('xf-detail-email');
-    var dMember = $('xf-detail-member');
-    var dPlan = $('xf-detail-plan');
-    var dPay = $('xf-detail-payment');
-    if (dEmail) dEmail.textContent = email;
-    if (dMember) dMember.textContent = formatDate(user.created_at);
-    if (dPlan) dPlan.textContent = pro ? planName.textContent : 'Free';
-    if (dPay) dPay.textContent = (sub && sub.paymentId) || '—';
+    /* Settings */
+    var setName = $('xf-set-name');
+    var setEmail = $('xf-set-email');
+    var setMember = $('xf-set-member');
+    var setPlan = $('xf-set-plan');
+    if (setName) setName.textContent = name;
+    if (setEmail) setEmail.textContent = email;
+    if (setMember) setMember.textContent = formatDate(user.created_at);
+    if (setPlan) setPlan.textContent = planLabel;
+  }
+
+  function bindTabs() {
+    document.querySelectorAll('.xf-account-tab').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        showTab(btn.getAttribute('data-tab') || 'overview');
+      });
+    });
+    window.addEventListener('hashchange', function () {
+      showTab(tabFromHash());
+    });
+  }
+
+  function bindSettings() {
+    var signOut = $('xf-set-signout');
+    if (signOut) {
+      signOut.addEventListener('click', function () {
+        if (window.XFreezeAuth && window.XFreezeAuth.signOut) {
+          window.XFreezeAuth.signOut();
+        }
+      });
+    }
   }
 
   function init() {
+    bindTabs();
+    bindSettings();
+    showTab(tabFromHash());
+
     waitForAuth(function () {
-      render();
+      /* Prefer a fresh session so metadata is current after checkout */
+      var p =
+        window.XFreezeAuth && window.XFreezeAuth.refreshSession
+          ? window.XFreezeAuth.refreshSession()
+          : Promise.resolve();
+      Promise.resolve(p)
+        .catch(function () {})
+        .then(function () {
+          render();
+          setTimeout(render, 500);
+          setTimeout(render, 1500);
+        });
+
       document.addEventListener('visibilitychange', function () {
         if (!document.hidden) render();
       });
-      setTimeout(render, 400);
-      setTimeout(render, 1200);
     });
-
-    /* One-click fix for members who paid before plan sync */
-    var restoreBtn = document.getElementById('xf-restore-plan');
-    if (restoreBtn) {
-      restoreBtn.addEventListener('click', function () {
-        if (!window.XFreezeUsage) return;
-        var now = new Date();
-        var exp = new Date(now);
-        exp.setMonth(exp.getMonth() + 1);
-        var lastPay = '';
-        try {
-          lastPay = localStorage.getItem('xf_last_payment_id') || '';
-        } catch (e) {}
-        window.XFreezeUsage.setSubscription({
-          planId: 'pro-monthly',
-          name: 'Pro Monthly',
-          price: 1,
-          interval: 'month',
-          status: 'active',
-          startedAt: now.toISOString(),
-          expiresAt: exp.toISOString(),
-          paymentId: lastPay || 'manual-restore',
-        });
-        render();
-      });
-    }
   }
 
   if (document.readyState === 'loading') {

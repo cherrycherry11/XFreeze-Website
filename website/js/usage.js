@@ -1,12 +1,14 @@
 /**
  * Client-side usage + subscription store for Account dashboard.
- * Persists in localStorage until server-side billing is wired.
+ * localStorage is the fast cache; Supabase user_metadata is the durable source
+ * so Pro sticks across browsers when the user is signed in.
  */
 (function (global) {
   'use strict';
 
   var SUB_KEY = 'xf_subscription';
   var USAGE_KEY = 'xf_usage_v1';
+  var META_KEY = 'xf_subscription';
 
   var FREE_LIMITS = {
     prompts: 50,
@@ -101,6 +103,113 @@
     return String(n);
   }
 
+  /** Build a subscription record from a catalog product + payment ids. */
+  function buildFromProduct(product, paymentId, orderId) {
+    if (!product || product.type !== 'subscription') return null;
+    var started = new Date();
+    var expires = new Date(started);
+    if (product.interval === 'year') {
+      expires.setFullYear(expires.getFullYear() + 1);
+    } else {
+      expires.setMonth(expires.getMonth() + 1);
+    }
+    return {
+      planId: product.id,
+      name: product.name,
+      price: product.price,
+      interval: product.interval || 'month',
+      status: 'active',
+      startedAt: started.toISOString(),
+      expiresAt: expires.toISOString(),
+      paymentId: paymentId || null,
+      orderId: orderId || null,
+    };
+  }
+
+  /** Read plan from Supabase user_metadata (durable). */
+  function fromUserMetadata(user) {
+    if (!user || !user.user_metadata) return null;
+    var meta = user.user_metadata;
+    var raw = meta[META_KEY] || meta.subscription || null;
+    if (!raw) {
+      /* Flat fallbacks if ever stored that way */
+      if (meta.xf_plan_id || meta.plan_id) {
+        raw = {
+          planId: meta.xf_plan_id || meta.plan_id,
+          name: meta.xf_plan_name || meta.plan_name || 'Pro',
+          price: meta.xf_plan_price != null ? meta.xf_plan_price : meta.plan_price,
+          interval: meta.xf_plan_interval || meta.plan_interval || 'month',
+          status: meta.xf_plan_status || meta.plan_status || 'active',
+          startedAt: meta.xf_plan_started_at || meta.plan_started_at || null,
+          expiresAt: meta.xf_plan_expires_at || meta.plan_expires_at || null,
+          paymentId: meta.xf_plan_payment_id || meta.plan_payment_id || null,
+        };
+      }
+    }
+    if (!raw || typeof raw !== 'object') return null;
+    if (!raw.planId && !raw.status) return null;
+    return {
+      planId: raw.planId || raw.id || 'pro-monthly',
+      name: raw.name || 'Pro',
+      price: raw.price != null ? raw.price : null,
+      interval: raw.interval || 'month',
+      status: raw.status || 'active',
+      startedAt: raw.startedAt || null,
+      expiresAt: raw.expiresAt || null,
+      paymentId: raw.paymentId || null,
+      orderId: raw.orderId || null,
+    };
+  }
+
+  /**
+   * Resolve best subscription: prefer active Pro from metadata, else local, else free.
+   * If metadata wins, mirror into localStorage.
+   */
+  function resolveSubscription(user) {
+    var local = getSubscription();
+    var remote = fromUserMetadata(user);
+    var localPro = isPro(local);
+    var remotePro = isPro(remote);
+
+    if (remotePro) {
+      setSubscription(remote);
+      return remote;
+    }
+    if (localPro) {
+      return local;
+    }
+    return remote || local || null;
+  }
+
+  /**
+   * Activate plan locally and (when signed in) push to Supabase user_metadata.
+   * Returns a Promise that resolves when remote sync finishes (or immediately if offline).
+   */
+  function activateSubscription(sub) {
+    if (!sub) return Promise.resolve(null);
+    setSubscription(sub);
+    try {
+      if (sub.paymentId) {
+        localStorage.setItem('xf_last_payment_id', sub.paymentId);
+      }
+    } catch (e) {}
+
+    if (
+      global.XFreezeAuth &&
+      typeof global.XFreezeAuth.syncSubscriptionMetadata === 'function'
+    ) {
+      return global.XFreezeAuth
+        .syncSubscriptionMetadata(sub)
+        .then(function () {
+          return sub;
+        })
+        .catch(function () {
+          return sub;
+        });
+    }
+    return Promise.resolve(sub);
+  }
+
   global.XFreezeUsage = {
     getUsage: getUsage,
     bump: bump,
@@ -118,7 +227,12 @@
     isPro: isPro,
     getLimits: getLimits,
     formatLimit: formatLimit,
+    buildFromProduct: buildFromProduct,
+    fromUserMetadata: fromUserMetadata,
+    resolveSubscription: resolveSubscription,
+    activateSubscription: activateSubscription,
     FREE_LIMITS: FREE_LIMITS,
     PRO_LIMITS: PRO_LIMITS,
+    META_KEY: META_KEY,
   };
 })(window);

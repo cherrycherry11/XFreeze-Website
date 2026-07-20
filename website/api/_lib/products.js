@@ -16,14 +16,14 @@ const SUBSCRIPTIONS = {
   'pro-monthly': {
     id: 'pro-monthly',
     name: 'Pro Monthly',
-    price: 1,
+    price: 49,
     type: 'subscription',
     interval: 'month',
   },
   'pro-yearly': {
     id: 'pro-yearly',
     name: 'Pro Yearly',
-    price: 9,
+    price: 499,
     type: 'subscription',
     interval: 'year',
   },

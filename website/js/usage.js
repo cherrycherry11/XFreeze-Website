@@ -188,7 +188,7 @@
         ? global.XFreezeProducts.getSubscription(planId)
         : null;
     var name = (catalog && catalog.name) || (planId === 'pro-yearly' ? 'Pro Yearly' : 'Pro Monthly');
-    var price = catalog && catalog.price != null ? catalog.price : planId === 'pro-yearly' ? 9 : 1;
+    var price = catalog && catalog.price != null ? catalog.price : planId === 'pro-yearly' ? 499 : 49;
     var interval = (catalog && catalog.interval) || (planId === 'pro-yearly' ? 'year' : 'month');
 
     var started = new Date();

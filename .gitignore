@@ -44,3 +44,5 @@ website/data/skills-browse-data.js
 website/data/skills-catalog.json
 website/assets/videos/*-original.mp4
 website/assets/imagine/
+node_modules
+website/node_modules/

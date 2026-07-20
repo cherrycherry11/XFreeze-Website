@@ -1,11 +1,22 @@
 /**
  * X Freeze checkout — Razorpay only (USD / international)
  *
- * Requires: data/products.js, payment-server on apiBase (default :4242)
+ * Local:  payment-server on http://localhost:4242
+ * Live:   same-origin Vercel API (/api/* on xfreeze.com)
  */
 (function (global) {
-  const DEFAULT_API = 'http://localhost:4242';
-  let apiBase = DEFAULT_API;
+  function resolveDefaultApiBase() {
+    try {
+      var h = (global.location && global.location.hostname) || '';
+      if (h && h !== 'localhost' && h !== '127.0.0.1') {
+        /* Production: API is deployed next to the static site */
+        return global.location.origin;
+      }
+    } catch (e) {}
+    return 'http://localhost:4242';
+  }
+
+  let apiBase = resolveDefaultApiBase();
   let currentProduct = null;
   let config = null;
 
@@ -135,12 +146,16 @@
     } catch (err) {
       setupEl.hidden = false;
       formWrap.hidden = true;
-      setupEl.innerHTML =
-        '<strong>Cannot reach payment server.</strong><br>' +
-        'Start it with <code>cd payment-server && npm start</code><br>' +
-        'Expected at <code>' +
-        apiBase +
-        '</code>';
+      var isLocal =
+        apiBase.indexOf('localhost') !== -1 || apiBase.indexOf('127.0.0.1') !== -1;
+      setupEl.innerHTML = isLocal
+        ? '<strong>Cannot reach payment server.</strong><br>' +
+          'Start it with <code>cd payment-server && npm start</code><br>' +
+          'Expected at <code>' +
+          apiBase +
+          '</code>'
+        : '<strong>Payments are temporarily unavailable.</strong><br>' +
+          'The live payment API is not configured yet. Add Razorpay keys in Vercel env, then redeploy.';
     }
   }
 

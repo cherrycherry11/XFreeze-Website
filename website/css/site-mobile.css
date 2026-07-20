@@ -12,6 +12,11 @@ html {
  * while multiple MP4s decode. Trim the expensive effects under 1024px.
  */
 @media (max-width: 1023px) {
+  /* Fewer simultaneous decodes = smoother scroll on phones */
+  video.section-video:not(.is-active) {
+    content-visibility: auto;
+  }
+
   .xf-glass-backdrop__img,
   .xf-glass-backdrop__mesh,
   .xf-glass-section:not(:has(.xf-glass-backdrop))::before,
@@ -52,17 +57,24 @@ html {
     animation-play-state: running !important;
   }
 
-  /* Prefer content-visibility for below-fold sections */
+  /*
+   * Avoid content-visibility on animated sections — breaks entrance geometry.
+   * Keep only on footer (no scroll-reveal flow required).
+   */
+  .xf-site-footer {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 320px;
+  }
+
   #section-experimental,
   #section-minimal,
   #xf-more-categories,
   #xf-skills-spotlight-section,
   #creator-library,
   #xf-motion-prompts,
-  #xf-final-cta,
-  .xf-site-footer {
-    content-visibility: auto;
-    contain-intrinsic-size: 1px 720px;
+  #xf-final-cta {
+    content-visibility: visible !important;
+    contain: none;
   }
 }
 
@@ -184,7 +196,7 @@ body.xf-menu-open {
 html.dark .text-\[\#0a0a0a\] { color: var(--text, #f2f5f3) !important; }
 html.dark .text-\[\#52525b\] { color: var(--text-secondary, #8a958c) !important; }
 html.dark .border-\[\#e5e7eb\] { border-color: var(--border, #1f2623) !important; }
-html.dark .bg-\[\#fafafa\] { background-color: var(--surface-elevated, #0a0d0b) !important; }
+html.dark .bg-\[\#fafafa\] { background-color: var(--surface-elevated, #121212) !important; }
 html.dark .hover\:text-\[\#0a0a0a\]:hover,
 html.dark .hover\:text-black:hover { color: var(--text, #f2f5f3) !important; }
 
@@ -337,7 +349,7 @@ html.dark .hover\:text-black:hover { color: var(--text, #f2f5f3) !important; }
 }
 
 html.dark .blog-card {
-  background: var(--surface-elevated, #0a0d0b);
+  background: var(--surface-elevated, #121212);
 }
 
 .blog-card:hover {

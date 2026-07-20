@@ -69,10 +69,10 @@
   }
 
   .hero-lead {
-    max-width: 36rem !important;
+    max-width: min(40rem, 100%) !important;
     font-size: 1.0625rem !important;
-    line-height: 1.65 !important;
-    margin-bottom: 2.65rem !important;
+    line-height: 1.5 !important;
+    margin-bottom: 0 !important;
   }
 
   .hero-actions {
@@ -105,7 +105,6 @@
     font-size: 1.25rem !important;
     max-width: none !important;
     overflow: visible !important;
-    text-overflow: clip !important;
   }
 
   .hero-header .site-nav-end {
@@ -122,19 +121,22 @@
   }
 }
 
-/* Wide screens: more air around the type block */
+/* Wide screens: display type scale (centered, full page rail) */
 @media (min-width: 1280px) {
-  .hero-copy {
-    max-width: 38rem;
+  .hero-header--studio .hero-layout--center .hero-copy {
+    max-width: 100%;
   }
 
   .hero-headline__line,
   .hero-headline__sans,
   .hero-headline em {
-    font-size: 4.35rem !important;
+    font-size: 4.5rem !important;
+    letter-spacing: -0.045em !important;
+    line-height: 1.05 !important;
   }
 
-  .hero-lead {
-    max-width: 36rem !important;
+  .hero-header--studio .hero-layout--center .hero-lead {
+    max-width: min(40rem, 100%) !important;
+    font-size: 1.0625rem !important;
   }
 }

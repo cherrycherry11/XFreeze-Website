@@ -1032,6 +1032,9 @@ html.dark .xf-faq-item[open] {
 #xf-final-cta {
   border-top: 1px solid var(--border);
   overflow: hidden;
+  /* Stable paint on reload — no content-visibility skip / pop */
+  content-visibility: visible;
+  contain: layout style;
 }
 
 .xf-final-cta-stage {
@@ -1039,6 +1042,9 @@ html.dark .xf-faq-item[open] {
   margin-top: 0.5rem;
   padding: 1.25rem 0.35rem;
   /* Do not isolate the stage — orbs must paint under the glass for blur */
+  /* Always visible: GSAP only soft-fades the box, not the stage */
+  opacity: 1;
+  transform: none;
 }
 
 /* Glows sit under the card so backdrop-filter has color to frost */
@@ -1078,22 +1084,23 @@ html.dark .xf-faq-item[open] {
   opacity: 0.4;
 }
 
+/* Dark orbs: deep steel only — less blue wash, more depth */
 html.dark .xf-final-cta-orb--a {
-  background: radial-gradient(circle, rgba(70, 130, 200, 0.65) 0%, transparent 68%);
-  opacity: 0.95;
-  filter: blur(4px);
+  background: radial-gradient(circle, rgba(36, 52, 78, 0.55) 0%, transparent 70%);
+  opacity: 0.55;
+  filter: blur(8px);
 }
 
 html.dark .xf-final-cta-orb--b {
-  background: radial-gradient(circle, rgba(40, 100, 170, 0.55) 0%, transparent 70%);
-  opacity: 0.9;
-  filter: blur(6px);
+  background: radial-gradient(circle, rgba(22, 32, 48, 0.5) 0%, transparent 72%);
+  opacity: 0.5;
+  filter: blur(10px);
 }
 
 html.dark .xf-final-cta-orb--c {
-  background: radial-gradient(circle, rgba(120, 180, 255, 0.35) 0%, transparent 70%);
-  opacity: 0.7;
-  filter: blur(3px);
+  background: radial-gradient(circle, rgba(48, 64, 88, 0.28) 0%, transparent 72%);
+  opacity: 0.4;
+  filter: blur(6px);
 }
 
 .xf-final-cta-box {
@@ -1159,17 +1166,17 @@ html.dark .xf-final-cta-orb--c {
   }
 }
 
-/* Dark: smoky translucent glass over steel-blue orbs */
+/* Dark: denser charcoal glass — higher contrast against stage */
 html.dark .xf-final-cta-box {
-  background: rgba(12, 16, 24, 0.28) !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  background: rgba(6, 6, 8, 0.78) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.14) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.4) inset,
-    0 28px 60px -18px rgba(0, 0, 0, 0.7),
-    0 0 40px rgba(60, 110, 180, 0.12) !important;
-  backdrop-filter: blur(32px) saturate(1.65) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(1.65) !important;
+    0 1px 0 rgba(255, 255, 255, 0.1) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.55) inset,
+    0 32px 70px -16px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(28px) saturate(1.15) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.15) !important;
 }
 
 html.dark .xf-final-cta-box::before {
@@ -1181,21 +1188,42 @@ html.dark .xf-final-cta-box::before {
   filter: none;
   background: linear-gradient(
     165deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.03) 36%,
-    transparent 58%
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 32%,
+    transparent 55%
   );
 }
 
 html.dark .xf-final-cta-box::after {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    transparent 42%
+    rgba(255, 255, 255, 0.04) 0%,
+    transparent 40%
   );
   filter: none;
   opacity: 1;
+}
+
+/* Dark type: pure white title, brighter secondary for contrast */
+html.dark .xf-final-cta-eyebrow {
+  color: rgba(255, 255, 255, 0.72) !important;
+  letter-spacing: 0.14em;
+}
+
+html.dark .xf-final-cta-eyebrow::before {
+  background: rgba(255, 255, 255, 0.55);
+  opacity: 0.9;
+}
+
+html.dark #xf-final-cta .xf-section-title,
+html.dark .xf-final-cta-title {
+  color: #ffffff !important;
+  text-shadow: 0 1px 24px rgba(0, 0, 0, 0.45);
+}
+
+html.dark .xf-final-cta-lead {
+  color: rgba(255, 255, 255, 0.78) !important;
 }
 
 .xf-final-cta-eyebrow {
@@ -1268,24 +1296,29 @@ html.dark .xf-final-cta-box::after {
 }
 
 html.dark .xf-final-cta-btn--primary {
-  background: #f2f5f3;
-  color: #020403;
+  background: #ffffff;
+  color: #050505;
+  border: 1px solid #ffffff;
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.55);
 }
 
 html.dark .xf-final-cta-btn--primary:hover {
-  background: #dfe5e1;
+  background: #f0f0f0;
+  color: #000000;
 }
 
 html.dark .xf-final-cta-btn--ghost {
   background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #f5f5f5;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 
 html.dark .xf-final-cta-btn--ghost:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.42);
+  color: #ffffff;
 }
 
 /* Light ghost button sits cleanly on glass */

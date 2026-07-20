@@ -1,0 +1,62 @@
+/**
+ * Home templates polish — category filter chips for marquee
+ */
+
+/* Category filter chips (templates section) */
+.xf-temp-filters {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.25rem 0 0.5rem;
+  margin-top: 1rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.xf-temp-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.xf-temp-filter {
+  flex-shrink: 0;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: transparent;
+  color: rgba(15, 23, 42, 0.62);
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.xf-temp-filter:hover {
+  border-color: rgba(15, 23, 42, 0.28);
+  color: #0a0a0a;
+}
+
+.xf-temp-filter.is-active {
+  background: #0a0a0a;
+  border-color: #0a0a0a;
+  color: #fff;
+}
+
+html.dark .xf-temp-filter {
+  border-color: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.65);
+}
+
+html.dark .xf-temp-filter:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+html.dark .xf-temp-filter.is-active {
+  background: #fff;
+  border-color: #fff;
+  color: #0a0a0a;
+}

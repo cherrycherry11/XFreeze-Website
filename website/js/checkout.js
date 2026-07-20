@@ -1,16 +1,13 @@
 /**
- * X Freeze checkout modal - Stripe (card) + PayPal
- * Requires: data/products.js, payment server running on PAYMENT_API_URL
+ * X Freeze checkout — Razorpay only (USD / international)
+ *
+ * Requires: data/products.js, payment-server on apiBase (default :4242)
  */
 (function (global) {
   const DEFAULT_API = 'http://localhost:4242';
   let apiBase = DEFAULT_API;
-  let stripe = null;
-  let elements = null;
-  let paymentElement = null;
   let currentProduct = null;
   let config = null;
-  let paypalLoaded = false;
 
   function getOverlay() {
     return document.getElementById('xf-checkout-overlay');
@@ -25,12 +22,14 @@
 
   function formatPrice(amount) {
     if (global.XFreezeProducts) return global.XFreezeProducts.formatUSD(amount);
-    return '$' + amount.toFixed(2);
+    const n = Number(amount);
+    return '$' + (Number.isInteger(n) ? n.toFixed(0) : n.toFixed(2));
   }
 
   async function fetchConfig() {
     if (config) return config;
     const res = await fetch(apiBase + '/api/config');
+    if (!res.ok) throw new Error('Config request failed');
     config = await res.json();
     return config;
   }
@@ -55,30 +54,9 @@
             </div>
             <div id="xf-checkout-setup" class="xf-checkout-setup" hidden></div>
             <div id="xf-checkout-form-wrap">
-              <div class="xf-checkout-tabs" role="tablist">
-                <button type="button" class="xf-checkout-tab is-active" data-tab="card" role="tab" aria-selected="true">
-                  <i class="fa-regular fa-credit-card" aria-hidden="true"></i> Card
-                </button>
-                <button type="button" class="xf-checkout-tab" data-tab="paypal" role="tab" aria-selected="false">
-                  <i class="fa-brands fa-paypal" aria-hidden="true"></i> PayPal
-                </button>
-              </div>
-              <div id="xf-panel-card" class="xf-checkout-panel is-active" role="tabpanel">
-                <input type="email" id="xf-checkout-email" class="xf-checkout-email" placeholder="Email for receipt (optional)" autocomplete="email">
-                <div id="xf-payment-element"></div>
-                <button type="button" id="xf-pay-card-btn" class="xf-checkout-pay-btn">Pay now</button>
-              </div>
-              <div id="xf-panel-paypal" class="xf-checkout-panel" role="tabpanel" hidden>
-                <p style="font-size:0.8125rem;color:var(--text-secondary,#52525b);margin:0 0 1rem;">
-                  You will be redirected to PayPal to complete payment, then returned here.
-                </p>
-                <div id="xf-paypal-button" class="xf-checkout-paypal-wrap"></div>
-              </div>
+              <input type="email" id="xf-checkout-email" class="xf-checkout-email" placeholder="Email (optional)" autocomplete="email">
+              <button type="button" id="xf-pay-razorpay-btn" class="xf-checkout-pay-btn">Pay now</button>
               <p id="xf-checkout-message" class="xf-checkout-message" aria-live="polite"></p>
-              <p class="xf-checkout-secure">
-                <i class="fa-solid fa-lock" aria-hidden="true"></i>
-                Encrypted checkout · Stripe &amp; PayPal
-              </p>
             </div>
           </div>
         </div>
@@ -94,32 +72,13 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && overlay.classList.contains('is-open')) close();
     });
-
-    overlay.querySelectorAll('.xf-checkout-tab').forEach((tab) => {
-      tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-    });
-
-    document.getElementById('xf-pay-card-btn').addEventListener('click', payWithCard);
-  }
-
-  function switchTab(tab) {
-    const overlay = getOverlay();
-    overlay.querySelectorAll('.xf-checkout-tab').forEach((t) => {
-      const active = t.dataset.tab === tab;
-      t.classList.toggle('is-active', active);
-      t.setAttribute('aria-selected', active ? 'true' : 'false');
-    });
-    overlay.querySelectorAll('.xf-checkout-panel').forEach((p) => {
-      const active = p.id === 'xf-panel-' + tab;
-      p.classList.toggle('is-active', active);
-      p.hidden = !active;
-    });
-    if (tab === 'paypal') initPayPalButton();
+    document.getElementById('xf-pay-razorpay-btn').addEventListener('click', payWithRazorpay);
   }
 
   function open(product) {
     injectModal();
     currentProduct = product;
+    config = null;
     const overlay = getOverlay();
     overlay.hidden = false;
     requestAnimationFrame(() => overlay.classList.add('is-open'));
@@ -128,7 +87,15 @@
     document.getElementById('xf-checkout-product-name').textContent = product.name;
     document.getElementById('xf-checkout-product-price').textContent = formatPrice(product.price);
     document.getElementById('xf-checkout-subtitle').textContent =
-      product.type === 'bundle' ? 'Bundle purchase' : 'Single template';
+      product.type === 'subscription'
+        ? product.interval === 'year'
+          ? 'Yearly'
+          : 'Monthly'
+        : product.type === 'bundle'
+          ? 'Bundle'
+          : product.type === 'custom'
+            ? 'Payment'
+            : 'Template';
 
     setMessage('');
     initCheckout();
@@ -139,16 +106,9 @@
     if (!overlay) return;
     overlay.classList.remove('is-open');
     document.body.style.overflow = '';
-    setTimeout(() => { overlay.hidden = true; }, 200);
-    teardownStripe();
-  }
-
-  function teardownStripe() {
-    if (paymentElement) {
-      try { paymentElement.unmount(); } catch (_) {}
-      paymentElement = null;
-    }
-    elements = null;
+    setTimeout(() => {
+      overlay.hidden = true;
+    }, 200);
   }
 
   async function initCheckout() {
@@ -157,28 +117,30 @@
 
     try {
       const cfg = await fetchConfig();
-      if (!cfg.configured) {
+      if (!cfg.configured || !cfg.razorpay) {
         setupEl.hidden = false;
         formWrap.hidden = true;
         setupEl.innerHTML =
-          '<strong>Payment server needs API keys.</strong><br>' +
-          '1. Copy <code>payment-server/.env.example</code> → <code>payment-server/.env</code><br>' +
-          '2. Add Stripe + PayPal keys (see <code>docs/PAYMENT-SETUP.md</code>)<br>' +
-          '3. Run <code>cd payment-server && npm install && npm start</code>';
+          '<strong>Razorpay is not configured.</strong><br>' +
+          '1. Add <code>RAZORPAY_KEY_ID</code> + <code>RAZORPAY_KEY_SECRET</code> to <code>payment-server/.env</code><br>' +
+          '2. Run <code>cd payment-server && npm start</code>';
         return;
       }
 
       setupEl.hidden = true;
       formWrap.hidden = false;
-      switchTab('card');
-      await initStripeElements(cfg);
+      document.getElementById('xf-checkout-product-price').textContent = formatPrice(
+        currentProduct.price
+      );
     } catch (err) {
       setupEl.hidden = false;
       formWrap.hidden = true;
       setupEl.innerHTML =
         '<strong>Cannot reach payment server.</strong><br>' +
         'Start it with <code>cd payment-server && npm start</code><br>' +
-        'Expected at <code>' + apiBase + '</code>';
+        'Expected at <code>' +
+        apiBase +
+        '</code>';
     }
   }
 
@@ -189,134 +151,126 @@
       if (id) s.id = id;
       s.src = src;
       s.onload = resolve;
-      s.onerror = reject;
+      s.onerror = () => reject(new Error('Failed to load ' + src));
       document.head.appendChild(s);
     });
   }
 
-  async function initStripeElements(cfg) {
-    teardownStripe();
-    if (!cfg.stripePublishableKey) return;
-
-    await loadScript('https://js.stripe.com/v3/', 'xf-stripe-js');
-    stripe = global.Stripe(cfg.stripePublishableKey);
-
-    const res = await fetch(apiBase + '/api/checkout/stripe/create-intent', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        productType: currentProduct.type,
-        productId: currentProduct.id,
-        category: currentProduct.category,
-        email: document.getElementById('xf-checkout-email')?.value || undefined,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Could not start checkout');
-
-    sessionStorage.setItem('xf_pending_product', JSON.stringify(currentProduct));
-
-    const appearance = {
-      theme: document.documentElement.classList.contains('dark') ? 'night' : 'stripe',
-      variables: {
-        fontFamily: 'Inter, Roboto, Open Sans, system-ui, sans-serif',
-        borderRadius: '12px',
-      },
-    };
-
-    elements = stripe.elements({ clientSecret: data.clientSecret, appearance });
-    paymentElement = elements.create('payment');
-    paymentElement.mount('#xf-payment-element');
-  }
-
-  async function payWithCard() {
-    const btn = document.getElementById('xf-pay-card-btn');
-    if (!stripe || !elements) return;
+  async function payWithRazorpay() {
+    const btn = document.getElementById('xf-pay-razorpay-btn');
+    if (!currentProduct) return;
 
     btn.disabled = true;
-    setMessage('Processing…');
+    setMessage('Creating order…');
 
-    const returnUrl =
-      window.location.origin +
-      window.location.pathname.replace(/[^/]+$/, '') +
-      'checkout-success.html?provider=stripe';
+    try {
+      const cfg = await fetchConfig();
+      if (!cfg.razorpay || !cfg.razorpayKeyId) {
+        throw new Error('Razorpay is not configured on the payment server');
+      }
 
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: { return_url: returnUrl },
-    });
+      await loadScript('https://checkout.razorpay.com/v1/checkout.js', 'xf-razorpay-js');
 
-    if (error) {
-      setMessage(error.message, 'error');
-      btn.disabled = false;
-    }
-  }
-
-  async function initPayPalButton() {
-    const container = document.getElementById('xf-paypal-button');
-    if (!container || container.dataset.ready === '1') return;
-
-    const cfg = await fetchConfig();
-    if (!cfg.paypalClientId) return;
-
-    await loadScript(
-      'https://www.paypal.com/sdk/js?client-id=' +
-        encodeURIComponent(cfg.paypalClientId) +
-        '&currency=USD&intent=capture',
-      'xf-paypal-sdk'
-    );
-
-    container.innerHTML = '';
-    container.dataset.ready = '1';
-
-    global.paypal
-      .Buttons({
-        style: { layout: 'vertical', color: 'black', shape: 'rect', label: 'paypal' },
-        createOrder: async () => {
-          const res = await fetch(apiBase + '/api/checkout/paypal/create-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+      const orderBody =
+        currentProduct.type === 'custom' || currentProduct.amountCents
+          ? {
+              amount: currentProduct.amountCents || Math.round(Number(currentProduct.price) * 100),
+              currency: 'USD',
+              receipt: String(currentProduct.id || 'custom').slice(0, 40),
+            }
+          : {
               productType: currentProduct.type,
               productId: currentProduct.id,
               category: currentProduct.category,
-            }),
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'PayPal order failed');
-          sessionStorage.setItem('xf_pending_product', JSON.stringify(currentProduct));
-          sessionStorage.setItem('xf_paypal_order', data.orderId);
-          return data.orderId;
-        },
-        onApprove: async (data) => {
-          setMessage('Capturing payment…');
-          const res = await fetch(apiBase + '/api/checkout/paypal/capture', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ orderId: data.orderID }),
-          });
-          const capture = await res.json();
-          if (!res.ok) {
-            setMessage(capture.error || 'Capture failed', 'error');
-            return;
-          }
-          const base = window.location.pathname.replace(/[^/]+$/, '');
-          window.location.href =
-            base + 'checkout-success.html?provider=paypal&order=' + encodeURIComponent(data.orderID);
-        },
-        onError: (err) => {
-          setMessage(err?.message || 'PayPal error', 'error');
-        },
-      })
-      .render('#xf-paypal-button');
+              currency: 'USD',
+            };
 
-    paypalLoaded = true;
+      const res = await fetch(apiBase + '/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderBody),
+      });
+      const order = await res.json();
+      if (!res.ok) throw new Error(order.error || 'Could not create order');
+
+      sessionStorage.setItem('xf_pending_product', JSON.stringify(currentProduct));
+
+      const email = document.getElementById('xf-checkout-email')?.value || '';
+
+      const options = {
+        key: order.key_id || cfg.razorpayKeyId,
+        amount: order.amount,
+        currency: order.currency || 'USD',
+        name: 'X Freeze',
+        description: currentProduct.name,
+        order_id: order.order_id,
+        prefill: email ? { email: email } : undefined,
+        theme: { color: '#0a0a0a' },
+        handler: async function (response) {
+          setMessage('Verifying payment…');
+          try {
+            const vRes = await fetch(apiBase + '/api/verify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+            const vData = await vRes.json();
+            if (!vRes.ok || !vData.success) {
+              setMessage(vData.error || 'Payment verification failed', 'error');
+              btn.disabled = false;
+              return;
+            }
+            const base = window.location.pathname.replace(/[^/]+$/, '');
+            window.location.href =
+              base +
+              'checkout-success.html?provider=razorpay&payment_id=' +
+              encodeURIComponent(response.razorpay_payment_id) +
+              '&order_id=' +
+              encodeURIComponent(response.razorpay_order_id);
+          } catch (err) {
+            setMessage(err.message || 'Verification error', 'error');
+            btn.disabled = false;
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setMessage('Payment cancelled.', 'error');
+            btn.disabled = false;
+          },
+        },
+      };
+
+      const rzp = new global.Razorpay(options);
+      rzp.on('payment.failed', function (resp) {
+        const desc =
+          (resp && resp.error && (resp.error.description || resp.error.reason)) ||
+          'Payment failed';
+        setMessage(desc, 'error');
+        btn.disabled = false;
+      });
+      setMessage('');
+      rzp.open();
+      btn.disabled = false;
+    } catch (err) {
+      setMessage(err.message || 'Could not start Razorpay', 'error');
+      btn.disabled = false;
+    }
   }
 
   function openBundle(bundleId) {
     const bundle = global.XFreezeProducts?.getBundle(bundleId);
     if (!bundle) return;
     open(bundle);
+  }
+
+  function openSubscription(planId) {
+    const plan = global.XFreezeProducts?.getSubscription(planId);
+    if (!plan) return;
+    open(plan);
   }
 
   function openTemplate(code, category) {
@@ -330,11 +284,26 @@
     config = null;
   }
 
+  /** Demo / custom amount — price is USD dollars; converted to cents on the server */
+  function openCustom(name, price) {
+    const dollars = Number(price) || 1;
+    open({
+      id: 'custom_' + Date.now(),
+      name: name || 'Custom payment',
+      price: dollars,
+      type: 'custom',
+      amountCents: Math.max(100, Math.round(dollars * 100)),
+    });
+  }
+
   global.XFreezeCheckout = {
     open: open,
     close: close,
     openBundle: openBundle,
+    openSubscription: openSubscription,
     openTemplate: openTemplate,
+    openCustom: openCustom,
     setApiBase: setApiBase,
+    payWithRazorpay: payWithRazorpay,
   };
 })(window);

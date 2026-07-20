@@ -1,35 +1,40 @@
 /**
- * X Freeze - dark mode (deep black, not gray)
- * Light mode is untouched. Only html.dark rules live here.
+ * X Freeze - dark mode matched to x.ai charcoal (not pure black)
  *
- * Palette (true dark):
- *   page     #000000
- *   elevated #050505
- *   muted    #0a0a0a
- *   subtle   #111111
- *   text     #f2f2f2
- *   secondary #9a9a9a
- *   border   #1a1a1a
+ * Sampled from x.ai hero:
+ *   page     #0a0a0a
+ *   elevated #121212
+ *   muted    #161616
+ *   subtle   #1c1c1c
+ *   text     #f5f5f5
+ *   secondary #a3a3a3
+ *   border   #2a2a2a
  */
 
-/* ── Tokens ── */
+/* ── Tokens (canonical x.ai charcoal — wins over page/liquid overrides) ── */
 html.dark {
   color-scheme: dark;
-  --text: #f2f2f2;
-  --text-secondary: #9a9a9a;
-  --border: #1a1a1a;
-  --border-subtle: #121212;
-  --border-hover: #2a2a2a;
-  --surface: #000000;
-  --surface-elevated: #050505;
-  --surface-muted: #0a0a0a;
-  --surface-subtle: #111111;
-  --nav-bg: rgba(0, 0, 0, 0.94);
-  background-color: #000000;
+  --text: #f5f5f5;
+  --text-secondary: #a3a3a3;
+  --border: #2a2a2a;
+  --border-subtle: #222222;
+  --border-hover: #3a3a3a;
+  --surface: #0a0a0a;
+  --surface-elevated: #121212;
+  --surface-muted: #161616;
+  --surface-subtle: #1c1c1c;
+  --nav-bg: rgba(10, 10, 10, 0.92);
+  /* Keep liquid-theme aliases on charcoal too */
+  --xf-ink: #0a0a0a;
+  --xf-ink-2: #121212;
+  --xf-ink-3: #161616;
+  --xf-paper: #0a0a0a;
+  --xf-paper-2: #121212;
+  background-color: #0a0a0a;
 }
 
 html.dark body {
-  background-color: var(--surface);
+  background-color: #0a0a0a;
   color: var(--text);
 }
 
@@ -38,10 +43,10 @@ html.dark .bg-white:not(.text-black) {
   background-color: var(--surface) !important;
 }
 html.dark .bg-white\/70 {
-  background-color: rgba(0, 0, 0, 0.88) !important;
+  background-color: rgba(10, 10, 10, 0.88) !important;
 }
 html.dark .bg-white\/92 {
-  background-color: rgba(8, 8, 8, 0.94) !important;
+  background-color: rgba(18, 18, 18, 0.94) !important;
 }
 html.dark .bg-\[\#fafafa\],
 html.dark .bg-\[\#f8f8f8\],
@@ -154,7 +159,6 @@ html.dark .xf-spot-card,
 html.dark .xf-combo-card,
 html.dark .xf-motion-card,
 html.dark .xf-motion-flow,
-html.dark .bundles-stats-panel,
 html.dark .xf-newsletter-box,
 html.dark .skills-builder-promo,
 html.dark .skill-bundle-card,
@@ -167,22 +171,30 @@ html.dark .sb-panel {
   color: var(--text);
 }
 
-/* Dark glass cards - deep + translucent */
+/* Creator library stats: glass only (not solid muted) — home.html owns final look */
+html.dark .bundles-stats-panel {
+  background: rgba(18, 18, 20, 0.38) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  backdrop-filter: blur(28px) saturate(1.25) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.25) !important;
+  color: var(--text);
+}
+
+/* Dark glass cards - soft charcoal + translucent */
 html.dark .xf-glass-section .xf-spot-card,
 html.dark .xf-glass-section .xf-combo-card,
 html.dark .xf-glass-section .xf-motion-card,
 html.dark .xf-glass-section .xf-motion-flow,
-html.dark .xf-glass-section .bundles-stats-panel,
 html.dark .xf-glass-section .xf-newsletter-box,
 html.dark .xf-glass-hero .xf-glass-panel,
 html.dark .xf-glass-panel:not(.xf-final-cta-box) {
-  background: rgba(0, 0, 0, 0.55) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: rgba(20, 20, 22, 0.72) !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
   backdrop-filter: blur(20px) saturate(1.15) !important;
   -webkit-backdrop-filter: blur(20px) saturate(1.15) !important;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.05) inset,
-    0 16px 40px -18px rgba(0, 0, 0, 0.7) !important;
+    0 16px 40px -18px rgba(0, 0, 0, 0.55) !important;
 }
 
 html.dark .xf-spot-card:hover,
@@ -329,4 +341,82 @@ html.dark .artistic-card {
 
 html.dark .artistic-card:hover {
   box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.55);
+}
+
+
+/* ── Hard lock: every major surface = x.ai #0a0a0a (never pure black) ── */
+html.dark,
+html.dark body {
+  background-color: #0a0a0a !important;
+  background: #0a0a0a !important;
+  --nav-bg: #0a0a0a;
+}
+
+/* Nav bar — solid charcoal on every page (page-nav, scrolled, elevated, mobile) */
+html.dark .site-nav.page-nav,
+html.dark .site-nav.is-scrolled,
+html.dark .site-nav.site-nav--elevated.is-scrolled,
+html.dark .site-nav:not(.page-nav).is-scrolled,
+html.dark .site-nav-mobile-panel,
+html.dark .site-nav-mobile-panel--drawer {
+  background: #0a0a0a !important;
+  background-color: #0a0a0a !important;
+  border-bottom-color: #2a2a2a !important;
+}
+
+html.dark .xf-glass-section,
+html.dark .xf-glass-section--soft,
+html.dark .xf-glass-hero,
+html.dark .hero-header,
+html.dark .hero-header--studio,
+html.dark .hero-stage__base,
+html.dark #selected-work,
+html.dark #creator-library,
+html.dark #xf-motion-prompts,
+html.dark #xf-newsletter-cta,
+html.dark #section-experimental,
+html.dark #section-minimal,
+html.dark #xf-more-categories,
+html.dark #xf-skills-spotlight-section,
+html.dark .skills-hero-section,
+html.dark .skills-banner,
+html.dark .templates-banner,
+html.dark .pl-hero,
+html.dark .contact-hero,
+html.dark .contact-panel,
+html.dark .page-main,
+html.dark main {
+  background: #0a0a0a !important;
+  background-color: #0a0a0a !important;
+}
+
+/* Final CTA: one step deeper than page charcoal */
+html.dark #xf-final-cta {
+  background: #050506 !important;
+  background-color: #050506 !important;
+}
+
+html.dark .xf-site-footer,
+html.dark footer.xf-site-footer {
+  background: #0a0a0a !important;
+  background-color: #0a0a0a !important;
+}
+
+/* Elevated cards sit one step above charcoal — not darker */
+html.dark .simple-card,
+html.dark .xf-motion-card,
+html.dark .xf-motion-flow,
+html.dark .xf-newsletter-box,
+html.dark .xf-start-card,
+html.dark .xf-spot-card,
+html.dark .xf-combo-card {
+  background-color: #121212 !important;
+}
+
+/* Creator library stats keep glass fill (not solid elevated) */
+html.dark #creator-library .bundles-stats-panel {
+  background: rgba(18, 18, 20, 0.38) !important;
+  background-color: transparent !important;
+  backdrop-filter: blur(28px) saturate(1.25) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.25) !important;
 }

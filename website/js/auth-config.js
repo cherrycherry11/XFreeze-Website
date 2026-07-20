@@ -17,6 +17,7 @@ var XF_PUBLIC_PAGES = [
   'contact.html',
   'connector-setup.html',
   'about.html',
+  'pricing.html',
   'skill-builder.html',
   'workflows.html',
   'use-cases.html',

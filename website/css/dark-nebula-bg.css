@@ -16,7 +16,7 @@ html.dark {
 
 /* ── 1. Auth (login / signup) ── */
 html.dark body.xf-auth-body {
-  background: #010204 !important;
+  background: #0a0a0a !important;
 }
 
 html.dark .xf-auth-bg.xf-glass-backdrop .xf-glass-backdrop__img {
@@ -37,17 +37,17 @@ html.dark .xf-auth-bg.xf-glass-backdrop .xf-glass-backdrop__mesh {
 html.dark .xf-auth-bg.xf-glass-backdrop .xf-glass-backdrop__veil {
   background: linear-gradient(
     180deg,
-    rgba(0, 1, 4, 0.48) 0%,
-    rgba(0, 1, 4, 0.28) 45%,
-    rgba(0, 1, 4, 0.55) 100%
+    rgba(10, 10, 10, 0.42) 0%,
+    rgba(10, 10, 10, 0.24) 45%,
+    rgba(10, 10, 10, 0.48) 100%
   ) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
 }
 
-/* ── 2. Final CTA only (home + glass accent) ── */
+/* ── 2. Final CTA only (home + glass accent) — deeper stage, stronger contrast ── */
 html.dark #xf-final-cta {
-  background: #010204 !important;
+  background: #050506 !important;
   position: relative;
   overflow: hidden;
 }
@@ -57,9 +57,9 @@ html.dark #xf-final-cta .xf-glass-backdrop__img {
   background-size: cover !important;
   background-position: 68% 30% !important;
   background-repeat: no-repeat !important;
-  filter: blur(12px) saturate(1.08) brightness(0.92) !important;
+  filter: blur(14px) saturate(0.85) brightness(0.55) !important;
   transform: scale(1.22) rotate(5deg) !important;
-  opacity: 0.9 !important;
+  opacity: 0.55 !important;
   animation: none !important;
 }
 
@@ -70,12 +70,12 @@ html.dark #xf-final-cta .xf-glass-backdrop__mesh {
 html.dark #xf-final-cta .xf-glass-backdrop__veil {
   background: linear-gradient(
     180deg,
-    rgba(0, 1, 4, 0.5) 0%,
-    rgba(0, 1, 4, 0.32) 50%,
-    rgba(0, 1, 4, 0.58) 100%
+    rgba(5, 5, 6, 0.72) 0%,
+    rgba(5, 5, 6, 0.58) 48%,
+    rgba(5, 5, 6, 0.78) 100%
   ) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
 }
 
 /* When final CTA has no explicit backdrop stack */
@@ -90,9 +90,9 @@ html.dark #xf-final-cta.xf-glass-section:not(:has(.xf-glass-backdrop))::before {
   background-size: cover !important;
   background-position: 68% 30% !important;
   background-repeat: no-repeat !important;
-  filter: blur(12px) saturate(1.08) brightness(0.92) !important;
+  filter: blur(14px) saturate(0.85) brightness(0.55) !important;
   transform: scale(1.22) rotate(5deg) !important;
-  opacity: 0.9 !important;
+  opacity: 0.55 !important;
   animation: none !important;
 }
 
@@ -105,12 +105,12 @@ html.dark #xf-final-cta.xf-glass-section:not(:has(.xf-glass-backdrop))::after {
   pointer-events: none !important;
   background: linear-gradient(
     180deg,
-    rgba(0, 1, 4, 0.5) 0%,
-    rgba(0, 1, 4, 0.32) 50%,
-    rgba(0, 1, 4, 0.58) 100%
+    rgba(5, 5, 6, 0.72) 0%,
+    rgba(5, 5, 6, 0.58) 48%,
+    rgba(5, 5, 6, 0.78) 100%
   ) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
 }
 
 /* CTA card glass sheen lives in home-extras.css (do not kill ::before) */
@@ -126,7 +126,7 @@ html.dark #section-minimal::after {
 
 /* ── 3. Page intro heroes (not Contact — contact uses silk plates) ── */
 html.dark .xf-glass-hero:not(.contact-hero) {
-  background: #010204 !important;
+  background: #0a0a0a !important;
   overflow: hidden;
 }
 
@@ -156,9 +156,9 @@ html.dark .xf-glass-hero:not(.contact-hero)::after {
   pointer-events: none !important;
   background: linear-gradient(
     180deg,
-    rgba(0, 1, 4, 0.48) 0%,
-    rgba(0, 1, 4, 0.3) 50%,
-    rgba(0, 1, 4, 0.55) 100%
+    rgba(10, 10, 10, 0.4) 0%,
+    rgba(10, 10, 10, 0.26) 50%,
+    rgba(10, 10, 10, 0.48) 100%
   ) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;

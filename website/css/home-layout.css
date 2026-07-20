@@ -1,0 +1,140 @@
+/**
+ * Home layout helpers — hero stays center; body sections stay left-aligned.
+ * (Previously forced sitewide center heads; reverted per product direction.)
+ */
+
+/* Optional section vertical rhythm only — no text-align changes */
+#selected-work .xf-home-section,
+#creator-library .xf-home-section,
+#xf-more-categories .xf-home-section,
+#xf-motion-prompts .xf-home-section,
+#xf-skills-spotlight-section .xf-home-section {
+  padding-top: clamp(4rem, 7vw, 6.5rem);
+  padding-bottom: clamp(4rem, 7vw, 6.5rem);
+}
+
+/* Left-aligned section heads (default) */
+.xf-home-head {
+  display: block;
+  text-align: left;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 1.5rem;
+}
+
+.xf-home-head .xf-section-eyebrow {
+  text-align: left;
+  margin: 0 0 0.85rem;
+}
+
+.xf-home-head .xf-section-title {
+  text-align: left;
+  margin: 0;
+  max-width: none;
+}
+
+.xf-home-head .xf-section-lead,
+.xf-home-head .xf-section-lead--flush {
+  text-align: left;
+  margin: 0.85rem 0 0;
+  max-width: 36rem;
+}
+
+.xf-home-head__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text, #0a0a0a);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.xf-home-head__link:hover {
+  color: var(--text-secondary, #52525b);
+}
+
+html.dark .xf-home-head__link {
+  color: #f0f0f0;
+}
+
+html.dark .xf-home-head__link:hover {
+  color: #c4c4c4;
+}
+
+.xf-home-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+/* Template filters — left */
+#selected-work .xf-temp-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  width: 100%;
+}
+
+#selected-work .xf-home-marquee {
+  margin-top: 1.25rem;
+}
+
+/* Creator library stats — left-aligned columns (not centered) */
+#creator-library .bundles-stat-col {
+  display: block;
+  text-align: left;
+  align-items: flex-start;
+  padding: 2rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  #creator-library .bundles-stat-col {
+    padding: 2.25rem 1.75rem;
+  }
+}
+
+#creator-library .bundles-stat-label {
+  margin-top: 1.15rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+#creator-library .xf-section-lead--compact {
+  margin: 0.65rem 0 0;
+  max-width: 15rem;
+  text-align: left;
+}
+
+#creator-library .xf-home-stat-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text, #0a0a0a);
+  text-decoration: none;
+}
+
+html.dark #creator-library .xf-home-stat-link {
+  color: #f0f0f0;
+}
+
+/* Hero only — keep center stack (do not affect page sections) */
+.hero-header--studio .hero-layout--center .hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: min(42rem, 100%);
+  margin-inline: auto;
+  text-align: center;
+}

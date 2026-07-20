@@ -29,9 +29,12 @@
     tagline: 'Ready-made AI assets for everything you ship.',
     heroTitle: {
       line1: 'The Ultimate',
-      line2: 'AI Resource Hub',
+      line2: 'AI Creation Library',
     },
-    heroLead: 'The all-in-one library for creators, developers, and businesses. Ready-made Grok Imagine templates, motion prompts, and AI skills - including tools that turn any image into a cinematic video.',
+    /* Applied with <br> for \n in applyCounts() */
+    heroLead:
+      'A curated library of Grok Imagine templates, cinematic prompt packs,\n' +
+      'and portable AI skills for creators, developers, founders, and AI-powered teams.',
 
     templateCategories: {
       Product: 122,
@@ -332,7 +335,17 @@
       else if (line === '2') el.textContent = config.heroTitle.line2;
     });
     document.querySelectorAll('[data-xf-hero-lead]').forEach(function (el) {
-      el.textContent = config.heroLead;
+      /* Preserve intentional line breaks as <br> (textContent would collapse them) */
+      var lead = config.heroLead || '';
+      el.innerHTML = lead
+        .split(/\n+/)
+        .map(function (line) {
+          return line
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        })
+        .join('<br>');
     });
     document.querySelectorAll('[data-xf-templates-count]').forEach(function (el) {
       el.textContent = String(DISPLAY_TEMPLATE_COUNT);

@@ -16,10 +16,14 @@
     document.querySelector('.hero-header--studio')
   );
 
-  /* Even if GSAP path bails, drop pending so CSS scroll-reveal can run */
+  /* Even if GSAP path bails, drop pending/home flags so CSS scroll-reveal can run */
   if (reduced || !wide || saveData) {
     if (!wide || reduced) {
-      document.documentElement.classList.remove('xf-cinematic-pending', 'xf-cinematic');
+      document.documentElement.classList.remove(
+        'xf-cinematic-pending',
+        'xf-cinematic',
+        'xf-cinematic-home'
+      );
     }
     return;
   }
@@ -28,7 +32,11 @@
   var ScrollTrigger = window.ScrollTrigger;
   if (!gsap || !ScrollTrigger) {
     console.warn('[xf-cinematic] GSAP/ScrollTrigger missing');
-    document.documentElement.classList.remove('xf-cinematic-pending');
+    document.documentElement.classList.remove(
+      'xf-cinematic-pending',
+      'xf-cinematic',
+      'xf-cinematic-home'
+    );
     return;
   }
 
@@ -268,7 +276,10 @@
     var lead = hero.querySelector('[data-xf-hero-lead]');
     var actions = hero.querySelector('.hero-actions');
     var proof = hero.querySelector('.hero-proof');
+    var proofSub = hero.querySelector('.hero-proof-sub');
+    var proofEyebrow = hero.querySelector('.hero-proof__eyebrow');
     var chips = hero.querySelectorAll('.hero-proof__chip');
+    var tools = hero.querySelectorAll('.hero-proof__tool');
     var theme = hero.querySelector('.hero-theme');
     var copy = hero.querySelector('.hero-copy');
 
@@ -307,7 +318,58 @@
         '-=0.55'
       );
     } else if (proof) {
-      tl.to(proof, { opacity: 1, y: 0, duration: 0.85 }, '-=0.55');
+      /* Clear pre-hide on children so they can animate (eyebrow had opacity:0 stuck) */
+      if (proofEyebrow) gsap.set(proofEyebrow, { opacity: 0, y: 12 });
+      if (tools.length) gsap.set(tools, { opacity: 0, y: 10 });
+      if (proofSub) gsap.set(proofSub, { opacity: 0, y: 10 });
+      gsap.set(proof, { opacity: 1, y: 0 });
+
+      if (proofEyebrow) {
+        tl.to(
+          proofEyebrow,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: 'power3.out',
+            onComplete: function () {
+              proofEyebrow.classList.add('is-revealed');
+              proofEyebrow.style.opacity = '1';
+            },
+          },
+          '-=0.45'
+        );
+      }
+      if (tools.length) {
+        tl.to(
+          tools,
+          { opacity: 1, y: 0, duration: 0.65, stagger: 0.06, ease: 'power3.out' },
+          '-=0.4'
+        );
+      }
+      if (proofSub) {
+        tl.to(proofSub, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.4');
+      }
+      /* Safety: eyebrow never stuck hidden */
+      window.setTimeout(function () {
+        if (!proofEyebrow) return;
+        proofEyebrow.classList.add('is-revealed');
+        proofEyebrow.style.opacity = '1';
+        proofEyebrow.style.transform = 'none';
+        if (proof) proof.classList.add('is-revealed');
+      }, 2400);
+    } else {
+      if (proofEyebrow) {
+        tl.to(proofEyebrow, {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          onComplete: function () {
+            proofEyebrow.classList.add('is-revealed');
+          },
+        }, '-=0.45');
+      }
+      if (proofSub) tl.to(proofSub, { opacity: 1, y: 0, duration: 0.7 }, '-=0.45');
     }
     if (theme) tl.to(theme, { opacity: 1, y: 0, duration: 0.8 }, '-=0.5');
 
@@ -316,13 +378,14 @@
      * Blur ramps up as Templates covers the hero.
      */
     var cover = document.getElementById('selected-work') || hero;
-    var pinEnd = cover === hero ? 'bottom top' : 'top 15%';
+    /* End scrub as next section reaches the top — avoids a growing empty band */
+    var pinEnd = cover === hero ? 'bottom top' : 'top top';
     var stage = hero.querySelector('.hero-stage') || hero;
     var scrubCommon = {
       trigger: cover,
       start: 'top bottom',
       end: pinEnd,
-      scrub: 1.15,
+      scrub: 1.05,
     };
 
     /* Progressive blur + soft darken on the visual stage (not the fixed nav bar) */
@@ -407,50 +470,124 @@
    */
   function initSkillsSectionMotion() {
     var section = document.getElementById('xf-skills-spotlight-section');
-    if (!section || section._xfSkillsMotionBound) return;
-    section._xfSkillsMotionBound = true;
+    if (!section) return;
+    if (!section._xfSkillsMotionBound) {
+      section._xfSkillsMotionBound = true;
+    }
+
+    function finishCards(cards) {
+      cards.forEach(function (c) {
+        c.classList.add('is-revealed', 'is-cinematic-revealed');
+        gsap.set(c, { clearProps: 'transform,opacity,visibility' });
+        /* Inline safety so CSS never re-hides after clearProps */
+        c.style.opacity = '1';
+        c.style.transform = 'none';
+        c.style.visibility = 'visible';
+      });
+    }
 
     function animateGrid(grid) {
-      if (!grid || grid._xfStaggerBound) return;
-      var cards = grid.querySelectorAll('.xf-spot-card, .xf-combo-card, a, article');
-      if (!cards.length) return;
-      grid._xfStaggerBound = true;
+      if (!grid) return;
+      var cards = Array.prototype.slice.call(
+        grid.querySelectorAll('.xf-spot-card, .xf-combo-card, a, article')
+      );
+      if (!cards.length) {
+        /* Allow re-bind when home-extras injects later */
+        grid._xfStaggerBound = false;
+        grid._xfStaggerCount = 0;
+        return;
+      }
 
-      gsap.fromTo(
-        cards,
-        { opacity: 0, y: 40, scale: 0.96 },
-        {
-          opacity: 1,
+      /* Re-bind if card set changed (inject after empty bind) */
+      if (grid._xfStaggerBound && grid._xfStaggerCount === cards.length && grid._xfStaggerPlayed) {
+        return;
+      }
+
+      grid._xfStaggerBound = true;
+      grid._xfStaggerCount = cards.length;
+      grid._xfStaggerPlayed = false;
+
+      gsap.set(cards, { autoAlpha: 0, y: 36, scale: 0.97 });
+
+      function playCards() {
+        if (grid._xfStaggerPlayed) return;
+        grid._xfStaggerPlayed = true;
+        gsap.to(cards, {
+          autoAlpha: 1,
           y: 0,
           scale: 1,
           duration: 0.85,
           stagger: 0.07,
           ease: 'power3.out',
-          scrollTrigger: {
-            trigger: grid,
-            start: 'top 88%',
-            toggleActions: 'play none none none',
+          overwrite: 'auto',
+          onComplete: function () {
+            finishCards(cards);
           },
+        });
+      }
+
+      if (typeof IntersectionObserver !== 'undefined') {
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (!entry.isIntersecting) return;
+              playCards();
+              io.disconnect();
+            });
+          },
+          { root: null, rootMargin: '0px 0px -8% 0px', threshold: [0, 0.05, 0.12] }
+        );
+        io.observe(grid);
+      }
+
+      if (ScrollTrigger) {
+        ScrollTrigger.create({
+          trigger: grid,
+          start: 'top 90%',
+          once: true,
+          onEnter: playCards,
+          onEnterBack: playCards,
+        });
+      }
+
+      /* Already in view (parent scroll-reveal opened while cards injected) */
+      window.requestAnimationFrame(function () {
+        var rect = grid.getBoundingClientRect();
+        var vh = window.innerHeight || 0;
+        if (rect.top < vh * 0.92 && rect.bottom > 0) {
+          playCards();
         }
-      );
+      });
+
+      /* Safety: if still hidden while on-screen, force play */
+      window.setTimeout(function () {
+        if (grid._xfStaggerPlayed) return;
+        var rect = grid.getBoundingClientRect();
+        var vh = window.innerHeight || 0;
+        if (rect.top < vh * 0.98 && rect.bottom > 0) playCards();
+      }, 2800);
     }
 
     function tryBind() {
       section.querySelectorAll('[data-xf-stagger-in]').forEach(animateGrid);
-      ScrollTrigger.refresh();
     }
 
     tryBind();
 
-    /* Cards often land after first paint */
-    var mo = new MutationObserver(function () {
-      tryBind();
-    });
-    mo.observe(section, { childList: true, subtree: true });
-    window.setTimeout(function () {
-      mo.disconnect();
-      tryBind();
-    }, 4000);
+    /* Cards often land after first paint via home-extras.js */
+    if (!section._xfSkillsMo) {
+      section._xfSkillsMo = new MutationObserver(function () {
+        tryBind();
+      });
+      section._xfSkillsMo.observe(section, { childList: true, subtree: true });
+      window.setTimeout(function () {
+        if (section._xfSkillsMo) {
+          section._xfSkillsMo.disconnect();
+          section._xfSkillsMo = null;
+        }
+        tryBind();
+      }, 5000);
+    }
   }
 
   function animateRevealNodes(nodes, trigger) {
@@ -482,6 +619,319 @@
     );
   }
 
+  /**
+   * Home: per-block scroll flow via IntersectionObserver.
+   * More reliable than ScrollTrigger-on-section when Lenis + content-visibility
+   * skew layout (lower sections used to paint fully with no entrance).
+   */
+  function bindHomeBlockReveal(el, opts) {
+    if (!el || el._xfHomeBlockReveal) return;
+    el._xfHomeBlockReveal = true;
+    opts = opts || {};
+
+    var yFrom = opts.y != null ? opts.y : 44;
+    var dur = opts.duration != null ? opts.duration : 0.95;
+    var delay = opts.delay || 0;
+
+    gsap.set(el, { autoAlpha: 0, y: yFrom, force3D: true });
+
+    var played = false;
+    function play() {
+      if (played) return;
+      played = true;
+
+      /* Nested cards / chips stagger for richer “flow” */
+      var staggerKids = el.querySelectorAll(
+        '.xf-motion-card, .xf-motion-chip, .xf-cat-showcase-item, .artistic-card, .bundles-stat-col'
+      );
+      var hasKids = staggerKids.length > 1;
+
+      if (hasKids) {
+        gsap.set(staggerKids, { autoAlpha: 0, y: 28 });
+      }
+
+      var tl = gsap.timeline({
+        delay: delay,
+        defaults: { ease: 'power3.out', overwrite: 'auto' },
+        onComplete: function () {
+          el.classList.add('is-revealed', 'is-cinematic-revealed');
+          gsap.set(el, { clearProps: 'transform,opacity,visibility' });
+          if (hasKids) {
+            staggerKids.forEach(function (k) {
+              k.classList.add('is-revealed', 'is-cinematic-revealed');
+              gsap.set(k, { clearProps: 'transform,opacity,visibility' });
+            });
+          }
+          /* Do not mark the whole section is-revealed here — that CSS path
+             forced sibling .scroll-reveal-in blocks visible and killed the flow. */
+        },
+      });
+
+      tl.to(el, { autoAlpha: 1, y: 0, duration: dur }, 0);
+
+      /* Title clip rise inside this block */
+      var title = el.querySelector('.xf-section-title');
+      if (title && !title._xfTitleClip) {
+        title._xfTitleClip = true;
+        gsap.set(title, { clipPath: 'inset(18% 0 82% 0)' });
+        tl.to(
+          title,
+          {
+            clipPath: 'inset(0% 0 0% 0)',
+            duration: 1.05,
+            ease: 'power4.out',
+          },
+          0.05
+        );
+      }
+
+      if (hasKids) {
+        tl.to(
+          staggerKids,
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.75,
+            stagger: 0.08,
+            ease: 'power3.out',
+          },
+          0.18
+        );
+      }
+    }
+
+    if (typeof IntersectionObserver !== 'undefined') {
+      var io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            var vh = window.innerHeight || 0;
+            /* Ignore blocks still deep below the fold at observe time */
+            if (entry.boundingClientRect.top > vh * 0.92) return;
+            play();
+            io.disconnect();
+          });
+        },
+        { root: null, rootMargin: '0px 0px -12% 0px', threshold: [0, 0.08, 0.15, 0.28] }
+      );
+      io.observe(el);
+    }
+
+    if (ScrollTrigger) {
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 84%',
+        once: true,
+        onEnter: play,
+        invalidateOnRefresh: true,
+      });
+    }
+
+    /* If already in view after layout (deep-link / mid-page reload) */
+    window.requestAnimationFrame(function () {
+      var scrollY = window.scrollY || window.pageYOffset || 0;
+      var rect = el.getBoundingClientRect();
+      var vh = window.innerHeight || 0;
+      if (scrollY > 80 && rect.top < vh * 0.88 && rect.bottom > vh * 0.12) {
+        play();
+      }
+    });
+  }
+
+  function initHomeSectionFlow(section) {
+    if (!section || !isHome) return;
+
+    /* Only top-level reveal blocks — avoid double-binding titles/leads inside */
+    var blocks = section.querySelectorAll(':scope > .scroll-reveal-in, :scope > .content-container > .scroll-reveal-in, :scope .content-container > .scroll-reveal-in');
+    if (!blocks.length) {
+      blocks = section.querySelectorAll('.scroll-reveal-in');
+    }
+
+    var seen = [];
+    blocks.forEach(function (el) {
+      if (el._xfHomeBlockReveal) return;
+      /* Skip nested reveal-in inside another reveal-in */
+      var parentReveal = el.parentElement && el.parentElement.closest('.scroll-reveal-in');
+      if (parentReveal && parentReveal !== el && section.contains(parentReveal)) return;
+      seen.push(el);
+    });
+
+    seen.forEach(function (el, i) {
+      bindHomeBlockReveal(el, {
+        delay: Math.min(i * 0.04, 0.16),
+        y: 48,
+        duration: 1,
+      });
+    });
+
+    /* Creator library stats (not always .scroll-reveal-in) */
+    if (section.id === 'creator-library') {
+      section.querySelectorAll('.bundles-stat-col').forEach(function (col, i) {
+        if (col.closest('.scroll-reveal-in')) return;
+        bindHomeBlockReveal(col, { delay: 0.08 + i * 0.05, y: 36, duration: 0.85 });
+      });
+    }
+  }
+
+  /**
+   * Template system section entrance — eyebrow → title → lead → filters → marquee.
+   * CSS pre-hides children (.xf-selected-work-copy:not(.is-flow-done) > *).
+   * Parent shell stays paint-ready so stagger is never blocked by parent opacity:0.
+   * Primary trigger: IntersectionObserver on #selected-work (works with Lenis + fixed hero).
+   * Backup: ScrollTrigger once.
+   */
+  function initSelectedWorkReveal(section) {
+    if (!section || section._xfSelectedWorkReveal) return;
+    section._xfSelectedWorkReveal = true;
+
+    var marqueeWrap = section.querySelector('.scroll-reveal-in.mt-4');
+    var marquee = document.getElementById('selected-work-marquee');
+    var textBlock =
+      section.querySelector('.xf-selected-work-copy') ||
+      section.querySelector('#templates > .scroll-reveal-in:not(.mt-4)') ||
+      section.querySelector('.content-container > .scroll-reveal-in:not(.mt-4)');
+
+    /* Marquee CSS train must keep transform free — hide wrap until flow plays */
+    if (marquee) {
+      gsap.set(marquee, { clearProps: 'transform,x,y' });
+      marquee.style.visibility = 'visible';
+    }
+
+    var eyebrow = textBlock && textBlock.querySelector('.xf-section-eyebrow');
+    var title = textBlock && textBlock.querySelector('.xf-section-title');
+    var leadRow = textBlock && textBlock.querySelector('.mt-3');
+    var filters = textBlock && textBlock.querySelector('.xf-temp-filters');
+    var flowList = [eyebrow, title, leadRow, filters].filter(Boolean);
+
+    if (!textBlock || !flowList.length) {
+      if (textBlock) {
+        textBlock.classList.add('is-revealed', 'is-cinematic-revealed', 'is-flow-done');
+        gsap.set(textBlock, { opacity: 1, y: 0 });
+      }
+      if (marqueeWrap) {
+        gsap.set(marqueeWrap, { opacity: 1, y: 0 });
+        marqueeWrap.classList.add('is-revealed', 'is-cinematic-revealed');
+      }
+      section.classList.add('is-revealed');
+      return;
+    }
+
+    /*
+     * Parent shell: force paint-ready (CSS also forces this via !important).
+     * Children: GSAP owns from hidden state so stagger is visible on scroll.
+     */
+    textBlock.classList.add('is-revealed', 'is-cinematic-revealed');
+    gsap.set(textBlock, { opacity: 1, y: 0, clearProps: 'transform' });
+    gsap.set(flowList, { autoAlpha: 0, y: 48, force3D: true });
+
+    if (marqueeWrap) {
+      /* Keep class off is-revealed so default home CSS keeps it hidden until flow */
+      gsap.set(marqueeWrap, { autoAlpha: 0, y: 28, force3D: true });
+    }
+
+    var played = false;
+    function finishFlow() {
+      /* Mark done first so CSS :not(.is-flow-done) hide rules drop before clearProps */
+      textBlock.classList.add('is-flow-done', 'is-revealed', 'is-cinematic-revealed');
+      section.classList.add('is-revealed');
+      flowList.forEach(function (el) {
+        el.classList.add('is-revealed', 'is-cinematic-revealed');
+        gsap.set(el, { clearProps: 'transform,opacity,visibility,clipPath' });
+      });
+      if (marqueeWrap) {
+        marqueeWrap.classList.add('is-revealed', 'is-cinematic-revealed');
+        gsap.set(marqueeWrap, { clearProps: 'transform,opacity,visibility' });
+      }
+    }
+
+    function playFlow() {
+      if (played) return;
+      played = true;
+
+      var tl = gsap.timeline({
+        defaults: { ease: 'power3.out', overwrite: 'auto' },
+        onComplete: finishFlow,
+      });
+
+      if (eyebrow) {
+        tl.to(eyebrow, { autoAlpha: 1, y: 0, duration: 0.65 }, 0);
+      }
+      if (title) {
+        tl.fromTo(
+          title,
+          { autoAlpha: 0, y: 52, clipPath: 'inset(12% 0 88% 0)' },
+          {
+            autoAlpha: 1,
+            y: 0,
+            clipPath: 'inset(0% 0 0% 0)',
+            duration: 1.05,
+            ease: 'power4.out',
+          },
+          eyebrow ? 0.1 : 0
+        );
+      }
+      if (leadRow) {
+        tl.to(leadRow, { autoAlpha: 1, y: 0, duration: 0.8 }, '-=0.55');
+      }
+      if (filters) {
+        tl.to(filters, { autoAlpha: 1, y: 0, duration: 0.75 }, '-=0.48');
+      }
+      if (marqueeWrap) {
+        tl.to(marqueeWrap, { autoAlpha: 1, y: 0, duration: 0.9, ease: 'power3.out' }, '-=0.4');
+      }
+    }
+
+    /* Primary: IO on the whole section (not a tiny child rect) */
+    if (typeof IntersectionObserver !== 'undefined') {
+      var io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            /*
+             * Skip false positives at page top: section still mostly below fold
+             * (fixed hero + pin spacer leave #selected-work ~1vh down).
+             */
+            var vh = window.innerHeight || 0;
+            if (entry.boundingClientRect.top > vh * 0.82) return;
+            playFlow();
+            io.disconnect();
+          });
+        },
+        { root: null, rootMargin: '0px 0px -10% 0px', threshold: [0, 0.05, 0.12, 0.2, 0.35] }
+      );
+      io.observe(section);
+    }
+
+    /* Backup: ScrollTrigger once section top crosses ~72% of viewport */
+    if (ScrollTrigger) {
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 72%',
+        once: true,
+        onEnter: playFlow,
+        invalidateOnRefresh: true,
+      });
+    }
+
+    /* Only auto-play if user already scrolled into the section (not at page top) */
+    window.requestAnimationFrame(function () {
+      var scrollY = window.scrollY || window.pageYOffset || 0;
+      var rect = section.getBoundingClientRect();
+      var vh = window.innerHeight || 0;
+      if (scrollY > vh * 0.35 && rect.top < vh * 0.75 && rect.bottom > vh * 0.2) {
+        playFlow();
+      }
+    });
+
+    /* Safety: never leave copy stuck hidden if triggers miss */
+    window.setTimeout(function () {
+      if (played) return;
+      var rect = section.getBoundingClientRect();
+      var vh = window.innerHeight || 0;
+      if (rect.top < vh * 0.85 && rect.bottom > 0) playFlow();
+    }, 6000);
+  }
+
   function initReveals() {
     document.querySelectorAll('[data-scroll-reveal]').forEach(function (section) {
       if (section._xfRevealBound) return;
@@ -489,98 +939,56 @@
 
       var isMarqueeSection = section.id === 'selected-work';
       var isSkillsSection = section.id === 'xf-skills-spotlight-section';
+      var isFinalCta = section.id === 'xf-final-cta';
+
+      /* Final CTA owned exclusively by initFinalCta — avoid double GSAP thrash */
+      if (isFinalCta) {
+        initFinalCta();
+        return;
+      }
+
+      /*
+       * Template system (#selected-work): dedicated scroll flow.
+       */
+      if (isMarqueeSection) {
+        initSelectedWorkReveal(section);
+        return;
+      }
+
+      /*
+       * HOME: per-block IO flow for motion / skills / categories / style sections.
+       * Replaces section-level ST batch that fired early or not at all below the fold.
+       */
+      if (isHome) {
+        initHomeSectionFlow(section);
+        /* Skills dynamic grids keep their own card stagger */
+        if (isSkillsSection) initSkillsSectionMotion();
+        return;
+      }
 
       var kids = section.querySelectorAll(
-        '.scroll-reveal-in, .xf-section-title, .xf-section-eyebrow, .xf-section-lead, .xf-motion-hero, .xf-more-categories-head, .bundles-stat-col, .xf-final-cta-stage, .xf-final-cta-box, .xf-content-hero, .xf-prose, .xf-about-section, .connector-setup-header, .connector-setup-grid, .connector-setup-apps, .connector-setup-faq, .connector-setup-cta, .skills-how-card, .skills-builder-promo, .skills-toolbar, .templates-header, .pl-hero'
+        '.scroll-reveal-in, .xf-section-title, .xf-section-eyebrow, .xf-section-lead, .xf-motion-hero, .xf-more-categories-head, .bundles-stat-col, .xf-content-hero, .xf-prose, .xf-about-section, .connector-setup-header, .connector-setup-grid, .connector-setup-apps, .connector-setup-faq, .connector-setup-cta, .skills-how-card, .skills-builder-promo, .skills-toolbar, .templates-header, .pl-hero'
       );
       if (!kids.length && !isSkillsSection) {
-        /* Whole section as one unit on simple pages */
         if (section.classList.contains('scroll-reveal-in') || section.children.length) {
           animateRevealNodes(section.children.length ? [section] : [], section);
         }
         return;
       }
 
-      /* Clip-mask titles — calmer on inner pages */
-      if (!isMarqueeSection && isHome) {
-        var titles = section.querySelectorAll('.xf-section-title');
-        titles.forEach(function (t) {
-          gsap.fromTo(
-            t,
-            { clipPath: 'inset(0 0 100% 0)', opacity: 0.2, y: 30 },
-            {
-              clipPath: 'inset(0 0 0% 0)',
-              opacity: 1,
-              y: 0,
-              duration: 1.15,
-              ease: 'power4.out',
-              scrollTrigger: {
-                trigger: t,
-                start: 'top 85%',
-                toggleActions: 'play none none none',
-              },
-            }
-          );
-        });
-      }
-
-      /*
-       * Marquee section: reveal text only once; force track fully opaque.
-       * Never animate transform/opacity on #selected-work-marquee (CSS owns it).
-       */
-      if (isMarqueeSection) {
-        var textKids = section.querySelectorAll(
-          '.scroll-reveal-in.mb-8, .xf-section-title, .xf-section-eyebrow, .xf-section-lead'
-        );
-        var marqueeWrap = section.querySelector('.scroll-reveal-in.mt-4');
-        var marquee = document.getElementById('selected-work-marquee');
-        if (marquee) {
-          gsap.set(marquee, { clearProps: 'transform,x,y,opacity' });
-          marquee.style.opacity = '1';
-        }
-        if (marqueeWrap) {
-          gsap.set(marqueeWrap, { opacity: 1, y: 0, clearProps: 'transform' });
-          marqueeWrap.classList.add('is-revealed', 'is-cinematic-revealed');
-        }
-        if (textKids.length) {
-          gsap.fromTo(
-            textKids,
-            { opacity: 0, y: 40 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 1.1,
-              stagger: 0.08,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: section,
-                start: 'top 80%',
-                toggleActions: 'play none none none',
-              },
-              onComplete: function () {
-                textKids.forEach(function (el) {
-                  el.classList.add('is-cinematic-revealed', 'is-revealed');
-                });
-                section.classList.add('is-revealed');
-              },
-            }
-          );
-        }
-        return;
-      }
-
-      /* Titles already animated — skip them in kids batch if we did clip reveal */
       animateRevealNodes(kids, section);
-
-      /* No section transform scrub — fights marquees / sticky layouts */
     });
 
     /* Standalone .scroll-reveal-in nodes not wrapped in [data-scroll-reveal] */
     document.querySelectorAll('.scroll-reveal-in').forEach(function (el) {
-      if (el._xfRevealBound) return;
+      if (el._xfRevealBound || el._xfHomeBlockReveal) return;
       if (el.closest('[data-scroll-reveal]')) return;
       el._xfRevealBound = true;
-      animateRevealNodes([el], el);
+      if (isHome) {
+        bindHomeBlockReveal(el, {});
+      } else {
+        animateRevealNodes([el], el);
+      }
     });
   }
 
@@ -672,25 +1080,45 @@
     });
   }
 
+  /**
+   * Final CTA: single calm reveal. No double GSAP, no opacity thrash on reload.
+   * Stage stays layout-stable; only a soft fade-up of the glass card.
+   */
   function initFinalCta() {
     var cta = document.getElementById('xf-final-cta');
-    if (!cta) return;
+    if (!cta || cta._xfFinalCtaBound) return;
+    cta._xfFinalCtaBound = true;
+
+    var stage = cta.querySelector('.xf-final-cta-stage');
     var box = cta.querySelector('.xf-final-cta-box');
     if (!box) return;
 
-    /* Animate the card only — never the section shell (avoids hero bleed) */
+    /* Stage always paint-ready (prevents FOUC hide → show glitch) */
+    if (stage) {
+      gsap.set(stage, { opacity: 1, y: 0, clearProps: 'transform' });
+      stage.classList.add('is-revealed', 'is-cinematic-revealed');
+    }
+
+    /* Soft card entrance only — never re-hide to 0 (reload flash) */
     gsap.fromTo(
       box,
-      { opacity: 0.65, y: 28 },
+      { opacity: 0.88, y: 18 },
       {
         opacity: 1,
         y: 0,
-        duration: 1,
-        ease: 'power3.out',
+        duration: 0.85,
+        ease: 'power2.out',
+        immediateRender: false,
         scrollTrigger: {
           trigger: cta,
-          start: 'top 82%',
+          start: 'top 85%',
           toggleActions: 'play none none none',
+          once: true,
+        },
+        onComplete: function () {
+          gsap.set(box, { clearProps: 'transform,opacity' });
+          box.classList.add('is-revealed', 'is-cinematic-revealed');
+          cta.classList.add('is-revealed');
         },
       }
     );
@@ -1276,6 +1704,14 @@
       initStatsPunch();
       initNavMorph();
       initReveals();
+      /* Re-measure after pin spacer + elevated nav so ST/IO hit selected-work correctly */
+      window.requestAnimationFrame(function () {
+        syncHeroPinSpacer();
+        ScrollTrigger.refresh();
+      });
+      window.setTimeout(function () {
+        ScrollTrigger.refresh();
+      }, 320);
     } else if (document.querySelector('.pl-hero')) {
       /* Prompts: dedicated calm flow only — no word-split, no body y-reveals */
       initPromptsHeroFlow();
@@ -1317,6 +1753,8 @@
           syncHeroPinSpacer();
           initExpand();
           initTilt();
+          /* Re-bind skills/combo cards after home-extras inject */
+          initSkillsSectionMotion();
         } else if (!isCalmInnerPage()) {
           /* Re-run after skills/dynamic render (not prompts/templates) */
           initInnerPageReveals();
@@ -1368,7 +1806,15 @@
     refresh: function () {
       var section = document.getElementById('xf-skills-spotlight-section');
       if (section) {
-        section._xfSkillsMotionBound = false;
+        /* Allow re-bind after home-extras injects combo/spotlight cards */
+        section.querySelectorAll('[data-xf-stagger-in]').forEach(function (grid) {
+          var n = grid.querySelectorAll('.xf-spot-card, .xf-combo-card, a, article').length;
+          if (n && (!grid._xfStaggerPlayed || grid._xfStaggerCount !== n)) {
+            grid._xfStaggerBound = false;
+            grid._xfStaggerPlayed = false;
+            grid._xfStaggerCount = 0;
+          }
+        });
         initSkillsSectionMotion();
       }
       if (!isHome && !isCalmInnerPage()) {

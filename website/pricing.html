@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" data-xf-meta-title="Pricing - X Freeze Pro" data-xf-meta-desc="X Freeze Pro plans. Monthly $49 or yearly $499. Full library access." data-xf-meta-path="pricing.html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing - X Freeze</title>
+  <script>
+    (function () {
+      var stored = localStorage.getItem('xfreeze-theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.classList.toggle(
+        'dark',
+        stored === 'dark' || (stored !== 'light' && prefersDark)
+      );
+    })();
+  </script>
+  <script src="js/auth-config.js"></script>
+  <script src="js/site-config.js"></script>
+  <script src="js/site-meta.js"></script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/content-pages.css">
+  <link rel="stylesheet" href="css/site-fonts.css">
+  <link rel="stylesheet" href="css/theme-switch.css">
+  <link rel="stylesheet" href="css/dark-nebula-bg.css">
+  <link rel="stylesheet" href="css/site-nav.css">
+  <link rel="stylesheet" href="css/site-mobile.css">
+  <link rel="stylesheet" href="css/site-footer.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/scroll-reveal.css">
+  <link rel="stylesheet" href="css/checkout.css">
+  <link rel="stylesheet" href="css/pricing.css">
+  <link rel="stylesheet" href="css/theme-dark.css">
+  <style>
+    :root {
+      --text: #0a0a0a; --text-secondary: #52525b; --border: #e5e7eb;
+      --surface: #ffffff; --surface-elevated: #fafafa; --surface-muted: #f8f8f8;
+      --surface-subtle: #f4f4f5; --border-hover: #d4d4d8;
+      --nav-bg: rgba(255,255,255,0.94); --page-gutter: 1rem;
+    }
+    @media (min-width:640px){:root{--page-gutter:1.25rem}}
+    @media (min-width:768px){:root{--page-gutter:1.5rem}}
+    @media (min-width:1024px){:root{--page-gutter:2rem}}
+    html.dark {
+      color-scheme: dark;
+      --text:#f5f5f5; --text-secondary:#a3a3a3; --border:#2a2a2a;
+      --surface:#0a0a0a; --surface-elevated:#121212; --surface-muted:#161616;
+      --surface-subtle:#1c1c1c; --border-hover:#3a3a3a;
+      --nav-bg:rgba(10,10,10,0.92);
+    }
+    body { font-family: var(--font-sans); background: var(--surface); color: var(--text); margin: 0; }
+    .content-container { width:100%; max-width:min(1520px,calc(100% - var(--page-gutter)*2)); margin-inline:auto; padding-inline:var(--page-gutter); }
+  </style>
+</head>
+<body>
+  <nav id="site-nav" class="site-nav page-nav" aria-label="Main">
+    <div class="content-container">
+      <div class="site-nav-bar">
+        <a href="home.html" class="site-nav-logo">X Freeze</a>
+        <div class="site-nav-pill">
+          <a href="templates.html" class="site-nav-pill-link">Templates</a>
+          <a href="prompt-library.html" class="site-nav-pill-link">Prompts</a>
+          <a href="skills.html" class="site-nav-pill-link">Skills</a>
+          <a href="pricing.html" class="site-nav-pill-link site-nav-pill-link--active" aria-current="page">Pricing</a>
+          <a href="about.html" class="site-nav-pill-link">About</a>
+          <a href="contact.html" class="site-nav-pill-link">Contact</a>
+        </div>
+        <div class="site-nav-end">
+          <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee" aria-label="Buy me a coffee">
+            <i class="fa-solid fa-mug-hot text-xs" aria-hidden="true"></i>
+            <span class="site-nav-coffee__label">Buy me a coffee</span>
+          </a>
+          <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+            <i class="fa-solid fa-bars text-sm"></i>
+          </button>
+          <div id="xf-auth-nav" class="site-nav-auth"><a href="login.html" class="site-nav-auth-btn">Sign in</a></div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div id="mobile-menu-backdrop" class="site-nav-mobile-backdrop hidden lg:hidden" aria-hidden="true"></div>
+
+  <div id="mobile-menu" class="site-nav-mobile-panel site-nav-mobile-panel--drawer hidden lg:hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Site menu">
+    <div class="site-nav-mobile-drawer">
+      <header class="site-nav-drawer-head">
+        <a href="home.html" class="site-nav-drawer-logo" onclick="toggleMobileMenu()">X Freeze</a>
+        <button type="button" class="site-nav-drawer-close" onclick="toggleMobileMenu()" aria-label="Close menu"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </header>
+      <nav class="site-nav-drawer-nav" aria-label="Mobile">
+        <a href="templates.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Templates</a>
+        <a href="prompt-library.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Prompts</a>
+        <a href="skills.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Skills</a>
+        <a href="pricing.html" class="site-nav-drawer-link site-nav-drawer-link--active" onclick="toggleMobileMenu()">Pricing</a>
+        <a href="about.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">About</a>
+      </nav>
+      
+    
+
+        <div class="site-nav-drawer-bottom">
+          <div id="xf-auth-drawer" class="site-nav-drawer-auth">
+            <a href="templates.html" class="site-nav-drawer-auth-btn site-nav-drawer-cta" onclick="toggleMobileMenu()">Get started</a>
+            <a href="login.html" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu()">Sign in</a>
+          </div>
+          <footer class="site-nav-drawer-footer">
+        <div class="site-nav-drawer-theme">
+          <span class="site-nav-drawer-theme__label">Dark mode</span>
+          <button type="button" onclick="toggleTheme()" class="site-nav-drawer-theme__switch theme-switch theme-switch--sm" role="switch" aria-checked="false" aria-label="Switch to dark mode">
+            <span class="theme-switch-track" aria-hidden="true">
+              <span class="theme-switch-thumb">
+                <span class="theme-switch-icon theme-switch-icon--sun"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12z"/></svg></span>
+                <span class="theme-switch-icon theme-switch-icon--moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg></span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </footer>
+          <div class="site-nav-drawer-meta-row">
+            <a href="contact.html" onclick="toggleMobileMenu()">Contact</a>
+            <span class="site-nav-drawer-meta-dot" aria-hidden="true">·</span>
+            <a href="privacy.html" onclick="toggleMobileMenu()">Legal</a>
+            <span class="site-nav-drawer-meta-dot" aria-hidden="true">·</span>
+            <a href="terms.html" onclick="toggleMobileMenu()">Terms</a>
+          </div>
+        </div>
+</div>
+  </div>
+
+  <main id="xf-pricing" class="xf-pricing-page page-main">
+    <div class="content-container">
+      <header class="xf-pricing-hero scroll-reveal-in">
+        <p class="xf-content-eyebrow">Pricing</p>
+        <h1 class="xf-content-title">Simple plans. Full library.</h1>
+        <p class="xf-content-lead">
+          Start free, or unlock the full library with a subscription.
+        </p>
+      </header>
+
+      <div class="xf-pricing-grid">
+        <!-- Free -->
+        <article class="xf-price-card scroll-reveal-in" data-plan="free">
+          <p class="xf-price-card__plan">Free</p>
+          <div class="xf-price-card__amount">
+            <span class="xf-price-card__dollar">$</span>
+            <span class="xf-price-card__value">0</span>
+            <span class="xf-price-card__period">forever</span>
+          </div>
+          <p class="xf-price-card__note">
+            Start exploring with free templates and skills.
+          </p>
+          <ul class="xf-price-card__features">
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              Free templates to browse &amp; use
+            </li>
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              Free AI skills packs
+            </li>
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              Motion prompt previews
+            </li>
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              Works with Grok, Claude, Cursor, GPT
+            </li>
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              No card required
+            </li>
+          </ul>
+          <a href="templates.html" class="xf-price-card__cta">Get started</a>
+        </article>
+
+        <!-- Monthly -->
+        <article class="xf-price-card scroll-reveal-in" data-plan="pro-monthly">
+          <p class="xf-price-card__plan">Monthly</p>
+          <div class="xf-price-card__amount">
+            <span class="xf-price-card__dollar">$</span>
+            <span class="xf-price-card__value">49</span>
+            <span class="xf-price-card__period">/ month</span>
+          </div>
+          <p class="xf-price-card__note">
+            Flexible month-to-month access. Cancel anytime.
+          </p>
+          <ul class="xf-price-card__features">
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              Full template library access
+            </li>
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              Motion prompt library
+            </li>
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              AI skills packs
+            </li>
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              New drops included while active
+            </li>
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              Works with Grok, Claude, Cursor, GPT
+            </li>
+          </ul>
+          <button type="button" class="xf-price-card__cta" data-checkout-plan="pro-monthly">
+            Start monthly
+          </button>
+        </article>
+
+        <!-- Yearly -->
+        <article class="xf-price-card xf-price-card--featured scroll-reveal-in" data-plan="pro-yearly">
+          <span class="xf-price-card__badge">Best value · Save $89</span>
+          <p class="xf-price-card__plan">Yearly</p>
+          <div class="xf-price-card__amount">
+            <span class="xf-price-card__dollar">$</span>
+            <span class="xf-price-card__value">499</span>
+            <span class="xf-price-card__period">/ year</span>
+          </div>
+          <p class="xf-price-card__note">
+            Equals <strong>~$41.58 / month</strong>. Two months free vs monthly.
+          </p>
+          <ul class="xf-price-card__features">
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              Everything in Monthly
+            </li>
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              Priority access to new packs
+            </li>
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              Best rate for serious creators
+            </li>
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              One payment · full year unlocked
+            </li>
+            <li>
+              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              Full year of library updates
+            </li>
+          </ul>
+          <button type="button" class="xf-price-card__cta xf-price-card__cta--primary" data-checkout-plan="pro-yearly">
+            Get yearly access
+          </button>
+        </article>
+      </div>
+
+      <section class="xf-pricing-include scroll-reveal-in" aria-labelledby="include-title">
+        <h2 id="include-title" class="xf-pricing-include__title">What’s included</h2>
+        <p class="xf-pricing-include__sub">One plan. The full X Freeze creator library.</p>
+        <div class="xf-pricing-include__grid">
+          <div class="xf-pricing-include__item">
+            <span class="xf-pricing-include__icon" aria-hidden="true"><i class="fa-solid fa-images"></i></span>
+            <div>
+              <h3>Visual templates</h3>
+              <p>Product, mockup, style edit, makeup, filters, and everyday use cases.</p>
+            </div>
+          </div>
+          <div class="xf-pricing-include__item">
+            <span class="xf-pricing-include__icon" aria-hidden="true"><i class="fa-solid fa-film"></i></span>
+            <div>
+              <h3>Motion prompts</h3>
+              <p>Ready-made cinematic and product motion prompts for Grok Imagine.</p>
+            </div>
+          </div>
+          <div class="xf-pricing-include__item">
+            <span class="xf-pricing-include__icon" aria-hidden="true"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+            <div>
+              <h3>AI skills</h3>
+              <p>Portable skills for Grok, Claude, Cursor, and GPT workflows.</p>
+            </div>
+          </div>
+          <div class="xf-pricing-include__item">
+            <span class="xf-pricing-include__icon" aria-hidden="true"><i class="fa-solid fa-arrows-rotate"></i></span>
+            <div>
+              <h3>Ongoing updates</h3>
+              <p>New library drops stay available while your plan is active.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="xf-pricing-faq scroll-reveal-in" aria-labelledby="faq-title">
+        <h2 id="faq-title" class="xf-pricing-faq__title">Questions</h2>
+        <details>
+          <summary>What’s the difference between monthly and yearly?</summary>
+          <p>Same library access. Yearly is $499/year (~$41.58/mo) and saves $89 versus twelve monthly payments of $49.</p>
+        </details>
+        <details>
+          <summary>Can I cancel monthly?</summary>
+          <p>Yes. Monthly is flexible — cancel anytime and keep access until the end of the paid period.</p>
+        </details>
+        <details>
+          <summary>How do I get access after paying?</summary>
+          <p>After a successful payment you’ll land on a confirmation page. Keep your payment receipt and email for your records.</p>
+        </details>
+      </section>
+
+      <div class="xf-pricing-bottom scroll-reveal-in">
+        <h2>Not sure yet?</h2>
+        <p>Browse free templates and skills first, then upgrade when you’re ready.</p>
+        <a href="templates.html">Explore templates</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="xf-site-footer" data-xf-footer-root></footer>
+
+  <script src="data/products.js"></script>
+  <script src="js/checkout.js"></script>
+  <script src="js/scroll-reveal.js"></script>
+  <script>
+    function getPreferredTheme() {
+      var stored = localStorage.getItem('xfreeze-theme');
+      if (stored === 'dark' || stored === 'light') return stored;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    function applyTheme(theme) {
+      var isDark = theme === 'dark';
+      document.documentElement.classList.toggle('dark', isDark);
+      localStorage.setItem('xfreeze-theme', theme);
+      document.querySelectorAll('.theme-toggle, .theme-toggle-mobile, .site-nav-drawer-theme__switch').forEach(function (btn) {
+        btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+        btn.setAttribute('aria-checked', isDark ? 'true' : 'false');
+      });
+    }
+    function toggleTheme() {
+      applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+    }
+    applyTheme(getPreferredTheme());
+
+    document.querySelectorAll('[data-checkout-plan]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-checkout-plan');
+        if (window.XFreezeCheckout && window.XFreezeCheckout.openSubscription) {
+          window.XFreezeCheckout.openSubscription(id);
+        } else if (window.XFreezeProducts && window.XFreezeCheckout) {
+          var plan = window.XFreezeProducts.getSubscription(id);
+          if (plan) window.XFreezeCheckout.open(plan);
+        }
+      });
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="js/auth.js" defer></script>
+  <script src="js/site-nav.js" defer></script>
+  <script src="js/site-footer.js" defer></script>
+</body>
+</html>

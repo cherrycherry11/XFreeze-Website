@@ -97,43 +97,6 @@
   letter-spacing: -0.03em;
 }
 
-.xf-checkout-tabs {
-  display: flex;
-  gap: 0.35rem;
-  padding: 0.25rem;
-  border-radius: 9999px;
-  background: var(--surface-subtle, #f4f4f5);
-  border: 1px solid var(--border, #e5e7eb);
-  margin-bottom: 1.25rem;
-}
-.xf-checkout-tab {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0.55rem 0.75rem;
-  border: none;
-  border-radius: 9999px;
-  background: transparent;
-  color: var(--text-secondary, #52525b);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.xf-checkout-tab.is-active {
-  background: var(--surface, #fff);
-  color: var(--text, #0a0a0a);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-html.dark .xf-checkout-tab.is-active {
-  background: var(--surface-muted, #0f1311);
-}
-
-.xf-checkout-panel { display: none; }
-.xf-checkout-panel.is-active { display: block; }
-
 .xf-checkout-email {
   width: 100%;
   padding: 0.65rem 0.875rem;
@@ -150,13 +113,9 @@ html.dark .xf-checkout-tab.is-active {
   outline-offset: 1px;
 }
 
-#xf-payment-element {
-  min-height: 120px;
-}
-
 .xf-checkout-pay-btn {
   width: 100%;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   padding: 0.8rem 1rem;
   border: none;
   border-radius: 0.875rem;
@@ -172,13 +131,6 @@ html.dark .xf-checkout-tab.is-active {
 html.dark .xf-checkout-pay-btn {
   background: #f2f5f3;
   color: #020403;
-}
-
-.xf-checkout-paypal-wrap {
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .xf-checkout-message {

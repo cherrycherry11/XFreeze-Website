@@ -13,7 +13,7 @@ html.xf-auth-pending::before {
 }
 
 html.dark.xf-auth-pending::before {
-  background: var(--surface, #020403);
+  background: var(--surface, #0a0a0a);
 }
 
 .site-nav-auth {
@@ -299,7 +299,7 @@ html:not(.dark) .xf-auth-bg.xf-glass-backdrop .xf-glass-backdrop__veil {
 }
 
 html.dark body.xf-auth-body {
-  background: #000000;
+  background: var(--surface, #0a0a0a);
   color: var(--text, #f2f2f2);
 }
 
@@ -577,48 +577,72 @@ html.dark .xf-auth-mode-tabs {
 .site-nav-drawer-auth {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.85rem 1.1rem 0.5rem;
+  gap: 0.55rem;
+  padding: 0;
+  width: 100%;
 }
 
-.site-nav-drawer-auth-btn {
+/* xAI-style full-width pill CTA */
+.site-nav-drawer-auth-btn,
+.site-nav-drawer-cta {
   display: flex;
   width: 100%;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  min-height: 2.75rem;
-  padding: 0.7rem 1rem;
-  /* Rectangle (site box buttons) - not pills */
-  border-radius: 0.5rem;
-  border: 1px solid var(--border, #e5e7eb);
+  min-height: 3.15rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 9999px;
+  border: none;
   background: var(--text, #0a0a0a);
   color: var(--surface, #fff);
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 550;
+  letter-spacing: -0.01em;
   line-height: 1.2;
   text-decoration: none;
   text-align: center;
   white-space: nowrap;
   cursor: pointer;
   box-sizing: border-box;
+  transition: opacity 0.15s ease;
 }
 
-html.dark .site-nav-drawer-auth-btn {
-  background: #f2f2f2;
+.site-nav-drawer-auth-btn:hover,
+.site-nav-drawer-cta:hover {
+  opacity: 0.92;
+}
+
+html.dark .site-nav-drawer-auth-btn,
+html.dark .site-nav-drawer-cta {
+  background: #f5f5f5;
   color: #0a0a0a;
-  border-color: #2a2a2a;
+  border: none;
 }
 
+/* Secondary action under primary CTA */
 .site-nav-drawer-auth-btn--ghost {
   background: transparent !important;
+  color: var(--text-secondary, #71717a) !important;
+  border: none !important;
+  min-height: 2.35rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  opacity: 1;
+}
+
+.site-nav-drawer-auth-btn--ghost:hover {
+  opacity: 0.85;
   color: var(--text, #0a0a0a) !important;
-  border-color: var(--border, #e5e7eb) !important;
 }
 
 html.dark .site-nav-drawer-auth-btn--ghost {
-  color: #f2f2f2 !important;
-  border-color: #2a2a2a !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  border: none !important;
+}
+
+html.dark .site-nav-drawer-auth-btn--ghost:hover {
+  color: rgba(255, 255, 255, 0.88) !important;
 }
 
 /* Top-bar Sign in on small screens: same rectangular shape */

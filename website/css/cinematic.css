@@ -115,23 +115,32 @@ html.xf-cinematic-pending body > footer.xf-site-footer {
   z-index: 2;
 }
 
-/* Soft sheet edge as templates slide over the hero */
+/* Next section slides over hero — no growing “gap” / floating sheet */
 html.xf-cinematic #selected-work,
 html.xf-cinematic-pending #selected-work {
-  border-top-left-radius: 1.25rem;
-  border-top-right-radius: 1.25rem;
-  box-shadow:
-    0 -12px 40px rgba(15, 23, 42, 0.08),
-    0 -1px 0 rgba(15, 23, 42, 0.05);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  box-shadow: none;
+  margin-top: 0 !important;
   background: #fafafa !important;
 }
 
 html.dark.xf-cinematic #selected-work,
 html.dark.xf-cinematic-pending #selected-work {
-  /* No white hairline under nav — soft black lift only */
-  box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.55);
-  border-top-color: transparent !important;
-  background: #000000 !important;
+  box-shadow: none;
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+  margin-top: 0 !important;
+  background: var(--surface, #0a0a0a) !important;
+}
+
+/* Same content rail as nav / rest of site (no extra horizontal shift on scroll) */
+html.xf-cinematic #selected-work > .content-container,
+html.xf-cinematic-pending #selected-work > .content-container,
+html.xf-cinematic body > section > .content-container,
+html.xf-cinematic-pending body > section > .content-container {
+  max-width: min(var(--page-max, 1520px), calc(100% - var(--page-gutter, 1rem) * 2)) !important;
+  margin-inline: auto !important;
+  box-sizing: border-box !important;
 }
 
 html.xf-cinematic body > section.bg-white,
@@ -141,7 +150,7 @@ html.xf-cinematic-pending body > section.bg-white {
 
 html.dark.xf-cinematic body > section.bg-white,
 html.dark.xf-cinematic-pending body > section.bg-white {
-  background-color: var(--surface, #020403) !important;
+  background-color: var(--surface, #0a0a0a) !important;
 }
 
 /*
@@ -248,14 +257,14 @@ html:not(.dark).xf-cinematic-pending .site-nav.site-nav--elevated.is-scrolled::a
   z-index: 1;
 }
 
-/* Dark scrolled nav: kill light border / white 1px line under the bar */
+/* Dark scrolled nav: x.ai charcoal (never pure black) */
 html.dark.xf-cinematic .site-nav.is-scrolled,
 html.dark.xf-cinematic-pending .site-nav.is-scrolled,
 html.dark.xf-cinematic .site-nav.site-nav--elevated.is-scrolled,
 html.dark.xf-cinematic-pending .site-nav.site-nav--elevated.is-scrolled {
   border-bottom-color: rgba(255, 255, 255, 0.06) !important;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.55) !important;
-  background: rgba(0, 0, 0, 0.96) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4) !important;
+  background: #0a0a0a !important;
 }
 
 /* Cover residual white hairline under dark scrolled nav */
@@ -267,11 +276,11 @@ html.dark.xf-cinematic-pending .site-nav.is-scrolled::after {
   right: 0;
   bottom: -1px;
   height: 2px;
-  background: #000;
+  background: var(--surface, #0a0a0a);
   pointer-events: none;
 }
 
-/* Explicit logo color so it never falls back to white-on-white */
+/* Explicit logo color so text name stays readable */
 html:not(.dark).xf-cinematic .site-nav.site-nav--elevated .site-nav-logo,
 html:not(.dark).xf-cinematic-pending .site-nav.site-nav--elevated .site-nav-logo {
   color: #0a0a0a !important;
@@ -397,11 +406,14 @@ html.xf-cinematic .hero-copy .hero-actions,
 html.xf-cinematic-pending .hero-copy .hero-actions,
 html.xf-cinematic .hero-copy .hero-proof,
 html.xf-cinematic-pending .hero-copy .hero-proof,
+html.xf-cinematic .hero-copy .hero-proof-sub,
+html.xf-cinematic-pending .hero-copy .hero-proof-sub,
 html.xf-cinematic .hero-copy .hero-theme,
 html.xf-cinematic-pending .hero-copy .hero-theme {
   opacity: 0;
   transform: translateY(28px);
 }
+/* Eyebrow lives inside .hero-proof — do not pre-hide separately (was stuck invisible) */
 
 html.xf-cinematic .hero-copy [data-xf-hero-title].is-split {
   opacity: 1;
@@ -413,34 +425,34 @@ html.xf-cinematic .hero-copy [data-xf-hero-title].is-split .xf-word__inner {
   transform: translateY(110%);
 }
 
-/* Scroll cue */
+/* Scroll cue — compact bottom center */
 .xf-scroll-cue {
   position: absolute;
   left: 50%;
-  bottom: 1.75rem;
+  bottom: 1rem;
   z-index: 12;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.35rem;
   color: inherit;
   opacity: 0;
   pointer-events: none;
 }
 
 .xf-scroll-cue__label {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  opacity: 0.55;
+  opacity: 0.45;
 }
 
 .xf-scroll-cue__line {
   position: relative;
   width: 1px;
-  height: 2.75rem;
+  height: 1.65rem;
   overflow: hidden;
   background: rgba(10, 10, 10, 0.12);
 }
@@ -482,13 +494,79 @@ html.xf-cinematic-home [data-xf-reveal] {
   will-change: transform, opacity;
 }
 
+/*
+ * Only mark individual blocks revealed — do NOT force every
+ * [data-scroll-reveal].is-revealed .scroll-reveal-in visible, or the first
+ * block’s complete kills the entrance flow for chips/cards below.
+ * Override scroll-reveal.css’s section-level reveal rule on home.
+ */
 html.xf-cinematic-home .scroll-reveal-in.is-revealed,
 html.xf-cinematic-home .scroll-reveal-in.is-cinematic-revealed,
-html.xf-cinematic-home [data-scroll-reveal].is-revealed .scroll-reveal-in,
 html.xf-cinematic-home [data-scroll-stagger].is-revealed > *,
 html.xf-cinematic-home [data-scroll-stagger] > *.is-revealed {
   opacity: 1;
   transform: none;
+}
+
+html.xf-cinematic-home [data-scroll-reveal].is-revealed .scroll-reveal-in:not(.is-revealed):not(.is-cinematic-revealed) {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+/*
+ * Final CTA stage: never pre-hide (glass + backdrop-filter + content paint
+ * glitches when opacity starts at 0 on reload).
+ */
+html.xf-cinematic-home #xf-final-cta .xf-final-cta-stage.scroll-reveal-in,
+html.xf-cinematic-home.xf-cinematic-pending #xf-final-cta .xf-final-cta-stage.scroll-reveal-in,
+html.xf-cinematic-home #xf-final-cta .xf-final-cta-stage.scroll-reveal-in.is-revealed,
+html.xf-cinematic-home #xf-final-cta[data-scroll-reveal].is-revealed .xf-final-cta-stage.scroll-reveal-in {
+  opacity: 1 !important;
+  transform: none !important;
+  will-change: auto;
+  transition: none !important;
+}
+
+/*
+ * Template system (#selected-work): dedicated entrance flow.
+ * Only when full cinematic is active (GSAP bound) — not pending/home-only flags.
+ * Parent shell stays paint-ready so child stagger is never multiplied by opacity:0.
+ * Children stay hidden until GSAP plays (or .is-flow-done after complete).
+ */
+html.xf-cinematic.xf-cinematic-home #selected-work .xf-selected-work-copy.scroll-reveal-in,
+html.xf-cinematic.xf-cinematic-home #selected-work .xf-selected-work-copy.scroll-reveal-in.is-revealed,
+html.xf-cinematic.xf-cinematic-home #selected-work .xf-selected-work-copy.scroll-reveal-in.is-cinematic-revealed,
+html.xf-cinematic.xf-cinematic-home #selected-work[data-scroll-reveal].is-revealed .xf-selected-work-copy.scroll-reveal-in {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  will-change: auto;
+}
+
+html.xf-cinematic.xf-cinematic-home #selected-work .xf-selected-work-copy:not(.is-flow-done) > .xf-section-eyebrow,
+html.xf-cinematic.xf-cinematic-home #selected-work .xf-selected-work-copy:not(.is-flow-done) > .xf-section-title,
+html.xf-cinematic.xf-cinematic-home #selected-work .xf-selected-work-copy:not(.is-flow-done) > .mt-3,
+html.xf-cinematic.xf-cinematic-home #selected-work .xf-selected-work-copy:not(.is-flow-done) > .xf-temp-filters {
+  opacity: 0;
+  transform: translate3d(0, 48px, 0);
+  will-change: opacity, transform;
+  transition: none !important;
+}
+
+html.xf-cinematic.xf-cinematic-home #selected-work .xf-selected-work-copy.is-flow-done > .xf-section-eyebrow,
+html.xf-cinematic.xf-cinematic-home #selected-work .xf-selected-work-copy.is-flow-done > .xf-section-title,
+html.xf-cinematic.xf-cinematic-home #selected-work .xf-selected-work-copy.is-flow-done > .mt-3,
+html.xf-cinematic.xf-cinematic-home #selected-work .xf-selected-work-copy.is-flow-done > .xf-temp-filters {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+/* Marquee row: hide until flow reaches it (no !important — GSAP must animate) */
+html.xf-cinematic.xf-cinematic-home #selected-work .scroll-reveal-in.mt-4:not(.is-revealed):not(.is-cinematic-revealed) {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition: none !important;
 }
 
 /* Inner pages: never leave content invisible if motion fails */
@@ -825,25 +903,40 @@ html.xf-cursor-on button {
   display: none !important;
 }
 
-/* Skills dynamic cards: GSAP owns entrance (override “always visible” home-extras) */
-html.xf-cinematic #xf-skills-spotlight-section [data-xf-stagger-in] > *,
-html.xf-cinematic-pending #xf-skills-spotlight-section [data-xf-stagger-in] > * {
+/*
+ * Skills dynamic cards: hide only until revealed.
+ * MUST release with .is-revealed — otherwise clearProps leaves CSS opacity:0 forever
+ * (empty Free/Premium combo grids).
+ */
+html.xf-cinematic #xf-skills-spotlight-section [data-xf-stagger-in] > *:not(.is-revealed):not(.is-cinematic-revealed),
+html.xf-cinematic-pending #xf-skills-spotlight-section [data-xf-stagger-in] > *:not(.is-revealed):not(.is-cinematic-revealed) {
   opacity: 0;
   will-change: transform, opacity;
 }
 
-html.xf-cinematic #xf-skills-spotlight-section .xf-spotlight-grid--dynamic > *,
-html.xf-cinematic #xf-skills-spotlight-section .xf-combos-grid--dynamic > * {
+html.xf-cinematic #xf-skills-spotlight-section .xf-spotlight-grid--dynamic > *:not(.is-revealed):not(.is-cinematic-revealed),
+html.xf-cinematic #xf-skills-spotlight-section .xf-combos-grid--dynamic > *:not(.is-revealed):not(.is-cinematic-revealed) {
   opacity: 0;
   transform: translateY(28px);
   transition: none !important;
 }
 
-/* Templates marquee: stay fully visible; never lock transform (CSS train owns it) */
-html.xf-cinematic #selected-work .scroll-reveal-in.mt-4 {
+html.xf-cinematic #xf-skills-spotlight-section [data-xf-stagger-in] > *.is-revealed,
+html.xf-cinematic #xf-skills-spotlight-section [data-xf-stagger-in] > *.is-cinematic-revealed,
+html.xf-cinematic #xf-skills-spotlight-section .xf-spotlight-grid--dynamic > *.is-revealed,
+html.xf-cinematic #xf-skills-spotlight-section .xf-spotlight-grid--dynamic > *.is-cinematic-revealed,
+html.xf-cinematic #xf-skills-spotlight-section .xf-combos-grid--dynamic > *.is-revealed,
+html.xf-cinematic #xf-skills-spotlight-section .xf-combos-grid--dynamic > *.is-cinematic-revealed {
+  opacity: 1 !important;
+  transform: none !important;
+  will-change: auto;
+}
+
+/* Templates marquee wrap: only force-visible AFTER reveal (GSAP fades it in) */
+html.xf-cinematic #selected-work .scroll-reveal-in.mt-4.is-revealed,
+html.xf-cinematic #selected-work .scroll-reveal-in.mt-4.is-cinematic-revealed {
   opacity: 1 !important;
   filter: none !important;
-  /* parent only — do not set transform here so children can animate */
   transform: none !important;
 }
 
@@ -908,11 +1001,11 @@ html.xf-cinematic #selected-work .relative.overflow-hidden::after {
 }
 
 html.dark.xf-cinematic #selected-work .relative.overflow-hidden::before {
-  background: linear-gradient(90deg, #020403, transparent);
+  background: linear-gradient(90deg, var(--surface, #0a0a0a), transparent);
 }
 
 html.dark.xf-cinematic #selected-work .relative.overflow-hidden::after {
-  background: linear-gradient(270deg, #020403, transparent);
+  background: linear-gradient(270deg, var(--surface, #0a0a0a), transparent);
 }
 
 /*
@@ -931,9 +1024,10 @@ html.xf-cinematic-pending #xf-final-cta {
 
 html.dark.xf-cinematic #xf-final-cta,
 html.dark.xf-cinematic-pending #xf-final-cta {
+  /* Deep stage — soft steel pocket only, no bright blue wash */
   background:
-    radial-gradient(ellipse 80% 70% at 50% 45%, rgba(40, 80, 130, 0.45) 0%, transparent 62%),
-    #03060c !important;
+    radial-gradient(ellipse 72% 60% at 50% 42%, rgba(22, 30, 44, 0.55) 0%, transparent 68%),
+    #050506 !important;
 }
 
 html.xf-cinematic .xf-site-footer,
@@ -949,7 +1043,7 @@ html.xf-cinematic-pending .xf-site-footer {
 
 html.dark.xf-cinematic .xf-site-footer,
 html.dark.xf-cinematic-pending .xf-site-footer {
-  background: var(--surface, #020403) !important;
+  background: var(--surface, #0a0a0a) !important;
 }
 
 /* Continuous solid stack: kill subpixel hairlines between last section & footer */

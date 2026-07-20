@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>X Freeze - Grok Templates &amp; Skills</title>
+  <!-- Favicon (static so crawlers/Google see it without JS) -->
+  <link rel="icon" href="favicon.ico?v=dark2" type="image/x-icon">
+  <link rel="icon" href="favicon.png?v=dark2" type="image/png" sizes="48x48">
+  <link rel="icon" href="assets/images/logo/favicon-32.png?v=dark2" type="image/png" sizes="32x32">
+  <link rel="icon" href="assets/images/logo/favicon-192.png?v=dark2" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="assets/images/logo/apple-touch-icon.png?v=dark2" sizes="180x180">
   <script src="js/site-config.js"></script>
   <script src="js/site-meta.js"></script>
   <script>
@@ -20,7 +26,7 @@
         : 'assets/images/hero/hero-liquid-poster-light.jpg';
       document.documentElement.setAttribute('data-hero-video', heroVideo);
       document.documentElement.setAttribute('data-hero-poster', heroPoster);
-      document.documentElement.style.backgroundColor = isDark ? '#000000' : '#f6f5f8';
+      document.documentElement.style.backgroundColor = isDark ? '#0a0a0a' : '#f6f5f8';
       /* Flag early: pin hero + GSAP (desktop / tablet landscape) */
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       var desktop = window.matchMedia('(min-width: 768px)').matches;
@@ -45,7 +51,8 @@
   </script>
   <style>
     html { background-color: #f6f5f8; }
-    html.dark { background-color: #000000; }
+    html.dark { background-color: #0a0a0a; }
+    html.dark body { background-color: #0a0a0a; }
   </style>
   <script src="js/auth-config.js"></script>
   <!-- Faster CDN handshakes -->
@@ -73,18 +80,24 @@
   <link rel="stylesheet" href="css/glass-backdrop.css">
   <link rel="stylesheet" href="css/home-hero-studio.css">
   <link rel="stylesheet" href="css/cinematic.css">
+  <link rel="stylesheet" href="css/home-workflow.css">
+  <link rel="stylesheet" href="css/home-layout.css">
   <link rel="stylesheet" href="css/auth.css">
   <link rel="stylesheet" href="css/support-toast.css">
   <style>
-    /* Skip layout work for off-screen showcase sections */
+    /*
+     * Do NOT use content-visibility on animated home sections.
+     * It breaks ScrollTrigger / IO geometry so lower sections paint fully
+     * with no entrance flow (motion → skills → final CTA).
+     */
     #section-experimental,
     #section-minimal,
     #xf-more-categories,
     #xf-motion-prompts,
     #xf-skills-spotlight-section,
     #xf-final-cta {
-      content-visibility: auto;
-      contain-intrinsic-size: auto 520px;
+      content-visibility: visible;
+      contain: none;
     }
   </style>
 
@@ -115,17 +128,18 @@
       :root { --page-gutter: 2rem; }
     }
 
+    /* x.ai charcoal — never pure black (#000 / #050505) */
     html.dark {
       color-scheme: dark;
-      --text: #f2f2f2;
-      --text-secondary: #9a9a9a;
-      --border: #1a1a1a;
-      --surface: #000000;
-      --surface-elevated: #050505;
-      --surface-muted: #0a0a0a;
-      --surface-subtle: #111111;
-      --nav-bg: rgba(0, 0, 0, 0.92);
-      --border-hover: #2a2a2a;
+      --text: #f5f5f5;
+      --text-secondary: #a3a3a3;
+      --border: #2a2a2a;
+      --surface: #0a0a0a;
+      --surface-elevated: #121212;
+      --surface-muted: #161616;
+      --surface-subtle: #1c1c1c;
+      --nav-bg: rgba(10, 10, 10, 0.92);
+      --border-hover: #3a3a3a;
     }
     
     body {
@@ -143,12 +157,6 @@
       color: var(--text);
     }
 
-    .bundles-edge-fade {
-      background: linear-gradient(to right, #ffffff 0%, transparent 8%, transparent 92%, #ffffff 100%);
-    }
-    html.dark .bundles-edge-fade {
-      background: linear-gradient(to right, #000000 0%, transparent 8%, transparent 92%, #000000 100%);
-    }
 #creator-library .content-container {
       isolation: isolate;
     }
@@ -156,24 +164,75 @@
     #creator-library .bundles-stats-panel {
       position: relative;
       z-index: 3;
+      isolation: isolate;
       border-radius: 1.25rem;
       border: 1px solid rgba(15, 23, 42, 0.1);
-      background: rgba(255, 255, 255, 0.62);
-      backdrop-filter: blur(16px) saturate(1.12);
-      -webkit-backdrop-filter: blur(16px) saturate(1.12);
+      /* Light: soft glass over grid */
+      background: rgba(255, 255, 255, 0.62) !important;
+      backdrop-filter: blur(22px) saturate(1.15) !important;
+      -webkit-backdrop-filter: blur(22px) saturate(1.15) !important;
       box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.7) inset,
-        0 14px 36px -20px rgba(15, 23, 42, 0.12);
+        0 1px 0 rgba(255, 255, 255, 0.85) inset,
+        0 16px 40px -22px rgba(15, 23, 42, 0.14);
       overflow: hidden;
+      color: #0a0a0a;
+    }
+    /* Black 20% underlay behind the glass fill */
+    #creator-library .bundles-stats-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: rgba(0, 0, 0, 0.06);
     }
     html.dark #creator-library .bundles-stats-panel {
-      border-color: rgba(255, 255, 255, 0.1) !important;
-      background: rgba(12, 12, 16, 0.48) !important;
-      backdrop-filter: blur(18px) saturate(1.15) !important;
-      -webkit-backdrop-filter: blur(18px) saturate(1.15) !important;
+      border-color: rgba(255, 255, 255, 0.14) !important;
+      /* Glass fill (lower solid opacity so blur + grid read through) */
+      background: rgba(18, 18, 20, 0.38) !important;
+      color: #f4f4f5 !important;
+      backdrop-filter: blur(28px) saturate(1.25) !important;
+      -webkit-backdrop-filter: blur(28px) saturate(1.25) !important;
       box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.05) inset,
-        0 16px 40px -18px rgba(0, 0, 0, 0.55) !important;
+        0 1px 0 rgba(255, 255, 255, 0.1) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.35) inset,
+        0 22px 48px -20px rgba(0, 0, 0, 0.55) !important;
+    }
+    /* Dark: black overlay at 20% behind glass content */
+    html.dark #creator-library .bundles-stats-panel::before {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    /* Soft top sheen for glass */
+    #creator-library .bundles-stats-panel::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(
+        165deg,
+        rgba(255, 255, 255, 0.14) 0%,
+        rgba(255, 255, 255, 0.03) 38%,
+        transparent 62%
+      );
+    }
+    html.dark #creator-library .bundles-stats-panel::after {
+      background: linear-gradient(
+        165deg,
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.02) 36%,
+        transparent 58%
+      );
+    }
+    #creator-library .bundles-stat-col {
+      border-color: rgba(15, 23, 42, 0.1) !important;
+      position: relative;
+      z-index: 1;
+    }
+    html.dark #creator-library .bundles-stat-col {
+      border-color: rgba(255, 255, 255, 0.1) !important;
     }
 
     .bundles-stat-col {
@@ -229,7 +288,7 @@
       position: absolute;
       inset: 0;
       overflow: hidden;
-      background: #000;
+      background: var(--surface, #0a0a0a);
     }
 
     .hero-video-layer {
@@ -272,7 +331,7 @@
     }
     html.dark [data-video-cycle] .artistic-card {
       background:
-        linear-gradient(145deg, #141416 0%, #0c0c0e 50%, #101014 100%);
+        linear-gradient(145deg, #141416 0%, #0a0a0a 50%, #101014 100%);
     }
     [data-video-cycle] .artistic-card::after {
       content: '';
@@ -459,140 +518,397 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 6px 16px rgba(0, 0, 0, 0.05);
     }
 
-    /* Perspective wireframe grid + cursor-following color gradient */
+    /* Creator library — plain grid + light cursor interaction */
+    /*
+     * Creator library — solid opaque sheet over the fixed hero video.
+     * No heavy transforms / will-change on power layers (those punched
+     * holes and let the hero bleed through).
+     */
     #creator-library {
-      /* --mx/--my: dampened (grid). --spot-x/--spot-y: full cursor (color wash) */
-      --mx: 50%;
-      --my: 42%;
-      --spot-x: 50%;
-      --spot-y: 42%;
-      --grid-line: rgba(15, 23, 42, 0.12);
+      --lib-x: 50%;
+      --lib-y: 50%;
+      --lib-cell: 72px;
+      --lib-base: #f7f7f9;
+      position: relative;
+      z-index: 2;
       overflow: hidden;
-      background: #f7f7f9;
+      isolation: isolate;
+      /* Force fully opaque paint — critical over fixed hero */
+      background: var(--lib-base) !important;
+      background-color: var(--lib-base) !important;
+      color: #0a0a0a;
+      /* Own compositor layer so children can't reveal hero */
+      transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
     }
 
     html.dark #creator-library {
-      --grid-line: rgba(255, 255, 255, 0.22);
-      background: #000000 !important;
+      --lib-base: #0a0a0a;
+      background: var(--lib-base) !important;
+      background-color: var(--lib-base) !important;
+      color: #f4f4f5;
+      border-color: rgba(255, 255, 255, 0.08) !important;
     }
 
-    .bundles-perspective {
+    /* Kill any legacy transparent ::after wash that could flash hero */
+    #creator-library::before,
+    #creator-library::after,
+    html.dark #creator-library::before,
+    html.dark #creator-library::after {
+      content: none !important;
+      display: none !important;
+      background: none !important;
+      opacity: 0 !important;
+    }
+
+    /* Solid plate — first paint under grid so nothing behind ever shows */
+    .xf-lib-base {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: var(--lib-base);
+    }
+
+    .xf-lib-grid {
       position: absolute;
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      overflow: hidden;
-      perspective: 520px;
-      /* Near-fixed origin - only tiny cursor influence */
-      perspective-origin: var(--mx) calc(var(--my) * 0.35 + 28%);
-      /* Soft fade so grid lines don't cut off hard at edges */
-      -webkit-mask-image: linear-gradient(
-        180deg,
-        #000 0%,
-        #000 55%,
-        rgba(0, 0, 0, 0.55) 78%,
+      background-color: transparent;
+      background-image:
+        linear-gradient(to right, rgba(15, 23, 42, 0.09) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(15, 23, 42, 0.09) 1px, transparent 1px);
+      background-size: var(--lib-cell) var(--lib-cell);
+      background-position: 0 0;
+    }
+
+    html.dark .xf-lib-grid {
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    }
+
+    /* Soft spotlight that follows cursor */
+    .xf-lib-grid-spot {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: radial-gradient(
+        min(72vw, 640px) circle at var(--lib-x) var(--lib-y),
+        rgba(255, 255, 255, 0.82) 0%,
+        rgba(255, 255, 255, 0.32) 38%,
+        transparent 72%
+      );
+    }
+
+    html.dark .xf-lib-grid-spot {
+      background: radial-gradient(
+        min(72vw, 640px) circle at var(--lib-x) var(--lib-y),
+        rgba(10, 10, 10, 0.82) 0%,
+        rgba(10, 10, 10, 0.36) 38%,
+        transparent 72%
+      );
+    }
+
+    /*
+     * Power beads on grid wires only.
+     * No transform / will-change — only background-position animation
+     * (avoids compositor holes over the fixed hero).
+     */
+    .xf-lib-grid-power {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Softer, longer bead for smoother medium-speed flow */
+    .xf-lib-grid-power--h {
+      background-image: linear-gradient(
+        90deg,
+        transparent 0%,
+        transparent 38%,
+        rgba(10, 10, 10, 0.08) 44%,
+        rgba(10, 10, 10, 0.35) 48%,
+        rgba(10, 10, 10, 0.7) 50%,
+        rgba(10, 10, 10, 0.35) 52%,
+        rgba(10, 10, 10, 0.08) 56%,
+        transparent 62%,
         transparent 100%
       );
-      mask-image: linear-gradient(
+      background-size: 220% 100%;
+      background-repeat: no-repeat;
+      background-position: 100% 0;
+      -webkit-mask-image: repeating-linear-gradient(
+        to bottom,
+        #000 0px,
+        #000 1px,
+        transparent 1px,
+        transparent calc(var(--lib-cell) * 2)
+      );
+      mask-image: repeating-linear-gradient(
+        to bottom,
+        #000 0px,
+        #000 1px,
+        transparent 1px,
+        transparent calc(var(--lib-cell) * 2)
+      );
+      -webkit-mask-size: 100% calc(var(--lib-cell) * 2);
+      mask-size: 100% calc(var(--lib-cell) * 2);
+      -webkit-mask-repeat: repeat;
+      mask-repeat: repeat;
+      animation: xf-lib-power-h 9s linear infinite;
+    }
+
+    .xf-lib-grid-power--v {
+      background-image: linear-gradient(
         180deg,
-        #000 0%,
-        #000 55%,
-        rgba(0, 0, 0, 0.55) 78%,
+        transparent 0%,
+        transparent 38%,
+        rgba(10, 10, 10, 0.07) 44%,
+        rgba(10, 10, 10, 0.3) 48%,
+        rgba(10, 10, 10, 0.65) 50%,
+        rgba(10, 10, 10, 0.3) 52%,
+        rgba(10, 10, 10, 0.07) 56%,
+        transparent 62%,
+        transparent 100%
+      );
+      background-size: 100% 220%;
+      background-repeat: no-repeat;
+      background-position: 0 100%;
+      -webkit-mask-image: repeating-linear-gradient(
+        to right,
+        #000 0px,
+        #000 1px,
+        transparent 1px,
+        transparent calc(var(--lib-cell) * 2)
+      );
+      mask-image: repeating-linear-gradient(
+        to right,
+        #000 0px,
+        #000 1px,
+        transparent 1px,
+        transparent calc(var(--lib-cell) * 2)
+      );
+      -webkit-mask-size: calc(var(--lib-cell) * 2) 100%;
+      mask-size: calc(var(--lib-cell) * 2) 100%;
+      -webkit-mask-repeat: repeat;
+      mask-repeat: repeat;
+      animation: xf-lib-power-v 11s linear infinite;
+    }
+
+    /* Staggered tracks — same medium range, different phase / direction */
+    .xf-lib-grid-power--h1 {
+      -webkit-mask-position: 0 0;
+      mask-position: 0 0;
+      animation-duration: 9s;
+      animation-delay: -2.4s;
+    }
+    .xf-lib-grid-power--h2 {
+      -webkit-mask-position: 0 var(--lib-cell);
+      mask-position: 0 var(--lib-cell);
+      animation-duration: 10.5s;
+      animation-delay: -6.1s;
+      animation-direction: reverse;
+      opacity: 0.8;
+    }
+    .xf-lib-grid-power--v1 {
+      -webkit-mask-position: 0 0;
+      mask-position: 0 0;
+      animation-duration: 10s;
+      animation-delay: -3.2s;
+    }
+    .xf-lib-grid-power--v2 {
+      -webkit-mask-position: var(--lib-cell) 0;
+      mask-position: var(--lib-cell) 0;
+      animation-duration: 11.5s;
+      animation-delay: -7.8s;
+      animation-direction: reverse;
+      opacity: 0.75;
+    }
+
+    html.dark .xf-lib-grid-power--h {
+      background-image: linear-gradient(
+        90deg,
+        transparent 0%,
+        transparent 38%,
+        rgba(255, 255, 255, 0.08) 44%,
+        rgba(255, 255, 255, 0.32) 48%,
+        rgba(255, 255, 255, 0.75) 50%,
+        rgba(255, 255, 255, 0.32) 52%,
+        rgba(255, 255, 255, 0.08) 56%,
+        transparent 62%,
         transparent 100%
       );
     }
 
-    /* Bottom wash so the section edge stays soft over the grid */
-    #creator-library::after {
-      content: "";
+    html.dark .xf-lib-grid-power--v {
+      background-image: linear-gradient(
+        180deg,
+        transparent 0%,
+        transparent 38%,
+        rgba(255, 255, 255, 0.07) 44%,
+        rgba(255, 255, 255, 0.28) 48%,
+        rgba(255, 255, 255, 0.7) 50%,
+        rgba(255, 255, 255, 0.28) 52%,
+        rgba(255, 255, 255, 0.07) 56%,
+        transparent 62%,
+        transparent 100%
+      );
+    }
+
+    @keyframes xf-lib-power-h {
+      0% {
+        background-position: 100% 0;
+      }
+      100% {
+        background-position: -120% 0;
+      }
+    }
+
+    @keyframes xf-lib-power-v {
+      0% {
+        background-position: 0 100%;
+      }
+      100% {
+        background-position: 0 -120%;
+      }
+    }
+
+    /* Black overlay on top of grid / power / spot — 20% opacity */
+    .xf-lib-grid-overlay {
       position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: min(42%, 14rem);
+      inset: 0;
       z-index: 2;
       pointer-events: none;
-      background: linear-gradient(
-        180deg,
-        transparent 0%,
-        rgba(247, 247, 249, 0.55) 45%,
-        #f7f7f9 100%
-      );
+      background: rgba(0, 0, 0, 0.2);
     }
 
-    html.dark #creator-library::after {
-      background: linear-gradient(
-        180deg,
-        transparent 0%,
-        rgba(0, 0, 0, 0.55) 42%,
-        #000000 100%
-      );
-    }
-
-    .bundles-perspective__wall,
-    .bundles-perspective__floor {
+    /* Fade grid out at top and bottom — solid section color at edges */
+    .xf-lib-grid-fade {
       position: absolute;
-      left: -30%;
-      width: 160%;
+      inset: 0;
+      z-index: 3;
       pointer-events: none;
-      background-image:
-        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-      background-size: 64px 64px;
-      will-change: background-position;
+      background: linear-gradient(
+        180deg,
+        var(--lib-base) 0%,
+        rgba(247, 247, 249, 0) 20%,
+        rgba(247, 247, 249, 0) 80%,
+        var(--lib-base) 100%
+      );
     }
 
-    /* Back / upright plane (upper half) */
-    .bundles-perspective__wall {
-      top: -8%;
-      height: 58%;
-      opacity: 0.75;
-      transform: rotateX(0deg) scale(1.05);
-      transform-origin: center bottom;
-      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.35) 55%, transparent 100%);
-      -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.35) 55%, transparent 100%);
-      animation: bundles-wall-drift 48s linear infinite;
-    }
-
-    /* Floor plane vanishing into horizon */
-    .bundles-perspective__floor {
-      top: 38%;
-      height: 95%;
-      opacity: 0.95;
-      transform: rotateX(62deg) translate3d(0, 0, 0);
-      transform-origin: center top;
-      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 55%, transparent 100%);
-      -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 55%, transparent 100%);
-      animation: bundles-floor-scroll 28s linear infinite;
-    }
-
-    html.dark .bundles-perspective__wall {
-      opacity: 0.85;
-    }
-
-    html.dark .bundles-perspective__floor {
-      opacity: 1;
-    }
-
-    /* Cursor color wash removed — too gimmicky */
-    .bundles-spotlight {
-      display: none !important;
-    }
-
-    @keyframes bundles-floor-scroll {
-      from { background-position: 0 0, 0 0; }
-      to { background-position: 0 64px, 0 64px; }
-    }
-
-    @keyframes bundles-wall-drift {
-      from { background-position: 0 0, 0 0; }
-      to { background-position: 64px 0, 0 0; }
+    html.dark .xf-lib-grid-fade {
+      background: linear-gradient(
+        180deg,
+        var(--lib-base) 0%,
+        rgba(10, 10, 10, 0) 20%,
+        rgba(10, 10, 10, 0) 80%,
+        var(--lib-base) 100%
+      );
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .bundles-perspective__wall,
-      .bundles-perspective__floor {
-        animation: none;
+      .xf-lib-grid-power {
+        animation: none !important;
+        display: none;
+      }
+    }
+
+    /* Built for — tool logos under hero CTAs */
+    .hero-header--studio .hero-layout--center .hero-proof--built {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0.75rem !important;
+      width: 100%;
+      max-width: 40rem;
+      margin: 5.5rem auto 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      background: none !important;
+    }
+    .hero-proof__eyebrow {
+      margin: 0 0 0.15rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.58);
+    }
+    html:not(.dark) .hero-proof__eyebrow {
+      color: rgba(24, 24, 27, 0.5);
+    }
+    /* Ensure label is never stuck invisible after hero entrance */
+    .hero-proof--built .hero-proof__eyebrow.is-revealed,
+    .hero-proof--built.is-revealed .hero-proof__eyebrow {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+    .hero-proof__tools {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem 2rem; /* reference-style generous logo spacing */
+    }
+    .hero-proof__tool {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.0625rem; /* ~17px wordmark weight like reference */
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      color: rgba(255, 255, 255, 0.52);
+      transition: color 0.18s ease, opacity 0.18s ease;
+      opacity: 0.95;
+    }
+    html:not(.dark) .hero-proof__tool {
+      color: rgba(24, 24, 27, 0.48);
+    }
+    .hero-proof__tool:hover {
+      color: rgba(255, 255, 255, 0.88);
+      opacity: 1;
+    }
+    html:not(.dark) .hero-proof__tool:hover {
+      color: rgba(10, 10, 10, 0.78);
+    }
+    .hero-proof__logo {
+      display: block;
+      flex-shrink: 0;
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+    .hero-proof__wordmark {
+      line-height: 1;
+      font-weight: 550;
+    }
+    .hero-proof--built .hero-proof-sub {
+      margin: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: rgba(255, 255, 255, 0.4);
+    }
+    html:not(.dark) .hero-proof--built .hero-proof-sub {
+      color: rgba(24, 24, 27, 0.42);
+    }
+    @media (max-width: 639px) {
+      .hero-proof__tools {
+        gap: 0.55rem 1rem;
+      }
+      .hero-proof__tool {
+        font-size: 0.875rem;
       }
     }
 
@@ -821,17 +1137,6 @@
       background-color: #cdd5cf !important;
       color: #020403 !important;
     }
-
-    html.dark #creator-library .bundles-edge-fade {
-      background: linear-gradient(
-        to right,
-        #000000 0%,
-        transparent 12%,
-        transparent 88%,
-        #000000 100%
-      );
-    }
-
 
     html.dark .motion-showcase { background: var(--surface-elevated); }
     html.dark .video-fan-container { background: var(--surface); }
@@ -1213,7 +1518,7 @@
     /* ── Style / Product: forced dark glass + amoeba (home inline wins) ── */
     html.dark #section-experimental,
     html.dark #section-minimal {
-      background: #000 !important;
+      background: var(--surface, #0a0a0a) !important;
       border-color: rgba(255, 255, 255, 0.06) !important;
       position: relative !important;
       overflow: hidden !important;
@@ -1251,33 +1556,54 @@
 
     /* ── Home glass sections: higher dark-mode contrast ── */
     html.dark #selected-work,
-    html.dark #creator-library,
     html.dark #xf-motion-prompts,
-    html.dark #xf-newsletter-cta,
-    html.dark #xf-final-cta {
-      background: #000000 !important;
+    html.dark #xf-newsletter-cta {
+      background: var(--surface, #0a0a0a) !important;
       border-color: rgba(255, 255, 255, 0.1) !important;
     }
 
-    /* Darker veil so type/cards pop over the gradient */
+    /* Final CTA: deeper base than rest of page */
+    html.dark #xf-final-cta {
+      background: #050506 !important;
+      border-color: rgba(255, 255, 255, 0.06) !important;
+    }
+
+    html.dark #creator-library {
+      border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Charcoal veil — same x.ai base, not pitch black */
     html.dark #selected-work .xf-glass-backdrop__veil,
     html.dark #xf-motion-prompts .xf-glass-backdrop__veil,
-    html.dark #xf-newsletter-cta .xf-glass-backdrop__veil,
+    html.dark #xf-newsletter-cta .xf-glass-backdrop__veil {
+      background: linear-gradient(
+        180deg,
+        rgba(10, 10, 10, 0.45) 0%,
+        rgba(10, 10, 10, 0.28) 45%,
+        rgba(10, 10, 10, 0.5) 100%
+      ) !important;
+    }
+
+    /* Final CTA: heavier veil for deeper stage */
     html.dark #xf-final-cta .xf-glass-backdrop__veil {
       background: linear-gradient(
         180deg,
-        rgba(0, 0, 0, 0.6) 0%,
-        rgba(0, 0, 0, 0.45) 45%,
-        rgba(0, 0, 0, 0.66) 100%
+        rgba(5, 5, 6, 0.75) 0%,
+        rgba(5, 5, 6, 0.6) 48%,
+        rgba(5, 5, 6, 0.8) 100%
       ) !important;
     }
 
     html.dark #selected-work .xf-glass-backdrop__img,
     html.dark #xf-motion-prompts .xf-glass-backdrop__img,
-    html.dark #xf-newsletter-cta .xf-glass-backdrop__img,
-    html.dark #xf-final-cta .xf-glass-backdrop__img {
+    html.dark #xf-newsletter-cta .xf-glass-backdrop__img {
       opacity: 0.6 !important;
       filter: none !important;
+    }
+
+    html.dark #xf-final-cta .xf-glass-backdrop__img {
+      opacity: 0.5 !important;
+      filter: brightness(0.55) saturate(0.85) !important;
     }
 
     html.dark #selected-work .xf-section-title,
@@ -1292,15 +1618,21 @@
     html.dark #selected-work .xf-section-eyebrow,
     html.dark #creator-library .xf-section-eyebrow,
     html.dark #xf-motion-prompts .xf-section-eyebrow,
-    html.dark #xf-final-cta .xf-final-cta-eyebrow,
     html.dark #selected-work .xf-section-lead,
     html.dark #creator-library .xf-section-lead,
     html.dark #xf-motion-prompts .xf-section-lead,
-    html.dark #xf-final-cta .xf-final-cta-lead,
     html.dark #xf-newsletter-cta p,
     html.dark #creator-library .bundles-stat-col p,
     html.dark #creator-library .bundles-stat-col .text-\[15px\] {
       color: #c4c4c4 !important;
+    }
+
+    /* Final CTA secondary copy — brighter for contrast on deep glass */
+    html.dark #xf-final-cta .xf-final-cta-eyebrow {
+      color: rgba(255, 255, 255, 0.72) !important;
+    }
+    html.dark #xf-final-cta .xf-final-cta-lead {
+      color: rgba(255, 255, 255, 0.8) !important;
     }
 
     html.dark #selected-work a,
@@ -1310,22 +1642,26 @@
       color: #f0f0f0 !important;
     }
 
-    /* Elevated cards - clearer lift off pure black */
+    /* Elevated cards — one step above charcoal (#121212), not pure black */
     html.dark #selected-work .simple-card,
     html.dark #xf-motion-prompts .xf-motion-card,
     html.dark #xf-motion-prompts .xf-motion-flow,
     html.dark #xf-newsletter-cta .xf-newsletter-box {
-      background: rgba(18, 18, 18, 0.92) !important;
-      border: 1px solid rgba(255, 255, 255, 0.14) !important;
+      background: #121212 !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
       box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.06) inset,
-        0 18px 40px -16px rgba(0, 0, 0, 0.8) !important;
-      color: #f2f2f2 !important;
+        0 1px 0 rgba(255, 255, 255, 0.05) inset,
+        0 18px 40px -16px rgba(0, 0, 0, 0.45) !important;
+      color: #f5f5f5 !important;
     }
     /* Final CTA uses frosted glass (home-extras.css) — do not force opaque fill */
 
     html.dark #creator-library .bundles-stats-panel {
       color: #f2f2f2 !important;
+      /* Keep glass (override solid theme-dark panel rules) */
+      background: rgba(18, 18, 20, 0.38) !important;
+      backdrop-filter: blur(28px) saturate(1.25) !important;
+      -webkit-backdrop-filter: blur(28px) saturate(1.25) !important;
     }
 
     html.dark #xf-motion-prompts .xf-motion-card__title,
@@ -1349,24 +1685,36 @@
     }
 
     html.dark #xf-newsletter-cta .xf-newsletter-btn--secondary,
-    html.dark #xf-final-cta .xf-final-cta-btn--ghost,
     html.dark #xf-motion-prompts .xf-motion-btn--ghost {
       border-color: rgba(255, 255, 255, 0.22) !important;
       color: #f2f2f2 !important;
       background: transparent !important;
     }
 
+    html.dark #xf-final-cta .xf-final-cta-btn--ghost {
+      border-color: rgba(255, 255, 255, 0.3) !important;
+      color: #f5f5f5 !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+    }
+
     html.dark #xf-newsletter-cta .xf-newsletter-btn--primary,
-    html.dark #xf-final-cta .xf-final-cta-btn--primary,
     html.dark #xf-motion-prompts .xf-motion-btn--primary,
     html.dark #xf-motion-prompts .xf-motion-cta-link {
       background: #ffffff !important;
       color: #000000 !important;
       border-color: #ffffff !important;
     }
+
+    html.dark #xf-final-cta .xf-final-cta-btn--primary {
+      background: #ffffff !important;
+      color: #050505 !important;
+      border-color: #ffffff !important;
+      box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.55) !important;
+    }
   </style>
   <link rel="stylesheet" href="css/home-liquid-theme.css">
   <link rel="stylesheet" href="css/dark-nebula-bg.css">
+  <link rel="stylesheet" href="css/theme-dark.css">
 </head>
 <body>
 
@@ -1449,30 +1797,29 @@
       })();
     </script>
 
-    <!-- Nav overlaid on studio stage -->
-    <nav id="site-nav" class="site-nav" aria-label="Main">
+    <!-- Nav overlaid on studio stage — Lumen-style: flat links + soft CTA -->
+    <nav id="site-nav" class="site-nav site-nav--lumen" aria-label="Main">
       <div class="content-container">
         <div class="site-nav-bar">
           <a href="home.html" class="site-nav-logo">X Freeze</a>
 
-                          <div class="site-nav-pill">
-          <a href="home.html" class="site-nav-pill-link site-nav-pill-link--active" aria-current="page">Home</a>
-          <a href="templates.html" class="site-nav-pill-link">Templates</a>
-          <a href="prompt-library.html" class="site-nav-pill-link">Prompts</a>
-          <a href="skills.html" class="site-nav-pill-link">Skills</a>
+          <div class="site-nav-pill">
+            <a href="templates.html" class="site-nav-pill-link">Templates</a>
+            <a href="prompt-library.html" class="site-nav-pill-link">Prompts</a>
+            <a href="skills.html" class="site-nav-pill-link">Skills</a>
+            <a href="pricing.html" class="site-nav-pill-link">Pricing</a>
           <a href="about.html" class="site-nav-pill-link">About</a>
-          <a href="contact.html" class="site-nav-pill-link">Contact</a>
-        </div>
+            <a href="contact.html" class="site-nav-pill-link">Contact</a>
+          </div>
 
           <div class="site-nav-end">
-            <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee" aria-label="Buy me a coffee">
-              <i class="fa-solid fa-mug-hot text-xs" aria-hidden="true"></i>
-              <span class="site-nav-coffee__label hidden lg:inline">Buy me a coffee</span>
-            </a>
+            <div id="xf-auth-nav" class="site-nav-auth">
+              <a href="login.html" class="site-nav-auth-btn site-nav-auth-btn--ghost">Sign in</a>
+            </div>
+            <a href="templates.html" class="site-nav-cta hidden lg:inline-flex">Get started</a>
             <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
               <i class="fa-solid fa-bars text-sm" aria-hidden="true"></i>
             </button>
-            <div id="xf-auth-nav" class="site-nav-auth"><a href="login.html" class="site-nav-auth-btn">Sign in</a></div>
           </div>
         </div>
       </div>
@@ -1489,43 +1836,85 @@
         </header>
 
                     <nav class="site-nav-drawer-nav" aria-label="Mobile">
-        <a href="home.html" class="site-nav-drawer-link site-nav-drawer-link--active" onclick="toggleMobileMenu()">Home</a>
         <a href="templates.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Templates</a>
         <a href="prompt-library.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Prompts</a>
         <a href="skills.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Skills</a>
+        <a href="pricing.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Pricing</a>
         <a href="about.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">About</a>
-        <a href="contact.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Contact</a>
       </nav>
 
-        <div id="xf-auth-drawer" class="site-nav-drawer-auth">
-          <a href="login.html" class="site-nav-drawer-auth-btn" onclick="toggleMobileMenu()">Sign in</a>
-          <a href="signup.html" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu()">Create account</a>
+
+        <div class="site-nav-drawer-bottom">
+          <div id="xf-auth-drawer" class="site-nav-drawer-auth">
+            <a href="templates.html" class="site-nav-drawer-auth-btn site-nav-drawer-cta" onclick="toggleMobileMenu()">Get started</a>
+            <a href="login.html" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu()">Sign in</a>
+          </div>
+          <div class="site-nav-drawer-meta-row">
+            <a href="contact.html" onclick="toggleMobileMenu()">Contact</a>
+            <span class="site-nav-drawer-meta-dot" aria-hidden="true">·</span>
+            <a href="privacy.html" onclick="toggleMobileMenu()">Legal</a>
+            <span class="site-nav-drawer-meta-dot" aria-hidden="true">·</span>
+            <a href="terms.html" onclick="toggleMobileMenu()">Terms</a>
+          </div>
         </div>
-      </div>
+</div>
     </div>
 
-    <!-- Hero content - centered, no floating product cards -->
+    <!-- Hero: centered — type scale & spacing modeled on premium product heroes -->
     <div class="hero-content relative z-10 content-container">
       <div class="hero-layout hero-layout--center">
         <div class="hero-copy">
           <h1 class="hero-headline">
-            <span class="hero-headline__line" data-xf-hero-title="1">Ship creative work</span>
-            <span class="hero-headline__line hero-headline__line--soft" data-xf-hero-title="2">faster with Grok</span>
+            <span class="hero-headline__line" data-xf-hero-title="1">The Ultimate</span>
+            <span class="hero-headline__line hero-headline__line--soft" data-xf-hero-title="2">AI Creation Library</span>
           </h1>
-          <p class="hero-lead" data-xf-hero-lead>Ready-made Imagine templates, motion prompts, and portable AI skills - built for creators, agencies, and product teams who need pro results without the prompt grind.</p>
+          <p class="hero-lead" data-xf-hero-lead>
+            A curated library of Grok Imagine templates, cinematic prompt packs,<br>
+            and portable AI skills for creators, developers, founders, and AI-powered teams.
+          </p>
           <div class="hero-actions">
-            <a href="templates.html" class="hero-btn hero-btn--primary" data-xf-magnetic="0.32">Browse templates</a>
+            <a href="#templates" class="hero-btn hero-btn--primary" data-xf-magnetic="0.32">Browse templates</a>
             <a href="skills.html" class="hero-btn hero-btn--ghost" data-xf-magnetic="0.28">Browse skills</a>
           </div>
-          <div class="hero-proof" aria-label="Highlights">
-            <span class="hero-proof__chip"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Instant templates</span>
-            <span class="hero-proof__chip"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Motion prompts</span>
-            <span class="hero-proof__chip"><i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i> Portable skills</span>
+          <!-- Built for — official monochrome brand marks (reference-style lockups) -->
+          <div class="hero-proof hero-proof--built" aria-label="Built for modern AI tools">
+            <p class="hero-proof__eyebrow">Portable AI skills</p>
+            <ul class="hero-proof__tools" role="list">
+              <li class="hero-proof__tool" title="Grok">
+                <!-- Grok / xAI mark (lobe-icons monochrome) -->
+                <svg class="hero-proof__logo" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+                  <path fill="currentColor" fill-rule="evenodd" d="M9.27 15.29l7.978-5.897c.391-.29.95-.177 1.137.272.98 2.369.542 5.215-1.41 7.169-1.951 1.954-4.667 2.382-7.149 1.406l-2.711 1.257c3.889 2.661 8.611 2.003 11.562-.953 2.341-2.344 3.066-5.539 2.388-8.42l.006.007c-.983-4.232.242-5.924 2.75-9.383.06-.082.12-.164.179-.248l-3.301 3.305v-.01L9.267 15.292M7.623 16.723c-2.792-2.67-2.31-6.801.071-9.184 1.761-1.763 4.647-2.483 7.166-1.425l2.705-1.25a7.808 7.808 0 00-1.829-1A8.975 8.975 0 005.984 5.83c-2.533 2.536-3.33 6.436-1.962 9.764 1.022 2.487-.653 4.246-2.34 6.022-.599.63-1.199 1.259-1.682 1.925l7.62-6.815"/>
+                </svg>
+                <span class="hero-proof__wordmark">Grok</span>
+              </li>
+              <li class="hero-proof__tool" title="Claude">
+                <!-- Anthropic / Claude (Simple Icons) -->
+                <svg class="hero-proof__logo" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+                  <path fill="currentColor" d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z"/>
+                </svg>
+                <span class="hero-proof__wordmark">Claude</span>
+              </li>
+              <li class="hero-proof__tool" title="Cursor">
+                <!-- Cursor (lobe-icons monochrome) -->
+                <svg class="hero-proof__logo" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+                  <path fill="currentColor" fill-rule="evenodd" d="M22.106 5.68L12.5.135a.998.998 0 00-.998 0L1.893 5.68a.84.84 0 00-.419.726v11.186c0 .3.16.577.42.727l9.607 5.547a.999.999 0 00.998 0l9.608-5.547a.84.84 0 00.42-.727V6.407a.84.84 0 00-.42-.726zm-.603 1.176L12.228 22.92c-.063.108-.228.064-.228-.061V12.34a.59.59 0 00-.295-.51l-9.11-5.26c-.107-.062-.063-.228.062-.228h18.55c.264 0 .428.286.296.514z"/>
+                </svg>
+                <span class="hero-proof__wordmark">Cursor</span>
+              </li>
+              <li class="hero-proof__tool" title="GPT">
+                <!-- OpenAI (Simple Icons) -->
+                <svg class="hero-proof__logo" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+                  <path fill="currentColor" d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/>
+                </svg>
+                <span class="hero-proof__wordmark">GPT</span>
+              </li>
+            </ul>
+            <p class="hero-proof-sub">Ready to use across your AI stack.</p>
           </div>
+
           <div class="hero-theme">
-            <button type="button" id="theme-toggle" onclick="toggleTheme()" class="theme-switch theme-switch--hero theme-toggle" role="switch" aria-checked="false" aria-label="Switch to dark mode" title="Dark mode">
+            <button type="button" id="theme-toggle" onclick="toggleTheme()" class="theme-switch theme-switch--hero theme-toggle" role="switch" aria-checked="false" aria-label="Switch to dark mode" title="Toggle light / dark mode">
               <span class="theme-switch-track" aria-hidden="true">
-                <span class="theme-switch-label">Light</span>
                 <span class="theme-switch-thumb">
                   <span class="theme-switch-icon theme-switch-icon--sun" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12zM4.22 4.22l2.12 2.12-1.06 1.06L3.16 5.28l1.06-1.06zm15.56 15.56 2.12 2.12-1.06 1.06-2.12-2.12 1.06-1.06zM19.78 4.22l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12zM6.34 17.66l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12z"/></svg>
@@ -1540,32 +1929,42 @@
         </div>
       </div>
     </div>
+
   </header>
   <!-- Holds document flow height while hero is fixed/pinned -->
   <div class="xf-hero-pin-spacer" aria-hidden="true"></div>
 
   <!-- ==================== SELECTED WORK ==================== -->
   <section id="selected-work" class="xf-glass-section border-t border-[#e5e7eb] bg-[#fafafa]" data-scroll-reveal>
-    <div class="xf-glass-backdrop" aria-hidden="true">
+        <div class="xf-glass-backdrop" aria-hidden="true">
       <div class="xf-glass-backdrop__img"></div>
       <div class="xf-glass-backdrop__mesh"></div>
       <div class="xf-glass-backdrop__veil"></div>
     </div>
 
-<div class="content-container py-20">
-      <div class="scroll-reveal-in mb-8">
-        <p class="xf-section-eyebrow">Templates</p>
-        <h2 class="xf-section-title max-w-3xl">Ready-made Grok Imagine templates<br>for every creative workflow.</h2>
+<div class="content-container py-20 xf-home-section" id="templates">
+      <div class="scroll-reveal-in mb-4 xf-home-head xf-selected-work-copy">
+        <p class="xf-section-eyebrow">Template system</p>
+        <h2 class="xf-section-title max-w-3xl">Ready-made Grok Imagine templates.</h2>
         <div class="mt-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <p class="xf-section-lead xf-section-lead--flush max-w-2xl">Browse a huge collection of AI templates across different categories. Pick a template, upload your image, and let Grok Imagine create the result for you in seconds - no prompting required.</p>
-          <a href="templates.html" class="hidden md:inline-flex text-sm font-semibold text-[#0a0a0a] hover:text-[#27272a] items-center gap-1 shrink-0">
-            Browse templates <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
+          <p class="xf-section-lead xf-section-lead--flush max-w-2xl">Pick a template, upload your image, get the result in seconds.</p>
+          <a href="templates.html" class="hidden md:inline-flex text-sm font-semibold text-[#0a0a0a] hover:text-[#27272a] items-center gap-1 shrink-0 xf-home-head__link">
+            Browse templates <i class="fa-solid fa-arrow-right ml-1 text-xs" aria-hidden="true"></i>
           </a>
+        </div>
+        <div class="xf-temp-filters" id="xf-temp-filters" role="toolbar" aria-label="Filter template marquee">
+          <button type="button" class="xf-temp-filter is-active" data-temp-filter="all">Featured</button>
+          <button type="button" class="xf-temp-filter" data-temp-filter="Product">Product</button>
+          <button type="button" class="xf-temp-filter" data-temp-filter="Mockup's">Mockups</button>
+          <button type="button" class="xf-temp-filter" data-temp-filter="Style Edit">Style Edit</button>
+          <button type="button" class="xf-temp-filter" data-temp-filter="Make-up">Makeup</button>
+          <button type="button" class="xf-temp-filter" data-temp-filter="Filters">Filters</button>
+          <button type="button" class="xf-temp-filter" data-temp-filter="Common Uses">Common Uses</button>
         </div>
       </div>
 
       <!-- Single endless marquee trail -->
-      <div class="scroll-reveal-in mt-4" style="transition-delay: 120ms">
+      <div class="scroll-reveal-in mt-4 xf-home-marquee" style="transition-delay: 120ms">
         <div class="relative left-1/2 -translate-x-1/2 w-screen overflow-hidden">
           <div id="selected-work-marquee"
                class="flex items-center"
@@ -1579,50 +1978,54 @@
 
   <!-- ==================== AI WORKFLOW LIBRARY (home overview - shop is separate) ==================== -->
   <section id="creator-library" class="section border-t border-[#e5e7eb] bg-white relative" data-scroll-reveal>
-    <!-- Perspective wireframe grid (mousemove → --mx/--my) -->
-    <div class="bundles-perspective" aria-hidden="true">
-      <div class="bundles-perspective__wall"></div>
-      <div class="bundles-perspective__floor"></div>
-    </div>
-    <div class="absolute inset-0 pointer-events-none z-[1] bundles-spotlight"></div>
-    <div class="absolute inset-0 pointer-events-none z-[1] bundles-edge-fade"></div>
+    <!-- Opaque base + grid + staggered power on wires (no transform thrash) -->
+    <div class="xf-lib-base" aria-hidden="true"></div>
+    <div class="xf-lib-grid" aria-hidden="true"></div>
+    <div class="xf-lib-grid-power xf-lib-grid-power--h xf-lib-grid-power--h1" aria-hidden="true"></div>
+    <div class="xf-lib-grid-power xf-lib-grid-power--h xf-lib-grid-power--h2" aria-hidden="true"></div>
+    <div class="xf-lib-grid-power xf-lib-grid-power--v xf-lib-grid-power--v1" aria-hidden="true"></div>
+    <div class="xf-lib-grid-power xf-lib-grid-power--v xf-lib-grid-power--v2" aria-hidden="true"></div>
+    <div class="xf-lib-grid-spot" aria-hidden="true"></div>
+    <!-- Black wash over grid lines (content stays above at z-20) -->
+    <div class="xf-lib-grid-overlay" aria-hidden="true"></div>
+    <div class="xf-lib-grid-fade" aria-hidden="true"></div>
 
-    <div class="content-container py-20 md:py-24 relative z-20">
-      <div class="scroll-reveal-in max-w-3xl">
+    <div class="content-container py-20 md:py-24 xf-home-section relative z-20">
+      <div class="scroll-reveal-in max-w-3xl xf-home-head">
         <p class="xf-section-eyebrow">Creator library</p>
         <h2 class="xf-section-title">
           The complete AI creator library,<br>built by a creator.
         </h2>
-        <a href="about.html" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#0a0a0a] hover:text-[#27272a] transition">
-          About the library <i class="fa-solid fa-arrow-right text-xs"></i>
+        <a href="about.html" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#0a0a0a] hover:text-[#27272a] transition xf-home-head__link">
+          About the library <i class="fa-solid fa-arrow-right text-xs" aria-hidden="true"></i>
         </a>
       </div>
 
-      <div class="bundles-stats-panel mt-14 grid grid-cols-1 md:grid-cols-3" data-scroll-stagger>
+      <div class="bundles-stats-panel mt-14 grid grid-cols-1 md:grid-cols-3 xf-home-stats" data-scroll-stagger>
         <div class="bundles-stat-col py-8 md:py-10">
           <div class="bundles-stat-value text-5xl font-semibold leading-none tracking-[-1.8px] md:text-6xl" data-xf-count="templates" data-xf-count-suffix="+">500+</div>
-          <div class="mt-5 text-[15px] font-semibold tracking-[-0.1px]">Grok Imagine Templates</div>
-          <p class="xf-section-lead xf-section-lead--compact max-w-[230px]">Product, Make-up, Filters, Style Edit, Common Uses, and Mockup's - ready for your AI workflow.</p>
-          <a href="templates.html" class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0a0a0a] hover:text-[#27272a] transition">
-            Browse templates <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          <div class="mt-5 text-[15px] font-semibold tracking-[-0.1px] bundles-stat-label">Grok Imagine Templates</div>
+          <p class="xf-section-lead xf-section-lead--compact max-w-[230px]">Product, makeup, filters, style edits, common uses, and mockups — ready for your AI workflow.</p>
+          <a href="templates.html" class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0a0a0a] hover:text-[#27272a] transition xf-home-stat-link">
+            Browse templates <i class="fa-solid fa-arrow-right text-[10px]" aria-hidden="true"></i>
           </a>
         </div>
 
         <div class="bundles-stat-col border-t border-[#e5e7eb] py-8 md:border-l md:border-t-0 md:py-10">
           <div class="bundles-stat-value text-5xl font-semibold leading-none tracking-[-1.8px] md:text-6xl" data-xf-count="skills" data-xf-count-suffix="+">1000+</div>
-          <div class="mt-5 text-[15px] font-semibold tracking-[-0.1px]">AI Skills</div>
+          <div class="mt-5 text-[15px] font-semibold tracking-[-0.1px] bundles-stat-label">AI Skills</div>
           <p class="xf-section-lead xf-section-lead--compact max-w-[230px]">Copy into Grok, Cursor, or Claude - business, social, connectors, and more.</p>
-          <a href="skills.html" class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0a0a0a] hover:text-[#27272a] transition">
-            Browse skills <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          <a href="skills.html" class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0a0a0a] hover:text-[#27272a] transition xf-home-stat-link">
+            Browse skills <i class="fa-solid fa-arrow-right text-[10px]" aria-hidden="true"></i>
           </a>
         </div>
 
         <div class="bundles-stat-col border-t border-[#e5e7eb] py-8 md:border-l md:border-t-0 md:py-10">
           <div class="bundles-stat-value text-5xl font-semibold leading-none tracking-[-1.8px] md:text-6xl" data-xf-count="motion-prompts" data-xf-count-suffix="+">330+</div>
-          <div class="mt-5 text-[15px] font-semibold tracking-[-0.1px]">Prompt Library</div>
+          <div class="mt-5 text-[15px] font-semibold tracking-[-0.1px] bundles-stat-label">Prompt Library</div>
           <p class="xf-section-lead xf-section-lead--compact max-w-[230px]">Image-to-video motion prompts - camera moves, expressions, lighting, product spins, and more.</p>
-          <a href="prompt-library.html" class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0a0a0a] hover:text-[#27272a] transition">
-            Browse prompts <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          <a href="prompt-library.html" class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0a0a0a] hover:text-[#27272a] transition xf-home-stat-link">
+            Browse prompts <i class="fa-solid fa-arrow-right text-[10px]" aria-hidden="true"></i>
           </a>
         </div>
       </div>
@@ -1631,7 +2034,7 @@
 
   <!-- ==================== STYLE EDIT (video showcase) ==================== -->
   <section id="section-experimental" class="bg-white border-t border-[#e5e7eb]" data-scroll-reveal>
-    <div class="content-container py-16 md:py-20 grid md:grid-cols-12 gap-x-8 items-center">
+        <div class="content-container py-16 md:py-20 grid md:grid-cols-12 gap-x-8 items-center">
       <!-- Text -->
       <div class="scroll-reveal-in scroll-reveal-in--left md:col-span-5 mb-10 md:mb-0">
         <div class="xf-feature-copy">
@@ -1670,7 +2073,7 @@
 
   <!-- ==================== PRODUCT (video showcase) ==================== -->
   <section id="section-minimal" class="bg-white border-t border-[#e5e7eb]" data-scroll-reveal>
-    <div class="content-container py-16 md:py-20 grid md:grid-cols-12 gap-x-8 md:gap-x-12 gap-y-10 md:gap-y-0 items-start md:items-center">
+        <div class="content-container py-16 md:py-20 grid md:grid-cols-12 gap-x-8 md:gap-x-12 gap-y-10 md:gap-y-0 items-start md:items-center">
       <!-- Two vertical video cards (left on desktop) -->
       <div class="scroll-reveal-in scroll-reveal-in--left order-2 md:order-1 md:col-span-7">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-video-cycle="minimal">
@@ -1709,51 +2112,51 @@
 
   <!-- ==================== MORE CATEGORIES ==================== -->
   <section id="xf-more-categories" class="xf-glass-section xf-glass-section--soft section border-t border-[#e5e7eb] py-20 md:py-24" data-scroll-reveal>
-    <div class="content-container">
-    <div class="scroll-reveal-in xf-more-categories-head max-w-3xl">
+        <div class="content-container xf-home-section">
+    <div class="scroll-reveal-in xf-more-categories-head max-w-3xl xf-home-head">
       <div class="xf-section-eyebrow">BEYOND PRODUCT &amp; STYLE</div>
-      <h2 class="xf-section-title">Mockups, Filter, Make-up, Common Uses -<br>and Much More</h2>
-      <p class="xf-section-lead">Compress hours of work into seconds with curated templates for mockups, make-up, filters, and everything else you need.</p>
+      <h2 class="xf-section-title">Mockups, filters, makeup,<br>and everyday creative edits</h2>
+      <p class="xf-section-lead">Turn hours of editing into seconds with templates for mockups, makeup, filters, and the creative work you do every day.</p>
     </div>
     <div id="xf-category-showcase" class="xf-cat-showcase-grid scroll-reveal-in" data-video-cycle="beforeAfter">
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Change Backgrounds">
+          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Change backgrounds">
             <source src="assets/videos/before-after/change-backgrounds.mp4" type="video/mp4">
           </video>
         </div>
         <p class="xf-cat-showcase-label" aria-live="polite">
-          <span class="xf-cat-showcase-label__text" data-cat-label>Change Backgrounds</span><span class="xf-cat-showcase-label__cursor" aria-hidden="true"></span>
+          <span class="xf-cat-showcase-label__text" data-cat-label>Change backgrounds</span><span class="xf-cat-showcase-label__cursor" aria-hidden="true"></span>
         </p>
       </div>
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Create Mockup's">
+          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Create mockups">
             <source src="assets/videos/before-after/create-mokeup-s.mp4" type="video/mp4">
           </video>
         </div>
         <p class="xf-cat-showcase-label" aria-live="polite">
-          <span class="xf-cat-showcase-label__text" data-cat-label>Create Mockup's</span><span class="xf-cat-showcase-label__cursor" aria-hidden="true"></span>
+          <span class="xf-cat-showcase-label__text" data-cat-label>Create mockups</span><span class="xf-cat-showcase-label__cursor" aria-hidden="true"></span>
         </p>
       </div>
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Professional Headshots">
+          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Professional headshots">
             <source src="assets/videos/before-after/professional-headshots.mp4" type="video/mp4">
           </video>
         </div>
         <p class="xf-cat-showcase-label" aria-live="polite">
-          <span class="xf-cat-showcase-label__text" data-cat-label>Professional Headshots</span><span class="xf-cat-showcase-label__cursor" aria-hidden="true"></span>
+          <span class="xf-cat-showcase-label__text" data-cat-label>Professional headshots</span><span class="xf-cat-showcase-label__cursor" aria-hidden="true"></span>
         </p>
       </div>
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Try on Outfits">
+          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Try on outfits">
             <source src="assets/videos/before-after/try-on-outfits.mp4" type="video/mp4">
           </video>
         </div>
         <p class="xf-cat-showcase-label" aria-live="polite">
-          <span class="xf-cat-showcase-label__text" data-cat-label>Try on Outfits</span><span class="xf-cat-showcase-label__cursor" aria-hidden="true"></span>
+          <span class="xf-cat-showcase-label__text" data-cat-label>Try on outfits</span><span class="xf-cat-showcase-label__cursor" aria-hidden="true"></span>
         </p>
       </div>
     </div>
@@ -1768,7 +2171,7 @@
       <div class="xf-glass-backdrop__veil"></div>
     </div>
 
-<div class="content-container py-16 md:py-24">
+    <div class="content-container py-16 md:py-24 xf-home-section">
       <div class="scroll-reveal-in xf-motion-hero">
         <div>
           <div class="xf-section-eyebrow">Motion prompt library</div>
@@ -1867,8 +2270,8 @@
 
   <!-- ==================== SKILLS SPOTLIGHT ==================== -->
   <section id="xf-skills-spotlight-section" class="xf-glass-section xf-glass-section--soft section border-t border-[#e5e7eb] py-20 md:py-24" data-scroll-reveal data-xf-skills-section>
-    <div class="content-container">
-    <div class="scroll-reveal-in flex flex-col md:flex-row md:items-end md:justify-between gap-4 max-w-3xl md:max-w-none">
+        <div class="content-container xf-home-section">
+    <div class="scroll-reveal-in flex flex-col md:flex-row md:items-end md:justify-between gap-4 max-w-3xl md:max-w-none xf-skills-head">
       <div class="max-w-2xl">
         <p class="xf-section-eyebrow">Skills</p>
         <h2 class="xf-section-title">Portable skills for every task<br>beyond Imagine.</h2>
@@ -1896,7 +2299,7 @@
       </div>
     </div>
 
-    <div class="xf-spotlight-links scroll-reveal-in mt-6 flex flex-wrap gap-3 text-sm" style="transition-delay: 120ms">
+    <div class="xf-spotlight-links scroll-reveal-in mt-6 flex flex-wrap gap-3 text-sm xf-home-links" style="transition-delay: 120ms">
       <a href="workflows.html" class="font-semibold underline-offset-2 hover:underline">Workflow combos</a>
       <span class="xf-spotlight-links__sep" aria-hidden="true">·</span>
       <a href="connector-setup.html" class="font-semibold underline-offset-2 hover:underline">Connector setup</a>
@@ -1908,7 +2311,7 @@
 
   <!-- ==================== FINAL CTA ==================== -->
   <section id="xf-final-cta" class="xf-glass-section section py-16 md:py-20 border-t border-[#e5e7eb]" data-scroll-reveal>
-    <div class="xf-glass-backdrop" aria-hidden="true">
+        <div class="xf-glass-backdrop" aria-hidden="true">
       <div class="xf-glass-backdrop__img"></div>
       <div class="xf-glass-backdrop__mesh"></div>
       <div class="xf-glass-backdrop__veil"></div>
@@ -1964,6 +2367,9 @@
     const HERO_CROSSFADE_MS = 650;
     let heroActiveKey = 'a';
     let heroThemeBootstrapped = false;
+    /* Bumps on every theme/hero swap — stale video callbacks must not paint the wrong clip */
+    let heroSwapGen = 0;
+    let themeApplyLock = false;
 
     function heroLayers() {
       const a = document.getElementById('hero-video-a');
@@ -1977,65 +2383,89 @@
       if (!src) return '';
       try {
         return decodeURIComponent(src.split('/').pop() || '');
-      } catch {
+      } catch (e) {
         return src.split('/').pop() || '';
       }
     }
 
     function heroHasLoadedSrc(hero, expectedSrc) {
+      if (!hero || !expectedSrc) return false;
       const expected = heroFileName(expectedSrc);
       const sourceName = heroFileName(hero.querySelector('source')?.getAttribute('src') || '');
       const currentName = heroFileName(hero.currentSrc || '');
-      return (
-        (sourceName === expected || currentName === expected) &&
-        hero.readyState >= 2 &&
-        hero.getAttribute('data-active-src') === expectedSrc
-      );
+      const tagged = hero.getAttribute('data-active-src') === expectedSrc;
+      const nameOk = sourceName === expected || currentName === expected;
+      return tagged && nameOk && hero.readyState >= 2;
     }
 
     function prepareHeroVideo(video, src) {
-      const source = video.querySelector('source');
-      if (!source) return;
+      const source = video && video.querySelector('source');
+      if (!source || !src) return;
       source.setAttribute('src', src);
       video.setAttribute('data-active-src', src);
       video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
       video.loop = true;
-      video.load();
+      try {
+        video.load();
+      } catch (e) { /* ignore */ }
     }
 
-    function waitForHeroVideo(video, expectedSrc, onReady) {
-      const done = () => {
-        if (!heroHasLoadedSrc(video, expectedSrc)) return;
-        onReady();
+    function waitForHeroVideo(video, expectedSrc, onReady, gen) {
+      let settled = false;
+      const finish = (ok) => {
+        if (settled) return;
+        if (typeof gen === 'number' && gen !== heroSwapGen) return;
+        if (ok && !heroHasLoadedSrc(video, expectedSrc)) return;
+        settled = true;
+        onReady(ok);
       };
 
       if (heroHasLoadedSrc(video, expectedSrc)) {
-        onReady();
+        finish(true);
         return;
       }
 
-      video.addEventListener('loadeddata', done, { once: true });
-      video.addEventListener('canplay', done, { once: true });
-      video.addEventListener('error', () => {
-        console.warn('[X Freeze] Hero video failed to load:', expectedSrc);
-        onReady();
-      }, { once: true });
+      const onData = () => finish(true);
+      video.addEventListener('loadeddata', onData, { once: true });
+      video.addEventListener('canplay', onData, { once: true });
+      video.addEventListener(
+        'error',
+        () => {
+          console.warn('[X Freeze] Hero video failed to load:', expectedSrc);
+          /* Do not reveal a broken/wrong frame — keep poster/base only */
+          finish(false);
+        },
+        { once: true }
+      );
+      /* Safety timeout so theme never hangs mid-swap */
+      setTimeout(() => {
+        if (settled) return;
+        if (heroHasLoadedSrc(video, expectedSrc)) finish(true);
+        else finish(false);
+      }, 8000);
       video.play().catch(() => {});
     }
 
-    function preloadAlternateHero() {
-      const { active, inactive } = heroLayers();
-      if (!active || !inactive) return;
+    function paintHeroBase(isDark, poster) {
+      const base = document.getElementById('hero-stage-base');
+      if (!base) return;
+      base.style.backgroundColor = isDark ? '#0a0a0a' : '#f4f2f6';
+      if (poster) {
+        base.style.backgroundImage = 'url("' + poster + '")';
+        base.style.backgroundSize = 'cover';
+        base.style.backgroundPosition = 'center';
+        base.style.backgroundRepeat = 'no-repeat';
+      }
+    }
 
-      const isDark = document.documentElement.classList.contains('dark');
-      const altSrc = isDark ? HERO_VIDEOS.light : HERO_VIDEOS.dark;
-      const inactiveSrc = inactive.querySelector('source')?.getAttribute('src') || '';
-      if (inactiveSrc === altSrc) return;
-
-      /* Alternate theme only after first hero is fully idle — never compete with backdrop */
-      const run = () => prepareHeroVideo(inactive, altSrc);
-      if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 8000 });
-      else setTimeout(run, 5000);
+    function hideHeroLayer(video) {
+      if (!video) return;
+      video.classList.remove('is-active', 'hero-ready');
+      try {
+        video.pause();
+      } catch (e) { /* ignore */ }
     }
 
     function revealHeroLayer(video) {
@@ -2044,107 +2474,191 @@
       video.play().catch(() => {});
     }
 
-    function crossfadeHeroTo(src) {
+    function preloadAlternateHero() {
       const { active, inactive } = heroLayers();
       if (!active || !inactive) return;
+      if (document.documentElement.classList.contains('xf-hero-swapping')) return;
 
-      const activeSrc = active.getAttribute('data-active-src') || active.querySelector('source')?.getAttribute('src') || '';
-      const isVisible = active.classList.contains('is-active') && active.classList.contains('hero-ready');
+      const isDark = document.documentElement.classList.contains('dark');
+      const altSrc = isDark ? HERO_VIDEOS.light : HERO_VIDEOS.dark;
+      const inactiveSrc = inactive.querySelector('source')?.getAttribute('src') || '';
+      if (inactiveSrc === altSrc && inactive.getAttribute('data-active-src') === altSrc) return;
 
+      const run = () => {
+        if (document.documentElement.classList.contains('xf-hero-swapping')) return;
+        prepareHeroVideo(inactive, altSrc);
+      };
+      if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 8000 });
+      else setTimeout(run, 5000);
+    }
+
+    function crossfadeHeroTo(src, gen) {
+      const { active, inactive } = heroLayers();
+      if (!active || !inactive) return;
+      if (typeof gen === 'number' && gen !== heroSwapGen) return;
+
+      const activeSrc =
+        active.getAttribute('data-active-src') ||
+        active.querySelector('source')?.getAttribute('src') ||
+        '';
+      const isVisible =
+        active.classList.contains('is-active') && active.classList.contains('hero-ready');
+
+      /* Already showing correct theme clip */
       if (activeSrc === src && heroHasLoadedSrc(active, src)) {
         revealHeroLayer(active);
-        preloadAlternateHero();
+        hideHeroLayer(inactive);
         document.documentElement.classList.remove('xf-hero-swapping');
+        preloadAlternateHero();
         return;
       }
 
+      /* First paint / not yet visible — load on active layer only */
       if (!isVisible) {
         if (activeSrc !== src) prepareHeroVideo(active, src);
-        waitForHeroVideo(active, src, () => {
-          revealHeroLayer(active);
-          preloadAlternateHero();
-          document.documentElement.classList.remove('xf-hero-swapping');
-        });
+        waitForHeroVideo(
+          active,
+          src,
+          (ok) => {
+            if (typeof gen === 'number' && gen !== heroSwapGen) return;
+            if (ok) revealHeroLayer(active);
+            else hideHeroLayer(active);
+            hideHeroLayer(inactive);
+            document.documentElement.classList.remove('xf-hero-swapping');
+            if (ok) preloadAlternateHero();
+          },
+          gen
+        );
         return;
       }
 
-      const canCrossfade =
-        !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
+      const canCrossfade = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       document.documentElement.classList.add('xf-hero-swapping');
-      inactive.classList.remove('is-active', 'hero-ready');
-      const inactiveSrc = inactive.querySelector('source')?.getAttribute('src') || '';
+
+      /* Keep active visible (correct or not) until inactive is ready — then swap */
+      const inactiveSrc =
+        inactive.querySelector('source')?.getAttribute('src') ||
+        inactive.getAttribute('data-active-src') ||
+        '';
       if (inactiveSrc !== src) prepareHeroVideo(inactive, src);
+      else if (!heroHasLoadedSrc(inactive, src)) prepareHeroVideo(inactive, src);
 
-      waitForHeroVideo(inactive, src, () => {
-        inactive.classList.add('hero-ready');
+      waitForHeroVideo(
+        inactive,
+        src,
+        (ok) => {
+          if (typeof gen === 'number' && gen !== heroSwapGen) return;
 
-        if (canCrossfade) {
-          inactive.classList.add('is-active');
-          requestAnimationFrame(() => active.classList.remove('is-active'));
-          inactive.play().catch(() => {});
-
-          setTimeout(() => {
-            active.pause();
-            active.classList.remove('hero-ready');
-            heroActiveKey = heroActiveKey === 'a' ? 'b' : 'a';
-            preloadAlternateHero();
+          if (!ok) {
+            /* Failed load: hide broken video, keep poster/base so theme stays solid */
+            hideHeroLayer(inactive);
+            /* If active is the WRONG theme, hide it too — poster is enough */
+            const activeIsCorrect =
+              (active.getAttribute('data-active-src') || '') === src &&
+              heroHasLoadedSrc(active, src);
+            if (!activeIsCorrect) hideHeroLayer(active);
             document.documentElement.classList.remove('xf-hero-swapping');
-          }, HERO_CROSSFADE_MS);
-        } else {
-          inactive.classList.add('is-active');
-          active.classList.remove('is-active', 'hero-ready');
-          active.pause();
-          inactive.play().catch(() => {});
-          heroActiveKey = heroActiveKey === 'a' ? 'b' : 'a';
-          preloadAlternateHero();
-          document.documentElement.classList.remove('xf-hero-swapping');
-        }
-      });
+            return;
+          }
+
+          if (canCrossfade) {
+            inactive.classList.add('hero-ready', 'is-active');
+            inactive.play().catch(() => {});
+            requestAnimationFrame(() => {
+              if (typeof gen === 'number' && gen !== heroSwapGen) return;
+              active.classList.remove('is-active');
+            });
+            setTimeout(() => {
+              if (typeof gen === 'number' && gen !== heroSwapGen) return;
+              hideHeroLayer(active);
+              heroActiveKey = heroActiveKey === 'a' ? 'b' : 'a';
+              document.documentElement.classList.remove('xf-hero-swapping');
+              preloadAlternateHero();
+            }, HERO_CROSSFADE_MS);
+          } else {
+            hideHeroLayer(active);
+            revealHeroLayer(inactive);
+            heroActiveKey = heroActiveKey === 'a' ? 'b' : 'a';
+            document.documentElement.classList.remove('xf-hero-swapping');
+            preloadAlternateHero();
+          }
+        },
+        gen
+      );
     }
 
     function setHeroVideoForTheme(isDark) {
-      const { stack } = heroLayers();
+      const { stack, active, inactive } = heroLayers();
       if (!stack) return;
+      const gen = ++heroSwapGen;
       const nextSrc = isDark ? HERO_VIDEOS.dark : HERO_VIDEOS.light;
       const nextPoster = isDark ? HERO_POSTERS.dark : HERO_POSTERS.light;
+
       document.documentElement.setAttribute('data-hero-video', nextSrc);
       document.documentElement.setAttribute('data-hero-poster', nextPoster);
-      const base = document.getElementById('hero-stage-base');
-      if (base && nextPoster) {
-        base.style.backgroundImage = 'url("' + nextPoster + '")';
-        base.style.backgroundSize = 'cover';
-        base.style.backgroundPosition = 'center';
-      }
-      const { active, inactive } = heroLayers();
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
+      /* Poster + solid base paint first — never flash the wrong liquid */
+      paintHeroBase(isDark, nextPoster);
       if (active) active.setAttribute('poster', nextPoster);
       if (inactive) inactive.setAttribute('poster', nextPoster);
-      crossfadeHeroTo(nextSrc);
+
+      crossfadeHeroTo(nextSrc, gen);
+    }
+
+    function syncThemeControls(isDark) {
+      document
+        .querySelectorAll(
+          '.theme-toggle, .theme-toggle-mobile, .site-nav-drawer-theme__switch, .xf-footer-theme-switch'
+        )
+        .forEach((btn) => {
+          btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+          btn.setAttribute('title', isDark ? 'Light mode' : 'Dark mode');
+          btn.setAttribute('aria-checked', isDark ? 'true' : 'false');
+        });
+      document.querySelectorAll('.theme-switch-label:not(.theme-switch-label--auto)').forEach((el) => {
+        el.textContent = isDark ? 'Dark' : 'Light';
+      });
+      document.querySelectorAll('.theme-switch-label--auto').forEach((el) => {
+        el.textContent = '';
+      });
+      document.querySelectorAll('.theme-toggle-label').forEach((el) => {
+        el.textContent = isDark ? 'Light mode' : 'Dark mode';
+      });
+      if (window.XFreezeFooter && typeof window.XFreezeFooter.syncTheme === 'function') {
+        try {
+          window.XFreezeFooter.syncTheme(document);
+        } catch (e) { /* ignore */ }
+      }
     }
 
     function applyTheme(theme, options) {
       options = options || {};
       const isDark = theme === 'dark';
-      document.documentElement.classList.toggle('dark', isDark);
-      document.documentElement.style.backgroundColor = isDark ? '#000000' : '#f6f5f8';
-      localStorage.setItem('xfreeze-theme', theme);
-      document.querySelectorAll('.theme-toggle, .theme-toggle-mobile, .site-nav-drawer-theme__switch').forEach(btn => {
-        btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
-        btn.setAttribute('title', isDark ? 'Light mode' : 'Dark mode');
-        btn.setAttribute('aria-checked', isDark ? 'true' : 'false');
-      });
-      /* Skip --auto labels (footer): those use CSS ::before only */
-      document.querySelectorAll('.theme-switch-label:not(.theme-switch-label--auto)').forEach(el => {
-        el.textContent = isDark ? 'Dark' : 'Light';
-      });
-      document.querySelectorAll('.theme-switch-label--auto').forEach(el => {
-        el.textContent = '';
-      });
-      document.querySelectorAll('.theme-toggle-label').forEach(el => {
-        el.textContent = isDark ? 'Light mode' : 'Dark mode';
-      });
+      const root = document.documentElement;
+
+      /* Atomic class set — never leave half-toggled / both classes */
+      if (isDark) {
+        root.classList.add('dark');
+        root.classList.remove('light');
+      } else {
+        root.classList.remove('dark');
+        root.classList.add('light');
+      }
+      root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      root.style.backgroundColor = isDark ? '#0a0a0a' : '#f6f5f8';
+      if (document.body) {
+        document.body.style.backgroundColor = isDark ? '#0a0a0a' : '';
+      }
+
+      try {
+        localStorage.setItem('xfreeze-theme', theme);
+      } catch (e) { /* private mode */ }
+
+      syncThemeControls(isDark);
 
       if (options.skipHero) {
+        paintHeroBase(isDark, isDark ? HERO_POSTERS.dark : HERO_POSTERS.light);
         preloadAlternateHero();
         return;
       }
@@ -2152,8 +2666,14 @@
     }
 
     function toggleTheme() {
+      if (themeApplyLock) return;
+      themeApplyLock = true;
       const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
       applyTheme(next);
+      /* Allow next click after a frame; hero gen token already cancels stale swaps */
+      requestAnimationFrame(() => {
+        themeApplyLock = false;
+      });
     }
 
     function initTheme() {
@@ -2164,15 +2684,25 @@
       const bootReady =
         active &&
         active.classList.contains('hero-ready') &&
-        active.getAttribute('data-active-src') === expectedSrc;
+        active.getAttribute('data-active-src') === expectedSrc &&
+        heroHasLoadedSrc(active, expectedSrc);
 
       applyTheme(theme, { skipHero: bootReady });
       heroThemeBootstrapped = true;
 
+      /* If boot thought video was ready but theme class and clip disagree, force swap */
+      if (bootReady) {
+        const rootDark = document.documentElement.classList.contains('dark');
+        const clipDark = (active.getAttribute('data-active-src') || '').indexOf('liquid-dark') !== -1;
+        if (rootDark !== clipDark) setHeroVideoForTheme(rootDark);
+      }
+
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (!localStorage.getItem('xfreeze-theme')) {
-          applyTheme(e.matches ? 'dark' : 'light');
-        }
+        try {
+          if (!localStorage.getItem('xfreeze-theme')) {
+            applyTheme(e.matches ? 'dark' : 'light');
+          }
+        } catch (err) { /* ignore */ }
       });
     }
 
@@ -2203,22 +2733,38 @@
       };
     }
 
+    let marqueeFilterCat = 'all';
+
     function buildCollectionMarqueeImages() {
       if (typeof visualTemplates === 'undefined' || !visualTemplates.length) return [];
 
       /* Fewer slides = fewer image requests (duplicated for seamless loop) */
       const target = 24;
+      const base = visualTemplates.filter(function (t) {
+        if (!t || !t.img) return false;
+        if (marqueeFilterCat === 'all') return true;
+        return t.cat === marqueeFilterCat;
+      });
       const productPool = randomShuffle(
-        visualTemplates.filter(function (t) { return t && t.img && t.cat === 'Product'; })
+        base.filter(function (t) { return t.cat === 'Product'; })
       );
       const mockupPool = randomShuffle(
-        visualTemplates.filter(function (t) { return t && t.img && t.cat === "Mockup's"; })
+        base.filter(function (t) { return t.cat === "Mockup's"; })
       );
       const otherPool = randomShuffle(
-        visualTemplates.filter(function (t) {
-          return t && t.img && t.cat !== 'Product' && t.cat !== "Mockup's";
+        base.filter(function (t) {
+          return t.cat !== 'Product' && t.cat !== "Mockup's";
         })
       );
+      /* If a single category filter is active, prefer that pool only */
+      if (marqueeFilterCat !== 'all') {
+        const only = randomShuffle(base.slice());
+        const slides = [];
+        for (let i = 0; i < target && i < only.length; i++) {
+          slides.push(toMarqueeSlide(only[i]));
+        }
+        return slides.length ? slides : only.map(toMarqueeSlide).slice(0, target);
+      }
 
       const slides = [];
       const usedCodes = new Set();
@@ -2282,6 +2828,14 @@
       const track1 = document.getElementById('selected-work-marquee');
       const images = buildCollectionMarqueeImages();
       if (!track1 || images.length === 0) return;
+
+      if (!window._xfTempFilterBound) {
+        window._xfTempFilterBound = true;
+        window.addEventListener('xf:template-filter', function (ev) {
+          marqueeFilterCat = (ev.detail && ev.detail.cat) || 'all';
+          initSelectedWorkMarquee();
+        });
+      }
 
       track1.classList.remove('animate-marquee', 'is-marquee-ready');
       track1._xfMarqueeReady = false;
@@ -2405,13 +2959,15 @@
           if (video.closest('[data-video-cycle]')) return;
           if (entry.isIntersecting) {
             if (video.classList.contains('is-active') || !video.closest('.section-video-stack')) {
-              video.play().catch(() => {});
+              if (window.XFreezeVideoPerf) window.XFreezeVideoPerf.softPlay(video);
+              else video.play().catch(() => {});
             }
           } else {
-            video.pause();
+            if (window.XFreezeVideoPerf) window.XFreezeVideoPerf.softPause(video);
+            else video.pause();
           }
         });
-      }, { threshold: 0.05, rootMargin: '15% 0px 15% 0px' });
+      }, { threshold: 0.12, rootMargin: '10% 0px' });
 
       videos.forEach((video) => {
         if (video.closest('[data-video-cycle]')) return;
@@ -2454,53 +3010,58 @@
       initSectionVideos()
       bootShowcaseVideos()
       initInspirationAnimation()
-      initBundlesBackground()
+      initCreatorLibraryGrid()
       initSectionVideoCycling()
 
       // Smooth scroll for nav links
       console.log('%c[X Freeze] Professional simple prototype initialized.', 'color:#888')
     }
 
-    function initBundlesBackground() {
+    function initCreatorLibraryGrid() {
       const section = document.getElementById('creator-library');
-      if (!section) return;
-      if (section._xfBundlesBgBound) return;
-      section._xfBundlesBgBound = true;
+      if (!section || section._xfLibGridBound) return;
+      section._xfLibGridBound = true;
 
-      let frame = null;
-      /* Subtle grid only — no cursor color spotlight */
-      const GRID_DAMP = 0.03;
-      const BASE_X = 50;
-      const BASE_Y = 42;
-      let gridX = BASE_X;
-      let gridY = BASE_Y;
+      /* Cursor spotlight only — no parallax transforms (those glitched over fixed hero) */
+      let targetX = 50;
+      let targetY = 50;
+      let curX = 50;
+      let curY = 50;
+      let raf = null;
 
-      const applyPosition = () => {
-        frame = null;
-        section.style.setProperty('--mx', gridX.toFixed(2) + '%');
-        section.style.setProperty('--my', gridY.toFixed(2) + '%');
+      const apply = () => {
+        raf = null;
+        curX += (targetX - curX) * 0.14;
+        curY += (targetY - curY) * 0.14;
+        section.style.setProperty('--lib-x', curX.toFixed(2) + '%');
+        section.style.setProperty('--lib-y', curY.toFixed(2) + '%');
+        if (Math.abs(targetX - curX) > 0.05 || Math.abs(targetY - curY) > 0.05) {
+          raf = requestAnimationFrame(apply);
+        }
+      };
+
+      const tick = () => {
+        if (!raf) raf = requestAnimationFrame(apply);
       };
 
       const onMove = (event) => {
         const rect = section.getBoundingClientRect();
         if (!rect.width || !rect.height) return;
-        const rawX = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
-        const rawY = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100));
-        gridX = BASE_X + (rawX - BASE_X) * GRID_DAMP;
-        gridY = BASE_Y + (rawY - BASE_Y) * GRID_DAMP;
-        if (!frame) frame = requestAnimationFrame(applyPosition);
+        targetX = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
+        targetY = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100));
+        tick();
+      };
+
+      const onLeave = () => {
+        targetX = 50;
+        targetY = 50;
+        tick();
       };
 
       section.addEventListener('mousemove', onMove, { passive: true });
       section.addEventListener('pointermove', onMove, { passive: true });
-
-      section.addEventListener('mouseleave', () => {
-        gridX = BASE_X;
-        gridY = BASE_Y;
-        if (!frame) frame = requestAnimationFrame(applyPosition);
-      });
-
-      applyPosition();
+      section.addEventListener('mouseleave', onLeave);
+      apply();
     }
 
     /* === Video cycling (fade only - no frame shuffle between slots) === */
@@ -2524,6 +3085,29 @@
         'product-add-3.mp4',
         'product-add-4.mp4',
         'product-production-quality-ads.mp4',
+      ],
+      /* Fallback if before-after data script is late; titles come from aliases + data map */
+      beforeAfter: [
+        'before-after/change-backgrounds.mp4',
+        'before-after/create-mokeup-s.mp4',
+        'before-after/professional-headshots.mp4',
+        'before-after/try-on-outfits.mp4',
+        'before-after/add-makeup.mp4',
+        'before-after/change-mood-filters.mp4',
+        'before-after/cinematic-looks.mp4',
+        'before-after/fashion-mockup-s.mp4',
+        'before-after/fix-colorgrading.mp4',
+        'before-after/perfect-social-post.mp4',
+        'before-after/production-quality-ads.mp4',
+        'before-after/create-viral-ads.mp4',
+        'before-after/deblur.mp4',
+        'before-after/remove-watermark.mp4',
+        'before-after/restore-old-images.mp4',
+        'before-after/your-product-on-models.mp4',
+        'before-after/add-instant-beauty.mp4',
+        'before-after/client-ready-brand-outlooks.mp4',
+        'before-after/create-brands.mp4',
+        'before-after/remove-background-people.mp4',
       ],
     };
 
@@ -2583,15 +3167,61 @@
     const VIDEO_FADE_MS = 480;
     const VIDEO_CARD_STAGGER_MS = 420; /* don't swap both cards on the same frame */
     const videoCycleInstances = [];
-    const beforeAfterTitleMap = (window.XFreezeBeforeAfterVideos || []).reduce((map, item) => {
-      map[item.file] = item.title;
-      map['before-after/' + item.file] = item.title;
+    /* Hard aliases so misspelled asset filenames never show as captions */
+    const BEFORE_AFTER_TITLE_ALIASES = {
+      'add-instant-beauty.mp4': 'Instant beauty retouch',
+      'add-makeup.mp4': 'Add makeup',
+      'change-backgrounds.mp4': 'Change backgrounds',
+      'change-mood-filters.mp4': 'Apply mood filters',
+      'cinematic-looks.mp4': 'Cinematic looks',
+      'client-ready-brand-outlooks.mp4': 'Client-ready brand looks',
+      'create-brands.mp4': 'Build brand kits',
+      'create-mokeup-s.mp4': 'Create mockups',
+      'create-viral-ads.mp4': 'Create viral ads',
+      'deblur.mp4': 'Deblur photos',
+      'fashion-mockup-s.mp4': 'Fashion mockups',
+      'fix-colorgrading.mp4': 'Fix color grading',
+      'perfect-social-post.mp4': 'Perfect social posts',
+      'production-quality-ads.mp4': 'Production-quality ads',
+      'professional-headshots.mp4': 'Professional headshots',
+      'remove-background-people.mp4': 'Remove people from backgrounds',
+      'remove-watermark.mp4': 'Remove watermarks',
+      'restore-old-images.mp4': 'Restore old photos',
+      'try-on-outfits.mp4': 'Try on outfits',
+      'your-product-on-models.mp4': 'Place products on models',
+    };
+
+    /* Rebuild map at call time — data script is deferred and may load after this block */
+    function getBeforeAfterTitleMap() {
+      const map = {};
+      Object.keys(BEFORE_AFTER_TITLE_ALIASES).forEach((file) => {
+        map[file] = BEFORE_AFTER_TITLE_ALIASES[file];
+        map['before-after/' + file] = BEFORE_AFTER_TITLE_ALIASES[file];
+      });
+      (window.XFreezeBeforeAfterVideos || []).forEach((item) => {
+        if (!item || !item.file) return;
+        map[item.file] = item.title;
+        map['before-after/' + item.file] = item.title;
+      });
       return map;
-    }, {});
+    }
 
     function titleForPoolSrc(src) {
-      const file = (src || '').split('/').pop();
-      return beforeAfterTitleMap[file] || file.replace(/\.mp4$/i, '').replace(/-/g, ' ');
+      const file = (src || '').split('/').pop() || '';
+      const map = getBeforeAfterTitleMap();
+      if (map[file]) return map[file];
+      if (map['before-after/' + file]) return map['before-after/' + file];
+      /* Fallback: clean filename into a readable professional label */
+      return file
+        .replace(/\.mp4$/i, '')
+        .replace(/mokeup/gi, 'mockup')
+        .replace(/colorgrading/gi, 'color-grading')
+        .replace(/outlooks/gi, 'looks')
+        .replace(/-s(?=-|$)/gi, 's')
+        .replace(/-/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .replace(/^\w/, (c) => c.toUpperCase());
     }
 
     function typewriterCaption(textEl, text) {
@@ -3289,7 +3919,9 @@
     })();
   </script>
   <script src="js/motion.js" defer></script>
+  <script src="js/video-perf.js" defer></script>
   <script src="js/cinematic.js" defer></script>
+  <script src="js/home-workflow.js" defer></script>
 
 </body>
 </html>

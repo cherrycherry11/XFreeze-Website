@@ -13,6 +13,24 @@
     ultimate: { id: 'ultimate', name: 'Ultimate Library', price: 79, type: 'bundle' },
   };
 
+  /** Subscription plans — billed in USD via Razorpay */
+  const SUBSCRIPTIONS = {
+    'pro-monthly': {
+      id: 'pro-monthly',
+      name: 'Pro Monthly',
+      price: 49,
+      type: 'subscription',
+      interval: 'month',
+    },
+    'pro-yearly': {
+      id: 'pro-yearly',
+      name: 'Pro Yearly',
+      price: 499,
+      type: 'subscription',
+      interval: 'year',
+    },
+  };
+
   const TEMPLATE_CATEGORY_PRICES = {
     Product: 2.99,
     'Make-up': 3.49,
@@ -22,6 +40,10 @@
 
   function getBundle(id) {
     return BUNDLES[id] || null;
+  }
+
+  function getSubscription(id) {
+    return SUBSCRIPTIONS[id] || null;
   }
 
   function getTemplateProduct(code, category) {
@@ -42,8 +64,10 @@
 
   global.XFreezeProducts = {
     BUNDLES: BUNDLES,
+    SUBSCRIPTIONS: SUBSCRIPTIONS,
     TEMPLATE_CATEGORY_PRICES: TEMPLATE_CATEGORY_PRICES,
     getBundle: getBundle,
+    getSubscription: getSubscription,
     getTemplateProduct: getTemplateProduct,
     formatUSD: formatUSD,
   };

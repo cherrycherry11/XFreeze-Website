@@ -1,6 +1,9 @@
-/* Glass pill bright / dark theme switch
-   Compact (nav): frosted track + circular sun/moon thumb
-   Hero (--hero + label): wide glass pill with "Dark"/"Light" text */
+/* ═══════════════════════════════════════════════════════════
+   X Freeze theme switch — crystal orb glass control
+   Reference: overhanging glass lens + frosted pill + mode label
+   Unique: ice-rim refraction, warm day / cyan-night dual glow
+   Compact (nav) · Hero labeled · Sm drawer
+   ═══════════════════════════════════════════════════════════ */
 
 .theme-switch {
   position: relative;
@@ -15,60 +18,48 @@
   -webkit-tap-highlight-color: transparent;
   vertical-align: middle;
   line-height: 0;
+  /* Room for the overhanging orb + outer glow */
+  isolation: isolate;
 }
 
 .theme-switch:focus-visible {
-  outline: 2px solid rgba(34, 211, 238, 0.75);
-  outline-offset: 3px;
+  outline: 2px solid rgba(56, 189, 248, 0.7);
+  outline-offset: 4px;
   border-radius: 9999px;
 }
 
-/* ── Track (glass pill) — compact default for nav ── */
+/* ── Track (frosted glass pill) — compact default for nav ── */
 .theme-switch-track {
   position: relative;
   display: block;
-  width: 3.35rem;
-  height: 1.85rem;
+  width: 3.5rem;
+  height: 1.9rem;
   border-radius: 9999px;
-  overflow: hidden;
+  overflow: visible; /* orb can overhang */
   box-sizing: border-box;
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.16) 0%,
-    rgba(255, 255, 255, 0.06) 48%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  /* Deep cool glass (dark default base; light overrides below) */
+  background:
+    linear-gradient(
+      160deg,
+      rgba(72, 76, 88, 0.72) 0%,
+      rgba(48, 52, 62, 0.88) 45%,
+      rgba(38, 40, 48, 0.95) 100%
+    );
+  border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-    0 4px 16px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(18px) saturate(1.3);
-  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 6px 18px rgba(0, 0, 0, 0.22),
+    0 2px 4px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(22px) saturate(1.35);
+  -webkit-backdrop-filter: blur(22px) saturate(1.35);
   transition:
-    background 0.35s ease,
-    border-color 0.35s ease,
-    box-shadow 0.35s ease,
-    width 0.25s ease,
-    height 0.25s ease;
+    background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
 }
 
-html:not(.dark) .theme-switch-track,
-html.light .theme-switch-track {
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.78) 0%,
-    rgba(255, 255, 255, 0.48) 48%,
-    rgba(240, 244, 255, 0.6) 100%
-  );
-  border-color: rgba(255, 255, 255, 0.75);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(15, 23, 42, 0.06),
-    0 4px 14px rgba(15, 23, 42, 0.1);
-}
-
-/* Soft specular highlight */
+/* Top specular sheen across the pill */
 .theme-switch-track::before {
   content: "";
   position: absolute;
@@ -76,23 +67,88 @@ html.light .theme-switch-track {
   border-radius: inherit;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.22) 0%,
-    transparent 42%,
-    transparent 100%
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.06) 38%,
+    transparent 55%
   );
   pointer-events: none;
+  z-index: 0;
 }
 
-/* ── Mode label ("Dark" / "Light") — hero + footer ── */
+/* Soft ambient ground shadow under the control */
+.theme-switch-track::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -0.45rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.28) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 0.35s ease, background 0.35s ease;
+}
+
+/* Light mode track — soft silver frost (matches reference vibe) */
+html:not(.dark) .theme-switch-track,
+html.light .theme-switch-track {
+  background:
+    linear-gradient(
+      155deg,
+      rgba(210, 214, 222, 0.95) 0%,
+      rgba(176, 182, 194, 0.92) 42%,
+      rgba(154, 160, 174, 0.96) 100%
+    );
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.1),
+    0 8px 22px rgba(15, 23, 42, 0.14),
+    0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+html:not(.dark) .theme-switch-track::after,
+html.light .theme-switch-track::after {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(15, 23, 42, 0.18) 0%,
+    transparent 72%
+  );
+}
+
+/* Dark mode track — ink glass with ice rim */
+html.dark .theme-switch-track {
+  background:
+    linear-gradient(
+      160deg,
+      rgba(42, 48, 62, 0.9) 0%,
+      rgba(18, 22, 32, 0.96) 50%,
+      rgba(10, 12, 18, 0.98) 100%
+    );
+  border-color: rgba(125, 211, 252, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(56, 189, 248, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    0 0 28px rgba(34, 211, 238, 0.08);
+}
+
+/* ── Mode label ("Dark" / "Light") ── */
 .theme-switch-label {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   z-index: 1;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -101,14 +157,18 @@ html.light .theme-switch-track {
   padding: 0;
   pointer-events: none;
   user-select: none;
-  transition: color 0.3s ease, opacity 0.3s ease;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition:
+    color 0.35s ease,
+    opacity 0.35s ease,
+    left 0.4s cubic-bezier(0.34, 1.2, 0.64, 1),
+    right 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
 }
 
 /*
- * Auto label via CSS (footer). Keep the node text empty —
- * if JS ever writes into it, hide that text so we never get "LightLight".
+ * Auto label via CSS (footer / empty label). Keep node text empty —
+ * if JS writes into it, hide that text so we never get "LightLight".
  */
 .theme-switch-label--auto {
   font-size: 0 !important;
@@ -121,200 +181,309 @@ html.light .theme-switch-track {
   content: "Light";
   font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
   line-height: 1;
-  color: rgba(24, 24, 27, 0.78);
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
 }
 
 html.dark .theme-switch-label--auto::before {
   content: "Dark";
-  color: rgba(255, 255, 255, 0.92);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  color: rgba(255, 255, 255, 0.94);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
-/* Dark: label left · Light: label right */
+/* Dark: label left · Light: label right (orb sits on the opposite side) */
 html.dark .theme-switch-label {
-  left: 1.05rem;
+  left: 0.78rem;
   right: auto;
   color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
 }
 
 html:not(.dark) .theme-switch-label,
 html.light .theme-switch-label {
   left: auto;
-  right: 1rem;
-  color: rgba(24, 24, 27, 0.78);
-  text-shadow: none;
+  right: 0.78rem;
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.22);
 }
 
-/* ── Circular thumb — compact default ── */
+/* ── Crystal orb thumb — larger than track, overhangs ── */
 .theme-switch-thumb {
   position: absolute;
   top: 50%;
-  left: 0.16rem;
-  width: 1.5rem;
-  height: 1.5rem;
-  margin-top: 0;
+  left: -0.1rem;
+  width: 1.72rem;
+  height: 1.72rem;
   border-radius: 50%;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* translateY keeps thumb true vertical center (margin-top breaks with borders) */
   transform: translateY(-50%) translateX(0);
   transition:
-    transform 0.4s cubic-bezier(0.34, 1.25, 0.64, 1),
-    box-shadow 0.38s ease,
-    background 0.38s ease;
+    transform 0.48s cubic-bezier(0.34, 1.35, 0.64, 1),
+    box-shadow 0.4s ease,
+    background 0.4s ease,
+    border-color 0.4s ease;
+  /* Light crystal — frosted lens (mid-tone so white sun pops, like the ref) */
   background:
-    radial-gradient(circle at 35% 30%, #ffffff 0%, #e8f0fc 38%, #9ec4ee 100%);
+    radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.2) 28%, transparent 52%),
+    radial-gradient(circle at 72% 78%, rgba(100, 116, 139, 0.28) 0%, transparent 48%),
+    linear-gradient(
+      145deg,
+      rgba(236, 240, 246, 0.88) 0%,
+      rgba(176, 186, 202, 0.82) 45%,
+      rgba(148, 160, 178, 0.9) 100%
+    );
+  border: 1.5px solid rgba(255, 255, 255, 0.72);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.75),
-    0 0 10px rgba(100, 160, 230, 0.3),
-    0 2px 8px rgba(15, 23, 42, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    0 0 0 1px rgba(255, 255, 255, 0.4),
+    0 0 18px rgba(255, 255, 255, 0.28),
+    0 5px 16px rgba(15, 23, 42, 0.2),
+    inset 0 2px 3px rgba(255, 255, 255, 0.75),
+    inset 0 -2px 5px rgba(71, 85, 105, 0.22);
 }
 
+/* Glass caustic ring on the orb */
+.theme-switch-thumb::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(148, 163, 184, 0.12) 100%
+  );
+  pointer-events: none;
+}
+
+/* Soft ice bloom behind the orb */
+.theme-switch-thumb::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 255, 255, 0.35) 0%,
+    transparent 68%
+  );
+  z-index: -1;
+  pointer-events: none;
+  transition: background 0.4s ease, opacity 0.4s ease;
+}
+
+/* Dark mode: orb slides right + becomes night crystal */
 html.dark .theme-switch-thumb {
-  transform: translateY(-50%) translateX(1.52rem);
+  transform: translateY(-50%) translateX(1.78rem);
   background:
-    radial-gradient(circle at 35% 28%, #2a4570 0%, #122038 55%, #0a1220 100%);
+    radial-gradient(circle at 32% 26%, rgba(186, 230, 253, 0.45) 0%, transparent 38%),
+    radial-gradient(circle at 68% 72%, rgba(14, 165, 233, 0.25) 0%, transparent 50%),
+    linear-gradient(
+      145deg,
+      rgba(51, 65, 85, 0.95) 0%,
+      rgba(15, 23, 42, 0.98) 48%,
+      rgba(2, 6, 23, 1) 100%
+    );
+  border-color: rgba(125, 211, 252, 0.55);
   box-shadow:
-    0 0 0 1.5px rgba(56, 232, 255, 0.55),
-    0 0 14px rgba(34, 211, 238, 0.55),
-    0 0 28px rgba(34, 211, 238, 0.25),
-    0 3px 10px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    0 0 0 1.5px rgba(56, 189, 248, 0.35),
+    0 0 18px rgba(34, 211, 238, 0.45),
+    0 0 36px rgba(14, 165, 233, 0.22),
+    0 4px 14px rgba(0, 0, 0, 0.5),
+    inset 0 1px 2px rgba(186, 230, 253, 0.25),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.45);
+}
+
+html.dark .theme-switch-thumb::after {
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(34, 211, 238, 0.4) 0%,
+    transparent 68%
+  );
 }
 
 .theme-switch:hover .theme-switch-thumb {
-  filter: brightness(1.06);
+  filter: brightness(1.05);
 }
 
 .theme-switch:active .theme-switch-thumb {
-  filter: brightness(0.98);
+  filter: brightness(0.97);
+  transition-duration: 0.15s;
 }
 
 /* ── Icons ── */
 .theme-switch-icon {
-  width: 0.78rem;
-  height: 0.78rem;
+  width: 0.82rem;
+  height: 0.82rem;
   display: none;
   align-items: center;
   justify-content: center;
   line-height: 0;
   pointer-events: none;
+  position: relative;
+  z-index: 1;
 }
 
 .theme-switch-icon svg {
   width: 100%;
   height: 100%;
   display: block;
-  /* Optical center for sun rays / moon crescent */
   flex-shrink: 0;
 }
 
 html:not(.dark) .theme-switch-icon--sun,
 html.light .theme-switch-icon--sun {
   display: flex;
-  color: #3d6fc0;
+  color: #ffffff;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.85));
 }
 
 html.dark .theme-switch-icon--moon {
   display: flex;
   color: #a5f3fc;
-  filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.65));
+  filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.75));
 }
 
 /* ══════════════════════════════════════════
-   Hero: large labeled glass control
+   Hero: quiet compact control (utility, not a CTA)
    ══════════════════════════════════════════ */
 .hero-theme {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-top: 1.5rem;
+  margin-top: 1.35rem;
+  opacity: 0.72;
+  transition: opacity 0.2s ease;
 }
 
-/* Compact labeled glass pill (smaller than reference) */
+.hero-theme:hover,
+.hero-theme:focus-within {
+  opacity: 1;
+}
+
+/* ~half the previous hero size — icon-only pill */
 .theme-switch--hero .theme-switch-track {
-  width: 5.5rem;
-  height: 2.1rem;
-  border-color: rgba(255, 255, 255, 0.32);
+  width: 2.85rem;
+  height: 1.45rem;
+  border-color: rgba(255, 255, 255, 0.14);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.16),
-    0 6px 18px rgba(0, 0, 0, 0.18),
-    0 1px 2px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(20px) saturate(1.35);
-  -webkit-backdrop-filter: blur(20px) saturate(1.35);
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.22),
+    0 4px 12px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(16px) saturate(1.15);
+  -webkit-backdrop-filter: blur(16px) saturate(1.15);
 }
 
 html:not(.dark) .theme-switch--hero .theme-switch-track,
 html.light .theme-switch--hero .theme-switch-track {
-  border-color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(15, 23, 42, 0.1);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
     inset 0 -1px 0 rgba(15, 23, 42, 0.06),
-    0 6px 16px rgba(15, 23, 42, 0.1),
-    0 1px 2px rgba(15, 23, 42, 0.05);
+    0 3px 10px rgba(15, 23, 42, 0.08);
+}
+
+html.dark .theme-switch--hero .theme-switch-track {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 4px 14px rgba(0, 0, 0, 0.28);
+  /* no cyan bloom — stays quiet under logos */
+}
+
+.theme-switch--hero .theme-switch-track::after {
+  bottom: -0.28rem;
+  height: 0.35rem;
+  opacity: 0.45;
 }
 
 .theme-switch--hero .theme-switch-thumb {
-  width: 1.72rem;
-  height: 1.72rem;
-  margin-top: 0;
-  left: 0.18rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  left: 0.1rem;
   transform: translateY(-50%) translateX(0);
+  border-width: 1px;
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.18),
+    inset 0 1px 1px rgba(255, 255, 255, 0.55);
 }
 
 html.dark .theme-switch--hero .theme-switch-thumb {
-  transform: translateY(-50%) translateX(3.4rem);
+  transform: translateY(-50%) translateX(1.45rem);
+  border-color: rgba(255, 255, 255, 0.18);
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.18) 0%, transparent 42%),
+    linear-gradient(145deg, rgba(55, 58, 66, 0.95) 0%, rgba(28, 30, 36, 0.98) 100%);
+  box-shadow:
+    0 1px 5px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.12);
+  filter: none;
 }
 
+.theme-switch--hero .theme-switch-thumb::after {
+  inset: -2px;
+  opacity: 0.2;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+}
+
+/* Hide Light/Dark text on hero — icons alone are enough */
 .theme-switch--hero .theme-switch-label {
-  font-size: 0.72rem;
-  line-height: 1;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-html.dark .theme-switch--hero .theme-switch-label {
-  left: 0.72rem;
-}
-
-html:not(.dark) .theme-switch--hero .theme-switch-label,
-html.light .theme-switch--hero .theme-switch-label {
-  right: 0.7rem;
+  display: none !important;
 }
 
 .theme-switch--hero .theme-switch-icon {
-  width: 0.82rem;
-  height: 0.82rem;
+  width: 0.62rem;
+  height: 0.62rem;
 }
 
-/* ── Compact sm (drawer on other pages) ── */
+html:not(.dark) .theme-switch--hero .theme-switch-icon--sun,
+html.light .theme-switch--hero .theme-switch-icon--sun {
+  filter: none;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+html.dark .theme-switch--hero .theme-switch-icon--moon {
+  filter: none;
+  color: rgba(226, 232, 240, 0.88);
+}
+
+/* ── Compact sm (drawer / nav) ── */
 .theme-switch--sm .theme-switch-track {
-  width: 3rem;
-  height: 1.65rem;
+  width: 3.1rem;
+  height: 1.7rem;
 }
 
 .theme-switch--sm .theme-switch-thumb {
-  width: 1.32rem;
-  height: 1.32rem;
-  margin-top: 0;
-  left: 0.15rem;
+  width: 1.48rem;
+  height: 1.48rem;
+  left: -0.06rem;
   transform: translateY(-50%) translateX(0);
 }
 
 html.dark .theme-switch--sm .theme-switch-thumb {
-  transform: translateY(-50%) translateX(1.35rem);
+  transform: translateY(-50%) translateX(1.55rem);
 }
 
 .theme-switch--sm .theme-switch-icon {
-  width: 0.68rem;
-  height: 0.68rem;
+  width: 0.7rem;
+  height: 0.7rem;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .theme-switch-track,
+  .theme-switch-thumb,
+  .theme-switch-label {
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Mobile menu row (legacy) */

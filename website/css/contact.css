@@ -91,7 +91,7 @@ html:not(.dark) .contact-hero {
 html.dark .contact-hero {
   min-height: max(36vh, 260px);
   color: #f2f2f2;
-  background: #010204;
+  background: #0a0a0a;
 }
 
 html.dark .contact-hero::before {
@@ -104,9 +104,9 @@ html.dark .contact-hero::before {
 html.dark .contact-hero::after {
   background: linear-gradient(
     180deg,
-    rgba(0, 1, 4, 0.42) 0%,
-    rgba(0, 1, 4, 0.28) 45%,
-    rgba(0, 1, 4, 0.5) 100%
+    rgba(10, 10, 10, 0.38) 0%,
+    rgba(10, 10, 10, 0.24) 45%,
+    rgba(10, 10, 10, 0.45) 100%
   );
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);

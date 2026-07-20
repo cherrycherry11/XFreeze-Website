@@ -406,8 +406,8 @@
     var signedOutNav =
       '<a href="login.html" class="site-nav-auth-btn" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign in</a>';
     var signedOutDrawer =
-      '<a href="login.html" class="site-nav-drawer-auth-btn" onclick="toggleMobileMenu && toggleMobileMenu()">Sign in</a>' +
-      '<a href="signup.html" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu && toggleMobileMenu()">Create account</a>';
+      '<a href="templates.html" class="site-nav-drawer-auth-btn site-nav-drawer-cta" onclick="toggleMobileMenu && toggleMobileMenu()">Get started</a>' +
+      '<a href="login.html" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu && toggleMobileMenu()">Sign in</a>';
 
     if (!slot && !document.getElementById('xf-auth-drawer')) return;
 

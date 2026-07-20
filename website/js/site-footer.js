@@ -12,6 +12,7 @@
     'skill-builder.html': 'skills',
     'prompt-library.html': 'prompts',
     'contact.html': 'contact',
+    'pricing.html': 'pricing',
     'workflows.html': 'workflows',
     'use-cases.html': 'use-cases',
     'account.html': 'account',
@@ -33,6 +34,7 @@
         { href: 'templates.html', label: 'Templates', nav: 'templates' },
         { href: 'prompt-library.html', label: 'Motion prompts', nav: 'prompts' },
         { href: 'skills.html', label: 'Skills', nav: 'skills' },
+        { href: 'pricing.html', label: 'Pricing', nav: 'pricing' },
         { href: 'about.html', label: 'About', nav: 'about' },
         { href: 'contact.html', label: 'Contact', nav: 'contact' },
       ],
@@ -318,5 +320,12 @@
     init();
   }
 
-  window.XFreezeFooter = { copyCrypto: copyCrypto, init: init, renderFooter: renderFooter };
+  window.XFreezeFooter = {
+    copyCrypto: copyCrypto,
+    init: init,
+    renderFooter: renderFooter,
+    syncTheme: function (root) {
+      syncFooterThemeSwitch(root);
+    },
+  };
 })();

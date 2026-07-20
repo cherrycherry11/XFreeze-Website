@@ -8,6 +8,24 @@ const BUNDLES = {
   ultimate: { id: 'ultimate', name: 'Ultimate Library', price: 79, type: 'bundle' },
 };
 
+/** Subscription plans — USD (amount charged via Razorpay order in cents) */
+const SUBSCRIPTIONS = {
+  'pro-monthly': {
+    id: 'pro-monthly',
+    name: 'Pro Monthly',
+    price: 49,
+    type: 'subscription',
+    interval: 'month',
+  },
+  'pro-yearly': {
+    id: 'pro-yearly',
+    name: 'Pro Yearly',
+    price: 499,
+    type: 'subscription',
+    interval: 'year',
+  },
+};
+
 const TEMPLATE_CATEGORY_PRICES = {
   Product: 2.99,
   'Make-up': 3.49,
@@ -20,6 +38,12 @@ function resolveProduct(productType, productId, category) {
     const bundle = BUNDLES[productId];
     if (!bundle) return null;
     return { ...bundle, amountCents: Math.round(bundle.price * 100) };
+  }
+
+  if (productType === 'subscription') {
+    const plan = SUBSCRIPTIONS[productId];
+    if (!plan) return null;
+    return { ...plan, amountCents: Math.round(plan.price * 100) };
   }
 
   if (productType === 'template') {
@@ -38,4 +62,4 @@ function resolveProduct(productType, productId, category) {
   return null;
 }
 
-module.exports = { BUNDLES, TEMPLATE_CATEGORY_PRICES, resolveProduct };
+module.exports = { BUNDLES, SUBSCRIPTIONS, TEMPLATE_CATEGORY_PRICES, resolveProduct };

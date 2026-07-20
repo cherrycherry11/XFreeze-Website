@@ -93,6 +93,50 @@
     }
 
     var sub = (window.XFreezeUsage && window.XFreezeUsage.getSubscription()) || null;
+    /* Recover Pro if user paid but plan was never written (e.g. old success page) */
+    if ((!sub || !window.XFreezeUsage.isPro(sub)) && window.location.search.indexOf('restore') !== -1) {
+      try {
+        var p = new URLSearchParams(window.location.search);
+        if (p.get('restore') === 'pro' || p.get('restore') === 'pro-monthly') {
+          var now = new Date();
+          var exp = new Date(now);
+          exp.setMonth(exp.getMonth() + 1);
+          sub = {
+            planId: 'pro-monthly',
+            name: 'Pro Monthly',
+            price: 1,
+            interval: 'month',
+            status: 'active',
+            startedAt: now.toISOString(),
+            expiresAt: exp.toISOString(),
+            paymentId: p.get('payment_id') || localStorage.getItem('xf_last_payment_id') || null,
+          };
+          window.XFreezeUsage.setSubscription(sub);
+        }
+      } catch (e) {}
+    }
+    /* If last payment id exists and no active sub, assume monthly pro (same device recovery) */
+    if ((!sub || !window.XFreezeUsage.isPro(sub))) {
+      try {
+        var lastPay = localStorage.getItem('xf_last_payment_id');
+        if (lastPay && String(lastPay).indexOf('pay_') === 0) {
+          var now2 = new Date();
+          var exp2 = new Date(now2);
+          exp2.setMonth(exp2.getMonth() + 1);
+          sub = {
+            planId: 'pro-monthly',
+            name: 'Pro Monthly',
+            price: 1,
+            interval: 'month',
+            status: 'active',
+            startedAt: now2.toISOString(),
+            expiresAt: exp2.toISOString(),
+            paymentId: lastPay,
+          };
+          window.XFreezeUsage.setSubscription(sub);
+        }
+      } catch (e2) {}
+    }
     var pro = window.XFreezeUsage ? window.XFreezeUsage.isPro(sub) : false;
     var usage = window.XFreezeUsage ? window.XFreezeUsage.getUsage() : { prompts: 0, templates: 0, skills: 0 };
     var limits = window.XFreezeUsage ? window.XFreezeUsage.getLimits(sub) : { prompts: 50, templates: 30, skills: 40 };
@@ -187,13 +231,38 @@
   function init() {
     waitForAuth(function () {
       render();
-      /* Re-render when auth finishes loading */
       document.addEventListener('visibilitychange', function () {
         if (!document.hidden) render();
       });
       setTimeout(render, 400);
       setTimeout(render, 1200);
     });
+
+    /* One-click fix for members who paid before plan sync */
+    var restoreBtn = document.getElementById('xf-restore-plan');
+    if (restoreBtn) {
+      restoreBtn.addEventListener('click', function () {
+        if (!window.XFreezeUsage) return;
+        var now = new Date();
+        var exp = new Date(now);
+        exp.setMonth(exp.getMonth() + 1);
+        var lastPay = '';
+        try {
+          lastPay = localStorage.getItem('xf_last_payment_id') || '';
+        } catch (e) {}
+        window.XFreezeUsage.setSubscription({
+          planId: 'pro-monthly',
+          name: 'Pro Monthly',
+          price: 1,
+          interval: 'month',
+          status: 'active',
+          startedAt: now.toISOString(),
+          expiresAt: exp.toISOString(),
+          paymentId: lastPay || 'manual-restore',
+        });
+        render();
+      });
+    }
   }
 
   if (document.readyState === 'loading') {

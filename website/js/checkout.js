@@ -245,13 +245,53 @@
               btn.disabled = false;
               return;
             }
+            /* Activate plan immediately so Account never stays Free after a good pay */
+            try {
+              if (currentProduct && currentProduct.type === 'subscription') {
+                var started = new Date();
+                var expires = new Date(started);
+                if (currentProduct.interval === 'year') {
+                  expires.setFullYear(expires.getFullYear() + 1);
+                } else {
+                  expires.setMonth(expires.getMonth() + 1);
+                }
+                var subPayload = {
+                  planId: currentProduct.id,
+                  name: currentProduct.name,
+                  price: currentProduct.price,
+                  interval: currentProduct.interval || 'month',
+                  status: 'active',
+                  startedAt: started.toISOString(),
+                  expiresAt: expires.toISOString(),
+                  paymentId: response.razorpay_payment_id || null,
+                  orderId: response.razorpay_order_id || null,
+                };
+                localStorage.setItem('xf_subscription', JSON.stringify(subPayload));
+                if (global.XFreezeUsage && global.XFreezeUsage.setSubscription) {
+                  global.XFreezeUsage.setSubscription(subPayload);
+                }
+              }
+              localStorage.setItem(
+                'xf_pending_product',
+                JSON.stringify(currentProduct)
+              );
+              localStorage.setItem(
+                'xf_last_payment_id',
+                response.razorpay_payment_id || ''
+              );
+            } catch (storeErr) {}
             const base = window.location.pathname.replace(/[^/]+$/, '');
+            var planQ =
+              currentProduct && currentProduct.id
+                ? '&plan=' + encodeURIComponent(currentProduct.id)
+                : '';
             window.location.href =
               base +
               'checkout-success.html?provider=razorpay&payment_id=' +
               encodeURIComponent(response.razorpay_payment_id) +
               '&order_id=' +
-              encodeURIComponent(response.razorpay_order_id);
+              encodeURIComponent(response.razorpay_order_id) +
+              planQ;
           } catch (err) {
             setMessage(err.message || 'Verification error', 'error');
             btn.disabled = false;

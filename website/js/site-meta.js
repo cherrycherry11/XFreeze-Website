@@ -49,8 +49,8 @@
     document.head.appendChild(link);
   }
 
-  /* Sitewide favicons — dark mark (white glyph on #0a0a0a); ?v busts browser cache */
-  var v = 'dark2';
+  /* Sitewide favicons — share mark (white nodes on #0a0a0a); ?v busts browser cache */
+  var v = 'share1';
   var base = assetUrl('assets/images/logo/');
   var rootFav = assetUrl('favicon.ico') + '?v=' + v;
   var rootPng = assetUrl('favicon.png') + '?v=' + v;

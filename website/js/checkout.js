@@ -131,10 +131,16 @@
       if (!cfg.configured || !cfg.razorpay) {
         setupEl.hidden = false;
         formWrap.hidden = true;
-        setupEl.innerHTML =
-          '<strong>Razorpay is not configured.</strong><br>' +
-          '1. Add <code>RAZORPAY_KEY_ID</code> + <code>RAZORPAY_KEY_SECRET</code> to <code>payment-server/.env</code><br>' +
-          '2. Run <code>cd payment-server && npm start</code>';
+        var isLocalHost =
+          apiBase.indexOf('localhost') !== -1 || apiBase.indexOf('127.0.0.1') !== -1;
+        setupEl.innerHTML = isLocalHost
+          ? '<strong>Razorpay is not configured locally.</strong><br>' +
+            '1. Add keys to <code>payment-server/.env</code><br>' +
+            '2. Run <code>cd payment-server && npm start</code>'
+          : '<strong>Razorpay keys missing on the live server.</strong><br>' +
+            'In <strong>Vercel → Project → Settings → Environment Variables</strong> add:<br>' +
+            '<code>RAZORPAY_KEY_ID</code> and <code>RAZORPAY_KEY_SECRET</code><br>' +
+            'then <strong>Redeploy</strong> Production. Keys on your laptop are not used by xfreeze.com.';
         return;
       }
 

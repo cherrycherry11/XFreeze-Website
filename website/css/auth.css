@@ -232,7 +232,12 @@ html.dark .site-nav-user-menu {
   word-break: break-all;
 }
 
-.site-nav-user-menu button {
+html.dark .site-nav-user-email {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.site-nav-user-menu button,
+.site-nav-user-menu-link {
   display: flex;
   width: 100%;
   align-items: center;
@@ -246,17 +251,22 @@ html.dark .site-nav-user-menu {
   font-weight: 500;
   cursor: pointer;
   text-align: left;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
-.site-nav-user-menu button:hover {
+.site-nav-user-menu button:hover,
+.site-nav-user-menu-link:hover {
   background: var(--surface-muted, #f8f8f8);
 }
 
-html.dark .site-nav-user-menu button {
+html.dark .site-nav-user-menu button,
+html.dark .site-nav-user-menu-link {
   color: var(--text, #fafafa);
 }
 
-html.dark .site-nav-user-menu button:hover {
+html.dark .site-nav-user-menu button:hover,
+html.dark .site-nav-user-menu-link:hover {
   background: var(--surface-muted, #27272a);
 }
 

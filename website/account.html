@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" data-xf-meta-title="My Library" data-xf-meta-desc="Optional sign-in for saved items and purchase history." data-xf-meta-path="account.html">
+<html lang="en" data-xf-meta-title="Account - X Freeze" data-xf-meta-desc="Your X Freeze account: subscription, usage, and profile." data-xf-meta-path="account.html">
 <head>
-  <!-- Favicon for browsers + Google Search (48px+ PNG required for SERP) -->
   <link rel="icon" href="/favicon.ico?v=share2" type="image/x-icon">
   <link rel="icon" href="/favicon.png?v=share2" type="image/png" sizes="48x48">
   <link rel="icon" href="/assets/images/logo/favicon-32.png?v=share2" type="image/png" sizes="32x32">
@@ -12,46 +11,35 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Library</title>
+  <title>Account - X Freeze</title>
   <script>
     (function () {
       var stored = localStorage.getItem('xfreeze-theme');
       var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
-      document.documentElement.classList.toggle('dark', isDark);
-      try {
-        var reduceM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var desktopM = window.matchMedia('(min-width: 768px)').matches;
-        if (!reduceM && desktopM) document.documentElement.classList.add('xf-cinematic-pending');
-      } catch (e) {}
-
+      document.documentElement.classList.toggle(
+        'dark',
+        stored === 'dark' || (stored !== 'light' && prefersDark)
+      );
     })();
   </script>
   <script src="js/auth-config.js"></script>
   <script src="js/site-config.js"></script>
   <script src="js/site-meta.js"></script>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' };</script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/site-fonts.css">
   <link rel="stylesheet" href="css/content-pages.css">
-    <link rel="stylesheet" href="css/site-fonts.css">
-<link rel="stylesheet" href="css/theme-switch.css">
-  <link rel="stylesheet" href="css/dark-nebula-bg.css">
+  <link rel="stylesheet" href="css/theme-switch.css">
   <link rel="stylesheet" href="css/site-nav.css">
   <link rel="stylesheet" href="css/site-mobile.css">
   <link rel="stylesheet" href="css/site-footer.css">
   <link rel="stylesheet" href="css/auth.css">
-  <link rel="stylesheet" href="css/scroll-reveal.css">
-  <link rel="stylesheet" href="css/motion.css">
-  <link rel="stylesheet" href="css/cinematic.css">
-  
+  <link rel="stylesheet" href="css/account.css">
+  <link rel="stylesheet" href="css/theme-dark.css">
   <style>
-:root {
+    :root {
       --text: #0a0a0a; --text-secondary: #52525b; --border: #e5e7eb;
-      --surface: #ffffff; --surface-elevated: #fafafa; --surface-muted: #f8f8f8;
+      --surface: #ffffff; --surface-elevated: #fafafa; --surface-muted: #f4f4f5;
       --nav-bg: rgba(255,255,255,0.94); --page-gutter: 1rem;
     }
     @media (min-width:640px){:root{--page-gutter:1.25rem}}
@@ -59,21 +47,20 @@
     @media (min-width:1024px){:root{--page-gutter:2rem}}
     html.dark {
       color-scheme: dark;
-      --text:#f2f5f3; --text-secondary:#8a958c; --border:#1f2623;
-      --surface:#0a0a0a; --surface-elevated:#141416; --surface-muted:#18181b;
-      --nav-bg: #0a0a0a;
+      --text:#f5f5f5; --text-secondary:#a3a3a3; --border:#2a2a2a;
+      --surface:#0a0a0a; --surface-elevated:#121212; --surface-muted:#1c1c1c;
+      --nav-bg:rgba(10,10,10,0.92);
     }
-    body { font-family: var(--font-sans); background:var(--surface); color:var(--text); }
-    .content-container { width:100%; max-width:min(1520px,calc(100% - var(--page-gutter)*2)); margin-inline:auto; padding-inline:var(--page-gutter); }
+    body { font-family: var(--font-sans); background: var(--surface); color: var(--text); margin: 0; }
+    .content-container { width:100%; max-width:min(1100px,calc(100% - var(--page-gutter)*2)); margin-inline:auto; padding-inline:var(--page-gutter); }
   </style>
-  <link rel="stylesheet" href="css/theme-dark.css">
 </head>
 <body>
   <nav id="site-nav" class="site-nav page-nav" aria-label="Main">
-    <div class="content-container">
+    <div class="content-container" style="max-width:min(1520px,calc(100% - var(--page-gutter)*2))">
       <div class="site-nav-bar">
         <a href="home.html" class="site-nav-logo">X Freeze</a>
-                        <div class="site-nav-pill">
+        <div class="site-nav-pill">
           <a href="templates.html" class="site-nav-pill-link">Templates</a>
           <a href="prompt-library.html" class="site-nav-pill-link">Prompts</a>
           <a href="skills.html" class="site-nav-pill-link">Skills</a>
@@ -82,81 +69,159 @@
           <a href="contact.html" class="site-nav-pill-link">Contact</a>
         </div>
         <div class="site-nav-end">
-            <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee" aria-label="Buy me a coffee">
-              <i class="fa-solid fa-mug-hot text-xs" aria-hidden="true"></i>
-              <span class="site-nav-coffee__label">Buy me a coffee</span>
-            </a>
-            <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><i class="fa-solid fa-bars text-sm"></i></button>
-            <div id="xf-auth-nav" class="site-nav-auth"><a href="login.html" class="site-nav-auth-btn">Sign in</a></div>
-          </div>
+          <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee" aria-label="Buy me a coffee">
+            <i class="fa-solid fa-mug-hot text-xs" aria-hidden="true"></i>
+            <span class="site-nav-coffee__label">Buy me a coffee</span>
+          </a>
+          <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+            <i class="fa-solid fa-bars text-sm"></i>
+          </button>
+          <div id="xf-auth-nav" class="site-nav-auth"><a href="login.html" class="site-nav-auth-btn">Sign in</a></div>
+        </div>
       </div>
     </div>
   </nav>
-    <div id="mobile-menu-backdrop" class="site-nav-mobile-backdrop hidden lg:hidden" aria-hidden="true"></div>
 
+  <div id="mobile-menu-backdrop" class="site-nav-mobile-backdrop hidden lg:hidden" aria-hidden="true"></div>
   <div id="mobile-menu" class="site-nav-mobile-panel site-nav-mobile-panel--drawer hidden lg:hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Site menu">
     <div class="site-nav-mobile-drawer">
       <header class="site-nav-drawer-head">
         <a href="home.html" class="site-nav-drawer-logo" onclick="toggleMobileMenu()">X Freeze</a>
-        <button type="button" class="site-nav-drawer-close" onclick="toggleMobileMenu()" aria-label="Close menu"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        <button type="button" class="site-nav-drawer-close" onclick="toggleMobileMenu()" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
       </header>
-
-                  <nav class="site-nav-drawer-nav" aria-label="Mobile">
+      <nav class="site-nav-drawer-nav" aria-label="Mobile">
         <a href="templates.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Templates</a>
         <a href="prompt-library.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Prompts</a>
         <a href="skills.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Skills</a>
         <a href="pricing.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Pricing</a>
+        <a href="account.html" class="site-nav-drawer-link site-nav-drawer-link--active" onclick="toggleMobileMenu()">Account</a>
         <a href="about.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">About</a>
       </nav>
-
-      
-    
-
-        <div class="site-nav-drawer-bottom">
-          <div id="xf-auth-drawer" class="site-nav-drawer-auth">
-            <a href="templates.html" class="site-nav-drawer-auth-btn site-nav-drawer-cta" onclick="toggleMobileMenu()">Get started</a>
-            <a href="login.html" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu()">Sign in</a>
-          </div>
-          <footer class="site-nav-drawer-footer">
-<div class="site-nav-drawer-theme">
-          <span class="site-nav-drawer-theme__label">Dark mode</span>
-          <button type="button" onclick="toggleTheme()" class="site-nav-drawer-theme__switch theme-switch theme-switch--sm" role="switch" aria-checked="false" aria-label="Switch to dark mode">
-            <span class="theme-switch-track" aria-hidden="true">
-              <span class="theme-switch-thumb">
-                <span class="theme-switch-icon theme-switch-icon--sun"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12z"/></svg></span>
-                <span class="theme-switch-icon theme-switch-icon--moon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/></svg></span>
-              </span>
-            </span>
-          </button>
+      <div class="site-nav-drawer-bottom">
+        <div id="xf-auth-drawer" class="site-nav-drawer-auth"></div>
+        <div class="site-nav-drawer-meta-row">
+          <a href="contact.html" onclick="toggleMobileMenu()">Contact</a>
+          <span class="site-nav-drawer-meta-dot">·</span>
+          <a href="privacy.html" onclick="toggleMobileMenu()">Legal</a>
         </div>
-      </footer>
-          <div class="site-nav-drawer-meta-row">
-            <a href="contact.html" onclick="toggleMobileMenu()">Contact</a>
-            <span class="site-nav-drawer-meta-dot" aria-hidden="true">·</span>
-            <a href="privacy.html" onclick="toggleMobileMenu()">Legal</a>
-            <span class="site-nav-drawer-meta-dot" aria-hidden="true">·</span>
-            <a href="terms.html" onclick="toggleMobileMenu()">Terms</a>
-          </div>
-        </div>
-</div>
-  </div>
-
-  <div class="xf-glass-hero">
-    <div class="content-container">
-      <div class="scroll-reveal-in xf-content-hero" style="margin-bottom:0;padding-top:0">
-        <p class="xf-content-eyebrow">Library</p>
-        <h1 class="xf-content-title">My Library</h1>
-        <p class="xf-content-lead">Optional sign-in for saved items and purchase history.</p>
       </div>
     </div>
   </div>
-  <main class="page-main content-container" data-scroll-reveal>
-    <div class="scroll-reveal-in xf-prose"><p>Sign in to sync favorites and track optional purchases. The public template and skills catalogs remain free to browse without an account.</p><p><a href="login.html">Go to login</a></p></div>
+
+  <main class="content-container xf-account">
+    <!-- Signed out -->
+    <div id="xf-account-gate" class="xf-account-gate" hidden>
+      <h1>Your account</h1>
+      <p>Sign in to see your plan, usage, and subscription details.</p>
+      <a class="xf-account-btn xf-account-btn--primary" href="login.html">Sign in</a>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="xf-account-dash" hidden>
+      <header class="xf-account-header">
+        <div class="xf-account-header__identity">
+          <div class="xf-account-avatar" id="xf-account-avatar">?</div>
+          <div>
+            <h1 id="xf-account-name">Account</h1>
+            <p class="xf-account-header__email" id="xf-account-email"></p>
+          </div>
+        </div>
+      </header>
+
+      <div class="xf-account-stats xf-account-card--span" style="margin-bottom:1rem">
+        <div class="xf-account-stat">
+          <p class="xf-account-stat__value" id="xf-stat-prompts">0</p>
+          <p class="xf-account-stat__label">Prompts used</p>
+        </div>
+        <div class="xf-account-stat">
+          <p class="xf-account-stat__value" id="xf-stat-templates">0</p>
+          <p class="xf-account-stat__label">Templates opened</p>
+        </div>
+        <div class="xf-account-stat">
+          <p class="xf-account-stat__value" id="xf-stat-skills">0</p>
+          <p class="xf-account-stat__label">Skills copied</p>
+        </div>
+        <div class="xf-account-stat">
+          <p class="xf-account-stat__value" id="xf-stat-month">—</p>
+          <p class="xf-account-stat__label">Period</p>
+        </div>
+      </div>
+
+      <div class="xf-account-grid">
+        <section class="xf-account-card">
+          <div class="xf-account-card__head">
+            <h2 class="xf-account-card__title">Subscription</h2>
+            <span class="xf-account-badge" id="xf-plan-badge">Free</span>
+          </div>
+          <h3 class="xf-account-plan-name" id="xf-plan-name">Free</h3>
+          <p class="xf-account-plan-meta" id="xf-plan-meta">Browse free templates &amp; skills.</p>
+          <p class="xf-account-plan-price" id="xf-plan-price">$0 <span>/ forever</span></p>
+          <div class="xf-account-actions">
+            <a class="xf-account-btn xf-account-btn--primary" id="xf-plan-upgrade" href="pricing.html">Upgrade to Pro</a>
+            <a class="xf-account-btn" href="templates.html">Open library</a>
+          </div>
+          <p class="xf-account-note">Plan status updates after a successful checkout on this device.</p>
+        </section>
+
+        <section class="xf-account-card">
+          <div class="xf-account-card__head">
+            <h2 class="xf-account-card__title">Usage this month</h2>
+          </div>
+          <div class="xf-usage-list">
+            <div>
+              <div class="xf-usage-row__top">
+                <span class="xf-usage-row__label">Motion prompts</span>
+                <span class="xf-usage-row__count"><span id="xf-use-prompts">0</span> / <span id="xf-lim-prompts">50</span></span>
+              </div>
+              <div class="xf-usage-bar"><div class="xf-usage-bar__fill" id="xf-bar-prompts" style="width:0%"></div></div>
+            </div>
+            <div>
+              <div class="xf-usage-row__top">
+                <span class="xf-usage-row__label">Templates</span>
+                <span class="xf-usage-row__count"><span id="xf-use-templates">0</span> / <span id="xf-lim-templates">30</span></span>
+              </div>
+              <div class="xf-usage-bar"><div class="xf-usage-bar__fill" id="xf-bar-templates" style="width:0%"></div></div>
+            </div>
+            <div>
+              <div class="xf-usage-row__top">
+                <span class="xf-usage-row__label">Skills</span>
+                <span class="xf-usage-row__count"><span id="xf-use-skills">0</span> / <span id="xf-lim-skills">40</span></span>
+              </div>
+              <div class="xf-usage-bar"><div class="xf-usage-bar__fill" id="xf-bar-skills" style="width:0%"></div></div>
+            </div>
+          </div>
+          <p class="xf-account-note">Usage is tracked when you copy prompts or open templates on this browser. Pro unlocks higher limits.</p>
+        </section>
+
+        <section class="xf-account-card xf-account-card--span">
+          <div class="xf-account-card__head">
+            <h2 class="xf-account-card__title">Account details</h2>
+          </div>
+          <dl class="xf-account-dl">
+            <div>
+              <dt>Email</dt>
+              <dd id="xf-detail-email">—</dd>
+            </div>
+            <div>
+              <dt>Member since</dt>
+              <dd id="xf-detail-member">—</dd>
+            </div>
+            <div>
+              <dt>Current plan</dt>
+              <dd id="xf-detail-plan">Free</dd>
+            </div>
+            <div>
+              <dt>Last payment ref</dt>
+              <dd id="xf-detail-payment">—</dd>
+            </div>
+          </dl>
+        </section>
+      </div>
+    </div>
   </main>
 
   <footer class="xf-site-footer" data-xf-footer-root></footer>
-  <script src="js/scroll-reveal.js"></script>
-  <script src="js/support-toast.js"></script>
+
   <script>
     function getPreferredTheme() {
       var stored = localStorage.getItem('xfreeze-theme');
@@ -167,22 +232,17 @@
       var isDark = theme === 'dark';
       document.documentElement.classList.toggle('dark', isDark);
       localStorage.setItem('xfreeze-theme', theme);
-      document.querySelectorAll('.theme-toggle, .theme-toggle-mobile, .site-nav-drawer-theme__switch').forEach(function (btn) {
-        btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
-        btn.setAttribute('aria-checked', isDark ? 'true' : 'false');
-      });
     }
-    function toggleTheme() { applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark'); }
+    function toggleTheme() {
+      applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+    }
     applyTheme(getPreferredTheme());
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="js/usage.js" defer></script>
   <script src="js/auth.js" defer></script>
+  <script src="js/account.js" defer></script>
   <script src="js/site-nav.js" defer></script>
   <script src="js/site-footer.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
-  <script src="js/motion.js" defer></script>
-  <script src="js/cinematic.js" defer></script>
 </body>
 </html>

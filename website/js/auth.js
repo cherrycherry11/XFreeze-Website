@@ -462,6 +462,8 @@
         '</button>' +
         '<div class="site-nav-user-menu" id="xf-auth-user-menu" hidden>' +
         '<div class="site-nav-user-email">' + escapeHtml(email) + '</div>' +
+        '<a href="account.html" class="site-nav-user-menu-link"><i class="fa-regular fa-user" aria-hidden="true"></i> Account</a>' +
+        '<a href="pricing.html" class="site-nav-user-menu-link"><i class="fa-solid fa-crown" aria-hidden="true"></i> Subscription</a>' +
         '<button type="button" id="xf-auth-sign-out"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Sign out</button>' +
         '</div>' +
         '</div>';
@@ -495,7 +497,8 @@
     }
 
     renderDrawerAuth(
-      '<button type="button" class="site-nav-drawer-auth-btn" id="xf-auth-drawer-sign-out">' +
+      '<a href="account.html" class="site-nav-drawer-auth-btn site-nav-drawer-cta" onclick="toggleMobileMenu && toggleMobileMenu()">Account</a>' +
+        '<button type="button" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" id="xf-auth-drawer-sign-out">' +
         '<i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Sign out' +
         '</button>' +
         '<p class="site-nav-drawer-auth-email">' +

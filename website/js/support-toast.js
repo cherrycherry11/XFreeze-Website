@@ -93,6 +93,14 @@
       return Promise.resolve(false);
     }
     return navigator.clipboard.writeText(text).then(function () {
+      try {
+        var ctx = (opts && opts.context) || 'copy';
+        if (window.XFreezeUsage) {
+          if (ctx === 'skill' || ctx === 'skills') window.XFreezeUsage.trackSkill();
+          else if (ctx === 'template' || ctx === 'templates') window.XFreezeUsage.trackTemplate();
+          else window.XFreezeUsage.trackPrompt();
+        }
+      } catch (e) {}
       afterCopy(opts);
       if (typeof onSuccess === 'function') onSuccess(true);
       return true;

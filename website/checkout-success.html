@@ -247,9 +247,9 @@
       </ul>
 
       <div class="xf-success-actions">
-        <a class="xf-success-btn xf-success-btn--primary" href="templates.html">Browse templates</a>
+        <a class="xf-success-btn xf-success-btn--primary" href="account.html">View account</a>
+        <a class="xf-success-btn xf-success-btn--ghost" href="templates.html">Browse templates</a>
         <a class="xf-success-btn xf-success-btn--ghost" href="skills.html">Explore skills</a>
-        <a class="xf-success-btn xf-success-btn--ghost" href="home.html">Back to home</a>
       </div>
 
       <p class="xf-success-ref" id="success-ref" hidden></p>
@@ -274,12 +274,13 @@
       var planPrice = document.getElementById('success-plan-price');
       var ref = document.getElementById('success-ref');
 
+      var paymentId = params.get('payment_id') || '';
+
       if (product && product.name) {
+        var priceNum = Number(product.price);
         var price =
           '$' +
-          (Number.isInteger(Number(product.price))
-            ? Number(product.price)
-            : Number(product.price).toFixed(2));
+          (Number.isInteger(priceNum) ? priceNum : priceNum.toFixed(2));
         plan.hidden = false;
         planName.textContent = product.name;
         planPrice.textContent = price;
@@ -288,6 +289,26 @@
             product.interval === 'year'
               ? 'Your yearly plan is active. Enjoy full library access for the year ahead.'
               : 'Your monthly plan is active. Enjoy full library access — cancel anytime from your account when available.';
+          /* Persist plan for Account dashboard */
+          try {
+            var started = new Date();
+            var expires = new Date(started);
+            if (product.interval === 'year') expires.setFullYear(expires.getFullYear() + 1);
+            else expires.setMonth(expires.getMonth() + 1);
+            localStorage.setItem(
+              'xf_subscription',
+              JSON.stringify({
+                planId: product.id,
+                name: product.name,
+                price: product.price,
+                interval: product.interval || 'month',
+                status: 'active',
+                startedAt: started.toISOString(),
+                expiresAt: expires.toISOString(),
+                paymentId: paymentId || null,
+              })
+            );
+          } catch (e) {}
         } else {
           lead.textContent = 'Thanks for your purchase. Open the library and start creating.';
         }
@@ -295,11 +316,13 @@
         sessionStorage.removeItem('xf_paypal_order');
       }
 
-      var paymentId = params.get('payment_id');
       if (paymentId) {
         ref.hidden = false;
         ref.textContent = 'Reference: ' + paymentId;
       }
+
+      /* Add account CTA if signed in later via success actions - static link below */
+    }
     })();
   </script>
 </body>

@@ -448,7 +448,7 @@
         (item.description ? ' · ' + item.description.slice(0, 60) : '');
       href =
         item.packId
-          ? 'skills.html#pack/' + encodeURIComponent(item.packId)
+          ? 'skills.html#skill-pack/' + encodeURIComponent(item.packId)
           : 'skills.html';
       icon = 'fa-bolt';
     } else {

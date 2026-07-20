@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-xf-meta-title="Payment successful - X Freeze" data-xf-meta-desc="Your X Freeze purchase is confirmed." data-xf-meta-path="checkout-success.html">
 <head>
-  <!-- Favicon for browsers + Google Search (48px+ PNG required for SERP) -->
   <link rel="icon" href="/favicon.ico?v=share2" type="image/x-icon">
   <link rel="icon" href="/favicon.png?v=share2" type="image/png" sizes="48x48">
   <link rel="icon" href="/assets/images/logo/favicon-32.png?v=share2" type="image/png" sizes="32x32">
@@ -10,77 +9,296 @@
   <link rel="apple-touch-icon" href="/assets/images/logo/apple-touch-icon.png?v=share2" sizes="180x180">
   <link rel="manifest" href="/site.webmanifest">
 
-<link rel="stylesheet" href="css/site-fonts.css">
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payment successful - X Freeze</title>
+  <title>You're in - X Freeze</title>
   <script>
     (function () {
       var stored = localStorage.getItem('xfreeze-theme');
       var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.classList.toggle('dark', stored === 'dark' || (stored !== 'light' && prefersDark));
+      document.documentElement.classList.toggle(
+        'dark',
+        stored === 'dark' || (stored !== 'light' && prefersDark)
+      );
     })();
   </script>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' };</script>
+  <link rel="stylesheet" href="css/site-fonts.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/theme-dark.css">
   <style>
-:root {
-      --text: #0a0a0a; --text-secondary: #52525b; --border: #e5e7eb;
-      --surface: #ffffff; --surface-subtle: #f4f4f5;
+    :root {
+      --text: #0a0a0a;
+      --text-secondary: #52525b;
+      --border: #e5e7eb;
+      --surface: #ffffff;
+      --surface-elevated: #fafafa;
+      --surface-muted: #f4f4f5;
+      --success: #15803d;
+      --success-soft: #dcfce7;
     }
     html.dark {
-      --text: #f5f5f5; --text-secondary: #a3a3a3; --border: #2a2a2a;
-      --surface: #0a0a0a; --surface-elevated: #121212; --surface-subtle: #1c1c1c;
+      color-scheme: dark;
+      --text: #f5f5f5;
+      --text-secondary: #a3a3a3;
+      --border: #2a2a2a;
+      --surface: #0a0a0a;
+      --surface-elevated: #121212;
+      --surface-muted: #1c1c1c;
+      --success: #4ade80;
+      --success-soft: rgba(74, 222, 128, 0.12);
     }
-    body { font-family: var(--font-sans); background: var(--surface); color: var(--text); }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+      background: var(--surface);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .xf-success {
+      width: 100%;
+      max-width: 26rem;
+      text-align: center;
+    }
+    .xf-success-card {
+      padding: 2rem 1.5rem 1.75rem;
+      border-radius: 1.25rem;
+      border: 1px solid var(--border);
+      background: var(--surface-elevated);
+      box-shadow: 0 24px 48px -28px rgba(0, 0, 0, 0.35);
+    }
+    html.dark .xf-success-card {
+      box-shadow: 0 28px 56px -24px rgba(0, 0, 0, 0.7);
+    }
+    .xf-success-mark {
+      width: 4rem;
+      height: 4rem;
+      margin: 0 auto 1.25rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--success-soft);
+      color: var(--success);
+      font-size: 1.5rem;
+      animation: xf-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes xf-pop {
+      from { transform: scale(0.6); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .xf-success-eyebrow {
+      margin: 0 0 0.4rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .xf-success-title {
+      margin: 0 0 0.65rem;
+      font-size: 1.65rem;
+      font-weight: 650;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+    .xf-success-lead {
+      margin: 0;
+      font-size: 0.9375rem;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+    .xf-success-plan {
+      margin: 1.35rem 0 0;
+      padding: 0.9rem 1rem;
+      border-radius: 0.9rem;
+      background: var(--surface-muted);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      text-align: left;
+    }
+    .xf-success-plan[hidden] { display: none; }
+    .xf-success-plan__name {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .xf-success-plan__price {
+      font-size: 1.05rem;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+    .xf-success-steps {
+      margin: 1.35rem 0 0;
+      padding: 0;
+      list-style: none;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    .xf-success-steps li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      font-size: 0.8125rem;
+      line-height: 1.45;
+      color: var(--text-secondary);
+    }
+    .xf-success-steps i {
+      margin-top: 0.15rem;
+      color: var(--success);
+      font-size: 0.75rem;
+      width: 1rem;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .xf-success-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    .xf-success-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.85rem;
+      padding: 0.7rem 1.25rem;
+      border-radius: 9999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.15s ease;
+    }
+    .xf-success-btn:hover { opacity: 0.92; }
+    .xf-success-btn--primary {
+      background: var(--text);
+      color: var(--surface);
+      border: none;
+    }
+    html.dark .xf-success-btn--primary {
+      background: #f2f5f3;
+      color: #020403;
+    }
+    .xf-success-btn--ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .xf-success-ref {
+      margin: 1.25rem 0 0;
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      opacity: 0.75;
+      word-break: break-all;
+      line-height: 1.4;
+    }
+    .xf-success-ref[hidden] { display: none; }
+    .xf-success-logo {
+      margin-top: 1.75rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .xf-success-logo:hover { color: var(--text); }
   </style>
-  <link rel="stylesheet" href="css/theme-dark.css">
 </head>
-<body class="min-h-screen flex items-center justify-center p-6">
-  <div class="max-w-md w-full text-center">
-    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mb-6">
-      <i class="fa-solid fa-check text-2xl" aria-hidden="true"></i>
+<body>
+  <main class="xf-success">
+    <div class="xf-success-card">
+      <div class="xf-success-mark" aria-hidden="true">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <p class="xf-success-eyebrow">Payment confirmed</p>
+      <h1 class="xf-success-title">You're all set</h1>
+      <p class="xf-success-lead" id="success-lead">
+        Welcome to X Freeze. Your purchase went through — start creating with the full library.
+      </p>
+
+      <div class="xf-success-plan" id="success-plan" hidden>
+        <span class="xf-success-plan__name" id="success-plan-name">Pro</span>
+        <span class="xf-success-plan__price" id="success-plan-price"></span>
+      </div>
+
+      <ul class="xf-success-steps">
+        <li>
+          <i class="fa-solid fa-check" aria-hidden="true"></i>
+          <span>Access templates, motion prompts, and AI skills</span>
+        </li>
+        <li>
+          <i class="fa-solid fa-check" aria-hidden="true"></i>
+          <span>Copy prompts into Grok, Claude, Cursor, or GPT</span>
+        </li>
+        <li>
+          <i class="fa-solid fa-check" aria-hidden="true"></i>
+          <span>Keep this tab open — your receipt is saved with your payment</span>
+        </li>
+      </ul>
+
+      <div class="xf-success-actions">
+        <a class="xf-success-btn xf-success-btn--primary" href="templates.html">Browse templates</a>
+        <a class="xf-success-btn xf-success-btn--ghost" href="skills.html">Explore skills</a>
+        <a class="xf-success-btn xf-success-btn--ghost" href="home.html">Back to home</a>
+      </div>
+
+      <p class="xf-success-ref" id="success-ref" hidden></p>
     </div>
-    <h1 class="text-2xl font-semibold tracking-tight">Payment successful</h1>
-    <p id="success-detail" class="mt-3 text-sm text-[#52525b] dark:text-[#8a958c]">Thank you for your purchase.</p>
-    <p id="success-product" class="mt-2 text-lg font-semibold"></p>
-    <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-      <a href="templates.html" class="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-[#0a0a0a] dark:bg-[#f2f5f3] text-white dark:text-[#020403] text-sm font-semibold">Browse templates</a>
-</div>
-    <p class="mt-8 text-xs text-[#52525b] dark:text-[#8a958c]">
-      A receipt will be sent if you provided an email. Download links will be delivered separately once fulfillment is connected.
-    </p>
-  </div>
+    <a class="xf-success-logo" href="home.html">X Freeze</a>
+  </main>
+
   <script>
     (function () {
       var params = new URLSearchParams(window.location.search);
-      var provider = params.get('provider') || 'card';
       var pending = sessionStorage.getItem('xf_pending_product');
-      var product = pending ? JSON.parse(pending) : null;
-
-      var detail =
-        provider === 'paypal'
-          ? 'Your PayPal payment was captured successfully.'
-          : provider === 'razorpay'
-            ? 'Your Razorpay payment was verified successfully.'
-            : 'Your card payment was confirmed by Stripe.';
-      if (params.get('payment_id')) {
-        detail += ' Payment ID: ' + params.get('payment_id');
+      var product = null;
+      try {
+        product = pending ? JSON.parse(pending) : null;
+      } catch (e) {
+        product = null;
       }
-      document.getElementById('success-detail').textContent = detail;
 
-      if (product) {
-        var priceLabel =
-          '$' + (Number.isInteger(product.price) ? product.price : product.price.toFixed(2));
-        document.getElementById('success-product').textContent =
-          product.name + ' - ' + priceLabel;
+      var lead = document.getElementById('success-lead');
+      var plan = document.getElementById('success-plan');
+      var planName = document.getElementById('success-plan-name');
+      var planPrice = document.getElementById('success-plan-price');
+      var ref = document.getElementById('success-ref');
+
+      if (product && product.name) {
+        var price =
+          '$' +
+          (Number.isInteger(Number(product.price))
+            ? Number(product.price)
+            : Number(product.price).toFixed(2));
+        plan.hidden = false;
+        planName.textContent = product.name;
+        planPrice.textContent = price;
+        if (product.type === 'subscription') {
+          lead.textContent =
+            product.interval === 'year'
+              ? 'Your yearly plan is active. Enjoy full library access for the year ahead.'
+              : 'Your monthly plan is active. Enjoy full library access — cancel anytime from your account when available.';
+        } else {
+          lead.textContent = 'Thanks for your purchase. Open the library and start creating.';
+        }
         sessionStorage.removeItem('xf_pending_product');
         sessionStorage.removeItem('xf_paypal_order');
+      }
+
+      var paymentId = params.get('payment_id');
+      if (paymentId) {
+        ref.hidden = false;
+        ref.textContent = 'Reference: ' + paymentId;
       }
     })();
   </script>

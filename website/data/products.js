@@ -18,14 +18,14 @@
     'pro-monthly': {
       id: 'pro-monthly',
       name: 'Pro Monthly',
-      price: 49,
+      price: 1,
       type: 'subscription',
       interval: 'month',
     },
     'pro-yearly': {
       id: 'pro-yearly',
       name: 'Pro Yearly',
-      price: 499,
+      price: 9,
       type: 'subscription',
       interval: 'year',
     },

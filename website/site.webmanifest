@@ -1,0 +1,31 @@
+{
+  "name": "X Freeze",
+  "short_name": "X Freeze",
+  "description": "Grok templates, AI skills, and motion prompts",
+  "start_url": "/home.html",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    {
+      "src": "/assets/images/logo/favicon-48.png?v=share2",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/images/logo/favicon-96.png?v=share2",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/images/logo/favicon-192.png?v=share2",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/images/logo/favicon-512.png?v=share2",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

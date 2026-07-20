@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://xfreeze.com/sitemap.xml

@@ -257,16 +257,66 @@
     <a class="xf-success-logo" href="home.html">X Freeze</a>
   </main>
 
+  <script src="data/products.js"></script>
+  <script src="js/usage.js"></script>
   <script>
     (function () {
       var params = new URLSearchParams(window.location.search);
-      var pending = sessionStorage.getItem('xf_pending_product');
+      var paymentId = params.get('payment_id') || '';
+      var planId = params.get('plan') || '';
       var product = null;
-      try {
-        product = pending ? JSON.parse(pending) : null;
-      } catch (e) {
-        product = null;
+
+      function readProduct() {
+        try {
+          var a = sessionStorage.getItem('xf_pending_product');
+          if (a) return JSON.parse(a);
+        } catch (e) {}
+        try {
+          var b = localStorage.getItem('xf_pending_product');
+          if (b) return JSON.parse(b);
+        } catch (e2) {}
+        return null;
       }
+
+      function catalogPlan(id) {
+        if (window.XFreezeProducts && window.XFreezeProducts.getSubscription) {
+          var p = window.XFreezeProducts.getSubscription(id);
+          if (p) return p;
+        }
+        if (id === 'pro-yearly') {
+          return { id: 'pro-yearly', name: 'Pro Yearly', price: 9, type: 'subscription', interval: 'year' };
+        }
+        return { id: 'pro-monthly', name: 'Pro Monthly', price: 1, type: 'subscription', interval: 'month' };
+      }
+
+      function activate(prod, payId) {
+        if (!prod || prod.type !== 'subscription') return;
+        var started = new Date();
+        var expires = new Date(started);
+        if (prod.interval === 'year') expires.setFullYear(expires.getFullYear() + 1);
+        else expires.setMonth(expires.getMonth() + 1);
+        var sub = {
+          planId: prod.id,
+          name: prod.name,
+          price: prod.price,
+          interval: prod.interval || 'month',
+          status: 'active',
+          startedAt: started.toISOString(),
+          expiresAt: expires.toISOString(),
+          paymentId: payId || null,
+        };
+        try {
+          localStorage.setItem('xf_subscription', JSON.stringify(sub));
+          if (window.XFreezeUsage && window.XFreezeUsage.setSubscription) {
+            window.XFreezeUsage.setSubscription(sub);
+          }
+          if (payId) localStorage.setItem('xf_last_payment_id', payId);
+        } catch (e) {}
+      }
+
+      product = readProduct();
+      if (!product && planId) product = catalogPlan(planId);
+      if (!product && paymentId) product = catalogPlan('pro-monthly');
 
       var lead = document.getElementById('success-lead');
       var plan = document.getElementById('success-plan');
@@ -274,56 +324,35 @@
       var planPrice = document.getElementById('success-plan-price');
       var ref = document.getElementById('success-ref');
 
-      var paymentId = params.get('payment_id') || '';
-
       if (product && product.name) {
         var priceNum = Number(product.price);
-        var price =
-          '$' +
-          (Number.isInteger(priceNum) ? priceNum : priceNum.toFixed(2));
+        var price = '$' + (Number.isInteger(priceNum) ? priceNum : priceNum.toFixed(2));
         plan.hidden = false;
         planName.textContent = product.name;
         planPrice.textContent = price;
         if (product.type === 'subscription') {
+          activate(product, paymentId);
           lead.textContent =
-            product.interval === 'year'
-              ? 'Your yearly plan is active. Enjoy full library access for the year ahead.'
-              : 'Your monthly plan is active. Enjoy full library access — cancel anytime from your account when available.';
-          /* Persist plan for Account dashboard */
-          try {
-            var started = new Date();
-            var expires = new Date(started);
-            if (product.interval === 'year') expires.setFullYear(expires.getFullYear() + 1);
-            else expires.setMonth(expires.getMonth() + 1);
-            localStorage.setItem(
-              'xf_subscription',
-              JSON.stringify({
-                planId: product.id,
-                name: product.name,
-                price: product.price,
-                interval: product.interval || 'month',
-                status: 'active',
-                startedAt: started.toISOString(),
-                expiresAt: expires.toISOString(),
-                paymentId: paymentId || null,
-              })
-            );
-          } catch (e) {}
+            'Your plan is active. Open Account anytime to see subscription and usage.';
         } else {
           lead.textContent = 'Thanks for your purchase. Open the library and start creating.';
         }
-        sessionStorage.removeItem('xf_pending_product');
-        sessionStorage.removeItem('xf_paypal_order');
+        try {
+          sessionStorage.removeItem('xf_pending_product');
+          localStorage.removeItem('xf_pending_product');
+          sessionStorage.removeItem('xf_paypal_order');
+        } catch (e3) {}
       }
 
       if (paymentId) {
         ref.hidden = false;
         ref.textContent = 'Reference: ' + paymentId;
+        try {
+          localStorage.setItem('xf_last_payment_id', paymentId);
+        } catch (e4) {}
       }
-
-      /* Add account CTA if signed in later via success actions - static link below */
-    }
     })();
   </script>
 </body>
 </html>
+

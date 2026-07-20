@@ -87,6 +87,26 @@
   }
 
   function open(product) {
+    /* Subscriptions must stick to a signed-in user (Supabase metadata). */
+    if (product && product.type === 'subscription') {
+      var auth = global.XFreezeAuth;
+      if (auth && auth.isConfigured && auth.isConfigured()) {
+        if (!auth.isLoggedIn || !auth.isLoggedIn()) {
+          try {
+            sessionStorage.setItem(
+              'xf-auth-redirect',
+              (window.location.pathname.split('/').pop() || 'pricing.html') +
+                window.location.search +
+                window.location.hash
+            );
+          } catch (e) {}
+          if (auth.rememberRedirect) auth.rememberRedirect();
+          window.location.href = 'login.html';
+          return;
+        }
+      }
+    }
+
     injectModal();
     currentProduct = product;
     config = null;
@@ -109,6 +129,17 @@
             : 'Template';
 
     setMessage('');
+    /* Prefill checkout email from signed-in session */
+    try {
+      var session =
+        global.XFreezeAuth && global.XFreezeAuth.getSession
+          ? global.XFreezeAuth.getSession()
+          : null;
+      var emailInput = document.getElementById('xf-checkout-email');
+      if (emailInput && session && session.user && session.user.email) {
+        emailInput.value = session.user.email;
+      }
+    } catch (e2) {}
     initCheckout();
   }
 
@@ -247,51 +278,60 @@
             }
             /* Activate plan locally + Supabase metadata so Account shows Pro */
             try {
-              if (
-                currentProduct &&
-                currentProduct.type === 'subscription' &&
-                global.XFreezeUsage &&
-                global.XFreezeUsage.buildFromProduct
-              ) {
-                var subPayload = global.XFreezeUsage.buildFromProduct(
-                  currentProduct,
-                  response.razorpay_payment_id,
-                  response.razorpay_order_id
-                );
-                if (subPayload && global.XFreezeUsage.activateSubscription) {
-                  await global.XFreezeUsage.activateSubscription(subPayload);
-                } else if (subPayload) {
-                  global.XFreezeUsage.setSubscription(subPayload);
-                }
-              } else if (currentProduct && currentProduct.type === 'subscription') {
-                var started = new Date();
-                var expires = new Date(started);
-                if (currentProduct.interval === 'year') {
-                  expires.setFullYear(expires.getFullYear() + 1);
-                } else {
-                  expires.setMonth(expires.getMonth() + 1);
-                }
-                var fallbackSub = {
-                  planId: currentProduct.id,
-                  name: currentProduct.name,
-                  price: currentProduct.price,
-                  interval: currentProduct.interval || 'month',
-                  status: 'active',
-                  startedAt: started.toISOString(),
-                  expiresAt: expires.toISOString(),
-                  paymentId: response.razorpay_payment_id || null,
-                  orderId: response.razorpay_order_id || null,
-                };
-                localStorage.setItem('xf_subscription', JSON.stringify(fallbackSub));
-              }
-              localStorage.setItem(
-                'xf_pending_product',
-                JSON.stringify(currentProduct)
-              );
               localStorage.setItem(
                 'xf_last_payment_id',
                 response.razorpay_payment_id || ''
               );
+              localStorage.setItem(
+                'xf_pending_product',
+                JSON.stringify(currentProduct)
+              );
+
+              if (currentProduct && currentProduct.type === 'subscription') {
+                var subPayload = null;
+                if (global.XFreezeUsage && global.XFreezeUsage.buildFromProduct) {
+                  subPayload = global.XFreezeUsage.buildFromProduct(
+                    currentProduct,
+                    response.razorpay_payment_id,
+                    response.razorpay_order_id
+                  );
+                } else {
+                  var started = new Date();
+                  var expires = new Date(started);
+                  if (currentProduct.interval === 'year') {
+                    expires.setFullYear(expires.getFullYear() + 1);
+                  } else {
+                    expires.setMonth(expires.getMonth() + 1);
+                  }
+                  subPayload = {
+                    planId: currentProduct.id,
+                    name: currentProduct.name,
+                    price: currentProduct.price,
+                    interval: currentProduct.interval || 'month',
+                    status: 'active',
+                    startedAt: started.toISOString(),
+                    expiresAt: expires.toISOString(),
+                    paymentId: response.razorpay_payment_id || null,
+                    orderId: response.razorpay_order_id || null,
+                  };
+                }
+                /* Always write local first so Account never stays Free */
+                try {
+                  localStorage.setItem('xf_subscription', JSON.stringify(subPayload));
+                } catch (lsErr) {}
+                if (global.XFreezeUsage && global.XFreezeUsage.activateSubscription) {
+                  try {
+                    await Promise.race([
+                      global.XFreezeUsage.activateSubscription(subPayload),
+                      new Promise(function (r) {
+                        setTimeout(r, 2500);
+                      }),
+                    ]);
+                  } catch (actErr) {}
+                } else if (global.XFreezeUsage && global.XFreezeUsage.setSubscription) {
+                  global.XFreezeUsage.setSubscription(subPayload);
+                }
+              }
             } catch (storeErr) {}
             const base = window.location.pathname.replace(/[^/]+$/, '');
             var planQ =

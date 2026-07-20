@@ -1,11 +1,12 @@
 /**
  * Account dashboard — Overview / Billing / Usage / Settings
- * Plan source: Supabase user_metadata first, then localStorage.
+ * Plan source: Supabase user_metadata → localStorage → last payment recovery.
  */
 (function () {
   'use strict';
 
   var TABS = ['overview', 'billing', 'usage', 'settings'];
+  var recovering = false;
 
   function $(id) {
     return document.getElementById(id);
@@ -76,21 +77,75 @@
   }
 
   /**
-   * If user paid on this device but metadata never wrote (guest checkout),
-   * push local Pro into Supabase once they're signed in.
+   * Push local Pro into Supabase once signed in so it sticks next login.
    */
   function maybeBackfillMetadata(user, sub) {
-    if (!user || !sub || !window.XFreezeUsage || !window.XFreezeUsage.isPro(sub)) return;
+    if (!user || !sub || !window.XFreezeUsage || !window.XFreezeUsage.isPro(sub)) {
+      return Promise.resolve(false);
+    }
     var remote = window.XFreezeUsage.fromUserMetadata
       ? window.XFreezeUsage.fromUserMetadata(user)
       : null;
-    if (remote && window.XFreezeUsage.isPro(remote)) return;
+    if (remote && window.XFreezeUsage.isPro(remote)) {
+      return Promise.resolve(false);
+    }
     if (
       window.XFreezeAuth &&
       typeof window.XFreezeAuth.syncSubscriptionMetadata === 'function'
     ) {
-      window.XFreezeAuth.syncSubscriptionMetadata(sub).catch(function () {});
+      return window.XFreezeAuth
+        .syncSubscriptionMetadata(sub)
+        .then(function () {
+          return true;
+        })
+        .catch(function () {
+          return false;
+        });
     }
+    return Promise.resolve(false);
+  }
+
+  /**
+   * If still free but this browser has a Razorpay payment id, activate Pro
+   * and sync to the signed-in user. Runs once per page load.
+   */
+  function ensureProFromPayment(user) {
+    if (!window.XFreezeUsage) return Promise.resolve(null);
+    var sub = window.XFreezeUsage.resolveSubscription(user);
+    if (window.XFreezeUsage.isPro(sub)) {
+      return maybeBackfillMetadata(user, sub).then(function () {
+        return sub;
+      });
+    }
+
+    /* URL recovery: account.html?payment_id=pay_xxx or from success redirect */
+    var urlPay = '';
+    var urlPlan = 'pro-monthly';
+    try {
+      var p = new URLSearchParams(window.location.search);
+      urlPay = p.get('payment_id') || '';
+      if (p.get('plan')) urlPlan = p.get('plan');
+    } catch (e) {}
+
+    var recovered = null;
+    if (urlPay && String(urlPay).indexOf('pay_') === 0) {
+      recovered = window.XFreezeUsage.recoverFromLastPayment({
+        paymentId: urlPay,
+        planId: urlPlan,
+      });
+    }
+    if (!recovered) {
+      recovered = window.XFreezeUsage.recoverFromLastPayment();
+    }
+    if (!recovered || !window.XFreezeUsage.isPro(recovered)) {
+      return Promise.resolve(null);
+    }
+
+    recovering = true;
+    return window.XFreezeUsage.activateSubscription(recovered).then(function (active) {
+      recovering = false;
+      return active;
+    });
   }
 
   function showTab(name) {
@@ -176,15 +231,12 @@
       }
     }
 
-    /* Resolve plan: metadata > localStorage */
     var sub = null;
     if (window.XFreezeUsage && window.XFreezeUsage.resolveSubscription) {
       sub = window.XFreezeUsage.resolveSubscription(user);
     } else if (window.XFreezeUsage) {
       sub = window.XFreezeUsage.getSubscription();
     }
-
-    maybeBackfillMetadata(user, sub);
 
     var pro = window.XFreezeUsage ? window.XFreezeUsage.isPro(sub) : false;
     var usage = window.XFreezeUsage
@@ -204,6 +256,9 @@
         ' · Active since ' +
         formatDate(sub.startedAt) +
         (sub.expiresAt ? ' · Renews / ends ' + formatDate(sub.expiresAt) : '');
+      if (sub.recovered && recovering) {
+        planMeta = 'Restoring your paid plan…';
+      }
     } else {
       planMeta = 'Browse free templates & skills. Upgrade anytime for full library access.';
     }
@@ -284,7 +339,13 @@
     }
     if (bStarted) bStarted.textContent = pro && sub ? formatDate(sub.startedAt) : '—';
     if (bExpires) bExpires.textContent = pro && sub ? formatDate(sub.expiresAt) : '—';
-    if (bPay) bPay.textContent = (sub && sub.paymentId) || '—';
+    if (bPay) {
+      var payId = (sub && sub.paymentId) || '';
+      if (!payId && window.XFreezeUsage && window.XFreezeUsage.getLastPaymentId) {
+        payId = window.XFreezeUsage.getLastPaymentId() || '';
+      }
+      bPay.textContent = payId || '—';
+    }
 
     /* Usage */
     fillMeter(
@@ -356,13 +417,25 @@
     }
   }
 
+  function bootDashboard() {
+    var user = getUser();
+    if (!user) {
+      render();
+      return;
+    }
+    ensureProFromPayment(user)
+      .catch(function () {})
+      .then(function () {
+        render();
+      });
+  }
+
   function init() {
     bindTabs();
     bindSettings();
     showTab(tabFromHash());
 
     waitForAuth(function () {
-      /* Prefer a fresh session so metadata is current after checkout */
       var p =
         window.XFreezeAuth && window.XFreezeAuth.refreshSession
           ? window.XFreezeAuth.refreshSession()
@@ -370,13 +443,13 @@
       Promise.resolve(p)
         .catch(function () {})
         .then(function () {
-          render();
-          setTimeout(render, 500);
-          setTimeout(render, 1500);
+          bootDashboard();
+          setTimeout(bootDashboard, 600);
+          setTimeout(bootDashboard, 1600);
         });
 
       document.addEventListener('visibilitychange', function () {
-        if (!document.hidden) render();
+        if (!document.hidden) bootDashboard();
       });
     });
   }

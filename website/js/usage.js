@@ -161,9 +161,61 @@
     };
   }
 
+  function getLastPaymentId() {
+    try {
+      return localStorage.getItem('xf_last_payment_id') || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function isRazorpayPaymentId(id) {
+    return Boolean(id && String(id).indexOf('pay_') === 0);
+  }
+
   /**
-   * Resolve best subscription: prefer active Pro from metadata, else local, else free.
-   * If metadata wins, mirror into localStorage.
+   * Rebuild a Pro Monthly sub from a known Razorpay payment id on this device.
+   * Used when checkout wrote the payment id but never wrote xf_subscription.
+   */
+  function recoverFromLastPayment(opts) {
+    opts = opts || {};
+    var payId = opts.paymentId || getLastPaymentId();
+    if (!isRazorpayPaymentId(payId)) return null;
+
+    var planId = opts.planId || 'pro-monthly';
+    var catalog =
+      global.XFreezeProducts && global.XFreezeProducts.getSubscription
+        ? global.XFreezeProducts.getSubscription(planId)
+        : null;
+    var name = (catalog && catalog.name) || (planId === 'pro-yearly' ? 'Pro Yearly' : 'Pro Monthly');
+    var price = catalog && catalog.price != null ? catalog.price : planId === 'pro-yearly' ? 9 : 1;
+    var interval = (catalog && catalog.interval) || (planId === 'pro-yearly' ? 'year' : 'month');
+
+    var started = new Date();
+    var expires = new Date(started);
+    if (interval === 'year') {
+      expires.setFullYear(expires.getFullYear() + 1);
+    } else {
+      expires.setMonth(expires.getMonth() + 1);
+    }
+
+    return {
+      planId: planId,
+      name: name,
+      price: price,
+      interval: interval,
+      status: 'active',
+      startedAt: started.toISOString(),
+      expiresAt: expires.toISOString(),
+      paymentId: payId,
+      orderId: opts.orderId || null,
+      recovered: true,
+    };
+  }
+
+  /**
+   * Resolve best subscription: metadata > local > recover from last payment id.
+   * If a Pro source wins, mirror into localStorage.
    */
   function resolveSubscription(user) {
     var local = getSubscription();
@@ -178,6 +230,17 @@
     if (localPro) {
       return local;
     }
+
+    /* Paid on this browser but plan record missing (pre-metadata checkout) */
+    var recovered = recoverFromLastPayment({
+      planId: (local && local.planId) || 'pro-monthly',
+      paymentId: (local && local.paymentId) || getLastPaymentId(),
+    });
+    if (recovered && isPro(recovered)) {
+      setSubscription(recovered);
+      return recovered;
+    }
+
     return remote || local || null;
   }
 
@@ -231,6 +294,8 @@
     fromUserMetadata: fromUserMetadata,
     resolveSubscription: resolveSubscription,
     activateSubscription: activateSubscription,
+    recoverFromLastPayment: recoverFromLastPayment,
+    getLastPaymentId: getLastPaymentId,
     FREE_LIMITS: FREE_LIMITS,
     PRO_LIMITS: PRO_LIMITS,
     META_KEY: META_KEY,

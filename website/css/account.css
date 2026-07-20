@@ -597,16 +597,19 @@ html.dark .xf-account-gate {
   text-underline-offset: 2px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .xf-account-tabs {
     width: 100%;
     border-radius: 0.9rem;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
   }
 
   .xf-account-tab {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     text-align: center;
-    padding: 0.5rem 0.55rem;
-    font-size: 0.75rem;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.72rem;
   }
 }

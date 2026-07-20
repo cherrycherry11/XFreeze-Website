@@ -963,6 +963,8 @@
   <footer class="xf-site-footer" data-xf-footer-root></footer>
 <script src="js/scroll-reveal.js"></script>
   <script src="js/usage.js" defer></script>
+  <script src="js/favorites.js"></script>
+  <link rel="stylesheet" href="css/favorites.css">
   <script src="js/support-toast.js"></script>
   <script src="data/visual-templates-data.js"></script>
   <script src="data/template-taxonomy.js"></script>
@@ -1241,10 +1243,15 @@
         : '';
       const tierBadge = '<span class="template-gallery-tier ' + (tier === 'free' ? 'is-free' : 'is-premium') + '">' +
         (tier === 'free' ? 'Free' : 'Premium') + '</span>';
+      const favBtn =
+        window.XFreezeFavorites && window.XFreezeFavorites.heartButtonHtml
+          ? window.XFreezeFavorites.heartButtonHtml('templates', t.code)
+          : '';
       return (
-        '<article class="template-gallery-tile" title="' + escapeHtml(name) + '">' +
+        '<article class="template-gallery-tile" title="' + escapeHtml(name) + '" data-template-code="' + escapeHtml(t.code) + '">' +
         badge +
         tierBadge +
+        favBtn +
         '<a href="' + t.link + '" target="_blank" rel="noopener noreferrer" class="template-gallery-open" aria-label="Open ' + escapeHtml(name) + ' in Grok" data-template-open>' +
         '<img src="' + t.img + '" style="image-orientation: from-image;" alt="' + escapeHtml(name) + '" loading="lazy" onerror="this.style.opacity=0.15">' +
         '<span class="template-gallery-overlay">' +
@@ -1343,6 +1350,26 @@
       grid._xfSupportBound = true;
 
       grid.addEventListener('click', function (e) {
+        var favBtn = e.target.closest('[data-xf-fav-type="templates"]');
+        if (favBtn && window.XFreezeFavorites) {
+          e.preventDefault();
+          e.stopPropagation();
+          var code = favBtn.getAttribute('data-xf-fav-id');
+          var t = visualTemplates.find(function (x) { return x.code === code; });
+          if (!t) return;
+          var name = formatTemplateName(t.name);
+          window.XFreezeFavorites.toggle('templates', {
+            id: t.code,
+            name: name,
+            cat: t.cat || '',
+            subcat: t.subcat || '',
+            img: t.img || '',
+            link: t.link || '',
+            tier: getTemplateTier(t),
+          });
+          window.XFreezeFavorites.syncButton(favBtn);
+          return;
+        }
         var openLink = e.target.closest('[data-template-open]');
         if (openLink && window.XFreezeSupportToast) {
           window.XFreezeSupportToast.afterAction({

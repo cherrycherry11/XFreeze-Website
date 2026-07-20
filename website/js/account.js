@@ -1,12 +1,13 @@
 /**
- * Account dashboard — Overview / Billing / Usage / Settings
+ * Account dashboard — Overview / Favorites / Billing / Usage / Settings
  * Plan source: Supabase user_metadata → localStorage → last payment recovery.
  */
 (function () {
   'use strict';
 
-  var TABS = ['overview', 'billing', 'usage', 'settings'];
+  var TABS = ['overview', 'favorites', 'billing', 'usage', 'settings'];
   var recovering = false;
+  var favFilter = 'all';
 
   function $(id) {
     return document.getElementById(id);
@@ -307,6 +308,9 @@
     if (ovS) ovS.textContent = usage.skills || 0;
     if (ovPeriod) ovPeriod.textContent = 'Period: ' + periodLabel;
 
+    renderFavoritesSummary();
+    renderFavoritesList();
+
     /* Billing */
     var bName = $('xf-bill-plan-name');
     var bMeta = $('xf-bill-plan-meta');
@@ -395,6 +399,163 @@
     if (setPlan) setPlan.textContent = planLabel;
   }
 
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function renderFavoritesSummary() {
+    var counts =
+      window.XFreezeFavorites && window.XFreezeFavorites.counts
+        ? window.XFreezeFavorites.counts()
+        : { templates: 0, skills: 0, prompts: 0, total: 0 };
+    var t = $('xf-ov-fav-templates');
+    var s = $('xf-ov-fav-skills');
+    var p = $('xf-ov-fav-prompts');
+    var badge = $('xf-fav-total-badge');
+    if (t) t.textContent = counts.templates;
+    if (s) s.textContent = counts.skills;
+    if (p) p.textContent = counts.prompts;
+    if (badge) badge.textContent = String(counts.total);
+  }
+
+  function favItemHtml(type, item) {
+    var title = '';
+    var meta = '';
+    var href = '';
+    var thumb = '';
+    var icon = 'fa-heart';
+
+    if (type === 'templates') {
+      title = item.name || item.id;
+      meta = [item.cat, item.subcat, item.tier].filter(Boolean).join(' · ');
+      href = item.link || 'templates.html';
+      icon = 'fa-layer-group';
+      if (item.img) {
+        thumb =
+          '<img src="' +
+          escapeHtml(item.img) +
+          '" alt="" loading="lazy" onerror="this.remove()">';
+      }
+    } else if (type === 'skills') {
+      title = item.slash || item.packName || item.id;
+      meta =
+        (item.kind === 'pack' ? 'Skill pack' : 'Skill') +
+        (item.packName && item.kind !== 'pack' ? ' · ' + item.packName : '') +
+        (item.description ? ' · ' + item.description.slice(0, 60) : '');
+      href =
+        item.packId
+          ? 'skills.html#pack/' + encodeURIComponent(item.packId)
+          : 'skills.html';
+      icon = 'fa-bolt';
+    } else {
+      title = item.title || item.id;
+      meta =
+        (item.categoryName || item.categoryId || 'Prompt') +
+        (item.shotNum ? ' · ' + item.shotNum : '');
+      href = 'prompt-library.html';
+      icon = 'fa-wand-magic-sparkles';
+    }
+
+    var openAttr =
+      type === 'templates' && href && href.indexOf('http') === 0
+        ? ' target="_blank" rel="noopener noreferrer"'
+        : '';
+
+    return (
+      '<div class="xf-fav-item" data-fav-type="' +
+      type +
+      '" data-fav-id="' +
+      escapeHtml(item.id) +
+      '">' +
+      '<div class="xf-fav-item__thumb">' +
+      (thumb || '<i class="fa-solid ' + icon + '" aria-hidden="true"></i>') +
+      '</div>' +
+      '<div class="xf-fav-item__body">' +
+      '<p class="xf-fav-item__title">' +
+      escapeHtml(title) +
+      '</p>' +
+      '<p class="xf-fav-item__meta">' +
+      escapeHtml(meta) +
+      '</p>' +
+      '</div>' +
+      '<div class="xf-fav-item__actions">' +
+      (href
+        ? '<a class="xf-account-btn" href="' +
+          escapeHtml(href) +
+          '"' +
+          openAttr +
+          '>Open</a>'
+        : '') +
+      '<button type="button" class="xf-account-btn" data-fav-remove title="Remove">Remove</button>' +
+      '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderFavoritesList() {
+    var list = $('xf-fav-list');
+    if (!list) return;
+
+    document.querySelectorAll('.xf-fav-filter').forEach(function (btn) {
+      btn.classList.toggle(
+        'is-active',
+        btn.getAttribute('data-fav-filter') === favFilter
+      );
+    });
+
+    if (!window.XFreezeFavorites) {
+      list.innerHTML =
+        '<div class="xf-fav-empty">Favorites are unavailable in this browser.</div>';
+      return;
+    }
+
+    var data = window.XFreezeFavorites.all();
+    var sections = [];
+    var types =
+      favFilter === 'all'
+        ? ['templates', 'skills', 'prompts']
+        : [favFilter];
+
+    types.forEach(function (type) {
+      var items = data[type] || [];
+      if (!items.length) return;
+      var label =
+        type === 'templates'
+          ? 'Templates'
+          : type === 'skills'
+            ? 'Skills'
+            : 'Prompts';
+      sections.push(
+        '<p class="xf-fav-section-label">' +
+          label +
+          ' (' +
+          items.length +
+          ')</p>' +
+          items.map(function (item) {
+            return favItemHtml(type, item);
+          }).join('')
+      );
+    });
+
+    if (!sections.length) {
+      list.innerHTML =
+        '<div class="xf-fav-empty">' +
+        'No favorites yet.<br>' +
+        'Tap the <i class="fa-regular fa-heart" aria-hidden="true"></i> on ' +
+        '<a href="templates.html">templates</a>, ' +
+        '<a href="skills.html">skills</a>, or ' +
+        '<a href="prompt-library.html">prompts</a> to save them here.' +
+        '</div>';
+      return;
+    }
+
+    list.innerHTML = sections.join('');
+  }
+
   function bindTabs() {
     document.querySelectorAll('.xf-account-tab').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -404,6 +565,48 @@
     window.addEventListener('hashchange', function () {
       showTab(tabFromHash());
     });
+  }
+
+  function bindFavoritesUi() {
+    document.querySelectorAll('.xf-fav-filter').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        favFilter = btn.getAttribute('data-fav-filter') || 'all';
+        renderFavoritesList();
+      });
+    });
+
+    document.querySelectorAll('[data-goto-tab="favorites"]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        var f = el.getAttribute('data-fav-filter');
+        if (f) favFilter = f;
+        showTab('favorites');
+        renderFavoritesList();
+      });
+    });
+
+    var list = $('xf-fav-list');
+    if (list && !list._xfFavBound) {
+      list._xfFavBound = true;
+      list.addEventListener('click', function (e) {
+        var removeBtn = e.target.closest('[data-fav-remove]');
+        if (!removeBtn || !window.XFreezeFavorites) return;
+        var row = removeBtn.closest('.xf-fav-item');
+        if (!row) return;
+        var type = row.getAttribute('data-fav-type');
+        var id = row.getAttribute('data-fav-id');
+        window.XFreezeFavorites.remove(type, id);
+        renderFavoritesSummary();
+        renderFavoritesList();
+      });
+    }
+
+    if (window.XFreezeFavorites && window.XFreezeFavorites.onChange) {
+      window.XFreezeFavorites.onChange(function () {
+        renderFavoritesSummary();
+        renderFavoritesList();
+      });
+    }
   }
 
   function bindSettings() {
@@ -432,6 +635,7 @@
 
   function init() {
     bindTabs();
+    bindFavoritesUi();
     bindSettings();
     showTab(tabFromHash());
 

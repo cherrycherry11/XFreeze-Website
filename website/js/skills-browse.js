@@ -508,11 +508,34 @@
           : '') +
         '</div></div>' +
         '<div class="skills-browse-skill-actions">' +
+        (global.XFreezeFavorites
+          ? global.XFreezeFavorites.heartButtonHtml('skills', s.id)
+          : '') +
         '<button type="button" class="skills-browse-btn primary" data-copy-skill="' + esc(s.id) + '">Copy prompt</button>' +
         '<button type="button" class="skills-browse-btn" data-preview-skill="' + esc(s.id) + '">Preview</button>' +
         '</div></div>'
       );
     }).join('');
+
+    list.querySelectorAll('[data-xf-fav-type="skills"]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!global.XFreezeFavorites) return;
+        var skillId = btn.getAttribute('data-xf-fav-id');
+        var skill = b.skills.find(function (x) { return x.id === skillId; });
+        if (!skill) return;
+        global.XFreezeFavorites.toggle('skills', {
+          id: skill.id,
+          slash: skill.slash || skill.id,
+          description: skill.description || '',
+          packId: b.id,
+          packName: b.name || '',
+          connector: Boolean(skill.requiresConnectors),
+        });
+        global.XFreezeFavorites.syncButton(btn);
+      });
+    });
 
     list.querySelectorAll('[data-copy-skill]').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -742,8 +765,13 @@
     const premium = isPremiumPack(b);
     const tagText = premium ? 'Premium' : (conn ? 'Connector' : 'Instant');
     const useCase = b.realWorldUseCase || b.group || '';
+    const packFavId = 'pack:' + b.id;
+    const favBtn = global.XFreezeFavorites
+      ? global.XFreezeFavorites.heartButtonHtml('skills', packFavId, 'xf-fav-btn--pack')
+      : '';
     return (
       '<article class="skills-browse-card" data-id="' + esc(b.id) + '" tabindex="0" role="button">' +
+      favBtn +
       '<div class="skills-browse-card-top">' +
       '<span class="skills-browse-tag' + (conn ? ' connector' : '') + (premium ? ' premium' : '') + '">' + tagText + '</span>' +
       countBadge(b.skillCount || b.skills.length) +
@@ -761,13 +789,38 @@
     grid.querySelectorAll('.skills-browse-card').forEach(function (c) {
       const packId = c.getAttribute('data-id');
       function open() { navigateToPack(packId); }
-      c.addEventListener('click', open);
+      c.addEventListener('click', function (e) {
+        if (e.target.closest('[data-xf-fav-type]')) return;
+        open();
+      });
       c.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
       });
       c.addEventListener('mouseenter', function () {
         loadPack(packId).catch(function () {});
       }, { once: true });
+    });
+
+    grid.querySelectorAll('[data-xf-fav-type="skills"]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!global.XFreezeFavorites) return;
+        var packId = (btn.getAttribute('data-xf-fav-id') || '').replace(/^pack:/, '');
+        var b = BUNDLES.find(function (x) { return x.id === packId; });
+        if (!b) return;
+        global.XFreezeFavorites.toggle('skills', {
+          id: 'pack:' + b.id,
+          slash: displayBundleName(b.name),
+          description: b.desc || '',
+          packId: b.id,
+          packName: b.name || '',
+          kind: 'pack',
+          connector: isConnectorPack(b),
+          premium: isPremiumPack(b),
+        });
+        global.XFreezeFavorites.syncButton(btn);
+      });
     });
   }
 

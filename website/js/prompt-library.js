@@ -342,9 +342,17 @@
           '<span class="pl-card__best">' +
           (p.bestFor ? escapeHtml(p.bestFor) : '') +
           '</span>' +
+          '<div class="pl-card__actions">' +
+          (window.XFreezeFavorites
+            ? window.XFreezeFavorites.heartButtonHtml(
+                'prompts',
+                c.id + '::' + p.title
+              )
+            : '') +
           '<button type="button" class="pl-card__copy" data-pl-copy="' +
           idx +
           '" aria-label="Copy prompt"><i class="fa-regular fa-copy"></i></button>' +
+          '</div>' +
           '</div>' +
           '</article>'
         );
@@ -557,12 +565,42 @@
     if (!grid) return;
 
     grid.addEventListener('click', function (e) {
+      var favBtn = e.target.closest('[data-xf-fav-type="prompts"]');
+      if (favBtn && window.XFreezeFavorites) {
+        e.stopPropagation();
+        e.preventDefault();
+        var favId = favBtn.getAttribute('data-xf-fav-id') || '';
+        var row =
+          state.filtered.find(function (r) {
+            return r.category.id + '::' + r.prompt.title === favId;
+          }) || null;
+        if (!row) {
+          /* fallback: card index near button */
+          var cardEl = favBtn.closest('[data-pl-idx]');
+          if (cardEl) {
+            row = state.filtered[parseInt(cardEl.getAttribute('data-pl-idx'), 10)];
+          }
+        }
+        if (!row) return;
+        window.XFreezeFavorites.toggle('prompts', {
+          id: row.category.id + '::' + row.prompt.title,
+          title: row.prompt.title,
+          text: row.prompt.text || '',
+          bestFor: row.prompt.bestFor || '',
+          categoryId: row.category.id,
+          categoryName: row.category.name || '',
+          shotNum: row.shotNum,
+          premium: Boolean(row.prompt.premium || row.category.premium),
+        });
+        window.XFreezeFavorites.syncButton(favBtn);
+        return;
+      }
       var copyBtn = e.target.closest('[data-pl-copy]');
       if (copyBtn) {
         e.stopPropagation();
         var idx = parseInt(copyBtn.getAttribute('data-pl-copy'), 10);
-        var row = state.filtered[idx];
-        if (row) copyText(copyablePromptText(row), copyBtn);
+        var rowCopy = state.filtered[idx];
+        if (rowCopy) copyText(copyablePromptText(rowCopy), copyBtn);
         return;
       }
       var card = e.target.closest('[data-pl-idx]');

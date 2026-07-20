@@ -1056,9 +1056,11 @@
 
   function initMagneticEnhanced() {
     if (!fine) return;
+    /* Nav coffee is excluded — magnetic pull felt sticky next to the avatar */
     document
-      .querySelectorAll('.hero-btn, .site-nav-coffee, .xf-final-cta-btn, [data-xf-magnetic]')
+      .querySelectorAll('.hero-btn, .xf-final-cta-btn, [data-xf-magnetic]')
       .forEach(function (el) {
+        if (el.classList.contains('site-nav-coffee')) return;
         var strength = parseFloat(el.getAttribute('data-xf-magnetic')) || 0.3;
         el.addEventListener('mousemove', function (e) {
           var r = el.getBoundingClientRect();

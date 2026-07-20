@@ -46,9 +46,9 @@ html.dark.xf-auth-pending::before {
   flex-wrap: nowrap;
 }
 
-/* Coffee + avatar sit closer when logged in */
+/* Comfortable gap between coffee and avatar when signed in */
 .site-nav-end:has(.site-nav-auth[data-auth-state='signed-in']) {
-  gap: 0.35rem;
+  gap: 0.55rem;
 }
 
 /* Fixed visual order on every page: coffee → menu → auth */
@@ -149,12 +149,11 @@ html.dark .site-nav.is-scrolled .site-nav-auth-btn:hover {
   overflow: hidden;
   flex: 0 0 2rem;
   line-height: 0;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity 0.15s ease;
 }
 
 .site-nav-user-trigger:hover {
-  opacity: 0.9;
-  transform: scale(1.05);
+  opacity: 0.88;
 }
 
 .site-nav-user-trigger:focus-visible {

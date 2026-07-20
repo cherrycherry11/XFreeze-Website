@@ -372,6 +372,8 @@ html.dark .site-nav-logo__img--on-dark {
   box-sizing: border-box;
   position: relative;
   z-index: 2;
+  /* No magnetic / translate hover — stays fixed in the nav */
+  transform: none !important;
   transition:
     opacity 0.15s ease,
     background-color 0.15s ease,

@@ -57,11 +57,12 @@
       --text: #0a0a0a;
       --text-secondary: #52525b;
       --border: #e5e7eb;
-      --surface: #ffffff;
-      --surface-elevated: #fafafa;
-      --surface-muted: #f8f8f8;
-      --surface-subtle: #f4f4f5;
-      --nav-bg: rgba(255, 255, 255, 0.94);
+      /* Match home soft page surface (not pure white) */
+      --surface: #f6f5f8;
+      --surface-elevated: #ffffff;
+      --surface-muted: #f0eff3;
+      --surface-subtle: #ebeaef;
+      --nav-bg: rgba(246, 245, 248, 0.94);
       --border-hover: #d4d4d8;
       --page-max: 1520px;
       --page-gutter: 1rem;
@@ -106,7 +107,7 @@
     }
 
     .bundles-edge-fade {
-      background: linear-gradient(to right, #ffffff 0%, transparent 8%, transparent 92%, #ffffff 100%);
+      background: linear-gradient(to right, var(--surface) 0%, transparent 8%, transparent 92%, var(--surface) 100%);
     }
     html.dark .bundles-edge-fade {
       background: linear-gradient(to right, var(--surface, #0a0a0a) 0%, transparent 8%, transparent 92%, var(--surface, #0a0a0a) 100%);
@@ -1184,7 +1185,7 @@
         const count = visualTemplates.filter(function (t) {
           return t.cat === c && matchesTierFilter(t);
         }).length;
-        return `<button type="button" data-visual-filter="${escapeHtml(c)}" class="px-6 py-2 text-sm font-medium rounded-full border transition-all ${isActive ? 'bg-[#0a0a0a] text-white border-[#0a0a0a]' : 'border-[#e5e7eb] text-[#52525b] hover:bg-[#fafafa]'}">${escapeHtml(c)} <span class="opacity-60">(${count})</span></button>`;
+        return `<button type="button" data-visual-filter="${escapeHtml(c)}" class="px-6 py-2 text-sm font-medium rounded-full border transition-all ${isActive ? 'bg-[#0a0a0a] text-white border-[#0a0a0a]' : 'border-[#e5e7eb] text-[#52525b] hover:bg-[var(--surface-muted)]'}">${escapeHtml(c)} <span class="opacity-60">(${count})</span></button>`;
       }).join('');
 
       if (!filtersContainer._xfFilterBound) {

@@ -425,14 +425,12 @@
   function favItemHtml(type, item) {
     var title = '';
     var meta = '';
-    var href = '';
     var thumb = '';
     var icon = 'fa-heart';
 
     if (type === 'templates') {
       title = item.name || item.id;
       meta = [item.cat, item.subcat, item.tier].filter(Boolean).join(' · ');
-      href = item.link || 'templates.html';
       icon = 'fa-layer-group';
       if (item.img) {
         thumb =
@@ -446,24 +444,14 @@
         (item.kind === 'pack' ? 'Skill pack' : 'Skill') +
         (item.packName && item.kind !== 'pack' ? ' · ' + item.packName : '') +
         (item.description ? ' · ' + item.description.slice(0, 60) : '');
-      href =
-        item.packId
-          ? 'skills.html#skill-pack/' + encodeURIComponent(item.packId)
-          : 'skills.html';
       icon = 'fa-bolt';
     } else {
       title = item.title || item.id;
       meta =
         (item.categoryName || item.categoryId || 'Prompt') +
         (item.shotNum ? ' · ' + item.shotNum : '');
-      href = 'prompt-library.html';
       icon = 'fa-wand-magic-sparkles';
     }
-
-    var openAttr =
-      type === 'templates' && href && href.indexOf('http') === 0
-        ? ' target="_blank" rel="noopener noreferrer"'
-        : '';
 
     return (
       '<div class="xf-fav-item" data-fav-type="' +
@@ -483,17 +471,143 @@
       '</p>' +
       '</div>' +
       '<div class="xf-fav-item__actions">' +
-      (href
-        ? '<a class="xf-account-btn" href="' +
-          escapeHtml(href) +
-          '"' +
-          openAttr +
-          '>Open</a>'
-        : '') +
-      '<button type="button" class="xf-account-btn" data-fav-remove title="Remove">Remove</button>' +
+      '<button type="button" class="xf-fav-action" data-fav-preview>Preview</button>' +
+      '<button type="button" class="xf-fav-action" data-fav-remove title="Remove">Remove</button>' +
       '</div>' +
       '</div>'
     );
+  }
+
+  function findFavorite(type, id) {
+    if (!window.XFreezeFavorites) return null;
+    var list = window.XFreezeFavorites.list(type) || [];
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === String(id)) return list[i];
+    }
+    return null;
+  }
+
+  function closeFavModal() {
+    var modal = $('xf-fav-modal');
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('xf-fav-modal-open');
+  }
+
+  function openFavModal(type, item) {
+    var modal = $('xf-fav-modal');
+    if (!modal || !item) return;
+
+    var typeEl = $('xf-fav-modal-type');
+    var titleEl = $('xf-fav-modal-title');
+    var metaEl = $('xf-fav-modal-meta');
+    var textEl = $('xf-fav-modal-text');
+    var mediaEl = $('xf-fav-modal-media');
+    var copyBtn = $('xf-fav-modal-copy');
+    var linkBtn = $('xf-fav-modal-link');
+
+    var typeLabel =
+      type === 'templates' ? 'Template' : type === 'skills' ? 'Skill' : 'Motion prompt';
+    var title = '';
+    var meta = '';
+    var body = '';
+    var copyText = '';
+    var externalHref = '';
+    var externalLabel = 'Open';
+
+    if (type === 'templates') {
+      title = item.name || item.id;
+      meta = [item.cat, item.subcat, item.tier].filter(Boolean).join(' · ');
+      body =
+        (item.name || 'Template') +
+        (meta ? '\n' + meta : '') +
+        '\n\nOpen this template in Grok Imagine to run it.';
+      externalHref = item.link || 'templates.html';
+      externalLabel = item.link ? 'Open in Grok' : 'Browse templates';
+      if (mediaEl) {
+        if (item.img) {
+          mediaEl.hidden = false;
+          mediaEl.innerHTML =
+            '<img src="' +
+            escapeHtml(item.img) +
+            '" alt="' +
+            escapeHtml(title) +
+            '">';
+        } else {
+          mediaEl.hidden = true;
+          mediaEl.innerHTML = '';
+        }
+      }
+    } else if (type === 'skills') {
+      title = item.slash || item.packName || item.id;
+      meta =
+        (item.kind === 'pack' ? 'Skill pack' : 'Skill') +
+        (item.packName ? ' · ' + item.packName : '');
+      body =
+        item.description ||
+        (item.kind === 'pack'
+          ? 'Saved skill pack. Open the pack on Skills to browse and copy prompts.'
+          : 'Saved skill. Open the pack to copy the install prompt.');
+      copyText = item.description || title;
+      externalHref = item.packId
+        ? 'skills.html#skill-pack/' + encodeURIComponent(item.packId)
+        : 'skills.html';
+      externalLabel = item.kind === 'pack' ? 'Open pack' : 'View on Skills';
+      if (mediaEl) {
+        mediaEl.hidden = true;
+        mediaEl.innerHTML = '';
+      }
+    } else {
+      title = item.title || item.id;
+      meta =
+        (item.categoryName || item.categoryId || 'Prompt') +
+        (item.shotNum ? ' · ' + item.shotNum : '') +
+        (item.bestFor ? ' · ' + item.bestFor : '');
+      body = item.text || 'No prompt text saved for this favorite.';
+      copyText = item.text || '';
+      externalHref = '';
+      if (mediaEl) {
+        mediaEl.hidden = true;
+        mediaEl.innerHTML = '';
+      }
+    }
+
+    if (typeEl) typeEl.textContent = typeLabel;
+    if (titleEl) titleEl.textContent = title;
+    if (metaEl) {
+      metaEl.textContent = meta;
+      metaEl.hidden = !meta;
+    }
+    if (textEl) textEl.textContent = body;
+
+    if (copyBtn) {
+      var canCopy = Boolean(copyText && (type === 'prompts' || type === 'skills'));
+      copyBtn.hidden = !canCopy;
+      copyBtn.textContent = 'Copy';
+      copyBtn._xfCopyPayload = copyText;
+    }
+    if (linkBtn) {
+      if (externalHref) {
+        linkBtn.hidden = false;
+        linkBtn.href = externalHref;
+        linkBtn.textContent = externalLabel;
+        if (externalHref.indexOf('http') === 0) {
+          linkBtn.target = '_blank';
+          linkBtn.rel = 'noopener noreferrer';
+        } else {
+          linkBtn.removeAttribute('target');
+          linkBtn.removeAttribute('rel');
+        }
+      } else {
+        linkBtn.hidden = true;
+        linkBtn.removeAttribute('href');
+      }
+    }
+
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('xf-fav-modal-open');
   }
 
   function renderFavoritesList() {
@@ -589,16 +703,58 @@
     if (list && !list._xfFavBound) {
       list._xfFavBound = true;
       list.addEventListener('click', function (e) {
+        var previewBtn = e.target.closest('[data-fav-preview]');
+        if (previewBtn) {
+          e.preventDefault();
+          var row = previewBtn.closest('.xf-fav-item');
+          if (!row) return;
+          var type = row.getAttribute('data-fav-type');
+          var id = row.getAttribute('data-fav-id');
+          var item = findFavorite(type, id);
+          if (item) openFavModal(type, item);
+          return;
+        }
         var removeBtn = e.target.closest('[data-fav-remove]');
         if (!removeBtn || !window.XFreezeFavorites) return;
-        var row = removeBtn.closest('.xf-fav-item');
-        if (!row) return;
-        var type = row.getAttribute('data-fav-type');
-        var id = row.getAttribute('data-fav-id');
-        window.XFreezeFavorites.remove(type, id);
+        var rowRm = removeBtn.closest('.xf-fav-item');
+        if (!rowRm) return;
+        var typeRm = rowRm.getAttribute('data-fav-type');
+        var idRm = rowRm.getAttribute('data-fav-id');
+        window.XFreezeFavorites.remove(typeRm, idRm);
         renderFavoritesSummary();
         renderFavoritesList();
       });
+    }
+
+    var modal = $('xf-fav-modal');
+    if (modal && !modal._xfBound) {
+      modal._xfBound = true;
+      modal.querySelectorAll('[data-fav-modal-close]').forEach(function (el) {
+        el.addEventListener('click', closeFavModal);
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal && !modal.hidden) closeFavModal();
+      });
+      var copyBtn = $('xf-fav-modal-copy');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', function () {
+          var text = copyBtn._xfCopyPayload || '';
+          if (!text) return;
+          function done() {
+            copyBtn.textContent = 'Copied';
+            setTimeout(function () {
+              copyBtn.textContent = 'Copy';
+            }, 1400);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done).catch(function () {
+              done();
+            });
+          } else {
+            done();
+          }
+        });
+      }
     }
 
     if (window.XFreezeFavorites && window.XFreezeFavorites.onChange) {

@@ -238,6 +238,32 @@
         </article>
       </section>
 
+      <!-- Favorite preview modal (stays on account — no redirect) -->
+      <div id="xf-fav-modal" class="xf-fav-modal" hidden aria-hidden="true">
+        <div class="xf-fav-modal__backdrop" data-fav-modal-close tabindex="-1"></div>
+        <div class="xf-fav-modal__panel" role="dialog" aria-modal="true" aria-labelledby="xf-fav-modal-title">
+          <header class="xf-fav-modal__head">
+            <div class="xf-fav-modal__head-text">
+              <p class="xf-fav-modal__eyebrow" id="xf-fav-modal-type">Preview</p>
+              <h2 class="xf-fav-modal__title" id="xf-fav-modal-title">—</h2>
+              <p class="xf-fav-modal__meta" id="xf-fav-modal-meta"></p>
+            </div>
+            <button type="button" class="xf-fav-modal__close" data-fav-modal-close aria-label="Close preview">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          </header>
+          <div class="xf-fav-modal__body">
+            <div class="xf-fav-modal__media" id="xf-fav-modal-media" hidden></div>
+            <pre class="xf-fav-modal__text" id="xf-fav-modal-text"></pre>
+          </div>
+          <footer class="xf-fav-modal__foot">
+            <button type="button" class="xf-fav-modal__btn" data-fav-modal-close>Close</button>
+            <button type="button" class="xf-fav-modal__btn xf-fav-modal__btn--primary" id="xf-fav-modal-copy" hidden>Copy</button>
+            <a class="xf-fav-modal__btn xf-fav-modal__btn--primary" id="xf-fav-modal-link" href="#" hidden target="_blank" rel="noopener noreferrer">Open</a>
+          </footer>
+        </div>
+      </div>
+
       <!-- Billing -->
       <section class="xf-account-panel" id="panel-billing" role="tabpanel" aria-labelledby="tab-billing" hidden>
         <div class="xf-account-grid">

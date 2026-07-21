@@ -609,10 +609,12 @@
      * No transform / will-change — only background-position animation
      * (avoids compositor holes over the fixed hero).
      */
-    /* Static grid only — disable animated “power” beads (noisy on hover) */
     .xf-lib-grid-power {
-      display: none !important;
+      position: absolute;
+      inset: 0;
+      z-index: 1;
       pointer-events: none;
+      display: block;
     }
 
     /* Softer, longer bead for smoother medium-speed flow */

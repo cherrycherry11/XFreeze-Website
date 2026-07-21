@@ -503,6 +503,15 @@
     .template-gallery-tile:hover .template-gallery-tier--premium {
       opacity: 0.92;
     }
+    /* Locked premium (free user): action label cue only — image stays visible */
+    .template-gallery-tile.is-locked .template-gallery-label {
+      opacity: 0.95;
+      gap: 0.35rem;
+    }
+    .template-gallery-tile.is-locked .template-gallery-label i.fa-lock {
+      font-size: 0.55rem;
+      opacity: 0.9;
+    }
     /*
      * Templates video banner - Getty stock collage backdrop,
      * left-aligned copy. No CSS filters on the video.
@@ -982,8 +991,9 @@
 
   <footer class="xf-site-footer" data-xf-footer-root></footer>
 <script src="js/scroll-reveal.js"></script>
-  <script src="js/usage.js" defer></script>
+  <script src="js/usage.js"></script>
   <script src="js/favorites.js"></script>
+  <script src="js/access.js"></script>
   <link rel="stylesheet" href="css/favorites.css">
   <script src="js/support-toast.js"></script>
   <script src="data/visual-templates-data.js"></script>
@@ -1270,16 +1280,55 @@
         window.XFreezeFavorites && window.XFreezeFavorites.heartButtonHtml
           ? window.XFreezeFavorites.heartButtonHtml('templates', t.code)
           : '';
+      /* Free users: never expose Grok URL on premium cards — link goes to pricing */
+      var canOpen =
+        !window.XFreezeAccess || window.XFreezeAccess.canUse('template', t);
+      var openHref =
+        window.XFreezeAccess && window.XFreezeAccess.templateOpenHref
+          ? window.XFreezeAccess.templateOpenHref(t)
+          : t.link;
+      var openExternal = canOpen && t.link && String(t.link).indexOf('http') === 0;
+      var openLabel = canOpen
+        ? 'Open in Grok <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>'
+        : '<i class="fa-solid fa-lock" aria-hidden="true"></i> Unlock with Pro';
+      var openAria = canOpen
+        ? 'Open ' + name + ' in Grok'
+        : 'Unlock ' + name + ' with Pro — go to pricing';
+      var lockedClass = canOpen ? '' : ' is-locked';
       return (
-        '<article class="template-gallery-tile" title="' + escapeHtml(name) + '" data-template-code="' + escapeHtml(t.code) + '">' +
+        '<article class="template-gallery-tile' +
+        lockedClass +
+        '" title="' +
+        escapeHtml(name) +
+        '" data-template-code="' +
+        escapeHtml(t.code) +
+        '" data-template-tier="' +
+        escapeHtml(tier) +
+        '">' +
         tierBadge +
         badge +
         favBtn +
-        '<a href="' + t.link + '" target="_blank" rel="noopener noreferrer" class="template-gallery-open" aria-label="Open ' + escapeHtml(name) + ' in Grok" data-template-open>' +
-        '<img src="' + t.img + '" style="image-orientation: from-image;" alt="' + escapeHtml(name) + '" loading="lazy" onerror="this.style.opacity=0.15">' +
+        '<a href="' +
+        escapeHtml(openHref) +
+        '"' +
+        (openExternal ? ' target="_blank" rel="noopener noreferrer"' : '') +
+        ' class="template-gallery-open" aria-label="' +
+        escapeHtml(openAria) +
+        '" data-template-open' +
+        (canOpen ? '' : ' data-template-locked="1"') +
+        '>' +
+        '<img src="' +
+        t.img +
+        '" style="image-orientation: from-image;" alt="' +
+        escapeHtml(name) +
+        '" loading="lazy" onerror="this.style.opacity=0.15">' +
         '<span class="template-gallery-overlay">' +
-        '<span class="template-gallery-title">' + escapeHtml(name) + '</span>' +
-        '<span class="template-gallery-label">Open in Grok <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span>' +
+        '<span class="template-gallery-title">' +
+        escapeHtml(name) +
+        '</span>' +
+        '<span class="template-gallery-label">' +
+        openLabel +
+        '</span>' +
         '</span></a></article>'
       );
     }
@@ -1394,10 +1443,31 @@
           return;
         }
         var openLink = e.target.closest('[data-template-open]');
-        if (openLink && window.XFreezeSupportToast) {
-          window.XFreezeSupportToast.afterAction({
-            subtitle: 'Opening in Grok - support my work if this helped.',
+        if (openLink) {
+          var tile = openLink.closest('[data-template-code]');
+          var openCode = tile ? tile.getAttribute('data-template-code') : '';
+          var openT = visualTemplates.find(function (x) {
+            return x.code === openCode;
           });
+          if (
+            openT &&
+            window.XFreezeAccess &&
+            !window.XFreezeAccess.canUse('template', openT)
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.XFreezeAccess.goToPricing({
+              reason: 'premium',
+              from: 'templates',
+              code: openT.code,
+            });
+            return;
+          }
+          if (openLink && window.XFreezeSupportToast && openT) {
+            window.XFreezeSupportToast.afterAction({
+              subtitle: 'Opening in Grok - support my work if this helped.',
+            });
+          }
         }
       });
     }
@@ -1418,6 +1488,13 @@
       if (window.XFreezeCinematic && window.XFreezeCinematic.refresh) {
         window.XFreezeCinematic.refresh();
       }
+      /* After auth/session resolves, re-render so Pro unlocks premium hrefs */
+      setTimeout(function () {
+        if (typeof renderVisualGrid === 'function') renderVisualGrid();
+      }, 800);
+      setTimeout(function () {
+        if (typeof renderVisualGrid === 'function') renderVisualGrid();
+      }, 2000);
     }
 
     /** Theme-aware banner videos (light + dark liquid stills) */

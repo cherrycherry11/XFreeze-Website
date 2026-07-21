@@ -169,18 +169,18 @@
       z-index: 3;
       isolation: isolate;
       border-radius: 1.25rem;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      /* Light: soft glass over grid */
-      background: rgba(255, 255, 255, 0.62) !important;
-      backdrop-filter: blur(22px) saturate(1.15) !important;
-      -webkit-backdrop-filter: blur(22px) saturate(1.15) !important;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      /* Light: bright opaque cards (not muddy glass over gray) */
+      background: #ffffff !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
       box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.85) inset,
-        0 16px 40px -22px rgba(15, 23, 42, 0.14);
+        0 1px 0 rgba(255, 255, 255, 1) inset,
+        0 12px 32px -18px rgba(15, 23, 42, 0.1);
       overflow: hidden;
       color: #0a0a0a;
     }
-    /* Black 20% underlay behind the glass fill */
+    /* No dark underlay in light mode */
     #creator-library .bundles-stats-panel::before {
       content: "";
       position: absolute;
@@ -188,7 +188,7 @@
       z-index: 0;
       border-radius: inherit;
       pointer-events: none;
-      background: rgba(0, 0, 0, 0.06);
+      background: transparent;
     }
     html.dark #creator-library .bundles-stats-panel {
       border-color: rgba(255, 255, 255, 0.14) !important;
@@ -531,7 +531,7 @@
       --lib-x: 50%;
       --lib-y: 50%;
       --lib-cell: 72px;
-      --lib-base: #f7f7f9;
+      --lib-base: #ffffff;
       position: relative;
       z-index: 2;
       overflow: hidden;
@@ -581,8 +581,8 @@
       pointer-events: none;
       background-color: transparent;
       background-image:
-        linear-gradient(to right, rgba(15, 23, 42, 0.09) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(15, 23, 42, 0.09) 1px, transparent 1px);
+        linear-gradient(to right, rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
       background-size: var(--lib-cell) var(--lib-cell);
       background-position: 0 0;
     }
@@ -781,13 +781,17 @@
       }
     }
 
-    /* Black overlay on top of grid / power / spot — 20% opacity */
+    /* Light: no black wash (was 20% and made the section muddy) */
     .xf-lib-grid-overlay {
       position: absolute;
       inset: 0;
       z-index: 2;
       pointer-events: none;
-      background: rgba(0, 0, 0, 0.2);
+      background: transparent;
+    }
+
+    html.dark .xf-lib-grid-overlay {
+      background: rgba(0, 0, 0, 0.12);
     }
 
     /* Fade grid out at top and bottom — solid section color at edges */
@@ -799,8 +803,8 @@
       background: linear-gradient(
         180deg,
         var(--lib-base) 0%,
-        rgba(247, 247, 249, 0) 20%,
-        rgba(247, 247, 249, 0) 80%,
+        rgba(255, 255, 255, 0) 20%,
+        rgba(255, 255, 255, 0) 80%,
         var(--lib-base) 100%
       );
     }

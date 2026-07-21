@@ -30,6 +30,29 @@
   max-width: 32rem;
 }
 
+.xf-pricing-premium-banner {
+  margin: 1.15rem auto 0;
+  max-width: 28rem;
+  padding: 0.7rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border, #e5e7eb);
+  background: var(--surface-muted, #f4f4f5);
+  color: var(--text-secondary, #52525b);
+  font-size: 0.875rem;
+  font-weight: 550;
+  line-height: 1.4;
+}
+
+html.dark .xf-pricing-premium-banner {
+  background: #161616;
+  border-color: #2a2a2a;
+  color: #a3a3a3;
+}
+
+.xf-pricing-premium-banner[hidden] {
+  display: none !important;
+}
+
 .xf-pricing-currency {
   display: inline-flex;
   align-items: center;

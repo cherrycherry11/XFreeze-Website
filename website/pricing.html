@@ -147,6 +147,9 @@
         <p class="xf-content-lead">
           Start free, or unlock the full library with a subscription.
         </p>
+        <p id="xf-pricing-premium-banner" class="xf-pricing-premium-banner" hidden>
+          Upgrade to Pro to unlock premium templates.
+        </p>
       </header>
 
       <div class="xf-pricing-grid">
@@ -325,6 +328,15 @@
         }
       });
     });
+
+    /* Banner when free users hit a premium template */
+    try {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('reason') === 'premium') {
+        var ban = document.getElementById('xf-pricing-premium-banner');
+        if (ban) ban.hidden = false;
+      }
+    } catch (e) {}
   </script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>

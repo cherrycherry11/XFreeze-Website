@@ -519,12 +519,27 @@
     if (type === 'templates') {
       title = item.name || item.id;
       meta = [item.cat, item.subcat, item.tier].filter(Boolean).join(' · ');
+      var templateLocked =
+        window.XFreezeAccess &&
+        !window.XFreezeAccess.canUse('template', item);
       body =
         (item.name || 'Template') +
         (meta ? '\n' + meta : '') +
-        '\n\nOpen this template in Grok Imagine to run it.';
-      externalHref = item.link || 'templates.html';
-      externalLabel = item.link ? 'Open in Grok' : 'Browse templates';
+        (templateLocked
+          ? '\n\nThis is a Pro template. Upgrade to open it in Grok Imagine.'
+          : '\n\nOpen this template in Grok Imagine to run it.');
+      if (templateLocked) {
+        externalHref =
+          window.XFreezeAccess.pricingUrl({
+            reason: 'premium',
+            from: 'account-favorites',
+            code: item.id || item.code,
+          }) || 'pricing.html';
+        externalLabel = 'Upgrade to Pro';
+      } else {
+        externalHref = item.link || 'templates.html';
+        externalLabel = item.link ? 'Open in Grok' : 'Browse templates';
+      }
       if (mediaEl) {
         if (item.img) {
           mediaEl.hidden = false;

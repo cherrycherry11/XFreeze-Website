@@ -176,7 +176,7 @@
   }
 
   function renderFooterThemeSwitch() {
-    /* Simple iOS-style toggle — plain track + white thumb with sun/moon, no label */
+    /* Plain footer toggle only — flat track, simple sun/moon (not crystal nav switch) */
     return (
       '<div class="xf-footer-theme">' +
       '<button type="button" onclick="typeof toggleTheme===\'function\'&&toggleTheme()" ' +
@@ -185,13 +185,12 @@
       '<span class="xf-footer-theme-switch__track" aria-hidden="true">' +
       '<span class="xf-footer-theme-switch__thumb">' +
       '<span class="xf-footer-theme-switch__icon xf-footer-theme-switch__icon--sun">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">' +
-      '<circle cx="12" cy="12" r="4"/>' +
-      '<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>' +
+      '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
+      '<path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-16h1.5v3H12V2zm0 19h1.5v3H12v-3zM2 12h3v1.5H2V12zm19 0h3v1.5h-3V12zM4.22 4.22l2.12 2.12-1.06 1.06L3.16 5.28l1.06-1.06zm15.56 15.56 2.12 2.12-1.06 1.06-2.12-2.12 1.06-1.06zM19.78 4.22l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12zM6.34 17.66l1.06 1.06-2.12 2.12-1.06-1.06 2.12-2.12z"/>' +
       '</svg></span>' +
       '<span class="xf-footer-theme-switch__icon xf-footer-theme-switch__icon--moon">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-      '<path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z"/>' +
+      '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
+      '<path d="M12.1 2.2a9.8 9.8 0 1 0 9.7 12.4A7.5 7.5 0 1 1 12.1 2.2z"/>' +
       '</svg></span>' +
       '</span></span></button></div>'
     );

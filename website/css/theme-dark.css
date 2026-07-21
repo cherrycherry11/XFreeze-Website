@@ -171,12 +171,13 @@ html.dark .sb-panel {
   color: var(--text);
 }
 
-/* Creator library stats: glass only (not solid muted) — home.html owns final look */
+/* Creator library stats: transparent shell — each .bundles-stat-col is the card */
 html.dark .bundles-stats-panel {
-  background: rgba(18, 18, 20, 0.38) !important;
-  border-color: rgba(255, 255, 255, 0.14) !important;
-  backdrop-filter: blur(28px) saturate(1.25) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(1.25) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   color: var(--text);
 }
 

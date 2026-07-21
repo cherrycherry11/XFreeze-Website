@@ -87,18 +87,11 @@ html.dark .xf-home-head__link:hover {
   margin-top: 1.25rem;
 }
 
-/* Creator library stats — left-aligned columns (not centered) */
+/* Creator library stats — independent cards, left-aligned */
 #creator-library .bundles-stat-col {
   display: block;
   text-align: left;
   align-items: flex-start;
-  padding: 2rem 1.5rem;
-}
-
-@media (min-width: 768px) {
-  #creator-library .bundles-stat-col {
-    padding: 2.25rem 1.75rem;
-  }
 }
 
 #creator-library .bundles-stat-label {

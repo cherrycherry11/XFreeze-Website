@@ -164,84 +164,74 @@
       isolation: isolate;
     }
 
+    /*
+     * Stats: three separate cards (no shared vertical borders).
+     * Old single panel + border-l caused hairline glitches on hover.
+     */
     #creator-library .bundles-stats-panel {
       position: relative;
       z-index: 3;
-      isolation: isolate;
-      border-radius: 1.25rem;
-      border: 1px solid rgba(15, 23, 42, 0.08);
-      /* Soft panel on same page surface — slightly lifted white */
-      background: #ffffff !important;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;
-      box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.9) inset,
-        0 10px 28px -16px rgba(15, 23, 42, 0.1);
-      overflow: hidden;
+      overflow: visible;
       color: #0a0a0a;
     }
-    /* No dark underlay in light mode */
-    #creator-library .bundles-stats-panel::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      border-radius: inherit;
-      pointer-events: none;
-      background: transparent;
+    @media (min-width: 768px) {
+      #creator-library .bundles-stats-panel {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.85rem;
+      }
+    }
+    #creator-library .bundles-stats-panel::before,
+    #creator-library .bundles-stats-panel::after {
+      display: none !important;
+      content: none !important;
     }
     html.dark #creator-library .bundles-stats-panel {
-      border-color: rgba(255, 255, 255, 0.14) !important;
-      /* Glass fill (lower solid opacity so blur + grid read through) */
-      background: rgba(18, 18, 20, 0.38) !important;
+      background: transparent !important;
       color: #f4f4f5 !important;
-      backdrop-filter: blur(28px) saturate(1.25) !important;
-      -webkit-backdrop-filter: blur(28px) saturate(1.25) !important;
-      box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.1) inset,
-        0 -1px 0 rgba(0, 0, 0, 0.35) inset,
-        0 22px 48px -20px rgba(0, 0, 0, 0.55) !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
     }
-    /* Dark: black overlay at 20% behind glass content */
-    html.dark #creator-library .bundles-stats-panel::before {
-      background: rgba(0, 0, 0, 0.2);
-    }
-    /* Soft top sheen for glass */
-    #creator-library .bundles-stats-panel::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      border-radius: inherit;
-      pointer-events: none;
-      background: linear-gradient(
-        165deg,
-        rgba(255, 255, 255, 0.14) 0%,
-        rgba(255, 255, 255, 0.03) 38%,
-        transparent 62%
-      );
-    }
-    html.dark #creator-library .bundles-stats-panel::after {
-      background: linear-gradient(
-        165deg,
-        rgba(255, 255, 255, 0.08) 0%,
-        rgba(255, 255, 255, 0.02) 36%,
-        transparent 58%
-      );
-    }
+
     #creator-library .bundles-stat-col {
-      border-color: rgba(15, 23, 42, 0.1) !important;
       position: relative;
       z-index: 1;
+      margin: 0;
+      border: 1px solid rgba(15, 23, 42, 0.08) !important;
+      border-radius: 1.15rem;
+      background: #ffffff !important;
+      box-shadow: 0 8px 24px -18px rgba(15, 23, 42, 0.12);
+      padding: 1.75rem 1.5rem !important;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    #creator-library .bundles-stat-col:hover {
+      border-color: rgba(15, 23, 42, 0.12) !important;
+      box-shadow: 0 12px 28px -16px rgba(15, 23, 42, 0.16);
+      transform: none; /* no lift — avoids edge/line artifacts */
     }
     html.dark #creator-library .bundles-stat-col {
       border-color: rgba(255, 255, 255, 0.1) !important;
+      background: rgba(18, 18, 20, 0.72) !important;
+      box-shadow: 0 12px 28px -16px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    html.dark #creator-library .bundles-stat-col:hover {
+      border-color: rgba(255, 255, 255, 0.14) !important;
     }
 
     .bundles-stat-col {
       position: relative;
       z-index: 1;
       padding-inline: 1.35rem;
+      box-sizing: border-box;
     }
     .section {
       scroll-margin-top: 80px;
@@ -1989,7 +1979,7 @@
   </section>
 
   <!-- ==================== AI WORKFLOW LIBRARY (home overview - shop is separate) ==================== -->
-  <section id="creator-library" class="section border-t border-[#e5e7eb] bg-white relative" data-scroll-reveal>
+  <section id="creator-library" class="section border-t border-[#e5e7eb] relative" data-scroll-reveal>
     <!-- Opaque base + grid + staggered power on wires (no transform thrash) -->
     <div class="xf-lib-base" aria-hidden="true"></div>
     <div class="xf-lib-grid" aria-hidden="true"></div>
@@ -2013,8 +2003,8 @@
         </a>
       </div>
 
-      <div class="bundles-stats-panel mt-14 grid grid-cols-1 md:grid-cols-3 xf-home-stats" data-scroll-stagger>
-        <div class="bundles-stat-col py-8 md:py-10">
+      <div class="bundles-stats-panel mt-14 xf-home-stats" data-scroll-stagger>
+        <div class="bundles-stat-col">
           <div class="bundles-stat-value text-5xl font-semibold leading-none tracking-[-1.8px] md:text-6xl" data-xf-count="templates" data-xf-count-suffix="+">500+</div>
           <div class="mt-5 text-[15px] font-semibold tracking-[-0.1px] bundles-stat-label">Grok Imagine Templates</div>
           <p class="xf-section-lead xf-section-lead--compact max-w-[230px]">Product, makeup, filters, style edits, common uses, and mockups — ready for your AI workflow.</p>
@@ -2023,7 +2013,7 @@
           </a>
         </div>
 
-        <div class="bundles-stat-col border-t border-[#e5e7eb] py-8 md:border-l md:border-t-0 md:py-10">
+        <div class="bundles-stat-col">
           <div class="bundles-stat-value text-5xl font-semibold leading-none tracking-[-1.8px] md:text-6xl" data-xf-count="skills" data-xf-count-suffix="+">1000+</div>
           <div class="mt-5 text-[15px] font-semibold tracking-[-0.1px] bundles-stat-label">AI Skills</div>
           <p class="xf-section-lead xf-section-lead--compact max-w-[230px]">Copy into Grok, Cursor, or Claude - business, social, connectors, and more.</p>
@@ -2032,7 +2022,7 @@
           </a>
         </div>
 
-        <div class="bundles-stat-col border-t border-[#e5e7eb] py-8 md:border-l md:border-t-0 md:py-10">
+        <div class="bundles-stat-col">
           <div class="bundles-stat-value text-5xl font-semibold leading-none tracking-[-1.8px] md:text-6xl" data-xf-count="motion-prompts" data-xf-count-suffix="+">330+</div>
           <div class="mt-5 text-[15px] font-semibold tracking-[-0.1px] bundles-stat-label">Prompt Library</div>
           <p class="xf-section-lead xf-section-lead--compact max-w-[230px]">Image-to-video motion prompts - camera moves, expressions, lighting, product spins, and more.</p>
@@ -2045,7 +2035,7 @@
   </section>
 
   <!-- ==================== STYLE EDIT (video showcase) ==================== -->
-  <section id="section-experimental" class="bg-white border-t border-[#e5e7eb]" data-scroll-reveal>
+  <section id="section-experimental" class="border-t border-[#e5e7eb]" data-scroll-reveal>
         <div class="content-container py-16 md:py-20 grid md:grid-cols-12 gap-x-8 items-center">
       <!-- Text -->
       <div class="scroll-reveal-in scroll-reveal-in--left md:col-span-5 mb-10 md:mb-0">
@@ -2084,7 +2074,7 @@
   </section>
 
   <!-- ==================== PRODUCT (video showcase) ==================== -->
-  <section id="section-minimal" class="bg-white border-t border-[#e5e7eb]" data-scroll-reveal>
+  <section id="section-minimal" class="border-t border-[#e5e7eb]" data-scroll-reveal>
         <div class="content-container py-16 md:py-20 grid md:grid-cols-12 gap-x-8 md:gap-x-12 gap-y-10 md:gap-y-0 items-start md:items-center">
       <!-- Two vertical video cards (left on desktop) -->
       <div class="scroll-reveal-in scroll-reveal-in--left order-2 md:order-1 md:col-span-7">
@@ -2176,7 +2166,7 @@
   </section>
 
   <!-- ==================== MOTION PROMPT LIBRARY ==================== -->
-  <section id="xf-motion-prompts" class="xf-glass-section xf-motion-section bg-white border-t border-[#e5e7eb]" data-scroll-reveal>
+  <section id="xf-motion-prompts" class="xf-glass-section xf-motion-section border-t border-[#e5e7eb]" data-scroll-reveal>
     <div class="xf-glass-backdrop" aria-hidden="true">
       <div class="xf-glass-backdrop__img"></div>
       <div class="xf-glass-backdrop__mesh"></div>

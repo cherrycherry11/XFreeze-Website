@@ -48,7 +48,7 @@ html.dark .xf-fav-btn.is-active {
   pointer-events: none;
 }
 
-/* Templates gallery */
+/* Templates gallery — heart alone on top-right; premium crown on top-left */
 .template-gallery-tile {
   position: relative;
 }
@@ -58,10 +58,6 @@ html.dark .xf-fav-btn.is-active {
   top: 0.45rem;
   right: 0.45rem;
   z-index: 5;
-}
-
-.template-gallery-tile .template-gallery-tier {
-  /* keep tier on the left if both present */
 }
 
 /* Prompt cards */

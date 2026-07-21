@@ -31,7 +31,7 @@
         : 'assets/images/hero/hero-liquid-poster-light.jpg';
       document.documentElement.setAttribute('data-hero-video', heroVideo);
       document.documentElement.setAttribute('data-hero-poster', heroPoster);
-      document.documentElement.style.backgroundColor = isDark ? '#0a0a0a' : '#f6f5f8';
+      document.documentElement.style.backgroundColor = isDark ? '#0a0a0a' : '#ffffff';
       /* Flag early: pin hero + GSAP (desktop / tablet landscape) */
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       var desktop = window.matchMedia('(min-width: 768px)').matches;
@@ -55,7 +55,7 @@
     })();
   </script>
   <style>
-    html { background-color: #f6f5f8; }
+    html { background-color: #ffffff; }
     html.dark { background-color: #0a0a0a; }
     html.dark body { background-color: #0a0a0a; }
   </style>
@@ -593,27 +593,9 @@
         linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
     }
 
-    /* Soft spotlight that follows cursor */
+    /* No cursor spotlight — it looked like a messy hover popup on white */
     .xf-lib-grid-spot {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      background: radial-gradient(
-        min(72vw, 640px) circle at var(--lib-x) var(--lib-y),
-        rgba(255, 255, 255, 0.82) 0%,
-        rgba(255, 255, 255, 0.32) 38%,
-        transparent 72%
-      );
-    }
-
-    html.dark .xf-lib-grid-spot {
-      background: radial-gradient(
-        min(72vw, 640px) circle at var(--lib-x) var(--lib-y),
-        rgba(10, 10, 10, 0.82) 0%,
-        rgba(10, 10, 10, 0.36) 38%,
-        transparent 72%
-      );
+      display: none !important;
     }
 
     /*
@@ -621,10 +603,9 @@
      * No transform / will-change — only background-position animation
      * (avoids compositor holes over the fixed hero).
      */
+    /* Static grid only — disable animated “power” beads (noisy on hover) */
     .xf-lib-grid-power {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
+      display: none !important;
       pointer-events: none;
     }
 
@@ -1942,7 +1923,7 @@
   <div class="xf-hero-pin-spacer" aria-hidden="true"></div>
 
   <!-- ==================== SELECTED WORK ==================== -->
-  <section id="selected-work" class="xf-glass-section border-t border-[#e5e7eb] bg-[#fafafa]" data-scroll-reveal>
+  <section id="selected-work" class="xf-glass-section border-t border-[#e5e7eb] bg-white" data-scroll-reveal>
         <div class="xf-glass-backdrop" aria-hidden="true">
       <div class="xf-glass-backdrop__img"></div>
       <div class="xf-glass-backdrop__mesh"></div>
@@ -3022,50 +3003,10 @@
     }
 
     function initCreatorLibraryGrid() {
+      /* Spotlight / power beads disabled — keep a calm static grid only */
       const section = document.getElementById('creator-library');
-      if (!section || section._xfLibGridBound) return;
+      if (!section) return;
       section._xfLibGridBound = true;
-
-      /* Cursor spotlight only — no parallax transforms (those glitched over fixed hero) */
-      let targetX = 50;
-      let targetY = 50;
-      let curX = 50;
-      let curY = 50;
-      let raf = null;
-
-      const apply = () => {
-        raf = null;
-        curX += (targetX - curX) * 0.14;
-        curY += (targetY - curY) * 0.14;
-        section.style.setProperty('--lib-x', curX.toFixed(2) + '%');
-        section.style.setProperty('--lib-y', curY.toFixed(2) + '%');
-        if (Math.abs(targetX - curX) > 0.05 || Math.abs(targetY - curY) > 0.05) {
-          raf = requestAnimationFrame(apply);
-        }
-      };
-
-      const tick = () => {
-        if (!raf) raf = requestAnimationFrame(apply);
-      };
-
-      const onMove = (event) => {
-        const rect = section.getBoundingClientRect();
-        if (!rect.width || !rect.height) return;
-        targetX = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
-        targetY = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100));
-        tick();
-      };
-
-      const onLeave = () => {
-        targetX = 50;
-        targetY = 50;
-        tick();
-      };
-
-      section.addEventListener('mousemove', onMove, { passive: true });
-      section.addEventListener('pointermove', onMove, { passive: true });
-      section.addEventListener('mouseleave', onLeave);
-      apply();
     }
 
     /* === Video cycling (fade only - no frame shuffle between slots) === */

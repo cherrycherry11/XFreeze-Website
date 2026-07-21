@@ -21,7 +21,8 @@
   isolation: isolate;
   overflow: hidden;
   z-index: 0;
-  background: #f7f7f8 !important;
+  /* Match pure white content sections for a consistent home scroll */
+  background: #ffffff !important;
   border-color: rgba(229, 231, 235, 0.75) !important;
 }
 
@@ -145,7 +146,7 @@ html:not(.dark) #xf-final-cta.xf-glass-section:not(:has(.xf-glass-backdrop))::af
 
 /* Soft variant: solid only */
 .xf-glass-section--soft {
-  background: #fafafa !important;
+  background: #ffffff !important;
 }
 
 html.dark .xf-glass-section--soft {

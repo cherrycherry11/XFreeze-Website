@@ -31,7 +31,7 @@
         : 'assets/images/hero/hero-liquid-poster-light.jpg';
       document.documentElement.setAttribute('data-hero-video', heroVideo);
       document.documentElement.setAttribute('data-hero-poster', heroPoster);
-      document.documentElement.style.backgroundColor = isDark ? '#0a0a0a' : '#ffffff';
+      document.documentElement.style.backgroundColor = isDark ? '#0a0a0a' : '#f6f5f8';
       /* Flag early: pin hero + GSAP (desktop / tablet landscape) */
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       var desktop = window.matchMedia('(min-width: 768px)').matches;
@@ -55,7 +55,7 @@
     })();
   </script>
   <style>
-    html { background-color: #ffffff; }
+    html { background-color: #f6f5f8; }
     html.dark { background-color: #0a0a0a; }
     html.dark body { background-color: #0a0a0a; }
   </style>
@@ -112,10 +112,10 @@
       --text: #0a0a0a;
       --text-secondary: #52525b;
       --border: #e5e7eb;
-      --surface: #ffffff;
-      --surface-elevated: #fafafa;
-      --surface-muted: #f8f8f8;
-      --surface-subtle: #f4f4f5;
+      --surface: #f6f5f8;
+      --surface-elevated: #ffffff;
+      --surface-muted: #f0eff3;
+      --surface-subtle: #ebeaef;
       --nav-bg: rgba(255, 255, 255, 0.94);
       --border-hover: #d4d4d8;
       --page-max: 1520px;
@@ -170,13 +170,13 @@
       isolation: isolate;
       border-radius: 1.25rem;
       border: 1px solid rgba(15, 23, 42, 0.08);
-      /* Light: bright opaque cards (not muddy glass over gray) */
+      /* Soft panel on same page surface — slightly lifted white */
       background: #ffffff !important;
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;
       box-shadow:
-        0 1px 0 rgba(255, 255, 255, 1) inset,
-        0 12px 32px -18px rgba(15, 23, 42, 0.1);
+        0 1px 0 rgba(255, 255, 255, 0.9) inset,
+        0 10px 28px -16px rgba(15, 23, 42, 0.1);
       overflow: hidden;
       color: #0a0a0a;
     }
@@ -531,7 +531,8 @@
       --lib-x: 50%;
       --lib-y: 50%;
       --lib-cell: 72px;
-      --lib-base: #ffffff;
+      /* Match page soft surface (not pure white — was too bright vs neighbors) */
+      --lib-base: #f6f5f8;
       position: relative;
       z-index: 2;
       overflow: hidden;
@@ -784,8 +785,8 @@
       background: linear-gradient(
         180deg,
         var(--lib-base) 0%,
-        rgba(255, 255, 255, 0) 20%,
-        rgba(255, 255, 255, 0) 80%,
+        rgba(246, 245, 248, 0) 20%,
+        rgba(246, 245, 248, 0) 80%,
         var(--lib-base) 100%
       );
     }
@@ -798,6 +799,29 @@
         rgba(10, 10, 10, 0) 80%,
         var(--lib-base) 100%
       );
+    }
+
+    /* Home content sections share the same soft surface */
+    #selected-work,
+    #section-experimental,
+    #section-minimal,
+    #xf-more-categories,
+    #xf-motion-prompts,
+    #xf-skills-spotlight-section,
+    #xf-final-cta {
+      background: #f6f5f8 !important;
+      background-color: #f6f5f8 !important;
+    }
+
+    html.dark #selected-work,
+    html.dark #section-experimental,
+    html.dark #section-minimal,
+    html.dark #xf-more-categories,
+    html.dark #xf-motion-prompts,
+    html.dark #xf-skills-spotlight-section,
+    html.dark #xf-final-cta {
+      background: #0a0a0a !important;
+      background-color: #0a0a0a !important;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1923,7 +1947,7 @@
   <div class="xf-hero-pin-spacer" aria-hidden="true"></div>
 
   <!-- ==================== SELECTED WORK ==================== -->
-  <section id="selected-work" class="xf-glass-section border-t border-[#e5e7eb] bg-white" data-scroll-reveal>
+  <section id="selected-work" class="xf-glass-section border-t border-[#e5e7eb]" data-scroll-reveal>
         <div class="xf-glass-backdrop" aria-hidden="true">
       <div class="xf-glass-backdrop__img"></div>
       <div class="xf-glass-backdrop__mesh"></div>

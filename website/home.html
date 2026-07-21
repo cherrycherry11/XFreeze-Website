@@ -1800,7 +1800,7 @@
       })();
     </script>
 
-    <!-- Nav overlaid on studio stage — Lumen-style: flat links + soft CTA -->
+    <!-- Nav: same actions as every other page (coffee + menu + auth) so the bar never reshuffles -->
     <nav id="site-nav" class="site-nav site-nav--lumen" aria-label="Main">
       <div class="content-container">
         <div class="site-nav-bar">
@@ -1811,18 +1811,19 @@
             <a href="prompt-library.html" class="site-nav-pill-link">Prompts</a>
             <a href="skills.html" class="site-nav-pill-link">Skills</a>
             <a href="pricing.html" class="site-nav-pill-link">Pricing</a>
-          <a href="about.html" class="site-nav-pill-link">About</a>
+            <a href="about.html" class="site-nav-pill-link">About</a>
             <a href="contact.html" class="site-nav-pill-link">Contact</a>
           </div>
 
-          <div class="site-nav-end">
-            <div id="xf-auth-nav" class="site-nav-auth">
-              <a href="login.html" class="site-nav-auth-btn site-nav-auth-btn--ghost">Sign in</a>
-            </div>
-            <a href="templates.html" class="site-nav-cta hidden lg:inline-flex">Get started</a>
+                    <div class="site-nav-end">
+            <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee" aria-label="Buy me a coffee">
+              <i class="fa-solid fa-mug-hot text-xs" aria-hidden="true"></i>
+              <span class="site-nav-coffee__label">Buy me a coffee</span>
+            </a>
             <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
               <i class="fa-solid fa-bars text-sm" aria-hidden="true"></i>
             </button>
+            <div id="xf-auth-nav" class="site-nav-auth"><a href="login.html" class="site-nav-auth-btn">Sign in</a></div>
           </div>
         </div>
       </div>

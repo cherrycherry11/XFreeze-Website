@@ -1,7 +1,33 @@
 /**
  * Shared mobile nav toggle - all pages with #mobile-menu
+ * Also normalizes right-side action order: coffee → menu → auth
  */
 (function () {
+  function normalizeNavEnd() {
+    var end = document.querySelector('#site-nav .site-nav-end');
+    if (!end) return;
+    var coffee = end.querySelector('.site-nav-coffee');
+    var menu = end.querySelector('.site-nav-menu-btn');
+    var auth = end.querySelector('.site-nav-auth, #xf-auth-nav');
+    /* Re-append in stable order so DOM matches CSS order on every page */
+    if (coffee) end.appendChild(coffee);
+    if (menu) end.appendChild(menu);
+    if (auth) end.appendChild(auth);
+    /* Drop obsolete Get started CTA from the bar */
+    end.querySelectorAll('.site-nav-cta').forEach(function (el) {
+      el.remove();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', normalizeNavEnd);
+  } else {
+    normalizeNavEnd();
+  }
+  /* After auth injects avatar */
+  window.setTimeout(normalizeNavEnd, 0);
+  window.setTimeout(normalizeNavEnd, 400);
+
   function setMenuOpen(isOpen) {
     var menu = document.getElementById('mobile-menu');
     var btn = document.querySelector('.site-nav-menu-btn');

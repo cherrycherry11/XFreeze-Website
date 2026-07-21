@@ -23,32 +23,27 @@ html.dark.xf-auth-pending::before {
   flex-shrink: 0;
   order: 3;
   margin-left: 0;
-  min-width: 0;
+  /* Same slot width signed-in or out so the bar never jumps between pages */
+  width: 5.5rem;
+  min-width: 5.5rem;
   min-height: 2.25rem;
+  box-sizing: border-box;
 }
 
-/* Only reserve Sign-in pill width when signed out (avoids coffee jump).
-   Signed-in avatar is ~2rem — do not keep the wide empty slot. */
-.site-nav-auth[data-auth-state='signed-out'] {
-  min-width: 5.25rem;
-}
-
+.site-nav-auth[data-auth-state='signed-out'],
 .site-nav-auth[data-auth-state='signed-in'] {
-  min-width: 0;
-  justify-content: center;
+  width: 5.5rem;
+  min-width: 5.5rem;
+  justify-content: flex-end;
 }
 
 .site-nav-end {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  /* Prevent reflows from painting partial children */
+  gap: 0.5rem;
   flex-wrap: nowrap;
-}
-
-/* Comfortable gap between coffee and avatar when signed in */
-.site-nav-end:has(.site-nav-auth[data-auth-state='signed-in']) {
-  gap: 0.55rem;
+  /* Fixed cluster so pages don’t reflow differently */
+  min-height: 2.25rem;
 }
 
 /* Fixed visual order on every page: coffee → menu → auth */
@@ -66,6 +61,15 @@ html.dark.xf-auth-pending::before {
 .site-nav-end > .site-nav-menu-btn {
   order: 2;
   flex-shrink: 0;
+}
+
+.site-nav-end > .site-nav-auth {
+  order: 3;
+}
+
+/* Hide legacy Get started CTA if any page still has it */
+.site-nav-end > .site-nav-cta {
+  display: none !important;
 }
 
 .site-nav-auth-btn {

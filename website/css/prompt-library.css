@@ -1334,6 +1334,16 @@ html.dark .pl-card--premium {
   border-color: rgba(120, 175, 235, 0.18);
 }
 
+/* Free user: premium text hidden — no full prompt on card */
+.pl-card--locked .pl-card__preview {
+  font-style: italic;
+  opacity: 0.85;
+  -webkit-line-clamp: 2;
+}
+.pl-card--locked .pl-card__copy {
+  color: var(--text-secondary, #52525b);
+}
+
 .pl-card__num {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.65rem;

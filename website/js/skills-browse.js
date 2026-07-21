@@ -28,6 +28,34 @@
     return String(b.id || '').indexOf('premium-') === 0;
   }
 
+  /** Free users cannot open / copy / preview premium packs */
+  function canUsePremiumPack(b) {
+    if (!isPremiumPack(b)) return true;
+    if (global.XFreezeAccess && typeof global.XFreezeAccess.isPro === 'function') {
+      return global.XFreezeAccess.isPro();
+    }
+    return false;
+  }
+
+  function requireSkillPackAccess(b, opts) {
+    if (canUsePremiumPack(b)) return true;
+    if (global.XFreezeAccess && global.XFreezeAccess.goToPricing) {
+      global.XFreezeAccess.goToPricing(
+        Object.assign(
+          {
+            reason: 'premium',
+            from: 'skills',
+            id: b && b.id,
+          },
+          opts || {}
+        )
+      );
+    } else {
+      global.location.href = 'pricing.html?reason=premium&from=skills';
+    }
+    return false;
+  }
+
   function isConnectorPack(b) {
     if (TAX && typeof TAX.isConnectorPack === 'function') return TAX.isConnectorPack(b, CONNECTOR);
     return CONNECTOR.has(b && b.id);
@@ -539,6 +567,7 @@
 
     list.querySelectorAll('[data-copy-skill]').forEach(function (btn) {
       btn.addEventListener('click', function () {
+        if (!requireSkillPackAccess(b)) return;
         const skillId = btn.getAttribute('data-copy-skill');
         const skill = b.skills.find(function (x) { return x.id === skillId; });
         if (!skill) return;
@@ -563,6 +592,7 @@
 
     list.querySelectorAll('[data-preview-skill]').forEach(function (btn) {
       btn.addEventListener('click', function () {
+        if (!requireSkillPackAccess(b)) return;
         const skillId = btn.getAttribute('data-preview-skill');
         const skill = b.skills.find(function (x) { return x.id === skillId; });
         if (!skill) return;
@@ -599,6 +629,11 @@
     const b = BUNDLES.find(function (x) { return x.id === id; });
     if (!b) {
       showHomeUI();
+      return;
+    }
+    /* Free users: do not enter premium packs (would reveal skill prompts) */
+    if (isPremiumPack(b) && !canUsePremiumPack(b)) {
+      requireSkillPackAccess(b);
       return;
     }
     currentBundle = b;
@@ -763,14 +798,22 @@
   function cardHtml(b) {
     const conn = isConnectorPack(b);
     const premium = isPremiumPack(b);
+    const locked = premium && !canUsePremiumPack(b);
     const tagText = premium ? 'Premium' : (conn ? 'Connector' : 'Instant');
     const useCase = b.realWorldUseCase || b.group || '';
     const packFavId = 'pack:' + b.id;
     const favBtn = global.XFreezeFavorites
       ? global.XFreezeFavorites.heartButtonHtml('skills', packFavId, 'xf-fav-btn--pack')
       : '';
+    const linkLabel = locked
+      ? '<i class="fa-solid fa-lock" style="font-size:0.65rem" aria-hidden="true"></i> Unlock with Pro'
+      : 'Browse pack <i class="fa-solid fa-arrow-right" style="font-size:0.65rem" aria-hidden="true"></i>';
     return (
-      '<article class="skills-browse-card" data-id="' + esc(b.id) + '" tabindex="0" role="button">' +
+      '<article class="skills-browse-card' +
+      (locked ? ' skills-browse-card--locked' : '') +
+      '" data-id="' +
+      esc(b.id) +
+      '" tabindex="0" role="button">' +
       favBtn +
       '<div class="skills-browse-card-top">' +
       '<span class="skills-browse-tag' + (conn ? ' connector' : '') + (premium ? ' premium' : '') + '">' + tagText + '</span>' +
@@ -780,7 +823,9 @@
       '<p class="skills-browse-card-desc">' + esc(b.desc || '') + '</p>' +
       (useCase ? '<p class="skills-browse-card-usecase">' + esc(useCase) + '</p>' : '') +
       '<div class="skills-browse-card-meta">' +
-      '<span class="skills-browse-card-link">Browse pack <i class="fa-solid fa-arrow-right" style="font-size:0.65rem"></i></span>' +
+      '<span class="skills-browse-card-link">' +
+      linkLabel +
+      '</span>' +
       '</div></article>'
     );
   }
@@ -967,6 +1012,7 @@
     if (copyBtn) {
       copyBtn.addEventListener('click', function () {
         if (!modalSkill || !currentBundle) return;
+        if (!requireSkillPackAccess(currentBundle)) return;
         if (modalSkill.aiInstallPrompt) {
           copyText(buildCopyText(modalSkill), copyBtn);
           return;

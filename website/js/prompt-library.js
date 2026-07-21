@@ -295,6 +295,42 @@
     wrap.hidden = false;
   }
 
+  function isPremiumRow(row) {
+    if (!row) return false;
+    return Boolean(
+      (row.prompt && row.prompt.premium) ||
+        (row.category && row.category.premium)
+    );
+  }
+
+  function canUsePromptRow(row) {
+    if (!isPremiumRow(row)) return true;
+    if (!window.XFreezeAccess) return false;
+    return window.XFreezeAccess.canUse('prompt', {
+      premium: true,
+      tier: 'premium',
+    });
+  }
+
+  function requirePromptAccess(row, opts) {
+    if (canUsePromptRow(row)) return true;
+    if (window.XFreezeAccess && window.XFreezeAccess.goToPricing) {
+      window.XFreezeAccess.goToPricing(
+        Object.assign(
+          {
+            reason: 'premium',
+            from: 'prompts',
+            id: row && row.prompt && (row.prompt.id || row.prompt.title),
+          },
+          opts || {}
+        )
+      );
+    } else {
+      window.location.href = 'pricing.html?reason=premium&from=prompts';
+    }
+    return false;
+  }
+
   function renderGrid() {
     var grid = $('pl-grid');
     if (!grid) return;
@@ -314,12 +350,26 @@
           .replace(/ Motion Prompts$/i, '')
           .replace(/ Motion$/i, '')
           .replace(/ Effect Prompts$/i, ' Effects');
-        var premiumBadge = (p.premium || c.premium)
+        var isPrem = isPremiumRow(row);
+        var locked = isPrem && !canUsePromptRow(row);
+        var premiumBadge = isPrem
           ? '<span class="pl-card__premium"><i class="fa-solid fa-crown" aria-hidden="true"></i> Premium</span>'
           : '';
+        /* Free users must not see full premium prompt text on the card */
+        var previewText = locked
+          ? 'Premium motion prompt — upgrade to Pro to view and copy the full text.'
+          : p.text;
+        var copyAria = locked ? 'Unlock with Pro' : 'Copy prompt';
+        var copyIcon = locked ? 'fa-solid fa-lock' : 'fa-regular fa-copy';
         return (
-          '<article class="pl-card' + (p.premium || c.premium ? ' pl-card--premium' : '') + '" role="button" tabindex="0" data-pl-idx="' +
+          '<article class="pl-card' +
+          (isPrem ? ' pl-card--premium' : '') +
+          (locked ? ' pl-card--locked' : '') +
+          '" role="button" tabindex="0" data-pl-idx="' +
           idx +
+          '" data-pl-premium="' +
+          (isPrem ? '1' : '0') +
+          (locked ? '" data-pl-locked="1' : '') +
           '" style="--card-hue:' +
           c.hue +
           '">' +
@@ -336,11 +386,15 @@
           escapeHtml(p.title) +
           '</h3>' +
           '<p class="pl-card__preview">' +
-          escapeHtml(p.text) +
+          escapeHtml(previewText) +
           '</p>' +
           '<div class="pl-card__foot">' +
           '<span class="pl-card__best">' +
-          (p.bestFor ? escapeHtml(p.bestFor) : '') +
+          (locked
+            ? 'Pro only'
+            : p.bestFor
+              ? escapeHtml(p.bestFor)
+              : '') +
           '</span>' +
           '<div class="pl-card__actions">' +
           (window.XFreezeFavorites
@@ -351,7 +405,11 @@
             : '') +
           '<button type="button" class="pl-card__copy" data-pl-copy="' +
           idx +
-          '" aria-label="Copy prompt"><i class="fa-regular fa-copy"></i></button>' +
+          '" aria-label="' +
+          copyAria +
+          '"><i class="' +
+          copyIcon +
+          '"></i></button>' +
           '</div>' +
           '</div>' +
           '</article>'
@@ -420,6 +478,7 @@
   function openPanel(idx) {
     var row = state.filtered[idx];
     if (!row) return;
+    if (!requirePromptAccess(row)) return;
     state.panelIndex = idx;
 
     var backdrop = $('pl-panel-backdrop');
@@ -582,10 +641,12 @@
           }
         }
         if (!row) return;
+        /* Favorite metadata only — never store full premium text for free users */
+        var favText = canUsePromptRow(row) ? row.prompt.text || '' : '';
         window.XFreezeFavorites.toggle('prompts', {
           id: row.category.id + '::' + row.prompt.title,
           title: row.prompt.title,
-          text: row.prompt.text || '',
+          text: favText,
           bestFor: row.prompt.bestFor || '',
           categoryId: row.category.id,
           categoryName: row.category.name || '',
@@ -600,7 +661,9 @@
         e.stopPropagation();
         var idx = parseInt(copyBtn.getAttribute('data-pl-copy'), 10);
         var rowCopy = state.filtered[idx];
-        if (rowCopy) copyText(copyablePromptText(rowCopy), copyBtn);
+        if (!rowCopy) return;
+        if (!requirePromptAccess(rowCopy)) return;
+        copyText(copyablePromptText(rowCopy), copyBtn);
         return;
       }
       var card = e.target.closest('[data-pl-idx]');
@@ -626,7 +689,9 @@
     var copyBtn = $('pl-panel-copy');
     if (copyBtn) copyBtn.addEventListener('click', function () {
       if (state.panelIndex < 0) return;
-      copyText(copyablePromptText(state.filtered[state.panelIndex]), copyBtn);
+      var rowPanel = state.filtered[state.panelIndex];
+      if (!requirePromptAccess(rowPanel)) return;
+      copyText(copyablePromptText(rowPanel), copyBtn);
     });
     var prevBtn = $('pl-panel-prev');
     if (prevBtn) prevBtn.addEventListener('click', function () { panelNav(-1); });

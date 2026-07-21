@@ -596,8 +596,38 @@
     }
     if (textEl) textEl.textContent = body;
 
+    var premLocked =
+      window.XFreezeAccess &&
+      ((type === 'prompts' &&
+        item.premium &&
+        !window.XFreezeAccess.canUse('prompt', { premium: true })) ||
+        (type === 'skills' &&
+          (item.premium ||
+            (item.packId && String(item.packId).indexOf('premium-') === 0)) &&
+          !window.XFreezeAccess.isPro()));
+
+    if (premLocked) {
+      if (type === 'prompts' && textEl) {
+        textEl.textContent =
+          'Premium prompt — upgrade to Pro to view the full text.';
+      }
+      if (type === 'skills' && textEl) {
+        textEl.textContent =
+          'Premium skill — upgrade to Pro to open and copy install prompts.';
+      }
+      externalHref = window.XFreezeAccess.pricingUrl({
+        reason: 'premium',
+        from: 'account-favorites',
+        id: item.id,
+      });
+      externalLabel = 'Upgrade to Pro';
+      copyText = '';
+    }
+
     if (copyBtn) {
-      var canCopy = Boolean(copyText && (type === 'prompts' || type === 'skills'));
+      var canCopy = Boolean(
+        copyText && (type === 'prompts' || type === 'skills') && !premLocked
+      );
       copyBtn.hidden = !canCopy;
       copyBtn.textContent = 'Copy';
       copyBtn._xfCopyPayload = copyText;
@@ -607,7 +637,7 @@
         linkBtn.hidden = false;
         linkBtn.href = externalHref;
         linkBtn.textContent = externalLabel;
-        if (externalHref.indexOf('http') === 0) {
+        if (externalHref.indexOf('http') === 0 && !premLocked) {
           linkBtn.target = '_blank';
           linkBtn.rel = 'noopener noreferrer';
         } else {

@@ -23,27 +23,38 @@ html.dark.xf-auth-pending::before {
   flex-shrink: 0;
   order: 3;
   margin-left: 0;
-  /* Same slot width signed-in or out so the bar never jumps between pages */
-  width: 5.5rem;
-  min-width: 5.5rem;
   min-height: 2.25rem;
   box-sizing: border-box;
+  /* Hug content — no empty reserved width next to coffee */
+  width: auto;
+  min-width: 0;
 }
 
-.site-nav-auth[data-auth-state='signed-out'],
-.site-nav-auth[data-auth-state='signed-in'] {
-  width: 5.5rem;
-  min-width: 5.5rem;
+/* Signed out: room for the Sign in pill only */
+.site-nav-auth[data-auth-state='signed-out'] {
+  min-width: 0;
   justify-content: flex-end;
+}
+
+/* Signed in: avatar only — sit tight next to coffee */
+.site-nav-auth[data-auth-state='signed-in'] {
+  width: 2rem;
+  min-width: 2rem;
+  max-width: 2rem;
+  justify-content: center;
 }
 
 .site-nav-end {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   flex-wrap: nowrap;
-  /* Fixed cluster so pages don’t reflow differently */
   min-height: 2.25rem;
+}
+
+/* When avatar is showing, keep coffee + avatar as a tight pair */
+.site-nav-end:has(.site-nav-auth[data-auth-state='signed-in']) {
+  gap: 0.4rem;
 }
 
 /* Fixed visual order on every page: coffee → menu → auth */

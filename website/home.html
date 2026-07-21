@@ -165,27 +165,29 @@
     }
 
     /*
-     * Stats: three separate cards (no shared vertical borders).
-     * Old single panel + border-l caused hairline glitches on hover.
+     * Unified stats panel (no gaps between columns) — earlier look.
+     * Hover hairlines fixed: no per-column transform/shadow; dividers via
+     * internal border only (not on outer edges).
      */
     #creator-library .bundles-stats-panel {
       position: relative;
       z-index: 3;
       display: grid;
       grid-template-columns: 1fr;
-      gap: 0.75rem;
-      border: none !important;
-      background: transparent !important;
-      box-shadow: none !important;
+      gap: 0;
+      border-radius: 1.25rem;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      background: #ffffff !important;
+      box-shadow: 0 10px 28px -16px rgba(15, 23, 42, 0.1);
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;
-      overflow: visible;
+      overflow: hidden;
       color: #0a0a0a;
+      isolation: isolate;
     }
     @media (min-width: 768px) {
       #creator-library .bundles-stats-panel {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 0.85rem;
       }
     }
     #creator-library .bundles-stats-panel::before,
@@ -194,37 +196,50 @@
       content: none !important;
     }
     html.dark #creator-library .bundles-stats-panel {
-      background: transparent !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+      background: rgba(18, 18, 20, 0.72) !important;
       color: #f4f4f5 !important;
-      box-shadow: none !important;
-      backdrop-filter: none !important;
+      box-shadow: 0 16px 36px -18px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(20px) saturate(1.15);
+      -webkit-backdrop-filter: blur(20px) saturate(1.15);
     }
 
     #creator-library .bundles-stat-col {
       position: relative;
       z-index: 1;
       margin: 0;
-      border: 1px solid rgba(15, 23, 42, 0.08) !important;
-      border-radius: 1.15rem;
-      background: #ffffff !important;
-      box-shadow: 0 8px 24px -18px rgba(15, 23, 42, 0.12);
-      padding: 1.75rem 1.5rem !important;
-      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+      border: none !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      padding: 1.85rem 1.5rem !important;
+      /* Soft hover: background only — no transform (avoids hairline glitches) */
+      transition: background-color 0.18s ease;
+    }
+    #creator-library .bundles-stat-col + .bundles-stat-col {
+      border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+    }
+    @media (min-width: 768px) {
+      #creator-library .bundles-stat-col {
+        padding: 2rem 1.65rem !important;
+      }
+      #creator-library .bundles-stat-col + .bundles-stat-col {
+        border-top: none !important;
+        border-left: 1px solid rgba(15, 23, 42, 0.08) !important;
+      }
     }
     #creator-library .bundles-stat-col:hover {
-      border-color: rgba(15, 23, 42, 0.12) !important;
-      box-shadow: 0 12px 28px -16px rgba(15, 23, 42, 0.16);
-      transform: none; /* no lift — avoids edge/line artifacts */
+      background: rgba(15, 23, 42, 0.025) !important;
+      transform: none !important;
+      box-shadow: none !important;
+      border-color: inherit; /* keep dividers stable */
     }
-    html.dark #creator-library .bundles-stat-col {
+    html.dark #creator-library .bundles-stat-col + .bundles-stat-col {
       border-color: rgba(255, 255, 255, 0.1) !important;
-      background: rgba(18, 18, 20, 0.72) !important;
-      box-shadow: 0 12px 28px -16px rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
     }
     html.dark #creator-library .bundles-stat-col:hover {
-      border-color: rgba(255, 255, 255, 0.14) !important;
+      background: rgba(255, 255, 255, 0.04) !important;
     }
 
     .bundles-stat-col {

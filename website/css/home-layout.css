@@ -87,7 +87,7 @@ html.dark .xf-home-head__link:hover {
   margin-top: 1.25rem;
 }
 
-/* Creator library stats — independent cards, left-aligned */
+/* Creator library stats — unified panel columns, left-aligned */
 #creator-library .bundles-stat-col {
   display: block;
   text-align: left;

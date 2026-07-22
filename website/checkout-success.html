@@ -259,14 +259,16 @@
 
   <script src="js/auth-config.js"></script>
   <script src="data/products.js"></script>
+  <script src="js/entitlement.js"></script>
   <script src="js/usage.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/auth.js"></script>
   <script>
     (function () {
+      /* Success page never self-grants Pro from URL params.
+         It only refreshes server entitlement after a real verify-payment grant. */
       var params = new URLSearchParams(window.location.search);
       var paymentId = params.get('payment_id') || '';
-      var orderId = params.get('order_id') || '';
       var planId = params.get('plan') || '';
       var product = null;
 
@@ -290,39 +292,10 @@
         if (id === 'pro-yearly') {
           return { id: 'pro-yearly', name: 'Pro Yearly', price: 499, type: 'subscription', interval: 'year' };
         }
-        return { id: 'pro-monthly', name: 'Pro Monthly', price: 49, type: 'subscription', interval: 'month' };
-      }
-
-      function activate(prod, payId, ordId) {
-        if (!prod || prod.type !== 'subscription') return Promise.resolve(null);
-        var sub = null;
-        if (window.XFreezeUsage && window.XFreezeUsage.buildFromProduct) {
-          sub = window.XFreezeUsage.buildFromProduct(prod, payId, ordId);
-        } else {
-          var started = new Date();
-          var expires = new Date(started);
-          if (prod.interval === 'year') expires.setFullYear(expires.getFullYear() + 1);
-          else expires.setMonth(expires.getMonth() + 1);
-          sub = {
-            planId: prod.id,
-            name: prod.name,
-            price: prod.price,
-            interval: prod.interval || 'month',
-            status: 'active',
-            startedAt: started.toISOString(),
-            expiresAt: expires.toISOString(),
-            paymentId: payId || null,
-            orderId: ordId || null,
-          };
+        if (id === 'pro-monthly') {
+          return { id: 'pro-monthly', name: 'Pro Monthly', price: 49, type: 'subscription', interval: 'month' };
         }
-        if (window.XFreezeUsage && window.XFreezeUsage.activateSubscription) {
-          return window.XFreezeUsage.activateSubscription(sub);
-        }
-        try {
-          localStorage.setItem('xf_subscription', JSON.stringify(sub));
-          if (payId) localStorage.setItem('xf_last_payment_id', payId);
-        } catch (e) {}
-        return Promise.resolve(sub);
+        return null;
       }
 
       function waitAuthReady() {
@@ -332,12 +305,8 @@
             tries += 1;
             if (
               window.XFreezeAuth &&
-              (window.XFreezeAuth.getSession() || tries > 25)
+              (window.XFreezeAuth.getSession() || tries > 40)
             ) {
-              resolve();
-              return;
-            }
-            if (tries > 25) {
               resolve();
               return;
             }
@@ -348,7 +317,6 @@
 
       product = readProduct();
       if (!product && planId) product = catalogPlan(planId);
-      if (!product && paymentId) product = catalogPlan('pro-monthly');
 
       var lead = document.getElementById('success-lead');
       var plan = document.getElementById('success-plan');
@@ -357,37 +325,41 @@
       var ref = document.getElementById('success-ref');
 
       waitAuthReady().then(function () {
-        var chain = Promise.resolve();
         if (product && product.name) {
           var priceNum = Number(product.price);
           var price = '$' + (Number.isInteger(priceNum) ? priceNum : priceNum.toFixed(2));
           plan.hidden = false;
           planName.textContent = product.name;
           planPrice.textContent = price;
-          if (product.type === 'subscription') {
-            chain = activate(product, paymentId, orderId).then(function () {
-              lead.textContent =
-                'Your plan is active. Open Account anytime to see billing and usage.';
-            });
+        }
+
+        var refresh =
+          window.XFreezeEntitlement && window.XFreezeEntitlement.refresh
+            ? window.XFreezeEntitlement.refresh({ force: true })
+            : Promise.resolve({ isPro: false });
+
+        return refresh.then(function (snap) {
+          if (snap && snap.isPro) {
+            lead.textContent =
+              'Your Pro plan is active. Open Account anytime to see billing and usage.';
+          } else if (paymentId) {
+            lead.textContent =
+              'Payment received. If Pro is not active yet, wait a few seconds and refresh Account — or contact support with your reference.';
           } else {
             lead.textContent = 'Thanks for your purchase. Open the library and start creating.';
           }
+
           try {
             sessionStorage.removeItem('xf_pending_product');
             localStorage.removeItem('xf_pending_product');
             sessionStorage.removeItem('xf_paypal_order');
           } catch (e3) {}
-        }
 
-        if (paymentId) {
-          ref.hidden = false;
-          ref.textContent = 'Reference: ' + paymentId;
-          try {
-            localStorage.setItem('xf_last_payment_id', paymentId);
-          } catch (e4) {}
-        }
-
-        return chain;
+          if (paymentId) {
+            ref.hidden = false;
+            ref.textContent = 'Reference: ' + paymentId;
+          }
+        });
       });
     })();
   </script>

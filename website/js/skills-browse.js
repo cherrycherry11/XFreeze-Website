@@ -172,6 +172,26 @@
   }
 
   function fetchPackJson(bundleId) {
+    const id = safePackId(bundleId);
+    /* Premium packs: server-gated only (never static public JSON) */
+    if (isPremiumPack({ id: id })) {
+      if (global.XFreezeEntitlement && global.XFreezeEntitlement.fetchSkillPack) {
+        return global.XFreezeEntitlement.fetchSkillPack(id).catch(function (err) {
+          if (err && (err.code === 'pro_required' || err.status === 403)) {
+            requireSkillPackAccess({ id: id, tier: 'premium' });
+          } else if (err && (err.code === 'auth_required' || err.status === 401)) {
+            if (global.XFreezeAuth && global.XFreezeAuth.redirectToLogin) {
+              global.XFreezeAuth.redirectToLogin();
+            } else {
+              global.location.href = 'login.html';
+            }
+          }
+          throw err;
+        });
+      }
+      return Promise.reject(new Error('Entitlement client missing'));
+    }
+
     const urls = packUrlCandidates(bundleId, '.json');
     let lastErr = new Error('No pack URL');
 

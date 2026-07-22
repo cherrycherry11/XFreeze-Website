@@ -672,6 +672,7 @@
     var sb = getClient();
     if (sb) await sb.auth.signOut();
     session = null;
+    clearEntitlementQuiet();
     renderNavSlot();
     if (window.location.pathname.indexOf('login') !== -1 || window.location.pathname.indexOf('signup') !== -1) return;
     window.location.reload();
@@ -1228,6 +1229,7 @@
       renderNavSlot();
       if (event === 'SIGNED_IN' && nextSession && nextSession.user) {
         cancelGoogleOneTap();
+        refreshEntitlementQuiet();
       }
       if (
         event === 'SIGNED_IN' &&
@@ -1239,11 +1241,15 @@
         finishLogin(document.getElementById('xf-auth-status'));
       }
       if (event === 'SIGNED_OUT') {
+        clearEntitlementQuiet();
         window.setTimeout(maybeShowGoogleOneTap, 400);
       }
     });
 
     await refreshSession();
+    if (session && session.user) {
+      refreshEntitlementQuiet();
+    }
 
     if (document.getElementById('xf-auth-page')) {
       if (!isOAuthCallback() && session && session.user && !shouldStayOnLoginPage()) {
@@ -1262,49 +1268,27 @@
   }
 
   /**
-   * Persist subscription on the signed-in user so Account shows Pro
-   * after checkout even on a new browser / cleared localStorage.
+   * Legacy no-op: user_metadata must not grant Pro (users can edit it).
+   * Entitlement lives in the server-only `entitlements` table.
    */
-  async function syncSubscriptionMetadata(sub) {
-    var sb = getClient();
-    if (!sb || !session || !session.user) {
-      return { ok: false, reason: 'not-signed-in' };
-    }
-    if (!sub || typeof sub !== 'object') {
-      return { ok: false, reason: 'no-sub' };
-    }
-    var payload = {
-      planId: sub.planId,
-      name: sub.name,
-      price: sub.price,
-      interval: sub.interval || 'month',
-      status: sub.status || 'active',
-      startedAt: sub.startedAt || null,
-      expiresAt: sub.expiresAt || null,
-      paymentId: sub.paymentId || null,
-      orderId: sub.orderId || null,
-    };
-    var data = {};
-    data[window.XFreezeUsage && window.XFreezeUsage.META_KEY
-      ? window.XFreezeUsage.META_KEY
-      : 'xf_subscription'] = payload;
-    /* Flat mirrors help debugging in Supabase dashboard */
-    data.xf_plan_id = payload.planId;
-    data.xf_plan_status = payload.status;
-    data.xf_plan_name = payload.name;
+  async function syncSubscriptionMetadata() {
+    return { ok: false, reason: 'disabled-use-server-entitlements' };
+  }
 
-    var result = await sb.auth.updateUser({ data: data });
-    if (result.error) {
-      console.warn('[xf-auth] syncSubscriptionMetadata failed', result.error);
-      return { ok: false, error: result.error };
-    }
-    if (result.data && result.data.user) {
-      /* Keep in-memory session.user in sync without full refresh */
-      if (session) {
-        session.user = result.data.user;
+  function refreshEntitlementQuiet() {
+    try {
+      if (window.XFreezeEntitlement && window.XFreezeEntitlement.refresh) {
+        window.XFreezeEntitlement.refresh({ force: true });
       }
-    }
-    return { ok: true, user: result.data && result.data.user };
+    } catch (e) {}
+  }
+
+  function clearEntitlementQuiet() {
+    try {
+      if (window.XFreezeEntitlement && window.XFreezeEntitlement.clear) {
+        window.XFreezeEntitlement.clear();
+      }
+    } catch (e) {}
   }
 
   window.XFreezeAuth = {

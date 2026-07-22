@@ -1,6 +1,6 @@
 /**
  * Account dashboard — Overview / Favorites / Billing / Usage / Settings
- * Plan source: Supabase user_metadata → localStorage → last payment recovery.
+ * Plan source: server entitlements table via /api/me/entitlement (authoritative).
  */
 (function () {
   'use strict';
@@ -78,75 +78,26 @@
   }
 
   /**
-   * Push local Pro into Supabase once signed in so it sticks next login.
-   */
-  function maybeBackfillMetadata(user, sub) {
-    if (!user || !sub || !window.XFreezeUsage || !window.XFreezeUsage.isPro(sub)) {
-      return Promise.resolve(false);
-    }
-    var remote = window.XFreezeUsage.fromUserMetadata
-      ? window.XFreezeUsage.fromUserMetadata(user)
-      : null;
-    if (remote && window.XFreezeUsage.isPro(remote)) {
-      return Promise.resolve(false);
-    }
-    if (
-      window.XFreezeAuth &&
-      typeof window.XFreezeAuth.syncSubscriptionMetadata === 'function'
-    ) {
-      return window.XFreezeAuth
-        .syncSubscriptionMetadata(sub)
-        .then(function () {
-          return true;
-        })
-        .catch(function () {
-          return false;
-        });
-    }
-    return Promise.resolve(false);
-  }
-
-  /**
-   * If still free but this browser has a Razorpay payment id, activate Pro
-   * and sync to the signed-in user. Runs once per page load.
+   * Load authoritative Pro status from the server. No client self-grant.
    */
   function ensureProFromPayment(user) {
-    if (!window.XFreezeUsage) return Promise.resolve(null);
-    var sub = window.XFreezeUsage.resolveSubscription(user);
-    if (window.XFreezeUsage.isPro(sub)) {
-      return maybeBackfillMetadata(user, sub).then(function () {
-        return sub;
-      });
+    if (!user) return Promise.resolve(null);
+    if (!window.XFreezeEntitlement || !window.XFreezeEntitlement.refresh) {
+      return Promise.resolve(
+        window.XFreezeUsage ? window.XFreezeUsage.resolveSubscription(user) : null
+      );
     }
-
-    /* URL recovery: account.html?payment_id=pay_xxx or from success redirect */
-    var urlPay = '';
-    var urlPlan = 'pro-monthly';
-    try {
-      var p = new URLSearchParams(window.location.search);
-      urlPay = p.get('payment_id') || '';
-      if (p.get('plan')) urlPlan = p.get('plan');
-    } catch (e) {}
-
-    var recovered = null;
-    if (urlPay && String(urlPay).indexOf('pay_') === 0) {
-      recovered = window.XFreezeUsage.recoverFromLastPayment({
-        paymentId: urlPay,
-        planId: urlPlan,
-      });
-    }
-    if (!recovered) {
-      recovered = window.XFreezeUsage.recoverFromLastPayment();
-    }
-    if (!recovered || !window.XFreezeUsage.isPro(recovered)) {
-      return Promise.resolve(null);
-    }
-
     recovering = true;
-    return window.XFreezeUsage.activateSubscription(recovered).then(function (active) {
-      recovering = false;
-      return active;
-    });
+    return window.XFreezeEntitlement
+      .refresh({ force: true })
+      .then(function (snap) {
+        recovering = false;
+        return (snap && snap.subscription) || null;
+      })
+      .catch(function () {
+        recovering = false;
+        return null;
+      });
   }
 
   function showTab(name) {

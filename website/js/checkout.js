@@ -237,13 +237,39 @@
               currency: 'USD',
             };
 
+      function authHeaders(extra) {
+        var h = Object.assign({ 'Content-Type': 'application/json' }, extra || {});
+        try {
+          var token =
+            global.XFreezeEntitlement && global.XFreezeEntitlement.getAccessToken
+              ? global.XFreezeEntitlement.getAccessToken()
+              : '';
+          if (!token && global.XFreezeAuth && global.XFreezeAuth.getSession) {
+            var sess = global.XFreezeAuth.getSession();
+            token = (sess && sess.access_token) || '';
+          }
+          if (token) h.Authorization = 'Bearer ' + token;
+        } catch (e) {}
+        return h;
+      }
+
       const res = await fetch(apiBase + '/api/create-order', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders(),
         body: JSON.stringify(orderBody),
       });
       const order = await res.json();
-      if (!res.ok) throw new Error(order.error || 'Could not create order');
+      if (!res.ok) {
+        if (order.code === 'auth_required') {
+          throw new Error('Sign in required before purchasing a plan');
+        }
+        if (order.code === 'entitlement_store_missing') {
+          throw new Error(
+            'Payments are not fully configured (entitlement store). Contact support.'
+          );
+        }
+        throw new Error(order.error || 'Could not create order');
+      }
 
       sessionStorage.setItem('xf_pending_product', JSON.stringify(currentProduct));
 
@@ -263,7 +289,7 @@
           try {
             const vRes = await fetch(apiBase + '/api/verify-payment', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: authHeaders(),
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
@@ -276,61 +302,16 @@
               btn.disabled = false;
               return;
             }
-            /* Activate plan locally + Supabase metadata so Account shows Pro */
+            /* Server is sole grant authority — apply returned entitlement only */
             try {
               localStorage.setItem(
                 'xf_last_payment_id',
                 response.razorpay_payment_id || ''
               );
-              localStorage.setItem(
-                'xf_pending_product',
-                JSON.stringify(currentProduct)
-              );
-
-              if (currentProduct && currentProduct.type === 'subscription') {
-                var subPayload = null;
-                if (global.XFreezeUsage && global.XFreezeUsage.buildFromProduct) {
-                  subPayload = global.XFreezeUsage.buildFromProduct(
-                    currentProduct,
-                    response.razorpay_payment_id,
-                    response.razorpay_order_id
-                  );
-                } else {
-                  var started = new Date();
-                  var expires = new Date(started);
-                  if (currentProduct.interval === 'year') {
-                    expires.setFullYear(expires.getFullYear() + 1);
-                  } else {
-                    expires.setMonth(expires.getMonth() + 1);
-                  }
-                  subPayload = {
-                    planId: currentProduct.id,
-                    name: currentProduct.name,
-                    price: currentProduct.price,
-                    interval: currentProduct.interval || 'month',
-                    status: 'active',
-                    startedAt: started.toISOString(),
-                    expiresAt: expires.toISOString(),
-                    paymentId: response.razorpay_payment_id || null,
-                    orderId: response.razorpay_order_id || null,
-                  };
-                }
-                /* Always write local first so Account never stays Free */
-                try {
-                  localStorage.setItem('xf_subscription', JSON.stringify(subPayload));
-                } catch (lsErr) {}
-                if (global.XFreezeUsage && global.XFreezeUsage.activateSubscription) {
-                  try {
-                    await Promise.race([
-                      global.XFreezeUsage.activateSubscription(subPayload),
-                      new Promise(function (r) {
-                        setTimeout(r, 2500);
-                      }),
-                    ]);
-                  } catch (actErr) {}
-                } else if (global.XFreezeUsage && global.XFreezeUsage.setSubscription) {
-                  global.XFreezeUsage.setSubscription(subPayload);
-                }
+              if (vData.entitlement && global.XFreezeEntitlement) {
+                global.XFreezeEntitlement.applyServerEntitlement(vData.entitlement);
+              } else if (global.XFreezeEntitlement && global.XFreezeEntitlement.refresh) {
+                await global.XFreezeEntitlement.refresh({ force: true });
               }
             } catch (storeErr) {}
             const base = window.location.pathname.replace(/[^/]+$/, '');
@@ -338,13 +319,15 @@
               currentProduct && currentProduct.id
                 ? '&plan=' + encodeURIComponent(currentProduct.id)
                 : '';
+            var grantedQ = vData.granted ? '&granted=1' : '';
             window.location.href =
               base +
               'checkout-success.html?provider=razorpay&payment_id=' +
               encodeURIComponent(response.razorpay_payment_id) +
               '&order_id=' +
               encodeURIComponent(response.razorpay_order_id) +
-              planQ;
+              planQ +
+              grantedQ;
           } catch (err) {
             setMessage(err.message || 'Verification error', 'error');
             btn.disabled = false;
@@ -418,6 +401,9 @@
     openTemplate: openTemplate,
     openCustom: openCustom,
     setApiBase: setApiBase,
+    getApiBase: function () {
+      return apiBase;
+    },
     payWithRazorpay: payWithRazorpay,
   };
 })(window);

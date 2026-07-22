@@ -11,7 +11,7 @@ const BUNDLES = {
   ultimate: { id: 'ultimate', name: 'Ultimate Library', price: 79, type: 'bundle' },
 };
 
-/** Test pricing — set back to 49 / 499 for production retail */
+/** Production retail: $49/mo · $499/yr */
 const SUBSCRIPTIONS = {
   'pro-monthly': {
     id: 'pro-monthly',

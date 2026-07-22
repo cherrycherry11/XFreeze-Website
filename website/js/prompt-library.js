@@ -431,6 +431,37 @@
     }
   }
 
+  function promptContentId(row) {
+    if (!row || !row.prompt || !row.category) return '';
+    return row.category.id + '::' + row.prompt.id;
+  }
+
+  /**
+   * Free prompts: text is already public.
+   * Premium: body text is not in the client payload — fetch from gated API.
+   */
+  function ensurePromptText(row) {
+    if (!row || !row.prompt) return Promise.resolve('');
+    if (!isPremiumRow(row)) {
+      return Promise.resolve(row.prompt.text || '');
+    }
+    if (row.prompt.text && !row.prompt.lockedText) {
+      return Promise.resolve(row.prompt.text);
+    }
+    if (!window.XFreezeEntitlement || !window.XFreezeEntitlement.fetchPromptText) {
+      return Promise.reject(new Error('Entitlement client missing'));
+    }
+    var id = promptContentId(row);
+    return window.XFreezeEntitlement.fetchPromptText(id).then(function (data) {
+      if (data && data.text) {
+        row.prompt.text = data.text;
+        row.prompt.lockedText = false;
+        return data.text;
+      }
+      return '';
+    });
+  }
+
   function copyablePromptText(row) {
     return row.prompt.text || '';
   }
@@ -501,8 +532,29 @@
       catEl.classList.toggle('is-premium', !!(p.premium || c.premium));
     }
     if (titleEl) titleEl.textContent = p.title;
-    if (textEl) textEl.textContent = p.text;
+    if (textEl) {
+      textEl.textContent = isPremiumRow(row)
+        ? 'Loading premium prompt…'
+        : p.text || '';
+    }
     if (shotEl) shotEl.textContent = row.shotNum;
+
+    if (isPremiumRow(row)) {
+      ensurePromptText(row)
+        .then(function (text) {
+          if (state.panelIndex !== idx) return;
+          if (textEl) textEl.textContent = text || '(Unavailable)';
+        })
+        .catch(function (err) {
+          if (state.panelIndex !== idx) return;
+          if (err && (err.code === 'pro_required' || err.status === 403)) {
+            requirePromptAccess(row);
+            closePanel();
+            return;
+          }
+          if (textEl) textEl.textContent = 'Could not load premium prompt.';
+        });
+    }
     if (builtWrap && builtText) {
       builtWrap.style.display = p.builtFrom ? 'block' : 'none';
       builtText.textContent = p.builtFrom || '';
@@ -663,7 +715,16 @@
         var rowCopy = state.filtered[idx];
         if (!rowCopy) return;
         if (!requirePromptAccess(rowCopy)) return;
-        copyText(copyablePromptText(rowCopy), copyBtn);
+        ensurePromptText(rowCopy)
+          .then(function (text) {
+            if (!text) return;
+            copyText(text, copyBtn);
+          })
+          .catch(function (err) {
+            if (err && (err.code === 'pro_required' || err.status === 403)) {
+              requirePromptAccess(rowCopy);
+            }
+          });
         return;
       }
       var card = e.target.closest('[data-pl-idx]');
@@ -691,7 +752,16 @@
       if (state.panelIndex < 0) return;
       var rowPanel = state.filtered[state.panelIndex];
       if (!requirePromptAccess(rowPanel)) return;
-      copyText(copyablePromptText(rowPanel), copyBtn);
+      ensurePromptText(rowPanel)
+        .then(function (text) {
+          if (!text) return;
+          copyText(text, copyBtn);
+        })
+        .catch(function (err) {
+          if (err && (err.code === 'pro_required' || err.status === 403)) {
+            requirePromptAccess(rowPanel);
+          }
+        });
     });
     var prevBtn = $('pl-panel-prev');
     if (prevBtn) prevBtn.addEventListener('click', function () { panelNav(-1); });

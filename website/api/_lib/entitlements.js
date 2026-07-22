@@ -1,0 +1,168 @@
+/**
+ * Server-owned Pro entitlement. Users cannot write this table (RLS).
+ * Only service role after verified payment / webhook may grant.
+ */
+const { rest, hasServiceRole } = require('./supabase');
+const { SUBSCRIPTIONS } = require('./products');
+
+function isActiveRow(row) {
+  if (!row || row.status !== 'active') return false;
+  if (row.expires_at) {
+    try {
+      if (new Date(row.expires_at).getTime() < Date.now()) return false;
+    } catch (e) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function publicEntitlement(row) {
+  if (!row) {
+    return { isPro: false, subscription: null };
+  }
+  const active = isActiveRow(row);
+  return {
+    isPro: active,
+    subscription: {
+      planId: row.plan_id,
+      name: row.plan_name || row.plan_id,
+      price: row.price != null ? Number(row.price) : null,
+      interval: row.interval || 'month',
+      status: active ? 'active' : row.status || 'expired',
+      startedAt: row.started_at || null,
+      expiresAt: row.expires_at || null,
+      paymentId: row.payment_id || null,
+      orderId: row.order_id || null,
+      source: 'server',
+    },
+  };
+}
+
+async function getEntitlementForUser(userId) {
+  if (!hasServiceRole() || !userId) return null;
+  const rows = await rest(
+    `entitlements?user_id=eq.${encodeURIComponent(userId)}&select=*&limit=1`
+  );
+  if (!Array.isArray(rows) || !rows.length) return null;
+  return rows[0];
+}
+
+async function getPaymentById(paymentId) {
+  if (!hasServiceRole() || !paymentId) return null;
+  const rows = await rest(
+    `payments?payment_id=eq.${encodeURIComponent(paymentId)}&select=*&limit=1`
+  );
+  if (!Array.isArray(rows) || !rows.length) return null;
+  return rows[0];
+}
+
+function computeExpiry(interval, fromDate) {
+  const started = fromDate ? new Date(fromDate) : new Date();
+  const expires = new Date(started);
+  if (interval === 'year') {
+    expires.setFullYear(expires.getFullYear() + 1);
+  } else {
+    expires.setMonth(expires.getMonth() + 1);
+  }
+  return { started, expires };
+}
+
+/**
+ * Grant Pro from a verified catalog subscription payment.
+ * Idempotent on payment_id.
+ */
+async function grantFromVerifiedPayment({
+  userId,
+  productId,
+  paymentId,
+  orderId,
+  amountCents,
+  currency,
+  raw,
+}) {
+  if (!hasServiceRole()) {
+    throw new Error('Entitlement store not configured (SUPABASE_SERVICE_ROLE_KEY)');
+  }
+  if (!userId) throw new Error('userId required');
+  if (!paymentId) throw new Error('paymentId required');
+
+  const plan = SUBSCRIPTIONS[productId];
+  if (!plan) {
+    throw new Error('Unknown subscription product: ' + productId);
+  }
+
+  const expectedCents = Math.round(Number(plan.price) * 100);
+  if (amountCents != null && Number(amountCents) !== expectedCents) {
+    throw new Error(
+      `Amount mismatch: paid ${amountCents}, expected ${expectedCents} for ${productId}`
+    );
+  }
+
+  /* Idempotency: already processed this payment */
+  const existingPay = await getPaymentById(paymentId);
+  if (existingPay) {
+    const row = await getEntitlementForUser(existingPay.user_id || userId);
+    return publicEntitlement(row);
+  }
+
+  const { started, expires } = computeExpiry(plan.interval);
+
+  /* Ledger first */
+  await rest('payments', {
+    method: 'POST',
+    prefer: 'return=minimal',
+    body: {
+      payment_id: paymentId,
+      order_id: orderId || null,
+      user_id: userId,
+      product_type: 'subscription',
+      product_id: plan.id,
+      amount_cents: amountCents != null ? Number(amountCents) : expectedCents,
+      currency: (currency || 'USD').toUpperCase(),
+      status: 'captured',
+      raw: raw || null,
+    },
+  });
+
+  const payload = {
+    user_id: userId,
+    plan_id: plan.id,
+    plan_name: plan.name,
+    interval: plan.interval || 'month',
+    status: 'active',
+    price: plan.price,
+    started_at: started.toISOString(),
+    expires_at: expires.toISOString(),
+    payment_id: paymentId,
+    order_id: orderId || null,
+    amount_cents: amountCents != null ? Number(amountCents) : expectedCents,
+    currency: (currency || 'USD').toUpperCase(),
+    updated_at: new Date().toISOString(),
+  };
+
+  /* Upsert entitlement for user (one active plan row per user) */
+  await rest('entitlements?on_conflict=user_id', {
+    method: 'POST',
+    prefer: 'resolution=merge-duplicates,return=representation',
+    body: payload,
+  });
+
+  const row = await getEntitlementForUser(userId);
+  return publicEntitlement(row);
+}
+
+async function userIsPro(userId) {
+  const row = await getEntitlementForUser(userId);
+  return isActiveRow(row);
+}
+
+module.exports = {
+  isActiveRow,
+  publicEntitlement,
+  getEntitlementForUser,
+  getPaymentById,
+  computeExpiry,
+  grantFromVerifiedPayment,
+  userIsPro,
+};

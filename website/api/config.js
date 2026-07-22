@@ -1,13 +1,11 @@
 const { hasRazorpay, getKeys, json } = require('./_lib/razorpay-client');
+const { handlePreflight, applyCors } = require('./_lib/cors');
+const { hasServiceRole } = require('./_lib/supabase');
 
 module.exports = function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') {
-    res.statusCode = 204;
-    return res.end();
-  }
+  if (handlePreflight(req, res, 'GET,OPTIONS')) return;
+  applyCors(req, res, 'GET,OPTIONS');
+
   if (req.method !== 'GET') {
     return json(res, 405, { error: 'Method not allowed' });
   }
@@ -18,6 +16,7 @@ module.exports = function handler(req, res) {
     configured: ok,
     razorpay: ok,
     razorpayKeyId: ok ? key_id : null,
+    entitlements: hasServiceRole(),
     stripe: false,
     stripePublishableKey: null,
     paypal: false,

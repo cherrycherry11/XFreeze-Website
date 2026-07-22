@@ -992,6 +992,7 @@
 
   <footer class="xf-site-footer" data-xf-footer-root></footer>
 <script src="js/scroll-reveal.js"></script>
+  <script src="js/entitlement.js"></script>
   <script src="js/usage.js"></script>
   <script src="js/favorites.js"></script>
   <script src="js/access.js"></script>
@@ -1461,6 +1462,26 @@
               reason: 'premium',
               from: 'templates',
               code: openT.code,
+            });
+            return;
+          }
+          /* Premium links are not in public data — resolve via gated API */
+          if (
+            openT &&
+            window.XFreezeAccess &&
+            window.XFreezeAccess.isPremiumTemplate(openT) &&
+            (!openT.link || openT.lockedLink)
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.XFreezeAccess.resolveTemplateLink(openT).then(function (link) {
+              if (!link) return;
+              if (window.XFreezeSupportToast) {
+                window.XFreezeSupportToast.afterAction({
+                  subtitle: 'Opening in Grok - support my work if this helped.',
+                });
+              }
+              window.open(link, '_blank', 'noopener,noreferrer');
             });
             return;
           }

@@ -71,6 +71,11 @@ function computeExpiry(interval, fromDate) {
 /**
  * Grant Pro from a verified catalog subscription payment.
  * Idempotent on payment_id.
+ *
+ * @param {object} opts
+ * @param {boolean} [opts.skipAmountCheck] - Paddle tax/locale may differ; skip strict cents match
+ * @param {string} [opts.expiresAt] - ISO end of period from provider
+ * @param {string} [opts.status] - entitlement status (default active)
  */
 async function grantFromVerifiedPayment({
   userId,
@@ -80,6 +85,9 @@ async function grantFromVerifiedPayment({
   amountCents,
   currency,
   raw,
+  skipAmountCheck,
+  expiresAt,
+  status,
 }) {
   if (!hasServiceRole()) {
     throw new Error('Entitlement store not configured (SUPABASE_SERVICE_ROLE_KEY)');
@@ -93,7 +101,11 @@ async function grantFromVerifiedPayment({
   }
 
   const expectedCents = Math.round(Number(plan.price) * 100);
-  if (amountCents != null && Number(amountCents) !== expectedCents) {
+  if (
+    !skipAmountCheck &&
+    amountCents != null &&
+    Number(amountCents) !== expectedCents
+  ) {
     throw new Error(
       `Amount mismatch: paid ${amountCents}, expected ${expectedCents} for ${productId}`
     );
@@ -107,6 +119,13 @@ async function grantFromVerifiedPayment({
   }
 
   const { started, expires } = computeExpiry(plan.interval);
+  let finalExpires = expires;
+  if (expiresAt) {
+    try {
+      const d = new Date(expiresAt);
+      if (!Number.isNaN(d.getTime())) finalExpires = d;
+    } catch (e) {}
+  }
 
   /* Ledger first */
   await rest('payments', {
@@ -130,10 +149,10 @@ async function grantFromVerifiedPayment({
     plan_id: plan.id,
     plan_name: plan.name,
     interval: plan.interval || 'month',
-    status: 'active',
+    status: status || 'active',
     price: plan.price,
     started_at: started.toISOString(),
-    expires_at: expires.toISOString(),
+    expires_at: finalExpires.toISOString(),
     payment_id: paymentId,
     order_id: orderId || null,
     amount_cents: amountCents != null ? Number(amountCents) : expectedCents,
@@ -152,6 +171,24 @@ async function grantFromVerifiedPayment({
   return publicEntitlement(row);
 }
 
+/**
+ * Mark user free / canceled (Paddle subscription.canceled).
+ */
+async function revokeEntitlement(userId) {
+  if (!hasServiceRole() || !userId) return null;
+  const row = await getEntitlementForUser(userId);
+  if (!row) return publicEntitlement(null);
+  await rest(`entitlements?user_id=eq.${encodeURIComponent(userId)}`, {
+    method: 'PATCH',
+    prefer: 'return=minimal',
+    body: {
+      status: 'canceled',
+      updated_at: new Date().toISOString(),
+    },
+  });
+  return publicEntitlement(await getEntitlementForUser(userId));
+}
+
 async function userIsPro(userId) {
   const row = await getEntitlementForUser(userId);
   return isActiveRow(row);
@@ -164,5 +201,6 @@ module.exports = {
   getPaymentById,
   computeExpiry,
   grantFromVerifiedPayment,
+  revokeEntitlement,
   userIsPro,
 };

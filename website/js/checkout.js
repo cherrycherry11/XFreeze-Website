@@ -1,24 +1,27 @@
 /**
- * X Freeze checkout — Razorpay only (USD / international)
+ * X Freeze checkout — Paddle Billing (overlay)
  *
- * Local:  payment-server on http://localhost:4242
- * Live:   same-origin Vercel API (/api/* on xfreeze.com)
+ * Pro is granted by Paddle webhooks → server entitlements table.
+ * Success page only refreshes /api/me/entitlement.
  */
 (function (global) {
   function resolveDefaultApiBase() {
     try {
       var h = (global.location && global.location.hostname) || '';
       if (h && h !== 'localhost' && h !== '127.0.0.1') {
-        /* Production: API is deployed next to the static site */
         return global.location.origin;
       }
     } catch (e) {}
-    return 'http://localhost:4242';
+    return global.location && global.location.origin
+      ? global.location.origin
+      : 'http://localhost:4242';
   }
 
   let apiBase = resolveDefaultApiBase();
   let currentProduct = null;
   let config = null;
+  let paddleInstance = null;
+  let paddleInitPromise = null;
 
   function getOverlay() {
     return document.getElementById('xf-checkout-overlay');
@@ -45,6 +48,38 @@
     return config;
   }
 
+  function getAccessToken() {
+    try {
+      if (global.XFreezeEntitlement && global.XFreezeEntitlement.getAccessToken) {
+        return global.XFreezeEntitlement.getAccessToken() || '';
+      }
+      if (global.XFreezeAuth && global.XFreezeAuth.getSession) {
+        var s = global.XFreezeAuth.getSession();
+        return (s && s.access_token) || '';
+      }
+    } catch (e) {}
+    return '';
+  }
+
+  function getUser() {
+    try {
+      if (global.XFreezeAuth && global.XFreezeAuth.getSession) {
+        var s = global.XFreezeAuth.getSession();
+        return s && s.user ? s.user : null;
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function successUrl() {
+    try {
+      var base = global.location.origin + global.location.pathname.replace(/[^/]+$/, '');
+      return base + 'checkout-success.html?provider=paddle';
+    } catch (e) {
+      return 'https://xfreeze.com/checkout-success.html?provider=paddle';
+    }
+  }
+
   function injectModal() {
     if (document.getElementById('xf-checkout-overlay')) return;
 
@@ -54,7 +89,7 @@
           <div class="xf-checkout-header">
             <div>
               <h2 id="xf-checkout-title" class="xf-checkout-title">Checkout</h2>
-              <p id="xf-checkout-subtitle" class="xf-checkout-subtitle">Secure payment</p>
+              <p id="xf-checkout-subtitle" class="xf-checkout-subtitle">Secure payment via Paddle</p>
             </div>
             <button type="button" class="xf-checkout-close" aria-label="Close checkout" data-xf-close>&times;</button>
           </div>
@@ -65,9 +100,12 @@
             </div>
             <div id="xf-checkout-setup" class="xf-checkout-setup" hidden></div>
             <div id="xf-checkout-form-wrap">
-              <input type="email" id="xf-checkout-email" class="xf-checkout-email" placeholder="Email (optional)" autocomplete="email">
-              <button type="button" id="xf-pay-razorpay-btn" class="xf-checkout-pay-btn">Pay now</button>
+              <input type="email" id="xf-checkout-email" class="xf-checkout-email" placeholder="Email" autocomplete="email">
+              <button type="button" id="xf-pay-paddle-btn" class="xf-checkout-pay-btn">Continue to payment</button>
               <p id="xf-checkout-message" class="xf-checkout-message" aria-live="polite"></p>
+              <p class="xf-checkout-message" style="margin-top:0.5rem;opacity:0.75;font-size:0.8rem">
+                Card payments are processed securely by Paddle. Tax may be calculated at checkout.
+              </p>
             </div>
           </div>
         </div>
@@ -83,11 +121,10 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && overlay.classList.contains('is-open')) close();
     });
-    document.getElementById('xf-pay-razorpay-btn').addEventListener('click', payWithRazorpay);
+    document.getElementById('xf-pay-paddle-btn').addEventListener('click', payWithPaddle);
   }
 
   function open(product) {
-    /* Subscriptions must stick to a signed-in user (Supabase metadata). */
     if (product && product.type === 'subscription') {
       var auth = global.XFreezeAuth;
       if (auth && auth.isConfigured && auth.isConfigured()) {
@@ -116,20 +153,17 @@
     document.body.style.overflow = 'hidden';
 
     document.getElementById('xf-checkout-product-name').textContent = product.name;
-    document.getElementById('xf-checkout-product-price').textContent = formatPrice(product.price);
+    document.getElementById('xf-checkout-product-price').textContent = formatPrice(
+      product.price
+    );
     document.getElementById('xf-checkout-subtitle').textContent =
       product.type === 'subscription'
         ? product.interval === 'year'
-          ? 'Yearly'
-          : 'Monthly'
-        : product.type === 'bundle'
-          ? 'Bundle'
-          : product.type === 'custom'
-            ? 'Payment'
-            : 'Template';
+          ? 'Pro · billed yearly via Paddle'
+          : 'Pro · billed monthly via Paddle'
+        : 'Secure payment via Paddle';
 
     setMessage('');
-    /* Prefill checkout email from signed-in session */
     try {
       var session =
         global.XFreezeAuth && global.XFreezeAuth.getSession
@@ -159,238 +193,189 @@
 
     try {
       const cfg = await fetchConfig();
-      if (!cfg.configured || !cfg.razorpay) {
+      if (!cfg.paddle || !cfg.paddleClientToken) {
         setupEl.hidden = false;
         formWrap.hidden = true;
-        var isLocalHost =
-          apiBase.indexOf('localhost') !== -1 || apiBase.indexOf('127.0.0.1') !== -1;
-        setupEl.innerHTML = isLocalHost
-          ? '<strong>Razorpay is not configured locally.</strong><br>' +
-            '1. Add keys to <code>payment-server/.env</code><br>' +
-            '2. Run <code>cd payment-server && npm start</code>'
-          : '<strong>Razorpay keys missing on the live server.</strong><br>' +
-            'In <strong>Vercel → Project → Settings → Environment Variables</strong> add:<br>' +
-            '<code>RAZORPAY_KEY_ID</code> and <code>RAZORPAY_KEY_SECRET</code><br>' +
-            'then <strong>Redeploy</strong> Production. Keys on your laptop are not used by xfreeze.com.';
+        setupEl.innerHTML =
+          '<strong>Paddle is not configured yet.</strong><br>' +
+          'Add <code>PADDLE_CLIENT_TOKEN</code>, price IDs, and webhook secret in Vercel, then redeploy.<br>' +
+          'See <code>docs/PADDLE-SETUP.md</code>.';
+        return;
+      }
+      if (!cfg.paddlePrices || !cfg.paddlePrices['pro-monthly']) {
+        setupEl.hidden = false;
+        formWrap.hidden = true;
+        setupEl.innerHTML =
+          '<strong>Paddle price IDs missing.</strong><br>' +
+          'Set <code>PADDLE_PRICE_PRO_MONTHLY</code> and <code>PADDLE_PRICE_PRO_YEARLY</code> in Vercel.';
         return;
       }
 
       setupEl.hidden = true;
       formWrap.hidden = false;
-      document.getElementById('xf-checkout-product-price').textContent = formatPrice(
-        currentProduct.price
-      );
     } catch (err) {
       setupEl.hidden = false;
       formWrap.hidden = true;
-      var isLocal =
-        apiBase.indexOf('localhost') !== -1 || apiBase.indexOf('127.0.0.1') !== -1;
-      setupEl.innerHTML = isLocal
-        ? '<strong>Cannot reach payment server.</strong><br>' +
-          'Start it with <code>cd payment-server && npm start</code><br>' +
-          'Expected at <code>' +
-          apiBase +
-          '</code>'
-        : '<strong>Payments are temporarily unavailable.</strong><br>' +
-          'The live payment API is not configured yet. Add Razorpay keys in Vercel env, then redeploy.';
+      setupEl.innerHTML =
+        '<strong>Cannot reach payment config.</strong><br>' +
+        (err && err.message ? err.message : 'Try again in a moment.');
     }
   }
 
-  function loadScript(src, id) {
-    return new Promise((resolve, reject) => {
-      if (id && document.getElementById(id)) return resolve();
-      const s = document.createElement('script');
-      if (id) s.id = id;
-      s.src = src;
-      s.onload = resolve;
-      s.onerror = () => reject(new Error('Failed to load ' + src));
+  function loadPaddleJs() {
+    return new Promise(function (resolve, reject) {
+      if (global.Paddle) return resolve(global.Paddle);
+      var existing = document.getElementById('xf-paddle-js');
+      if (existing) {
+        existing.addEventListener('load', function () {
+          resolve(global.Paddle);
+        });
+        existing.addEventListener('error', reject);
+        return;
+      }
+      var s = document.createElement('script');
+      s.id = 'xf-paddle-js';
+      s.src = 'https://cdn.paddle.com/paddle/v2/paddle.js';
+      s.async = true;
+      s.onload = function () {
+        resolve(global.Paddle);
+      };
+      s.onerror = function () {
+        reject(new Error('Failed to load Paddle.js'));
+      };
       document.head.appendChild(s);
     });
   }
 
-  async function payWithRazorpay() {
-    const btn = document.getElementById('xf-pay-razorpay-btn');
+  async function ensurePaddle(cfg) {
+    if (paddleInstance) return paddleInstance;
+    if (paddleInitPromise) return paddleInitPromise;
+
+    paddleInitPromise = loadPaddleJs().then(function (Paddle) {
+      if (!Paddle) throw new Error('Paddle.js missing');
+      var env = cfg.paddleEnv === 'production' ? 'production' : 'sandbox';
+      try {
+        Paddle.Environment.set(env);
+      } catch (e) {}
+      Paddle.Initialize({
+        token: cfg.paddleClientToken,
+        eventCallback: function (event) {
+          try {
+            if (event && event.name === 'checkout.completed') {
+              setMessage('Payment received — activating Pro…');
+              if (global.XFreezeEntitlement && global.XFreezeEntitlement.refresh) {
+                global.XFreezeEntitlement.refresh({ force: true });
+              }
+            }
+            if (event && event.name === 'checkout.closed') {
+              setMessage('');
+            }
+            if (event && (event.name === 'checkout.error' || event.name === 'checkout.payment-error')) {
+              setMessage('Payment could not be completed. Try again.', 'error');
+            }
+          } catch (err) {}
+        },
+      });
+      paddleInstance = Paddle;
+      return Paddle;
+    });
+
+    return paddleInitPromise;
+  }
+
+  async function payWithPaddle() {
+    const btn = document.getElementById('xf-pay-paddle-btn');
     if (!currentProduct) return;
 
     btn.disabled = true;
-    setMessage('Creating order…');
+    setMessage('Opening Paddle checkout…');
 
     try {
       const cfg = await fetchConfig();
-      if (!cfg.razorpay || !cfg.razorpayKeyId) {
-        throw new Error('Razorpay is not configured on the payment server');
+      if (!cfg.paddle || !cfg.paddleClientToken) {
+        throw new Error('Paddle is not configured on the server');
       }
 
-      await loadScript('https://checkout.razorpay.com/v1/checkout.js', 'xf-razorpay-js');
-
-      const orderBody =
-        currentProduct.type === 'custom' || currentProduct.amountCents
-          ? {
-              amount: currentProduct.amountCents || Math.round(Number(currentProduct.price) * 100),
-              currency: 'USD',
-              receipt: String(currentProduct.id || 'custom').slice(0, 40),
-            }
-          : {
-              productType: currentProduct.type,
-              productId: currentProduct.id,
-              category: currentProduct.category,
-              currency: 'USD',
-            };
-
-      function authHeaders(extra) {
-        var h = Object.assign({ 'Content-Type': 'application/json' }, extra || {});
-        try {
-          var token =
-            global.XFreezeEntitlement && global.XFreezeEntitlement.getAccessToken
-              ? global.XFreezeEntitlement.getAccessToken()
-              : '';
-          if (!token && global.XFreezeAuth && global.XFreezeAuth.getSession) {
-            var sess = global.XFreezeAuth.getSession();
-            token = (sess && sess.access_token) || '';
-          }
-          if (token) h.Authorization = 'Bearer ' + token;
-        } catch (e) {}
-        return h;
+      if (currentProduct.type !== 'subscription') {
+        throw new Error('Only Pro subscriptions are available via Paddle right now');
       }
 
-      const res = await fetch(apiBase + '/api/create-order', {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(orderBody),
-      });
-      const order = await res.json();
-      if (!res.ok) {
-        if (order.code === 'auth_required') {
-          throw new Error('Sign in required before purchasing a plan');
-        }
-        if (order.code === 'entitlement_store_missing') {
-          throw new Error(
-            'Payments are not fully configured (entitlement store). Contact support.'
-          );
-        }
-        throw new Error(order.error || 'Could not create order');
+      const priceId =
+        (cfg.paddlePrices && cfg.paddlePrices[currentProduct.id]) || null;
+      if (!priceId) {
+        throw new Error('No Paddle price configured for ' + currentProduct.id);
       }
 
-      sessionStorage.setItem('xf_pending_product', JSON.stringify(currentProduct));
+      const user = getUser();
+      if (!user || !user.id) {
+        throw new Error('Sign in required before purchasing');
+      }
 
-      const email = document.getElementById('xf-checkout-email')?.value || '';
+      const emailEl = document.getElementById('xf-checkout-email');
+      const email =
+        (emailEl && emailEl.value.trim()) || (user.email || '') || undefined;
 
-      const options = {
-        key: order.key_id || cfg.razorpayKeyId,
-        amount: order.amount,
-        currency: order.currency || 'USD',
-        name: 'X Freeze',
-        description: currentProduct.name,
-        order_id: order.order_id,
-        prefill: email ? { email: email } : undefined,
-        theme: { color: '#0a0a0a' },
-        handler: async function (response) {
-          setMessage('Verifying payment…');
-          try {
-            const vRes = await fetch(apiBase + '/api/verify-payment', {
-              method: 'POST',
-              headers: authHeaders(),
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-              }),
-            });
-            const vData = await vRes.json();
-            if (!vRes.ok || !vData.success) {
-              setMessage(vData.error || 'Payment verification failed', 'error');
-              btn.disabled = false;
-              return;
-            }
-            /* Server is sole grant authority — apply returned entitlement only */
-            try {
-              localStorage.setItem(
-                'xf_last_payment_id',
-                response.razorpay_payment_id || ''
-              );
-              if (vData.entitlement && global.XFreezeEntitlement) {
-                global.XFreezeEntitlement.applyServerEntitlement(vData.entitlement);
-              } else if (global.XFreezeEntitlement && global.XFreezeEntitlement.refresh) {
-                await global.XFreezeEntitlement.refresh({ force: true });
-              }
-            } catch (storeErr) {}
-            const base = window.location.pathname.replace(/[^/]+$/, '');
-            var planQ =
-              currentProduct && currentProduct.id
-                ? '&plan=' + encodeURIComponent(currentProduct.id)
-                : '';
-            var grantedQ = vData.granted ? '&granted=1' : '';
-            window.location.href =
-              base +
-              'checkout-success.html?provider=razorpay&payment_id=' +
-              encodeURIComponent(response.razorpay_payment_id) +
-              '&order_id=' +
-              encodeURIComponent(response.razorpay_order_id) +
-              planQ +
-              grantedQ;
-          } catch (err) {
-            setMessage(err.message || 'Verification error', 'error');
-            btn.disabled = false;
-          }
+      const Paddle = await ensurePaddle(cfg);
+
+      try {
+        sessionStorage.setItem('xf_pending_product', JSON.stringify(currentProduct));
+      } catch (e) {}
+
+      Paddle.Checkout.open({
+        items: [{ priceId: priceId, quantity: 1 }],
+        customer: email ? { email: email } : undefined,
+        customData: {
+          user_id: String(user.id),
+          plan_id: String(currentProduct.id),
         },
-        modal: {
-          ondismiss: function () {
-            setMessage('Payment cancelled.', 'error');
-            btn.disabled = false;
-          },
+        settings: {
+          displayMode: 'overlay',
+          theme: 'light',
+          successUrl:
+            successUrl() +
+            '&plan=' +
+            encodeURIComponent(currentProduct.id),
+          allowLogout: false,
         },
-      };
-
-      const rzp = new global.Razorpay(options);
-      rzp.on('payment.failed', function (resp) {
-        const desc =
-          (resp && resp.error && (resp.error.description || resp.error.reason)) ||
-          'Payment failed';
-        setMessage(desc, 'error');
-        btn.disabled = false;
       });
-      setMessage('');
-      rzp.open();
+
+      setMessage('Complete payment in the Paddle window.');
       btn.disabled = false;
+      close();
     } catch (err) {
-      setMessage(err.message || 'Could not start Razorpay', 'error');
+      setMessage((err && err.message) || 'Could not start Paddle checkout', 'error');
       btn.disabled = false;
     }
   }
 
   function openBundle(bundleId) {
-    const bundle = global.XFreezeProducts?.getBundle(bundleId);
+    const bundle = global.XFreezeProducts && global.XFreezeProducts.getBundle(bundleId);
     if (!bundle) return;
     open(bundle);
   }
 
   function openSubscription(planId) {
-    const plan = global.XFreezeProducts?.getSubscription(planId);
+    const plan =
+      global.XFreezeProducts && global.XFreezeProducts.getSubscription(planId);
     if (!plan) return;
     open(plan);
   }
 
   function openTemplate(code, category) {
-    const product = global.XFreezeProducts?.getTemplateProduct(code, category);
+    const product =
+      global.XFreezeProducts &&
+      global.XFreezeProducts.getTemplateProduct(code, category);
     if (!product) return;
     open(product);
   }
 
   function setApiBase(url) {
-    apiBase = url.replace(/\/$/, '');
+    apiBase = String(url || '').replace(/\/$/, '');
     config = null;
   }
 
-  /** Demo / custom amount — price is USD dollars; converted to cents on the server */
-  function openCustom(name, price) {
-    const dollars = Number(price) || 1;
-    open({
-      id: 'custom_' + Date.now(),
-      name: name || 'Custom payment',
-      price: dollars,
-      type: 'custom',
-      amountCents: Math.max(100, Math.round(dollars * 100)),
-    });
+  function openCustom() {
+    setMessage('Custom payments are not available. Choose a Pro plan.', 'error');
   }
 
   global.XFreezeCheckout = {
@@ -404,6 +389,8 @@
     getApiBase: function () {
       return apiBase;
     },
-    payWithRazorpay: payWithRazorpay,
+    payWithPaddle: payWithPaddle,
+    /* legacy alias */
+    payWithRazorpay: payWithPaddle,
   };
 })(window);

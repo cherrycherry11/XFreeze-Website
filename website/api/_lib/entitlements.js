@@ -34,6 +34,7 @@ function publicEntitlement(row) {
       expiresAt: row.expires_at || null,
       paymentId: row.payment_id || null,
       orderId: row.order_id || null,
+      paddleCustomerId: row.paddle_customer_id || null,
       source: 'server',
     },
   };
@@ -88,6 +89,7 @@ async function grantFromVerifiedPayment({
   skipAmountCheck,
   expiresAt,
   status,
+  paddleCustomerId,
 }) {
   if (!hasServiceRole()) {
     throw new Error('Entitlement store not configured (SUPABASE_SERVICE_ROLE_KEY)');
@@ -159,13 +161,30 @@ async function grantFromVerifiedPayment({
     currency: (currency || 'USD').toUpperCase(),
     updated_at: new Date().toISOString(),
   };
+  if (paddleCustomerId) {
+    payload.paddle_customer_id = paddleCustomerId;
+  }
 
   /* Upsert entitlement for user (one active plan row per user) */
-  await rest('entitlements?on_conflict=user_id', {
-    method: 'POST',
-    prefer: 'resolution=merge-duplicates,return=representation',
-    body: payload,
-  });
+  try {
+    await rest('entitlements?on_conflict=user_id', {
+      method: 'POST',
+      prefer: 'resolution=merge-duplicates,return=representation',
+      body: payload,
+    });
+  } catch (err) {
+    /* Column paddle_customer_id may not exist until optional migration */
+    if (payload.paddle_customer_id) {
+      delete payload.paddle_customer_id;
+      await rest('entitlements?on_conflict=user_id', {
+        method: 'POST',
+        prefer: 'resolution=merge-duplicates,return=representation',
+        body: payload,
+      });
+    } else {
+      throw err;
+    }
+  }
 
   const row = await getEntitlementForUser(userId);
   return publicEntitlement(row);

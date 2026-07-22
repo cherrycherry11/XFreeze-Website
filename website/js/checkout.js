@@ -253,11 +253,17 @@
 
     paddleInitPromise = loadPaddleJs().then(function (Paddle) {
       if (!Paddle) throw new Error('Paddle.js missing');
-      var env = cfg.paddleEnv === 'production' ? 'production' : 'sandbox';
-      try {
-        Paddle.Environment.set(env);
-      } catch (e) {}
-      Paddle.Initialize({
+      /*
+       * Live is the Paddle.js default. Only force sandbox when configured.
+       * Never leave Environment.set('sandbox') active for a live build.
+       */
+      if (cfg.isSandbox || cfg.paddleEnv === 'sandbox') {
+        try {
+          Paddle.Environment.set('sandbox');
+        } catch (e) {}
+      }
+
+      var initOpts = {
         token: cfg.paddleClientToken,
         eventCallback: function (event) {
           try {
@@ -266,16 +272,50 @@
               if (global.XFreezeEntitlement && global.XFreezeEntitlement.refresh) {
                 global.XFreezeEntitlement.refresh({ force: true });
               }
+              try {
+                var ctmFromEvt =
+                  event.data &&
+                  event.data.customer &&
+                  (event.data.customer.id || event.data.customer_id);
+                if (ctmFromEvt && String(ctmFromEvt).indexOf('ctm_') === 0) {
+                  localStorage.setItem('xf_paddle_customer_id', String(ctmFromEvt));
+                }
+              } catch (storeCtm) {}
             }
             if (event && event.name === 'checkout.closed') {
               setMessage('');
             }
-            if (event && (event.name === 'checkout.error' || event.name === 'checkout.payment-error')) {
+            if (
+              event &&
+              (event.name === 'checkout.error' || event.name === 'checkout.payment-error')
+            ) {
               setMessage('Payment could not be completed. Try again.', 'error');
             }
           } catch (err) {}
         },
-      });
+      };
+
+      /* Paddle Retain: Paddle customer id only (ctm_…), not app user id */
+      try {
+        var ctm = null;
+        var snap =
+          global.XFreezeEntitlement && global.XFreezeEntitlement.getSnapshot
+            ? global.XFreezeEntitlement.getSnapshot()
+            : null;
+        if (snap && snap.subscription && snap.subscription.paddleCustomerId) {
+          ctm = snap.subscription.paddleCustomerId;
+        }
+        if (!ctm) {
+          try {
+            ctm = localStorage.getItem('xf_paddle_customer_id') || null;
+          } catch (ls) {}
+        }
+        if (ctm && String(ctm).indexOf('ctm_') === 0) {
+          initOpts.pwCustomer = { id: String(ctm) };
+        }
+      } catch (e2) {}
+
+      Paddle.Initialize(initOpts);
       paddleInstance = Paddle;
       return Paddle;
     });

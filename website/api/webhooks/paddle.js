@@ -4,6 +4,7 @@ const {
   paddleWebhookSecret,
   planIdFromPriceId,
   hasPaddleWebhook,
+  assertPaddleWebhookIp,
 } = require('../_lib/paddle');
 const { hasServiceRole } = require('../_lib/supabase');
 const {
@@ -99,6 +100,13 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    /* Optional IP allowlist (PADDLE_WEBHOOK_IP_ALLOWLIST=true) — IPs from api.paddle.com/ips */
+    const ipCheck = await assertPaddleWebhookIp(req);
+    if (!ipCheck.ok) {
+      console.error('Paddle webhook rejected IP', ipCheck.ip);
+      return json(res, 403, { error: 'Forbidden source IP' });
+    }
+
     const rawBody = await readRawBody(req);
     const signature =
       req.headers['paddle-signature'] || req.headers['Paddle-Signature'] || '';
@@ -139,6 +147,11 @@ module.exports = async function handler(req, res) {
       }
 
       if (status === 'active' || status === 'trialing' || status === 'past_due') {
+        const ctm =
+          data.customer_id ||
+          data.customerId ||
+          (data.customer && (data.customer.id || data.customer_id)) ||
+          null;
         await grantFromVerifiedPayment({
           userId,
           productId: planId,
@@ -149,7 +162,8 @@ module.exports = async function handler(req, res) {
           skipAmountCheck: true,
           expiresAt: periodEnd(data),
           status: 'active',
-          raw: { source: 'paddle', eventType, status },
+          paddleCustomerId: ctm,
+          raw: { source: 'paddle', eventType, status, customer_id: ctm },
         });
         return json(res, 200, { ok: true, granted: true, planId, userId });
       }

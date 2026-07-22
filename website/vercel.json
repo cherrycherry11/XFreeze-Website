@@ -1,6 +1,19 @@
 {
+  "redirects": [
+    {
+      "source": "/:page.html",
+      "destination": "/:page",
+      "permanent": true
+    },
+    {
+      "source": "/blog/:slug.html",
+      "destination": "/blog/:slug",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/home.html" },
+    { "source": "/home", "destination": "/home.html" },
     { "source": "/pricing", "destination": "/pricing.html" },
     { "source": "/account", "destination": "/account.html" },
     { "source": "/templates", "destination": "/templates.html" },
@@ -10,17 +23,19 @@
     { "source": "/signup", "destination": "/signup.html" },
     { "source": "/contact", "destination": "/contact.html" },
     { "source": "/about", "destination": "/about.html" },
-    { "source": "/home", "destination": "/home.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/refund", "destination": "/refund.html" },
     { "source": "/workflows", "destination": "/workflows.html" },
     { "source": "/use-cases", "destination": "/use-cases.html" },
     { "source": "/changelog", "destination": "/changelog.html" },
     { "source": "/blog", "destination": "/blog.html" },
+    { "source": "/blog/:slug", "destination": "/blog/:slug.html" },
     { "source": "/skill-builder", "destination": "/skill-builder.html" },
     { "source": "/connector-setup", "destination": "/connector-setup.html" },
     { "source": "/checkout-success", "destination": "/checkout-success.html" },
-    { "source": "/checkout-cancel", "destination": "/checkout-cancel.html" }
+    { "source": "/checkout-cancel", "destination": "/checkout-cancel.html" },
+    { "source": "/pay-demo", "destination": "/pay-demo.html" }
   ],
   "functions": {
     "api/**/*.js": {

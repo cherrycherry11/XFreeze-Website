@@ -326,7 +326,7 @@
         )
       );
     } else {
-      window.location.href = 'pricing.html?reason=premium&from=prompts';
+      window.location.href = 'pricing?reason=premium&from=prompts';
     }
     return false;
   }

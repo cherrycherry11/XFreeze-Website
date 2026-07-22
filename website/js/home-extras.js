@@ -34,7 +34,7 @@
   }
 
   function skillsPackHref(pack) {
-    return 'skills.html#skill-pack/' + encodeURIComponent(pack);
+    return 'skills#skill-pack/' + encodeURIComponent(pack);
   }
 
   function renderSkillsSpotlight() {

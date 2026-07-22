@@ -83,7 +83,7 @@
     if (opts.from) params.set('from', opts.from);
     if (opts.code) params.set('code', String(opts.code));
     if (opts.id) params.set('id', String(opts.id));
-    return 'pricing.html?' + params.toString();
+    return 'pricing?' + params.toString();
   }
 
   function goToPricing(opts) {
@@ -122,12 +122,12 @@
   }
 
   function templateOpenHref(t) {
-    if (!t) return 'templates.html';
+    if (!t) return 'templates';
     if (canUse('template', t) && t.link) return t.link;
     if (isPremiumTemplate(t)) {
       return pricingUrl({ reason: 'premium', from: 'templates', code: t.code });
     }
-    return t.link || 'templates.html';
+    return t.link || 'templates';
   }
 
   function templateOpensExternally(t) {
@@ -168,7 +168,7 @@
           if (global.XFreezeAuth && global.XFreezeAuth.redirectToLogin) {
             global.XFreezeAuth.redirectToLogin();
           } else {
-            global.location.href = 'login.html';
+            global.location.href = 'login';
           }
         }
         return null;

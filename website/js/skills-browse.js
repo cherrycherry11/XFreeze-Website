@@ -51,7 +51,7 @@
         )
       );
     } else {
-      global.location.href = 'pricing.html?reason=premium&from=skills';
+      global.location.href = 'pricing?reason=premium&from=skills';
     }
     return false;
   }
@@ -89,7 +89,7 @@
     );
   }
 
-  const CONNECTOR_SETUP_URL = 'connector-setup.html';
+  const CONNECTOR_SETUP_URL = 'connector-setup';
 
   function connectorSetupPrefix(skill) {
     const apps = (skill.integrations && skill.integrations.length)
@@ -183,7 +183,7 @@
             if (global.XFreezeAuth && global.XFreezeAuth.redirectToLogin) {
               global.XFreezeAuth.redirectToLogin();
             } else {
-              global.location.href = 'login.html';
+              global.location.href = 'login';
             }
           }
           throw err;

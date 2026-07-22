@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-xf-meta-title="Terms of Service" data-xf-meta-desc="Simple rules for using X Freeze. Use freely for your own work - please don’t resell or redistribute the library." data-xf-meta-path="terms.html">
+<html lang="en" data-xf-meta-title="Terms of Service" data-xf-meta-desc="The rules for using X Freeze and buying from us, including plans, billing, and acceptable use." data-xf-meta-path="terms">
 <head>
   <!-- Favicon for browsers + Google Search (48px+ PNG required for SERP) -->
   <link rel="icon" href="/favicon.ico?v=share3" type="image/x-icon">
@@ -72,14 +72,14 @@
   <nav id="site-nav" class="site-nav page-nav" aria-label="Main">
     <div class="content-container">
       <div class="site-nav-bar">
-        <a href="home.html" class="site-nav-logo">X Freeze</a>
+        <a href="home" class="site-nav-logo">X Freeze</a>
                         <div class="site-nav-pill">
-          <a href="templates.html" class="site-nav-pill-link">Templates</a>
-          <a href="prompt-library.html" class="site-nav-pill-link">Prompts</a>
-          <a href="skills.html" class="site-nav-pill-link">Skills</a>
-          <a href="pricing.html" class="site-nav-pill-link">Pricing</a>
-          <a href="about.html" class="site-nav-pill-link">About</a>
-          <a href="contact.html" class="site-nav-pill-link">Contact</a>
+          <a href="templates" class="site-nav-pill-link">Templates</a>
+          <a href="prompt-library" class="site-nav-pill-link">Prompts</a>
+          <a href="skills" class="site-nav-pill-link">Skills</a>
+          <a href="pricing" class="site-nav-pill-link">Pricing</a>
+          <a href="about" class="site-nav-pill-link">About</a>
+          <a href="contact" class="site-nav-pill-link">Contact</a>
         </div>
                   <div class="site-nav-end">
             <a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer" class="site-nav-coffee" aria-label="Buy me a coffee">
@@ -89,7 +89,7 @@
             <button type="button" onclick="toggleMobileMenu()" class="site-nav-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
               <i class="fa-solid fa-bars text-sm" aria-hidden="true"></i>
             </button>
-            <div id="xf-auth-nav" class="site-nav-auth"><a href="login.html" class="site-nav-auth-btn">Sign in</a></div>
+            <div id="xf-auth-nav" class="site-nav-auth"><a href="login" class="site-nav-auth-btn">Sign in</a></div>
           </div>
       </div>
     </div>
@@ -99,16 +99,16 @@
   <div id="mobile-menu" class="site-nav-mobile-panel site-nav-mobile-panel--drawer hidden lg:hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Site menu">
     <div class="site-nav-mobile-drawer">
       <header class="site-nav-drawer-head">
-        <a href="home.html" class="site-nav-drawer-logo" onclick="toggleMobileMenu()">X Freeze</a>
+        <a href="home" class="site-nav-drawer-logo" onclick="toggleMobileMenu()">X Freeze</a>
         <button type="button" class="site-nav-drawer-close" onclick="toggleMobileMenu()" aria-label="Close menu"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </header>
 
                   <nav class="site-nav-drawer-nav" aria-label="Mobile">
-        <a href="templates.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Templates</a>
-        <a href="prompt-library.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Prompts</a>
-        <a href="skills.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Skills</a>
-        <a href="pricing.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Pricing</a>
-        <a href="about.html" class="site-nav-drawer-link" onclick="toggleMobileMenu()">About</a>
+        <a href="templates" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Templates</a>
+        <a href="prompt-library" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Prompts</a>
+        <a href="skills" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Skills</a>
+        <a href="pricing" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Pricing</a>
+        <a href="about" class="site-nav-drawer-link" onclick="toggleMobileMenu()">About</a>
       </nav>
 
       
@@ -116,8 +116,8 @@
 
         <div class="site-nav-drawer-bottom">
           <div id="xf-auth-drawer" class="site-nav-drawer-auth">
-            <a href="templates.html" class="site-nav-drawer-auth-btn site-nav-drawer-cta" onclick="toggleMobileMenu()">Get started</a>
-            <a href="login.html" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu()">Sign in</a>
+            <a href="templates" class="site-nav-drawer-auth-btn site-nav-drawer-cta" onclick="toggleMobileMenu()">Get started</a>
+            <a href="login" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu()">Sign in</a>
           </div>
           <footer class="site-nav-drawer-footer">
 <div class="site-nav-drawer-theme">
@@ -133,11 +133,11 @@
         </div>
       </footer>
           <div class="site-nav-drawer-meta-row">
-            <a href="contact.html" onclick="toggleMobileMenu()">Contact</a>
+            <a href="contact" onclick="toggleMobileMenu()">Contact</a>
             <span class="site-nav-drawer-meta-dot" aria-hidden="true">·</span>
-            <a href="privacy.html" onclick="toggleMobileMenu()">Legal</a>
+            <a href="privacy" onclick="toggleMobileMenu()">Legal</a>
             <span class="site-nav-drawer-meta-dot" aria-hidden="true">·</span>
-            <a href="terms.html" onclick="toggleMobileMenu()">Terms</a>
+            <a href="terms" onclick="toggleMobileMenu()">Terms</a>
           </div>
         </div>
 </div>
@@ -147,50 +147,70 @@
     <div class="scroll-reveal-in xf-content-hero">
       <p class="xf-content-eyebrow">Legal</p>
       <h1 class="xf-content-title">Terms of Service</h1>
-      <p class="xf-content-lead">Simple rules. Be cool, use the library for your own work, and don’t steal the catalog.</p>
+      <p class="xf-content-lead">The rules for using X Freeze and for buying from us. Please read them before you use the site or make a purchase.</p>
     </div>
     <div class="scroll-reveal-in xf-prose" style="max-width:42rem">
 
-      <p>Hey - thanks for using <strong>X Freeze</strong>. This is a small independent site with ready-made Grok templates, motion prompts, and AI skills. I’m not affiliated with xAI or Grok. Updated July 2026.</p>
+      <p><strong>X Freeze</strong> (<a href="https://xfreeze.com">xfreeze.com</a>) sells ready to use Grok templates, motion prompts, and AI skills for creators. By using the site or buying anything from us, you agree to these Terms. We are an independent product and are not affiliated with, endorsed by, or connected to xAI or Grok. Last updated July 2026.</p>
 
-      <h2>The short version</h2>
+      <h2>What X Freeze is</h2>
+      <p>We provide a library of digital creative resources. Some of it is free to browse and use. Some of it is Pro content that you unlock with a paid plan or a one-time purchase. Many items are designed to be used inside Grok or other AI tools, which are run by other companies under their own terms.</p>
+
+      <h2>Your account</h2>
+      <p>You can browse most of the site without an account. Some features and purchases need you to sign in. You are responsible for keeping your login details safe and for activity that happens under your account. Tell us at once if you think your account has been used without your permission. You must be old enough to enter a binding agreement in your location to buy from us.</p>
+
+      <h2>How you may use the library</h2>
+      <p>When you have access to an item, you may use it for your own projects, whether personal or commercial. That includes copying a prompt, opening a template in Grok, installing a skill for yourself, and making ads, posts, or client work with it. What you create with these tools is yours, as long as you also follow the rules of the AI tool you used.</p>
+
+      <h2>What you may not do</h2>
       <ul>
-        <li>Use templates, skills, and prompts for <strong>your own projects</strong> (personal or commercial).</li>
-        <li><strong>Don’t resell</strong> them.</li>
-        <li><strong>Don’t redistribute</strong> the library (no zips, dumps, paid packs, clones, or “my catalog” copies).</li>
-        <li>Don’t pretend you’re xAI or that this is an official Grok product.</li>
-        <li>The site is free to browse and offered as-is - stuff can change or break.</li>
+        <li>Resell templates, skills, prompts, or packs, whether as they are or lightly changed</li>
+        <li>Reupload or share large parts of the library as your own product or catalog</li>
+        <li>Post our content on file dumps, drives, marketplaces, or servers for others to download</li>
+        <li>Scrape or bulk download the site to rebuild something similar</li>
+        <li>Share, resell, or give away paid access, or work around the paywall and access controls</li>
+        <li>Claim you are xAI or Grok, or that this is an official Grok product</li>
+        <li>Spam, hack, overload, or otherwise abuse the site</li>
       </ul>
+      <p>If you want a wider license for a team or a white-label use, email us first and we will work something out.</p>
 
-      <h2>What you can do</h2>
-      <p>Browse freely. Copy a prompt, open a template in Grok, install a skill for yourself, make ads, posts, client work - all good. What you create with those tools is yours (follow Grok’s rules too).</p>
+      <h2>Prices and payment</h2>
+      <p>Prices are shown on the <a href="pricing">Pricing</a> page and at checkout in US dollars. We may change prices at any time, but a change will not affect an order you have already paid for. Payments are handled by Paddle, which acts as the Merchant of Record and seller for your purchase. Paddle processes the payment, charges any applicable taxes, and its own terms and privacy policy also apply to the transaction. We do not see or store your full card details. You confirm that you are allowed to use the payment method you choose.</p>
 
-      <h2>Please don’t</h2>
-      <ul>
-        <li>Resell templates, skills, prompts, or packs</li>
-        <li>Reupload or share large parts of the library as your own product</li>
-        <li>Scrape the whole site to rebuild something similar</li>
-        <li>Put my catalog on Gumroad, Drive dumps, Discords, etc. for others to download</li>
-        <li>Spam, hack, or abuse the site</li>
-      </ul>
-      <p>If you want a special license (team, white-label, etc.), just email me first - I’m friendly.</p>
+      <h2>Pro plans and auto-renewal</h2>
+      <p>Pro Monthly and Pro Yearly are recurring subscriptions. Unless you cancel, they renew automatically at the end of each billing period, and your saved payment method is charged so that your access continues. You can cancel at any time from your <a href="account">Account</a> page or by emailing us. When you cancel, your Pro access stays active until the end of the period you have already paid for, and it is not renewed after that.</p>
 
-      <h2>Accounts, tips &amp; purchases</h2>
-      <p>Sign-in is optional when available. Keep your login safe. Tips (Buy Me a Coffee) and any paid items go through those payment sites - I don’t store your card. Digital purchases are usually final once you get access; if something’s broken on my side, message me and I’ll sort it out.</p>
+      <h2>Cancellations and refunds</h2>
+      <p>Because our items are digital and are delivered as soon as you buy them, all sales are final except in the limited cases set out in our <a href="refund">Refund Policy</a>. Please read that policy before you purchase. It explains when we refund a charge, how to ask for one, and how subscription renewals are handled.</p>
 
-      <h2>Third-party tools</h2>
-      <p>Links to Grok, SuperGrok, and other apps are just links. Their pricing and rules are on them, not me. Some templates may need SuperGrok - that’s Grok’s plan, not something I sell.</p>
+      <h2>Third-party tools and links</h2>
+      <p>Links to Grok, SuperGrok, and other apps are provided for convenience. Those services set their own pricing, features, and rules, and we do not control them. Some templates may need a Grok plan such as SuperGrok, which is Grok's product and is not something we sell or guarantee.</p>
 
-      <h2>As-is</h2>
-      <p>I build this in good faith, but I can’t promise every template will always work or that the site will never have downtime. Use at your own risk. I’m not liable for how you use third-party AI tools or for results you generate.</p>
+      <h2>Our content and yours</h2>
+      <p>The X Freeze name, the site, and the way our library is put together belong to us or our licensors. Buying access gives you the right to use an item under these Terms, not ownership of it. You keep the rights to the images, videos, and text you create with these tools, subject to the rules of the AI service you used.</p>
 
-      <h2>Questions</h2>
+      <h2>Service provided as is</h2>
+      <p>We build and maintain X Freeze in good faith, but we provide the site and its content on an "as is" and "as available" basis. We do not promise that every item will always work, that results will meet your expectations, or that the site will never have downtime or errors. You use the site and any output you generate at your own risk.</p>
+
+      <h2>Limitation of liability</h2>
+      <p>To the fullest extent allowed by law, X Freeze is not liable for indirect or consequential losses, lost profits, or lost data arising from your use of the site, our content, or any third-party AI tool. Where we are found liable despite this, our total liability to you is limited to the amount you paid us in the 12 months before the claim.</p>
+
+      <h2>Suspension</h2>
+      <p>We may limit, suspend, or close access for anyone who breaks these Terms, abuses the service, or attempts to bypass payment or access controls. Where it is fair to do so, we will try to warn you first.</p>
+
+      <h2>Changes to these Terms</h2>
+      <p>We may update these Terms from time to time. The version shown here is the one that applies, and we will update the date at the top when we make changes. If you keep using the site after a change, that means you accept the updated Terms.</p>
+
+      <h2>Governing terms and disputes</h2>
+      <p>These Terms are governed by the laws that apply where X Freeze operates. If you have a problem, please contact us first so we can try to resolve it directly. Most issues are sorted out quickly by email.</p>
+
+      <h2>Contact</h2>
       <p>
         <a href="mailto:contact@xfreeze.com">contact@xfreeze.com</a> ·
-        <a href="contact.html">Contact form</a> ·
+        <a href="contact">Contact form</a> ·
         <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer">@XFreeze</a>
       </p>
-      <p>Also see my simple <a href="privacy.html">Privacy note</a>.</p>
+      <p>See also our <a href="privacy">Privacy Policy</a> and <a href="refund">Refund Policy</a>.</p>
     </div>
   </main>
 

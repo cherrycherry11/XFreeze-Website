@@ -231,14 +231,14 @@
     if (ovCta) {
       if (pro) {
         ovCta.textContent = 'Manage plan';
-        ovCta.href = 'account.html#billing';
+        ovCta.href = 'account#billing';
         ovCta.onclick = function (e) {
           e.preventDefault();
           showTab('billing');
         };
       } else {
         ovCta.textContent = 'Upgrade to Pro';
-        ovCta.href = 'pricing.html';
+        ovCta.href = 'pricing';
         ovCta.onclick = null;
       }
     }
@@ -276,7 +276,7 @@
     if (bPrice) bPrice.innerHTML = priceHtml;
     if (bCta) {
       bCta.textContent = pro ? 'View pricing' : 'Upgrade to Pro';
-      bCta.href = 'pricing.html';
+      bCta.href = 'pricing';
     }
 
     var bStatus = $('xf-bill-status');
@@ -485,10 +485,10 @@
             reason: 'premium',
             from: 'account-favorites',
             code: item.id || item.code,
-          }) || 'pricing.html';
+          }) || 'pricing';
         externalLabel = 'Upgrade to Pro';
       } else {
-        externalHref = item.link || 'templates.html';
+        externalHref = item.link || 'templates';
         externalLabel = item.link ? 'Open in Grok' : 'Browse templates';
       }
       if (mediaEl) {
@@ -517,8 +517,8 @@
           : 'Saved skill. Open the pack to copy the install prompt.');
       copyText = item.description || title;
       externalHref = item.packId
-        ? 'skills.html#skill-pack/' + encodeURIComponent(item.packId)
-        : 'skills.html';
+        ? 'skills#skill-pack/' + encodeURIComponent(item.packId)
+        : 'skills';
       externalLabel = item.kind === 'pack' ? 'Open pack' : 'View on Skills';
       if (mediaEl) {
         mediaEl.hidden = true;
@@ -656,9 +656,9 @@
         '<div class="xf-fav-empty">' +
         'No favorites yet.<br>' +
         'Tap the <i class="fa-regular fa-heart" aria-hidden="true"></i> on ' +
-        '<a href="templates.html">templates</a>, ' +
-        '<a href="skills.html">skills</a>, or ' +
-        '<a href="prompt-library.html">prompts</a> to save them here.' +
+        '<a href="templates">templates</a>, ' +
+        '<a href="skills">skills</a>, or ' +
+        '<a href="prompt-library">prompts</a> to save them here.' +
         '</div>';
       return;
     }

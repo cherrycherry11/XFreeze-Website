@@ -74,9 +74,9 @@
   function successUrl() {
     try {
       var base = global.location.origin + global.location.pathname.replace(/[^/]+$/, '');
-      return base + 'checkout-success.html?provider=paddle';
+      return base + 'checkout-success?provider=paddle';
     } catch (e) {
-      return 'https://xfreeze.com/checkout-success.html?provider=paddle';
+      return 'https://xfreeze.com/checkout-success?provider=paddle';
     }
   }
 
@@ -132,13 +132,13 @@
           try {
             sessionStorage.setItem(
               'xf-auth-redirect',
-              (window.location.pathname.split('/').pop() || 'pricing.html') +
+              (window.location.pathname.split('/').pop() || 'pricing') +
                 window.location.search +
                 window.location.hash
             );
           } catch (e) {}
           if (auth.rememberRedirect) auth.rememberRedirect();
-          window.location.href = 'login.html';
+          window.location.href = 'login';
           return;
         }
       }

@@ -279,7 +279,7 @@
         title: 'Browse templates',
         desc: 'Pick a look on the Templates page. Every card opens the original in Grok Imagine - free, one tap.',
         cta: 'Open templates',
-        href: 'templates.html',
+        href: 'templates',
         icon: 'fa-wand-magic-sparkles',
       },
       {
@@ -287,7 +287,7 @@
         title: 'Copy a skill',
         desc: 'Find a skill pack, hit Copy prompt, and paste into Grok, Cursor, or Claude. Run slash commands like /meeting-notes.',
         cta: 'Browse skills',
-        href: 'skills.html',
+        href: 'skills',
         icon: 'fa-bolt',
       },
       {
@@ -295,7 +295,7 @@
         title: 'Learn the library',
         desc: 'See how X Freeze is built, what updates weekly, and how it relates to Grok Imagine.',
         cta: 'About X Freeze',
-        href: 'about.html',
+        href: 'about',
         icon: 'fa-circle-info',
       },
     ],

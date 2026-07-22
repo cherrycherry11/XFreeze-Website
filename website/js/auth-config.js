@@ -4,25 +4,25 @@
  * account.html is the only page that still requires sign-in on load.
  */
 var XF_PUBLIC_PAGES = [
-  'login.html',
-  'signup.html',
-  'home.html',
-  'index.html',
-  'terms.html',
-  'privacy.html',
-  'templates.html',
-  'skills.html',
-  'prompt-library.html',
-  'bundles.html',
-  'contact.html',
-  'connector-setup.html',
-  'about.html',
-  'pricing.html',
-  'skill-builder.html',
-  'workflows.html',
-  'use-cases.html',
-  'checkout-success.html',
-  'checkout-cancel.html',
+  'login',
+  'signup',
+  'home',
+  'index',
+  'terms',
+  'privacy',
+  'templates',
+  'skills',
+  'prompt-library',
+  'bundles',
+  'contact',
+  'connector-setup',
+  'about',
+  'pricing',
+  'skill-builder',
+  'workflows',
+  'use-cases',
+  'checkout-success',
+  'checkout-cancel',
 ];
 
 /**
@@ -30,7 +30,7 @@ var XF_PUBLIC_PAGES = [
  * Resource actions are gated separately in auth.js (copy / open / use).
  */
 var XF_PROTECTED_PAGES = [
-  'account.html',
+  'account',
 ];
 
 /**
@@ -38,7 +38,8 @@ var XF_PROTECTED_PAGES = [
  */
 (function () {
   var page = (location.pathname.split('/').pop() || '').split('?')[0];
-  if (!page || page === 'index.html') page = 'home.html';
+  if (!page || page === 'index' || page === 'index.html') page = 'home';
+  if (page.length > 5 && page.slice(-5) === '.html') page = page.slice(0, -5);
   if (XF_PROTECTED_PAGES.indexOf(page) !== -1) {
     document.documentElement.classList.add('xf-auth-pending');
   }
@@ -60,8 +61,8 @@ window.XFreezeAuthConfig = {
   supabaseUrl: 'https://ekmllicbgmuodptvgxsl.supabase.co',
   supabaseAnonKey: 'sb_publishable_hwfaIz4HJxim1Rb3o04-UA_jyyoJgfY',
   siteUrl: 'https://xfreeze.com',
-  loginPath: 'login.html',
-  defaultRedirect: 'home.html',
+  loginPath: 'login',
+  defaultRedirect: 'home',
 
   /* Same Google OAuth Web Client ID as Supabase (for One Tap / GIS). */
   googleClientId: '420941566311-7ms3q9vd5p6er0j1lmvnumug51c6dsqb.apps.googleusercontent.com',

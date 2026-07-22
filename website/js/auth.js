@@ -54,7 +54,7 @@
 
   function loginUrl() {
     var c = config();
-    var path = c.loginPath || 'login.html';
+    var path = c.loginPath || 'login';
     return siteOrigin() + '/' + path.replace(/^\//, '');
   }
 
@@ -79,17 +79,21 @@
       return stored;
     }
 
-    return c.defaultRedirect || 'home.html';
+    return c.defaultRedirect || 'home';
   }
 
   function currentPage() {
     var page = (window.location.pathname.split('/').pop() || '').split('?')[0];
-    if (!page || page === 'index.html') return 'home.html';
+    if (!page || page === 'index' || page === 'index.html') return 'home';
+    /* Support both /pricing and legacy /pricing.html */
+    if (page.length > 5 && page.slice(-5) === '.html') {
+      page = page.slice(0, -5);
+    }
     return page;
   }
 
   function loginPageName() {
-    var path = config().loginPath || 'login.html';
+    var path = config().loginPath || 'login';
     return path.split('/').pop();
   }
 
@@ -104,13 +108,13 @@
   }
 
   function loginPageUrl() {
-    return config().loginPath || 'login.html';
+    return config().loginPath || 'login';
   }
 
   function shouldStayOnLoginPage() {
     var page = currentPage();
     /* Always allow the login + signup pages to render */
-    if (page === 'signup.html' || page === loginPageName()) return true;
+    if (page === 'signup' || page === loginPageName()) return true;
     if (isOAuthCallback()) return true;
     return false;
   }
@@ -129,18 +133,18 @@
 
   function publicPages() {
     var c = config();
-    return c.publicPages || ['login.html', 'signup.html', 'home.html'];
+    return c.publicPages || ['login', 'signup', 'home'];
   }
 
   function protectedPages() {
     var c = config();
     return (
       c.protectedPages || [
-        'templates.html',
-        'skills.html',
-        'bundles.html',
-                'contact.html',
-        'connector-setup.html',
+        'templates',
+        'skills',
+        'bundles',
+        'contact',
+        'connector-setup',
       ]
     );
   }
@@ -152,7 +156,7 @@
   function isProtectedPage(page) {
     if (!page) return false;
     if (publicPages().indexOf(page) !== -1) return false;
-    if (page === loginPageName() || page === 'signup.html') return false;
+    if (page === loginPageName() || page === 'signup') return false;
     /* Only pages listed in protectedPages require sign-in on load. */
     return protectedPages().indexOf(page) !== -1;
   }
@@ -195,7 +199,7 @@
 
     var page = pageFromHref(href);
     if (!page) return false;
-    if (page === loginPageName() || page === 'signup.html') return false;
+    if (page === loginPageName() || page === 'signup') return false;
     return isProtectedPage(page);
   }
 
@@ -404,10 +408,10 @@
   function renderNavSlot() {
     var slot = document.getElementById('xf-auth-nav');
     var signedOutNav =
-      '<a href="login.html" class="site-nav-auth-btn" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign in</a>';
+      '<a href="login" class="site-nav-auth-btn" onclick="window.XFreezeAuth && window.XFreezeAuth.rememberRedirect()">Sign in</a>';
     var signedOutDrawer =
-      '<a href="templates.html" class="site-nav-drawer-auth-btn site-nav-drawer-cta" onclick="toggleMobileMenu && toggleMobileMenu()">Get started</a>' +
-      '<a href="login.html" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu && toggleMobileMenu()">Sign in</a>';
+      '<a href="templates" class="site-nav-drawer-auth-btn site-nav-drawer-cta" onclick="toggleMobileMenu && toggleMobileMenu()">Get started</a>' +
+      '<a href="login" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu && toggleMobileMenu()">Sign in</a>';
 
     if (!slot && !document.getElementById('xf-auth-drawer')) return;
 
@@ -462,8 +466,8 @@
         '</button>' +
         '<div class="site-nav-user-menu" id="xf-auth-user-menu" hidden>' +
         '<div class="site-nav-user-email">' + escapeHtml(email) + '</div>' +
-        '<a href="account.html" class="site-nav-user-menu-link"><i class="fa-regular fa-user" aria-hidden="true"></i> Account</a>' +
-        '<a href="account.html#billing" class="site-nav-user-menu-link"><i class="fa-regular fa-credit-card" aria-hidden="true"></i> Billing</a>' +
+        '<a href="account" class="site-nav-user-menu-link"><i class="fa-regular fa-user" aria-hidden="true"></i> Account</a>' +
+        '<a href="account#billing" class="site-nav-user-menu-link"><i class="fa-regular fa-credit-card" aria-hidden="true"></i> Billing</a>' +
         '<button type="button" id="xf-auth-sign-out"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Sign out</button>' +
         '</div>' +
         '</div>';
@@ -497,7 +501,7 @@
     }
 
     renderDrawerAuth(
-      '<a href="account.html" class="site-nav-drawer-auth-btn site-nav-drawer-cta" onclick="toggleMobileMenu && toggleMobileMenu()">Account</a>' +
+      '<a href="account" class="site-nav-drawer-auth-btn site-nav-drawer-cta" onclick="toggleMobileMenu && toggleMobileMenu()">Account</a>' +
         '<button type="button" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" id="xf-auth-drawer-sign-out">' +
         '<i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Sign out' +
         '</button>' +
@@ -680,7 +684,7 @@
 
   function detectAuthMode() {
     var page = currentPage();
-    if (page === 'signup.html') return 'signup';
+    if (page === 'signup') return 'signup';
     var params = new URLSearchParams(window.location.search || '');
     if (params.get('mode') === 'signup' || params.get('signup') === '1') return 'signup';
     var attr = document.documentElement.getAttribute('data-xf-auth-mode');
@@ -1042,11 +1046,11 @@
 
     var sb = getClient();
     if (!sb) {
-      showAuthNotice('error', 'Auth is not configured.', 'login.html', 'Sign in');
+      showAuthNotice('error', 'Auth is not configured.', 'login', 'Sign in');
       return;
     }
     if (!response || !response.credential) {
-      showAuthNotice('error', 'Google did not return a credential. Try Sign in → Google.', 'login.html', 'Sign in');
+      showAuthNotice('error', 'Google did not return a credential. Try Sign in → Google.', 'login', 'Sign in');
       return;
     }
 
@@ -1078,7 +1082,7 @@
 
       if (result.error) {
         console.warn('[xf-auth] Google One Tap failed', result.error);
-        showAuthNotice('error', friendlyOneTapError(result.error), 'login.html', 'Sign in');
+        showAuthNotice('error', friendlyOneTapError(result.error), 'login', 'Sign in');
         return;
       }
 
@@ -1095,7 +1099,7 @@
         showAuthNotice(
           'error',
           'Google accepted the sign-in, but no session was saved. Try Sign in → Google.',
-          'login.html',
+          'login',
           'Sign in'
         );
         return;
@@ -1118,7 +1122,7 @@
       }
     } catch (err) {
       console.warn('[xf-auth] Google One Tap error', err);
-      showAuthNotice('error', friendlyOneTapError(err), 'login.html', 'Sign in');
+      showAuthNotice('error', friendlyOneTapError(err), 'login', 'Sign in');
     } finally {
       googleOneTapBusy = false;
     }
@@ -1253,7 +1257,7 @@
 
     if (document.getElementById('xf-auth-page')) {
       if (!isOAuthCallback() && session && session.user && !shouldStayOnLoginPage()) {
-        window.location.replace(config().defaultRedirect || 'home.html');
+        window.location.replace(config().defaultRedirect || 'home');
         return;
       }
       await handleLoginCallback();

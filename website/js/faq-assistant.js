@@ -22,9 +22,9 @@
       title: 'Build your own custom skill',
       terms: ['build skill', 'custom skill', 'create skill', 'own skill', 'skill builder', 'make skill', 'new skill', 'build my own'],
       picks: [
-        { id: 'skill-builder', label: 'Skill Builder', href: 'skill-builder.html', desc: 'Free wizard - answer five questions and get a meta-prompt for your AI.' },
-        { id: 'create-skill', label: 'Build with your AI', href: 'skill-builder.html', desc: 'Your AI drafts, tests, and refines a SKILL.md with you - no backend.' },
-        { id: 'contact', label: 'Done-for-you request', href: 'contact.html?topic=skill', desc: 'Prefer hands-off? Request a custom skill from me.' }
+        { id: 'skill-builder', label: 'Skill Builder', href: 'skill-builder', desc: 'Free wizard - answer five questions and get a meta-prompt for your AI.' },
+        { id: 'create-skill', label: 'Build with your AI', href: 'skill-builder', desc: 'Your AI drafts, tests, and refines a SKILL.md with you - no backend.' },
+        { id: 'contact', label: 'Done-for-you request', href: 'contact?topic=skill', desc: 'Prefer hands-off? Request a custom skill from me.' }
       ]
     },
     {
@@ -288,7 +288,7 @@
   }
 
   function skillPackHref(pack) {
-    return basePath() + 'skills.html#skill-pack/' + encodeURIComponent(pack);
+    return basePath() + 'skills#skill-pack/' + encodeURIComponent(pack);
   }
 
   function hasSkillIntent(query) {
@@ -433,7 +433,7 @@
 
   function formatSkillPick(pick) {
     var name = pick.label || prettySkillName(pick.id);
-    var href = pick.href || (pick.pack ? skillPackHref(pick.pack) : basePath() + 'skills.html');
+    var href = pick.href || (pick.pack ? skillPackHref(pick.pack) : basePath() + 'skills');
     var desc = pick.desc || 'Open the pack and copy the install prompt.';
     var slash = pick.slash || (pick.pack ? skillSlash(pick.id) : '');
 
@@ -451,7 +451,7 @@
     return (
       'For <strong>' + escHtml(title) + '</strong>, start here:' +
       '<ul class="xf-faq-bot__skill-list">' + list + '</ul>' +
-      'Open a pack on the <a href="' + escHtml(basePath() + 'skills.html') + '">Skills page</a>, hit <strong>Copy prompt</strong>, and paste into Grok, Claude, or Cursor.'
+      'Open a pack on the <a href="' + escHtml(basePath() + 'skills') + '">Skills page</a>, hit <strong>Copy prompt</strong>, and paste into Grok, Claude, or Cursor.'
     );
   }
 

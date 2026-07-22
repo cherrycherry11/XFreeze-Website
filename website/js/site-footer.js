@@ -5,19 +5,20 @@
   'use strict';
 
   var PAGE_MAP = {
-    'home.html': 'home',
-    'templates.html': 'templates',
-    'about.html': 'about',
-    'skills.html': 'skills',
-    'skill-builder.html': 'skills',
-    'prompt-library.html': 'prompts',
-    'contact.html': 'contact',
-    'pricing.html': 'pricing',
-    'workflows.html': 'workflows',
-    'use-cases.html': 'use-cases',
-    'account.html': 'account',
-    'privacy.html': 'privacy',
-    'terms.html': 'terms',
+    'home': 'home',
+    'templates': 'templates',
+    'about': 'about',
+    'skills': 'skills',
+    'skill-builder': 'skills',
+    'prompt-library': 'prompts',
+    'contact': 'contact',
+    'pricing': 'pricing',
+    'workflows': 'workflows',
+    'use-cases': 'use-cases',
+    'account': 'account',
+    'privacy': 'privacy',
+    'terms': 'terms',
+    'refund': 'refund',
   };
 
   var CRYPTO_ADDRESSES = {
@@ -30,34 +31,34 @@
     {
       title: 'Explore',
       links: [
-        { href: 'home.html', label: 'Home', nav: 'home' },
-        { href: 'templates.html', label: 'Templates', nav: 'templates' },
-        { href: 'prompt-library.html', label: 'Motion prompts', nav: 'prompts' },
-        { href: 'skills.html', label: 'Skills', nav: 'skills' },
-        { href: 'pricing.html', label: 'Pricing', nav: 'pricing' },
-        { href: 'about.html', label: 'About', nav: 'about' },
-        { href: 'contact.html', label: 'Contact', nav: 'contact' },
+        { href: 'home', label: 'Home', nav: 'home' },
+        { href: 'templates', label: 'Templates', nav: 'templates' },
+        { href: 'prompt-library', label: 'Motion prompts', nav: 'prompts' },
+        { href: 'skills', label: 'Skills', nav: 'skills' },
+        { href: 'pricing', label: 'Pricing', nav: 'pricing' },
+        { href: 'about', label: 'About', nav: 'about' },
+        { href: 'contact', label: 'Contact', nav: 'contact' },
       ],
     },
     {
       title: 'Templates',
       links: [
-        { href: 'templates.html?cat=Product', label: 'Product' },
-        { href: 'templates.html?cat=Mockup%27s', label: "Mockup's" },
-        { href: 'templates.html?cat=Style+Edit', label: 'Style Edit' },
-        { href: 'templates.html?cat=Make-up', label: 'Make-up' },
-        { href: 'templates.html?cat=Filters', label: 'Filters' },
-        { href: 'templates.html?cat=Common+Uses', label: 'Common Uses' },
+        { href: 'templates?cat=Product', label: 'Product' },
+        { href: 'templates?cat=Mockup%27s', label: "Mockup's" },
+        { href: 'templates?cat=Style+Edit', label: 'Style Edit' },
+        { href: 'templates?cat=Make-up', label: 'Make-up' },
+        { href: 'templates?cat=Filters', label: 'Filters' },
+        { href: 'templates?cat=Common+Uses', label: 'Common Uses' },
       ],
     },
     {
       title: 'Guides',
       links: [
-        { href: 'skill-builder.html', label: 'Skill Builder' },
-        { href: 'connector-setup.html', label: 'Connector setup' },
-        { href: 'use-cases.html', label: 'Use cases', nav: 'use-cases' },
-        { href: 'workflows.html', label: 'Workflow combos', nav: 'workflows' },
-        { href: 'account.html', label: 'My Library', nav: 'account' },
+        { href: 'skill-builder', label: 'Skill Builder' },
+        { href: 'connector-setup', label: 'Connector setup' },
+        { href: 'use-cases', label: 'Use cases', nav: 'use-cases' },
+        { href: 'workflows', label: 'Workflow combos', nav: 'workflows' },
+        { href: 'account', label: 'My Library', nav: 'account' },
       ],
     },
     {
@@ -67,8 +68,9 @@
         { href: 'https://grok.com', label: 'grok.com', external: true },
         { href: 'https://grok.com/imagine', label: 'Grok Imagine', external: true },
         { href: 'https://buymeacoffee.com/xfreeze', label: 'Buy me a coffee', external: true },
-        { href: 'privacy.html', label: 'Privacy', nav: 'privacy' },
-        { href: 'terms.html', label: 'Terms', nav: 'terms' },
+        { href: 'privacy', label: 'Privacy', nav: 'privacy' },
+        { href: 'terms', label: 'Terms', nav: 'terms' },
+        { href: 'refund', label: 'Refunds', nav: 'refund' },
         { href: 'mailto:contact@xfreeze.com', label: 'contact@xfreeze.com' },
       ],
     },
@@ -80,7 +82,8 @@
   }
 
   function currentPageKey() {
-    var file = (location.pathname.split('/').pop() || 'home.html').split('?')[0];
+    var file = (location.pathname.split('/').pop() || 'home').split('?')[0];
+    if (file.length > 5 && file.slice(-5) === '.html') file = file.slice(0, -5);
     return PAGE_MAP[file] || '';
   }
 
@@ -145,7 +148,7 @@
       '<div class="xf-footer-shell">' +
       '<div class="xf-footer-brand">' +
       '<p class="xf-footer-eyebrow">AI library for</p>' +
-      '<a href="' + base + 'home.html" class="xf-footer-logo">X Freeze</a>' +
+      '<a href="' + base + 'home" class="xf-footer-logo">X Freeze</a>' +
       '<p class="xf-footer-tagline" data-xf-tagline>Ready-made AI assets for everything you ship.</p>' +
       '<a href="https://buymeacoffee.com/xfreeze" class="xf-footer-coffee" target="_blank" rel="noopener noreferrer">' +
       '<i class="fa-solid fa-mug-hot" aria-hidden="true"></i>' +
@@ -221,14 +224,14 @@
     if (!key) return;
 
     var hrefMap = {
-      home: 'home.html',
-      templates: 'templates.html',
-      about: 'about.html',
-      skills: 'skills.html',
-      contact: 'contact.html',
-      workflows: 'workflows.html',
-      'use-cases': 'use-cases.html',
-      account: 'account.html',
+      home: 'home',
+      templates: 'templates',
+      about: 'about',
+      skills: 'skills',
+      contact: 'contact',
+      workflows: 'workflows',
+      'use-cases': 'use-cases',
+      account: 'account',
     };
 
     var target = hrefMap[key];

@@ -1,4 +1,4 @@
-const { json } = require('../_lib/razorpay-client');
+const { json } = require('../_lib/http');
 const { handlePreflight, applyCors } = require('../_lib/cors');
 const { getUserFromRequest, hasServiceRole } = require('../_lib/supabase');
 const {

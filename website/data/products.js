@@ -1,6 +1,6 @@
 /**
- * X Freeze product catalog - single source of truth for checkout pricing.
- * Used by static pages and validated server-side in payment-server/products.js
+ * X Freeze product catalog (display / plan ids).
+ * Paid checkout is offline — rebuild payments separately.
  */
 (function (global) {
   const BUNDLES = {
@@ -13,22 +13,19 @@
     ultimate: { id: 'ultimate', name: 'Ultimate Library', price: 79, type: 'bundle' },
   };
 
-  /**
-   * Subscription plans — billed in USD via Dodo Payments.
-   * TEMP: $1 test pricing for live smoke tests (restore $49 / $499 for retail).
-   */
+  /** Subscription plan display catalog (checkout offline). */
   const SUBSCRIPTIONS = {
     'pro-monthly': {
       id: 'pro-monthly',
       name: 'Pro Monthly',
-      price: 1,
+      price: 49,
       type: 'subscription',
       interval: 'month',
     },
     'pro-yearly': {
       id: 'pro-yearly',
       name: 'Pro Yearly',
-      price: 1,
+      price: 499,
       type: 'subscription',
       interval: 'year',
     },

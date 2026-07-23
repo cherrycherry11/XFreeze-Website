@@ -1,6 +1,5 @@
 const { handlePreflight, applyCors } = require('./_lib/cors');
 const { hasServiceRole, hasSupabase } = require('./_lib/supabase');
-const { hasDodo, productsReady, dodoEnv } = require('./_lib/dodo');
 
 module.exports = function handler(req, res) {
   if (handlePreflight(req, res, 'GET,OPTIONS')) return;
@@ -12,18 +11,13 @@ module.exports = function handler(req, res) {
   res.end(
     JSON.stringify({
       ok: true,
-      provider: 'dodo',
-      configured: Boolean(hasDodo() && productsReady() && hasServiceRole()),
-      dodo: hasDodo(),
-      dodoEnv: dodoEnv(),
-      dodoProducts: productsReady(),
+      payments: false,
+      provider: null,
+      configured: false,
       entitlements: hasServiceRole(),
       supabase: hasSupabase(),
-      razorpay: false,
-      paddle: false,
-      stripe: false,
-      paypal: false,
       host: 'vercel',
+      note: 'Payment integration removed — rebuild from a clean slate.',
     })
   );
 };

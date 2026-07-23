@@ -2,8 +2,6 @@
   "name": "xfreeze-website",
   "private": true,
   "version": "1.0.0",
-  "description": "X Freeze static site + Vercel serverless payment API",
-  "dependencies": {
-    "razorpay": "^2.9.8"
-  }
+  "description": "X Freeze static site + Vercel serverless APIs",
+  "dependencies": {}
 }

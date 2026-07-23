@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" data-xf-meta-title="Payment result - X Freeze" data-xf-meta-desc="Your X Freeze purchase result." data-xf-meta-path="checkout-success">
+<html lang="en" data-xf-meta-title="Checkout - X Freeze" data-xf-meta-desc="Checkout is offline." data-xf-meta-path="checkout-success">
 <head>
   <link rel="icon" href="/favicon.ico?v=share3" type="image/x-icon">
-  <link rel="icon" href="/favicon.png?v=share3" type="image/png" sizes="48x48">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payment result - X Freeze</title>
+  <title>Checkout offline - X Freeze</title>
   <script>
     (function () {
       var stored = localStorage.getItem('xfreeze-theme');
@@ -17,518 +16,47 @@
     })();
   </script>
   <link rel="stylesheet" href="css/site-fonts.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="css/theme-dark.css">
   <style>
-    :root {
-      --text: #0a0a0a;
-      --text-secondary: #52525b;
-      --border: #e5e7eb;
-      --surface: #ffffff;
-      --surface-elevated: #fafafa;
-      --surface-muted: #f4f4f5;
-      --success: #15803d;
-      --success-soft: #dcfce7;
-      --danger: #dc2626;
-      --danger-soft: #fee2e2;
-      --warn: #ca8a04;
-      --warn-soft: #fef9c3;
-    }
-    html.dark {
-      color-scheme: dark;
-      --text: #f5f5f5;
-      --text-secondary: #a3a3a3;
-      --border: #2a2a2a;
-      --surface: #0a0a0a;
-      --surface-elevated: #121212;
-      --surface-muted: #1c1c1c;
-      --success: #4ade80;
-      --success-soft: rgba(74, 222, 128, 0.12);
-      --danger: #f87171;
-      --danger-soft: rgba(248, 113, 113, 0.12);
-      --warn: #facc15;
-      --warn-soft: rgba(250, 204, 21, 0.12);
-    }
-    * { box-sizing: border-box; }
     body {
-      margin: 0;
+      font-family: var(--font-sans, system-ui, sans-serif);
       min-height: 100vh;
-      font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
-      background: var(--surface);
-      color: var(--text);
+      margin: 0;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
+      background: #fff;
+      color: #0a0a0a;
     }
-    .xf-success {
-      width: 100%;
-      max-width: 26rem;
-      text-align: center;
-    }
-    .xf-success-card {
-      padding: 2rem 1.5rem 1.75rem;
-      border-radius: 1.25rem;
-      border: 1px solid var(--border);
-      background: var(--surface-elevated);
-      box-shadow: 0 24px 48px -28px rgba(0, 0, 0, 0.35);
-    }
-    .xf-success-mark {
-      width: 4rem;
-      height: 4rem;
-      margin: 0 auto 1.25rem;
-      border-radius: 9999px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--success-soft);
-      color: var(--success);
-      font-size: 1.5rem;
-    }
-    .xf-success-card.is-failed .xf-success-mark {
-      background: var(--danger-soft);
-      color: var(--danger);
-    }
-    .xf-success-card.is-pending .xf-success-mark {
-      background: var(--warn-soft);
-      color: var(--warn);
-    }
-    .xf-success-eyebrow {
-      margin: 0 0 0.4rem;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-    }
-    .xf-success-title {
-      margin: 0 0 0.65rem;
-      font-size: 1.65rem;
-      font-weight: 650;
-      letter-spacing: -0.03em;
-      line-height: 1.2;
-    }
-    .xf-success-lead {
-      margin: 0;
-      font-size: 0.9375rem;
-      line-height: 1.55;
-      color: var(--text-secondary);
-    }
-    .xf-success-plan {
-      margin: 1.35rem 0 0;
-      padding: 0.9rem 1rem;
-      border-radius: 0.9rem;
-      background: var(--surface-muted);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      text-align: left;
-    }
-    .xf-success-plan[hidden] { display: none; }
-    .xf-success-plan__name { font-size: 0.9rem; font-weight: 600; }
-    .xf-success-plan__price {
-      font-size: 1.05rem;
-      font-weight: 650;
-      letter-spacing: -0.02em;
-      white-space: nowrap;
-    }
-    .xf-success-steps {
-      margin: 1.35rem 0 0;
-      padding: 0;
-      list-style: none;
-      text-align: left;
-      display: flex;
-      flex-direction: column;
-      gap: 0.65rem;
-    }
-    .xf-success-steps[hidden] { display: none; }
-    .xf-success-steps li {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.65rem;
-      font-size: 0.8125rem;
-      line-height: 1.45;
-      color: var(--text-secondary);
-    }
-    .xf-success-steps i {
-      margin-top: 0.15rem;
-      color: var(--success);
-      font-size: 0.75rem;
-      width: 1rem;
-      text-align: center;
-      flex-shrink: 0;
-    }
-    .xf-success-actions {
-      margin-top: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.55rem;
-    }
-    .xf-success-btn {
+    html.dark body { background: #0a0a0a; color: #f2f5f3; }
+    .card { max-width: 28rem; text-align: center; }
+    h1 { font-size: 1.5rem; margin: 0 0 0.75rem; }
+    p { color: #52525b; font-size: 0.9rem; line-height: 1.5; }
+    html.dark p { color: #8a958c; }
+    a {
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 2.85rem;
-      padding: 0.7rem 1.25rem;
+      margin-top: 1.5rem;
+      padding: 0.65rem 1.25rem;
       border-radius: 9999px;
-      font-size: 0.9rem;
-      font-weight: 600;
+      border: 1px solid #e5e7eb;
+      color: inherit;
       text-decoration: none;
-      transition: opacity 0.15s ease;
-    }
-    .xf-success-btn:hover { opacity: 0.92; }
-    .xf-success-btn--primary {
-      background: var(--text);
-      color: var(--surface);
-      border: none;
-    }
-    html.dark .xf-success-btn--primary {
-      background: #f2f5f3;
-      color: #020403;
-    }
-    .xf-success-btn--ghost {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .xf-success-ref {
-      margin: 1.25rem 0 0;
-      font-size: 0.7rem;
-      color: var(--text-secondary);
-      opacity: 0.75;
-      word-break: break-all;
-      line-height: 1.4;
-    }
-    .xf-success-ref[hidden] { display: none; }
-    .xf-success-logo {
-      margin-top: 1.75rem;
-      font-size: 0.9rem;
+      font-size: 0.875rem;
       font-weight: 600;
-      letter-spacing: -0.02em;
-      color: var(--text-secondary);
-      text-decoration: none;
     }
-    .xf-success-logo:hover { color: var(--text); }
+    html.dark a { border-color: #1f2623; }
   </style>
 </head>
 <body>
-  <main class="xf-success">
-    <div class="xf-success-card" id="success-card">
-      <div class="xf-success-mark" id="success-mark" aria-hidden="true">
-        <i class="fa-solid fa-spinner fa-spin" id="success-icon"></i>
-      </div>
-      <p class="xf-success-eyebrow" id="success-eyebrow">Confirming payment…</p>
-      <h1 class="xf-success-title" id="success-title">One moment</h1>
-      <p class="xf-success-lead" id="success-lead">
-        Unlocking Pro on your account. This can take a few seconds.
-      </p>
-
-      <div class="xf-success-plan" id="success-plan" hidden>
-        <span class="xf-success-plan__name" id="success-plan-name">Pro</span>
-        <span class="xf-success-plan__price" id="success-plan-price"></span>
-      </div>
-
-      <ul class="xf-success-steps" id="success-steps" hidden>
-        <li>
-          <i class="fa-solid fa-check" aria-hidden="true"></i>
-          <span>Access templates, motion prompts, and AI skills</span>
-        </li>
-        <li>
-          <i class="fa-solid fa-check" aria-hidden="true"></i>
-          <span>Copy prompts into Grok, Claude, Cursor, or GPT</span>
-        </li>
-        <li>
-          <i class="fa-solid fa-check" aria-hidden="true"></i>
-          <span>Pro unlocks after payment is verified on the server</span>
-        </li>
-      </ul>
-
-      <div class="xf-success-actions">
-        <a class="xf-success-btn xf-success-btn--primary" id="success-primary" href="account">View account</a>
-        <a class="xf-success-btn xf-success-btn--ghost" id="success-secondary" href="pricing">Back to pricing</a>
-        <a class="xf-success-btn xf-success-btn--ghost" href="skills">Explore skills</a>
-      </div>
-
-      <p class="xf-success-ref" id="success-ref" hidden></p>
-    </div>
-    <a class="xf-success-logo" href="home">X Freeze</a>
-  </main>
-
-  <script src="js/auth-config.js"></script>
-  <script src="data/products.js"></script>
-  <script src="js/entitlement.js"></script>
-  <script src="js/usage.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/auth.js"></script>
-  <script>
-    (function () {
-      var params = new URLSearchParams(window.location.search);
-      var paymentId = params.get('payment_id') || params.get('paymentId') || '';
-      var planId = params.get('plan') || '';
-      var statusRaw = (
-        params.get('status') ||
-        params.get('payment_status') ||
-        params.get('paymentStatus') ||
-        ''
-      ).toLowerCase();
-
-      function isFailedStatus(s) {
-        return /^(failed|fail|declined|cancelled|canceled|error)$/.test(s);
-      }
-      function isSuccessStatus(s) {
-        return /^(succeeded|success|paid|active|completed)$/.test(s);
-      }
-
-      function catalogPlan(id) {
-        if (window.XFreezeProducts && window.XFreezeProducts.getSubscription) {
-          var p = window.XFreezeProducts.getSubscription(id);
-          if (p) return p;
-        }
-        if (id === 'pro-yearly') {
-          return { id: 'pro-yearly', name: 'Pro Yearly', price: 1, type: 'subscription', interval: 'year' };
-        }
-        if (id === 'pro-monthly') {
-          return { id: 'pro-monthly', name: 'Pro Monthly', price: 1, type: 'subscription', interval: 'month' };
-        }
-        return null;
-      }
-
-      function readProduct() {
-        try {
-          var a = sessionStorage.getItem('xf_pending_product');
-          if (a) return JSON.parse(a);
-        } catch (e) {}
-        try {
-          var b = localStorage.getItem('xf_pending_product');
-          if (b) return JSON.parse(b);
-        } catch (e2) {}
-        return null;
-      }
-
-      function sleep(ms) {
-        return new Promise(function (r) {
-          setTimeout(r, ms);
-        });
-      }
-
-      /** Wait until Supabase session + access token exist (return from Dodo needs this). */
-      async function waitForToken() {
-        for (var i = 0; i < 30; i++) {
-          try {
-            if (window.XFreezeAuth && window.XFreezeAuth.refreshSession) {
-              await window.XFreezeAuth.refreshSession();
-            }
-          } catch (e) {}
-          var token = '';
-          try {
-            if (window.XFreezeEntitlement && window.XFreezeEntitlement.getAccessToken) {
-              token = window.XFreezeEntitlement.getAccessToken() || '';
-            }
-            if (!token && window.XFreezeAuth && window.XFreezeAuth.getSession) {
-              var s = window.XFreezeAuth.getSession();
-              token = (s && s.access_token) || '';
-            }
-          } catch (e2) {}
-          if (token) return token;
-          await sleep(250);
-        }
-        return '';
-      }
-
-      function setUi(mode, leadText) {
-        var card = document.getElementById('success-card');
-        var icon = document.getElementById('success-icon');
-        var eyebrow = document.getElementById('success-eyebrow');
-        var title = document.getElementById('success-title');
-        var lead = document.getElementById('success-lead');
-        var steps = document.getElementById('success-steps');
-        var primary = document.getElementById('success-primary');
-        var secondary = document.getElementById('success-secondary');
-
-        card.classList.remove('is-failed', 'is-pending');
-        if (mode === 'failed') {
-          card.classList.add('is-failed');
-          icon.className = 'fa-solid fa-xmark';
-          eyebrow.textContent = 'Payment failed';
-          title.textContent = 'Payment not completed';
-          steps.hidden = true;
-          primary.href = 'pricing';
-          primary.textContent = 'Try again';
-          secondary.href = 'account';
-          secondary.textContent = 'View account';
-        } else if (mode === 'success') {
-          icon.className = 'fa-solid fa-check';
-          eyebrow.textContent = 'Payment confirmed';
-          title.textContent = "You're all set";
-          steps.hidden = false;
-          primary.href = 'account';
-          primary.textContent = 'View account';
-          secondary.href = 'templates';
-          secondary.textContent = 'Browse templates';
-        } else {
-          card.classList.add('is-pending');
-          icon.className = 'fa-solid fa-circle-exclamation';
-          eyebrow.textContent = 'Almost there';
-          title.textContent = 'Payment pending';
-          steps.hidden = true;
-          primary.href = 'account';
-          primary.textContent = 'View account';
-          secondary.href = 'pricing';
-          secondary.textContent = 'Back to pricing';
-        }
-        lead.textContent = leadText || '';
-      }
-
-      var product = readProduct();
-      if (!product && planId) product = catalogPlan(planId);
-
-      var planEl = document.getElementById('success-plan');
-      var planName = document.getElementById('success-plan-name');
-      var planPrice = document.getElementById('success-plan-price');
-      var ref = document.getElementById('success-ref');
-
-      if (product && product.name) {
-        var priceNum = Number(product.price);
-        var price = '$' + (Number.isInteger(priceNum) ? priceNum : priceNum.toFixed(2));
-        planEl.hidden = false;
-        planName.textContent = product.name;
-        planPrice.textContent = price;
-      }
-
-      if (isFailedStatus(statusRaw)) {
-        setUi(
-          'failed',
-          'Your card was declined or the payment did not complete. In Dodo test mode use card 4242 4242 4242 4242 (any future expiry, any CVC). Real cards are rejected. Pro was not unlocked.'
-        );
-        if (paymentId) {
-          ref.hidden = false;
-          ref.textContent = 'Reference: ' + paymentId + ' · status: ' + statusRaw;
-        }
-        try {
-          sessionStorage.removeItem('xf_pending_product');
-          localStorage.removeItem('xf_pending_product');
-        } catch (e0) {}
-        return;
-      }
-
-      (async function run() {
-        var token = await waitForToken();
-        var verifyOk = false;
-        var lastErr = '';
-
-        var mayVerify =
-          paymentId &&
-          !isFailedStatus(statusRaw) &&
-          (isSuccessStatus(statusRaw) || !statusRaw);
-
-        if (token) {
-          /* Prefer explicit payment_id; otherwise recover latest succeeded Dodo pay for this user */
-          for (var attempt = 0; attempt < 8; attempt++) {
-            try {
-              document.getElementById('success-lead').textContent =
-                attempt === 0
-                  ? 'Confirming payment and unlocking Pro…'
-                  : 'Still unlocking Pro… (' + (attempt + 1) + '/8)';
-
-              var endpoint = paymentId ? '/api/verify-payment' : '/api/verify-payment';
-              var payload = paymentId
-                ? {
-                    payment_id: paymentId,
-                    planId: planId || (product && product.id) || 'pro-monthly',
-                  }
-                : {
-                    planId: planId || (product && product.id) || 'pro-monthly',
-                  };
-
-              /* Always try recover-pro on later attempts (finds payment by user_id) */
-              if (attempt >= 2 || !paymentId) {
-                endpoint = '/api/verify-payment';
-                payload = {
-                  payment_id: paymentId || undefined,
-                  planId: planId || (product && product.id) || 'pro-monthly',
-                };
-              }
-
-              var res = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: 'Bearer ' + token,
-                },
-                body: JSON.stringify(payload),
-              });
-              var data = await res.json().catch(function () {
-                return {};
-              });
-              if (res.ok && data.success) {
-                if (data.entitlement && window.XFreezeEntitlement) {
-                  window.XFreezeEntitlement.applyServerEntitlement(data.entitlement);
-                }
-                if (data.paymentId && !paymentId) paymentId = data.paymentId;
-                if (data.granted || (data.entitlement && data.entitlement.isPro) || data.already) {
-                  verifyOk = true;
-                  break;
-                }
-                lastErr = data.error || 'Grant not complete yet';
-              } else {
-                lastErr = (data && data.error) || ('HTTP ' + res.status);
-              }
-            } catch (err) {
-              lastErr = (err && err.message) || 'Network error';
-            }
-            await sleep(1500);
-          }
-        } else {
-          lastErr =
-            'Not signed in. Sign in with the same account you used at checkout, then open Account or reload this page.';
-        }
-
-        var snap = { isPro: false };
-        if (window.XFreezeEntitlement && window.XFreezeEntitlement.refresh) {
-          snap = await window.XFreezeEntitlement.refresh({ force: true });
-        }
-
-        try {
-          sessionStorage.removeItem('xf_pending_product');
-          localStorage.removeItem('xf_pending_product');
-        } catch (e3) {}
-
-        if (paymentId) {
-          ref.hidden = false;
-          ref.textContent =
-            'Reference: ' +
-            paymentId +
-            (statusRaw ? ' · status: ' + statusRaw : '') +
-            (lastErr && !(snap && snap.isPro) ? ' · ' + lastErr : '');
-        }
-
-        if (snap && snap.isPro) {
-          setUi(
-            'success',
-            'Your Pro plan is active. Open Account anytime to see billing and usage.'
-          );
-        } else if (verifyOk) {
-          setUi(
-            'success',
-            'Payment verified. Open Account — Pro should show as active.'
-          );
-        } else if (isSuccessStatus(statusRaw) || paymentId) {
-          setUi(
-            'pending',
-            'Payment looks successful at Dodo, but Pro is not active on your account yet. Stay signed in, open Account, and refresh. If it stays Free, contact support with your payment reference.' +
-              (lastErr ? ' (' + lastErr + ')' : '')
-          );
-        } else {
-          setUi(
-            'pending',
-            'No payment reference found. If you just paid, open Account while signed in — otherwise return to Pricing.'
-          );
-        }
-      })();
-    })();
-  </script>
+  <div class="card">
+    <h1>Checkout is offline</h1>
+    <p>
+      Online payments were removed so we can rebuild from a clean slate.
+      No new charges can be completed until checkout is reconnected.
+    </p>
+    <a href="pricing">Back to pricing</a>
+    <a href="templates" style="margin-left:0.5rem">Browse templates</a>
+  </div>
 </body>
 </html>

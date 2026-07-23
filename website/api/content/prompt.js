@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { json } = require('../_lib/razorpay-client');
+const { json } = require('../_lib/http');
 const { handlePreflight, applyCors } = require('../_lib/cors');
 const { getUserFromRequest } = require('../_lib/supabase');
 const { userIsPro } = require('../_lib/entitlements');

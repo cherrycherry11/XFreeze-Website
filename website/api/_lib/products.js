@@ -11,19 +11,19 @@ const BUNDLES = {
   ultimate: { id: 'ultimate', name: 'Ultimate Library', price: 79, type: 'bundle' },
 };
 
-/** TEMP live smoke pricing: $1/mo · $1/yr (restore $49 / $499 for retail) */
+/** Plan catalog for entitlements display (checkout offline). */
 const SUBSCRIPTIONS = {
   'pro-monthly': {
     id: 'pro-monthly',
     name: 'Pro Monthly',
-    price: 1,
+    price: 49,
     type: 'subscription',
     interval: 'month',
   },
   'pro-yearly': {
     id: 'pro-yearly',
     name: 'Pro Yearly',
-    price: 1,
+    price: 499,
     type: 'subscription',
     interval: 'year',
   },

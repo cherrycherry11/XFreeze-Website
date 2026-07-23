@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-xf-meta-title="Pricing - X Freeze Pro" data-xf-meta-desc="X Freeze Pro plans. Temporary $1 test pricing for live checkout verification." data-xf-meta-path="pricing">
+<html lang="en" data-xf-meta-title="Pricing - X Freeze Pro" data-xf-meta-desc="X Freeze Pro plans. Monthly $49 or yearly $499. Checkout rebuilding." data-xf-meta-path="pricing">
 <head>
   <!-- Favicon for browsers + Google Search (48px+ PNG required for SERP) -->
   <link rel="icon" href="/favicon.ico?v=share3" type="image/x-icon">
@@ -41,7 +41,6 @@
   <link rel="stylesheet" href="css/site-footer.css">
   <link rel="stylesheet" href="css/auth.css">
   <link rel="stylesheet" href="css/scroll-reveal.css">
-  <link rel="stylesheet" href="css/checkout.css">
   <link rel="stylesheet" href="css/pricing.css">
   <link rel="stylesheet" href="css/theme-dark.css">
   <style>
@@ -194,11 +193,11 @@
           <p class="xf-price-card__plan">Monthly</p>
           <div class="xf-price-card__amount">
             <span class="xf-price-card__dollar">$</span>
-            <span class="xf-price-card__value">1</span>
+            <span class="xf-price-card__value">49</span>
             <span class="xf-price-card__period">/ month</span>
           </div>
           <p class="xf-price-card__note">
-            Temporary $1 live test price. Flexible month-to-month. Cancel anytime.
+            Flexible month-to-month access. Cancel anytime.
           </p>
           <ul class="xf-price-card__features">
             <li>
@@ -222,27 +221,22 @@
               Works with Grok, Claude, Cursor, GPT
             </li>
           </ul>
-          <button
-            type="button"
-            class="xf-price-card__cta"
-            data-checkout-plan="pro-monthly"
-            data-default-label="Start monthly"
-          >
-            Start monthly
+          <button type="button" class="xf-price-card__cta" disabled aria-disabled="true">
+            Checkout offline
           </button>
         </article>
 
         <!-- Yearly -->
         <article class="xf-price-card xf-price-card--featured scroll-reveal-in" data-plan="pro-yearly">
-          <span class="xf-price-card__badge" data-default-badge="Test pricing · $1">Test pricing · $1</span>
+          <span class="xf-price-card__badge">Best value · Save $89</span>
           <p class="xf-price-card__plan">Yearly</p>
           <div class="xf-price-card__amount">
             <span class="xf-price-card__dollar">$</span>
-            <span class="xf-price-card__value">1</span>
+            <span class="xf-price-card__value">499</span>
             <span class="xf-price-card__period">/ year</span>
           </div>
           <p class="xf-price-card__note">
-            Temporary <strong>$1 live test</strong> price for yearly access. Full retail prices return after testing.
+            Equals <strong>~$41.58 / month</strong>. Best value — save $89 vs monthly.
           </p>
           <ul class="xf-price-card__features">
             <li>
@@ -266,34 +260,25 @@
               Full year of library updates
             </li>
           </ul>
-          <button
-            type="button"
-            class="xf-price-card__cta xf-price-card__cta--primary"
-            data-checkout-plan="pro-yearly"
-            data-default-label="Get yearly access"
-          >
-            Get yearly access
+          <button type="button" class="xf-price-card__cta xf-price-card__cta--primary" disabled aria-disabled="true">
+            Checkout offline
           </button>
         </article>
       </div>
+
+      <p class="xf-pricing-offline-note scroll-reveal-in" style="text-align:center;margin:1.5rem auto 0;max-width:36rem;font-size:0.9rem;color:var(--text-secondary,#52525b);">
+        Online checkout is temporarily offline while we rebuild payments from a clean slate. Free plans still work.
+      </p>
 
       <section class="xf-pricing-faq scroll-reveal-in" aria-labelledby="faq-title">
         <h2 id="faq-title" class="xf-pricing-faq__title">Questions</h2>
         <details>
           <summary>What’s the difference between monthly and yearly?</summary>
-          <p>Same library access. Right now both plans are temporarily $1 for live payment testing; retail will return to $49/month and $499/year.</p>
+          <p>Same library access. Yearly is $499/year (~$41.58/mo) and saves $89 versus twelve monthly payments of $49.</p>
         </details>
         <details>
-          <summary>Can I cancel monthly?</summary>
-          <p>Yes. Monthly is flexible — cancel anytime and keep access until the end of the paid period.</p>
-        </details>
-        <details>
-          <summary>How do I get access after paying?</summary>
-          <p>After a successful payment you’ll land on a confirmation page. Keep your payment receipt and email for your records.</p>
-        </details>
-        <details>
-          <summary>What payment methods do you accept?</summary>
-          <p>Payments are processed by <strong>Dodo Payments</strong>. Depending on your country, you may see <strong>local and international</strong> options — major credit/debit cards, and any local methods Dodo has enabled for your region (for example wallets or bank methods where available). Options on checkout are what your location and our payment provider support.</p>
+          <summary>Can I buy Pro right now?</summary>
+          <p>Not yet — paid checkout is offline while payments are rebuilt. Browse free templates and skills in the meantime.</p>
         </details>
       </section>
 
@@ -307,10 +292,6 @@
 
   <footer class="xf-site-footer" data-xf-footer-root></footer>
 
-  <script src="data/products.js"></script>
-  <script src="js/entitlement.js"></script>
-  <script src="js/usage.js"></script>
-  <script src="js/checkout.js"></script>
   <script src="js/scroll-reveal.js"></script>
   <script>
     function getPreferredTheme() {
@@ -332,156 +313,16 @@
     }
     applyTheme(getPreferredTheme());
 
-    function normalizePlanId(id) {
-      if (!id) return '';
-      var s = String(id).toLowerCase().trim();
-      if (s === 'monthly' || s === 'pro_monthly' || s === 'pro-month') return 'pro-monthly';
-      if (s === 'yearly' || s === 'annual' || s === 'pro_yearly' || s === 'pro-year') return 'pro-yearly';
-      return s;
-    }
-
-    function resetPricingCtas() {
-      document.querySelectorAll('.xf-price-card').forEach(function (card) {
-        card.classList.remove('is-current-plan');
-      });
-      document.querySelectorAll('[data-checkout-plan]').forEach(function (btn) {
-        var def = btn.getAttribute('data-default-label') || btn.textContent;
-        btn.textContent = def;
-        btn.disabled = false;
-        btn.removeAttribute('aria-disabled');
-        btn.classList.remove('xf-price-card__cta--current');
-        btn.dataset.checkoutBlocked = '';
-        if (btn.getAttribute('data-checkout-plan') === 'pro-yearly') {
-          btn.classList.add('xf-price-card__cta--primary');
-        }
-      });
-      var badge = document.querySelector('.xf-price-card--featured .xf-price-card__badge');
-      if (badge) {
-        badge.textContent =
-          badge.getAttribute('data-default-badge') || 'Best value · Save $89';
-        badge.classList.remove('xf-price-card__badge--current');
-      }
-    }
-
-    /**
-     * Mark active Pro plan on pricing cards.
-     * Pro monthly → "Current plan" on monthly, upgrade CTA on yearly.
-     * Pro yearly  → "Current plan" on yearly, manage/account on monthly.
-     */
-    function applyPricingPlanState(snap) {
-      resetPricingCtas();
-      if (!snap || !snap.isPro) return;
-
-      var planId = normalizePlanId(
-        (snap.subscription && (snap.subscription.planId || snap.subscription.plan_id)) ||
-          ''
-      );
-      /* Active Pro without plan id: treat as monthly default for CTA match */
-      if (!planId) planId = 'pro-monthly';
-
-      var monthlyBtn = document.querySelector('[data-checkout-plan="pro-monthly"]');
-      var yearlyBtn = document.querySelector('[data-checkout-plan="pro-yearly"]');
-      var monthlyCard = document.querySelector('.xf-price-card[data-plan="pro-monthly"]');
-      var yearlyCard = document.querySelector('.xf-price-card[data-plan="pro-yearly"]');
-      var badge = document.querySelector('.xf-price-card--featured .xf-price-card__badge');
-
-      function markCurrent(btn, card) {
-        if (!btn) return;
-        btn.textContent = 'Current plan';
-        btn.disabled = true;
-        btn.setAttribute('aria-disabled', 'true');
-        btn.classList.add('xf-price-card__cta--current');
-        btn.classList.remove('xf-price-card__cta--primary');
-        btn.dataset.checkoutBlocked = '1';
-        if (card) card.classList.add('is-current-plan');
-      }
-
-      if (planId === 'pro-yearly') {
-        markCurrent(yearlyBtn, yearlyCard);
-        if (badge) {
-          badge.textContent = 'Your plan';
-          badge.classList.add('xf-price-card__badge--current');
-        }
-        if (monthlyBtn) {
-          monthlyBtn.textContent = 'Manage billing';
-          monthlyBtn.dataset.checkoutBlocked = 'manage';
-        }
-      } else if (planId === 'pro-monthly') {
-        markCurrent(monthlyBtn, monthlyCard);
-        if (yearlyBtn) {
-          yearlyBtn.textContent = 'Upgrade to yearly';
-          yearlyBtn.classList.add('xf-price-card__cta--primary');
-        }
-      } else {
-        /* Unknown plan id but still Pro — mark both buy buttons as managed */
-        if (monthlyBtn) {
-          monthlyBtn.textContent = 'Manage billing';
-          monthlyBtn.dataset.checkoutBlocked = 'manage';
-        }
-        if (yearlyBtn) {
-          yearlyBtn.textContent = 'Manage billing';
-          yearlyBtn.dataset.checkoutBlocked = 'manage';
-          yearlyBtn.classList.remove('xf-price-card__cta--primary');
-        }
-      }
-    }
-
-    function refreshPricingFromServer() {
-      /* Optimistic paint from cache */
-      if (window.XFreezeEntitlement && window.XFreezeEntitlement.getSnapshot) {
-        applyPricingPlanState(window.XFreezeEntitlement.getSnapshot());
-      }
-      if (!window.XFreezeEntitlement || !window.XFreezeEntitlement.refresh) return;
-      window.XFreezeEntitlement.refresh({ force: true }).then(function (snap) {
-        applyPricingPlanState(snap);
-      });
-    }
-
-    document.querySelectorAll('[data-checkout-plan]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        if (btn.dataset.checkoutBlocked === '1') return;
-        if (btn.dataset.checkoutBlocked === 'manage') {
-          window.location.href = 'account#billing';
-          return;
-        }
-        var id = btn.getAttribute('data-checkout-plan');
-        /* Dodo overlay modal on this page (not full-page leave) */
-        if (window.XFreezeCheckout && window.XFreezeCheckout.openSubscription) {
-          window.XFreezeCheckout.openSubscription(id, btn);
-        } else if (window.XFreezeProducts && window.XFreezeCheckout) {
-          var plan = window.XFreezeProducts.getSubscription(id);
-          if (plan) window.XFreezeCheckout.open(plan, btn);
-        }
-      });
-    });
-
-    window.addEventListener('xf-entitlement-change', function (ev) {
-      applyPricingPlanState((ev && ev.detail) || null);
-    });
-
-    /* Banner when free users hit a premium template */
     try {
       var params = new URLSearchParams(window.location.search);
       if (params.get('reason') === 'premium') {
         var ban = document.getElementById('xf-pricing-premium-banner');
-        if (ban) ban.hidden = false;
+        if (ban) {
+          ban.hidden = false;
+          ban.textContent = 'Premium checkout is offline while payments are rebuilt. Free content stays available.';
+        }
       }
     } catch (e) {}
-
-    /* After auth boots (defer scripts), refresh plan CTAs */
-    function bootPricingPlanUi() {
-      refreshPricingFromServer();
-    }
-    if (document.readyState === 'complete') {
-      setTimeout(bootPricingPlanUi, 50);
-    } else {
-      window.addEventListener('load', function () {
-        setTimeout(bootPricingPlanUi, 50);
-      });
-    }
-    /* Retry once auth session settles */
-    setTimeout(bootPricingPlanUi, 600);
-    setTimeout(bootPricingPlanUi, 1800);
   </script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>

@@ -1,44 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Favicon for browsers + Google Search (48px+ PNG required for SERP) -->
   <link rel="icon" href="/favicon.ico?v=share3" type="image/x-icon">
-  <link rel="icon" href="/favicon.png?v=share3" type="image/png" sizes="48x48">
-  <link rel="icon" href="/assets/images/logo/favicon-32.png?v=share3" type="image/png" sizes="32x32">
-  <link rel="icon" href="/assets/images/logo/favicon-96.png?v=share3" type="image/png" sizes="96x96">
-  <link rel="icon" href="/assets/images/logo/favicon-192.png?v=share3" type="image/png" sizes="192x192">
-  <link rel="apple-touch-icon" href="/assets/images/logo/apple-touch-icon.png?v=share3" sizes="180x180">
-  <link rel="manifest" href="/site.webmanifest">
-
-<link rel="stylesheet" href="css/site-fonts.css">
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout cancelled - X Freeze</title>
+  <title>Checkout offline - X Freeze</title>
   <script>
     (function () {
       var stored = localStorage.getItem('xfreeze-theme');
       var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.classList.toggle('dark', stored === 'dark' || (stored !== 'light' && prefersDark));
+      document.documentElement.classList.toggle(
+        'dark',
+        stored === 'dark' || (stored !== 'light' && prefersDark)
+      );
     })();
   </script>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' };</script>
-  <style>
-body { font-family: var(--font-sans); }
-  </style>
+  <link rel="stylesheet" href="css/site-fonts.css">
   <link rel="stylesheet" href="css/theme-dark.css">
+  <style>
+    body {
+      font-family: var(--font-sans, system-ui, sans-serif);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background: #fff;
+      color: #0a0a0a;
+    }
+    html.dark body { background: #0a0a0a; color: #f2f5f3; }
+    .card { max-width: 28rem; text-align: center; }
+    h1 { font-size: 1.5rem; margin: 0 0 0.75rem; }
+    p { color: #52525b; font-size: 0.9rem; }
+    html.dark p { color: #8a958c; }
+    a {
+      display: inline-flex;
+      margin-top: 1.5rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: 9999px;
+      border: 1px solid #e5e7eb;
+      color: inherit;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+  </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6 bg-white dark:bg-[#0a0a0a] text-[#0a0a0a] dark:text-[#f2f5f3]">
-  <div class="max-w-md w-full text-center">
-    <h1 class="text-2xl font-semibold tracking-tight">Checkout cancelled</h1>
-    <p class="mt-3 text-sm text-[#52525b] dark:text-[#8a958c]">No charge was made. You can try again anytime.</p>
-    <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-<a href="templates" class="inline-flex items-center justify-center px-5 py-2.5 rounded-full border border-[#e5e7eb] dark:border-[#1f2623] text-sm font-medium">Templates</a>
-    </div>
+<body>
+  <div class="card">
+    <h1>Checkout offline</h1>
+    <p>Payments are being rebuilt. No charge was made.</p>
+    <a href="pricing">Back to pricing</a>
   </div>
 </body>
 </html>

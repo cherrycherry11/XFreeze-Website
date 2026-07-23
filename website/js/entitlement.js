@@ -171,7 +171,7 @@
     return inflight;
   }
 
-  /** Apply server verify-payment entitlement payload immediately */
+  /** Apply a server entitlement payload immediately (e.g. after manual grant) */
   function applyServerEntitlement(entitlement, userId) {
     if (!entitlement) return getSnapshot();
     return writeLocalCache({

@@ -98,6 +98,15 @@
             <div id="xf-checkout-setup" class="xf-checkout-setup" hidden></div>
             <div id="xf-checkout-form-wrap">
               <input type="email" id="xf-checkout-email" class="xf-checkout-email" placeholder="Email" autocomplete="email">
+              <label id="xf-checkout-autodebit-row" class="xf-checkout-autodebit" hidden>
+                <input type="checkbox" id="xf-checkout-autodebit" checked>
+                <span class="xf-checkout-autodebit__text">
+                  <strong>Auto-debit / auto-renew</strong>
+                  <span class="xf-checkout-autodebit__hint" id="xf-checkout-autodebit-hint">
+                    Charge my card automatically each billing period. Turn off for a one-period plan (no renewal).
+                  </span>
+                </span>
+              </label>
               <button type="button" id="xf-pay-dodo-btn" class="xf-checkout-pay-btn">Continue to payment</button>
               <p id="xf-checkout-message" class="xf-checkout-message" aria-live="polite"></p>
               <p class="xf-checkout-message" style="margin-top:0.5rem;opacity:0.75;font-size:0.8rem">
@@ -159,6 +168,24 @@
           ? 'Pro · billed yearly via Dodo'
           : 'Pro · billed monthly via Dodo'
         : 'Secure payment via Dodo';
+
+    var autoRow = document.getElementById('xf-checkout-autodebit-row');
+    var autoCb = document.getElementById('xf-checkout-autodebit');
+    var autoHint = document.getElementById('xf-checkout-autodebit-hint');
+    if (autoRow) {
+      if (product.type === 'subscription') {
+        autoRow.hidden = false;
+        if (autoCb) autoCb.checked = true;
+        if (autoHint) {
+          autoHint.textContent =
+            product.interval === 'year'
+              ? 'Charge my card automatically each year. Turn off for one year only (no renewal).'
+              : 'Charge my card automatically each month. Turn off for one month only (no renewal).';
+        }
+      } else {
+        autoRow.hidden = true;
+      }
+    }
 
     setMessage('');
     try {
@@ -229,9 +256,15 @@
 
       const emailEl = document.getElementById('xf-checkout-email');
       const email = (emailEl && emailEl.value.trim()) || '';
+      const autoCb = document.getElementById('xf-checkout-autodebit');
+      /* Default ON when checkbox missing or checked */
+      const autoDebit = !autoCb || autoCb.checked;
 
       try {
-        sessionStorage.setItem('xf_pending_product', JSON.stringify(currentProduct));
+        sessionStorage.setItem(
+          'xf_pending_product',
+          JSON.stringify(Object.assign({}, currentProduct, { autoDebit: autoDebit }))
+        );
       } catch (e) {}
 
       const res = await fetch(apiBase + '/api/create-checkout', {
@@ -244,6 +277,7 @@
           planId: currentProduct.id,
           email: email || undefined,
           returnUrl: successUrl(currentProduct.id),
+          autoDebit: autoDebit,
         }),
       });
       const data = await res.json();

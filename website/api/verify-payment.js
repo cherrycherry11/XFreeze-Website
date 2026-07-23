@@ -1,7 +1,13 @@
 const { json, readBody } = require('./_lib/razorpay-client');
 const { handlePreflight, applyCors } = require('./_lib/cors');
 const { getUserFromRequest, hasServiceRole } = require('./_lib/supabase');
-const { hasDodo, dodoFetch, planIdFromProductId, dodoEnv } = require('./_lib/dodo');
+const {
+  hasDodo,
+  dodoFetch,
+  planIdFromProductId,
+  dodoEnv,
+  applyAutoDebitPreference,
+} = require('./_lib/dodo');
 const {
   grantFromVerifiedPayment,
   getPaymentById,
@@ -133,13 +139,16 @@ module.exports = async function handler(req, res) {
             ? Number(payment.amount)
             : null;
 
+    const subscriptionId =
+      payment.subscription_id || payment.subscriptionId || null;
+
     let entitlement;
     try {
       entitlement = await grantFromVerifiedPayment({
         userId: user.id,
         productId: planId,
         paymentId,
-        orderId: payment.subscription_id || payment.subscriptionId || paymentId,
+        orderId: subscriptionId || paymentId,
         amountCents,
         currency: (payment.currency || payment.settlement_currency || 'USD').toUpperCase(),
         skipAmountCheck: true,
@@ -147,13 +156,16 @@ module.exports = async function handler(req, res) {
           source: 'dodo_verify',
           status,
           env: dodoEnv(),
-          subscription_id: payment.subscription_id || null,
+          subscription_id: subscriptionId,
+          auto_debit: meta.auto_debit != null ? meta.auto_debit : meta.autoDebit,
         },
       });
     } catch (grantErr) {
       console.error('grantFromVerifiedPayment failed', grantErr);
       const row = await getEntitlementForUser(user.id);
       if (row && publicEntitlement(row).isPro) {
+        /* Still honor no-auto-debit if Pro already active from this pay */
+        const cancelPref = await applyAutoDebitPreference(meta, subscriptionId);
         return json(res, 200, {
           success: true,
           provider: 'dodo',
@@ -162,6 +174,7 @@ module.exports = async function handler(req, res) {
           entitlement: publicEntitlement(row),
           granted: true,
           recovered: true,
+          autoDebitCancelled: Boolean(cancelPref && cancelPref.applied),
         });
       }
       return json(res, 500, {
@@ -171,6 +184,8 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    const cancelPref = await applyAutoDebitPreference(meta, subscriptionId);
+
     return json(res, 200, {
       success: true,
       provider: 'dodo',
@@ -178,6 +193,8 @@ module.exports = async function handler(req, res) {
       planId,
       entitlement,
       granted: Boolean(entitlement && entitlement.isPro),
+      autoDebit: !(cancelPref && cancelPref.applied),
+      autoDebitCancelled: Boolean(cancelPref && cancelPref.applied),
     });
   } catch (err) {
     console.error('verify-payment (dodo) error:', err);

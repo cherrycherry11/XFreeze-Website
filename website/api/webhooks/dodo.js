@@ -4,6 +4,7 @@ const {
   verifyDodoWebhook,
   planIdFromProductId,
   hasDodo,
+  applyAutoDebitPreference,
 } = require('../_lib/dodo');
 const { hasServiceRole } = require('../_lib/supabase');
 const {
@@ -116,11 +117,14 @@ module.exports = async function handler(req, res) {
         return json(res, 200, { ok: true, revoked: true });
       }
 
+      const subscriptionId = data.subscription_id || data.subscriptionId || null;
+      const meta = extractMeta(data);
+
       await grantFromVerifiedPayment({
         userId,
         productId: planId,
         paymentId: paymentId || `dodo_${event.timestamp || Date.now()}`,
-        orderId: data.subscription_id || data.subscriptionId || paymentId,
+        orderId: subscriptionId || paymentId,
         amountCents:
           data.total_amount != null
             ? Number(data.total_amount)
@@ -129,9 +133,27 @@ module.exports = async function handler(req, res) {
               : null,
         currency: (data.currency || 'USD').toUpperCase(),
         skipAmountCheck: true,
-        raw: { source: 'dodo_webhook', type },
+        raw: {
+          source: 'dodo_webhook',
+          type,
+          auto_debit: meta.auto_debit != null ? meta.auto_debit : meta.autoDebit,
+        },
       });
-      return json(res, 200, { ok: true, granted: true, planId, userId });
+
+      /*
+       * If the customer opted out of auto-debit at checkout, keep access for
+       * the paid period but schedule cancel so Dodo does not renew.
+       * Do not revoke here — period end + subscription.cancelled will.
+       */
+      const cancelPref = await applyAutoDebitPreference(meta, subscriptionId);
+
+      return json(res, 200, {
+        ok: true,
+        granted: true,
+        planId,
+        userId,
+        autoDebitCancelled: Boolean(cancelPref && cancelPref.applied),
+      });
     }
 
     if (

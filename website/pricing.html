@@ -222,14 +222,19 @@
               Works with Grok, Claude, Cursor, GPT
             </li>
           </ul>
-          <button type="button" class="xf-price-card__cta" data-checkout-plan="pro-monthly">
+          <button
+            type="button"
+            class="xf-price-card__cta"
+            data-checkout-plan="pro-monthly"
+            data-default-label="Start monthly"
+          >
             Start monthly
           </button>
         </article>
 
         <!-- Yearly -->
         <article class="xf-price-card xf-price-card--featured scroll-reveal-in" data-plan="pro-yearly">
-          <span class="xf-price-card__badge">Best value · Save $89</span>
+          <span class="xf-price-card__badge" data-default-badge="Best value · Save $89">Best value · Save $89</span>
           <p class="xf-price-card__plan">Yearly</p>
           <div class="xf-price-card__amount">
             <span class="xf-price-card__dollar">$</span>
@@ -261,7 +266,12 @@
               Full year of library updates
             </li>
           </ul>
-          <button type="button" class="xf-price-card__cta xf-price-card__cta--primary" data-checkout-plan="pro-yearly">
+          <button
+            type="button"
+            class="xf-price-card__cta xf-price-card__cta--primary"
+            data-checkout-plan="pro-yearly"
+            data-default-label="Get yearly access"
+          >
             Get yearly access
           </button>
         </article>
@@ -318,8 +328,118 @@
     }
     applyTheme(getPreferredTheme());
 
+    function normalizePlanId(id) {
+      if (!id) return '';
+      var s = String(id).toLowerCase().trim();
+      if (s === 'monthly' || s === 'pro_monthly' || s === 'pro-month') return 'pro-monthly';
+      if (s === 'yearly' || s === 'annual' || s === 'pro_yearly' || s === 'pro-year') return 'pro-yearly';
+      return s;
+    }
+
+    function resetPricingCtas() {
+      document.querySelectorAll('.xf-price-card').forEach(function (card) {
+        card.classList.remove('is-current-plan');
+      });
+      document.querySelectorAll('[data-checkout-plan]').forEach(function (btn) {
+        var def = btn.getAttribute('data-default-label') || btn.textContent;
+        btn.textContent = def;
+        btn.disabled = false;
+        btn.removeAttribute('aria-disabled');
+        btn.classList.remove('xf-price-card__cta--current');
+        btn.dataset.checkoutBlocked = '';
+        if (btn.getAttribute('data-checkout-plan') === 'pro-yearly') {
+          btn.classList.add('xf-price-card__cta--primary');
+        }
+      });
+      var badge = document.querySelector('.xf-price-card--featured .xf-price-card__badge');
+      if (badge) {
+        badge.textContent =
+          badge.getAttribute('data-default-badge') || 'Best value · Save $89';
+        badge.classList.remove('xf-price-card__badge--current');
+      }
+    }
+
+    /**
+     * Mark active Pro plan on pricing cards.
+     * Pro monthly → "Current plan" on monthly, upgrade CTA on yearly.
+     * Pro yearly  → "Current plan" on yearly, manage/account on monthly.
+     */
+    function applyPricingPlanState(snap) {
+      resetPricingCtas();
+      if (!snap || !snap.isPro) return;
+
+      var planId = normalizePlanId(
+        (snap.subscription && (snap.subscription.planId || snap.subscription.plan_id)) ||
+          ''
+      );
+      /* Active Pro without plan id: treat as monthly default for CTA match */
+      if (!planId) planId = 'pro-monthly';
+
+      var monthlyBtn = document.querySelector('[data-checkout-plan="pro-monthly"]');
+      var yearlyBtn = document.querySelector('[data-checkout-plan="pro-yearly"]');
+      var monthlyCard = document.querySelector('.xf-price-card[data-plan="pro-monthly"]');
+      var yearlyCard = document.querySelector('.xf-price-card[data-plan="pro-yearly"]');
+      var badge = document.querySelector('.xf-price-card--featured .xf-price-card__badge');
+
+      function markCurrent(btn, card) {
+        if (!btn) return;
+        btn.textContent = 'Current plan';
+        btn.disabled = true;
+        btn.setAttribute('aria-disabled', 'true');
+        btn.classList.add('xf-price-card__cta--current');
+        btn.classList.remove('xf-price-card__cta--primary');
+        btn.dataset.checkoutBlocked = '1';
+        if (card) card.classList.add('is-current-plan');
+      }
+
+      if (planId === 'pro-yearly') {
+        markCurrent(yearlyBtn, yearlyCard);
+        if (badge) {
+          badge.textContent = 'Your plan';
+          badge.classList.add('xf-price-card__badge--current');
+        }
+        if (monthlyBtn) {
+          monthlyBtn.textContent = 'Manage billing';
+          monthlyBtn.dataset.checkoutBlocked = 'manage';
+        }
+      } else if (planId === 'pro-monthly') {
+        markCurrent(monthlyBtn, monthlyCard);
+        if (yearlyBtn) {
+          yearlyBtn.textContent = 'Upgrade to yearly';
+          yearlyBtn.classList.add('xf-price-card__cta--primary');
+        }
+      } else {
+        /* Unknown plan id but still Pro — mark both buy buttons as managed */
+        if (monthlyBtn) {
+          monthlyBtn.textContent = 'Manage billing';
+          monthlyBtn.dataset.checkoutBlocked = 'manage';
+        }
+        if (yearlyBtn) {
+          yearlyBtn.textContent = 'Manage billing';
+          yearlyBtn.dataset.checkoutBlocked = 'manage';
+          yearlyBtn.classList.remove('xf-price-card__cta--primary');
+        }
+      }
+    }
+
+    function refreshPricingFromServer() {
+      /* Optimistic paint from cache */
+      if (window.XFreezeEntitlement && window.XFreezeEntitlement.getSnapshot) {
+        applyPricingPlanState(window.XFreezeEntitlement.getSnapshot());
+      }
+      if (!window.XFreezeEntitlement || !window.XFreezeEntitlement.refresh) return;
+      window.XFreezeEntitlement.refresh({ force: true }).then(function (snap) {
+        applyPricingPlanState(snap);
+      });
+    }
+
     document.querySelectorAll('[data-checkout-plan]').forEach(function (btn) {
       btn.addEventListener('click', function () {
+        if (btn.dataset.checkoutBlocked === '1') return;
+        if (btn.dataset.checkoutBlocked === 'manage') {
+          window.location.href = 'account#billing';
+          return;
+        }
         var id = btn.getAttribute('data-checkout-plan');
         /* Dodo overlay modal on this page (not full-page leave) */
         if (window.XFreezeCheckout && window.XFreezeCheckout.openSubscription) {
@@ -331,6 +451,10 @@
       });
     });
 
+    window.addEventListener('xf-entitlement-change', function (ev) {
+      applyPricingPlanState((ev && ev.detail) || null);
+    });
+
     /* Banner when free users hit a premium template */
     try {
       var params = new URLSearchParams(window.location.search);
@@ -339,6 +463,21 @@
         if (ban) ban.hidden = false;
       }
     } catch (e) {}
+
+    /* After auth boots (defer scripts), refresh plan CTAs */
+    function bootPricingPlanUi() {
+      refreshPricingFromServer();
+    }
+    if (document.readyState === 'complete') {
+      setTimeout(bootPricingPlanUi, 50);
+    } else {
+      window.addEventListener('load', function () {
+        setTimeout(bootPricingPlanUi, 50);
+      });
+    }
+    /* Retry once auth session settles */
+    setTimeout(bootPricingPlanUi, 600);
+    setTimeout(bootPricingPlanUi, 1800);
   </script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>

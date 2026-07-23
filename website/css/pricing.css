@@ -328,6 +328,37 @@ html.dark .xf-price-card__cta--primary:hover {
   opacity: 0.92;
 }
 
+/* Current plan — not clickable buy CTA */
+.xf-price-card__cta--current,
+.xf-price-card__cta--current:hover {
+  cursor: default;
+  opacity: 1;
+  background: var(--surface-subtle, #f4f4f5);
+  color: var(--text-secondary, #52525b);
+  border-color: var(--border, #e5e7eb);
+  pointer-events: none;
+}
+html.dark .xf-price-card__cta--current,
+html.dark .xf-price-card__cta--current:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary, #a1a1aa);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.xf-price-card.is-current-plan {
+  box-shadow: 0 0 0 2px var(--text, #0a0a0a);
+}
+html.dark .xf-price-card.is-current-plan {
+  box-shadow: 0 0 0 2px rgba(242, 245, 243, 0.85);
+}
+.xf-price-card__badge--current {
+  background: var(--text, #0a0a0a);
+  color: var(--surface, #fff);
+}
+html.dark .xf-price-card__badge--current {
+  background: #f2f5f3;
+  color: #020403;
+}
+
 /* ── Trust strip ── */
 .xf-pricing-trust {
   display: flex;

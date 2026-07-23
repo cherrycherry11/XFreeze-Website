@@ -129,22 +129,30 @@ async function grantFromVerifiedPayment({
     } catch (e) {}
   }
 
-  /* Ledger first */
-  await rest('payments', {
-    method: 'POST',
-    prefer: 'return=minimal',
-    body: {
-      payment_id: paymentId,
-      order_id: orderId || null,
-      user_id: userId,
-      product_type: 'subscription',
-      product_id: plan.id,
-      amount_cents: amountCents != null ? Number(amountCents) : expectedCents,
-      currency: (currency || 'USD').toUpperCase(),
-      status: 'captured',
-      raw: raw || null,
-    },
-  });
+  /* Ledger first — ignore duplicate payment_id races */
+  try {
+    await rest('payments', {
+      method: 'POST',
+      prefer: 'return=minimal,resolution=ignore-duplicates',
+      body: {
+        payment_id: paymentId,
+        order_id: orderId || null,
+        user_id: userId,
+        product_type: 'subscription',
+        product_id: plan.id,
+        amount_cents: amountCents != null ? Number(amountCents) : expectedCents,
+        currency: (currency || 'USD').toUpperCase(),
+        status: 'captured',
+        raw: raw || null,
+      },
+    });
+  } catch (payErr) {
+    const already = await getPaymentById(paymentId);
+    if (!already) {
+      /* Don't block entitlement if ledger insert fails for schema reasons */
+      console.error('payments ledger insert failed', payErr.message || payErr);
+    }
+  }
 
   const payload = {
     user_id: userId,

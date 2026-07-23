@@ -72,6 +72,8 @@ module.exports = async function handler(req, res) {
     const meta = payment.metadata || {};
     let planId = body.planId || meta.plan_id || meta.planId || '';
     const metaUser = meta.user_id || meta.userId || '';
+    /* If metadata has user_id, it must match the signed-in user.
+       If missing (edge case), still allow grant to the signed-in buyer. */
     if (metaUser && metaUser !== user.id) {
       return json(res, 403, {
         success: false,
@@ -86,26 +88,57 @@ module.exports = async function handler(req, res) {
       planId = planIdFromProductId(pid) || 'pro-monthly';
     }
     if (!SUBSCRIPTIONS[planId]) {
-      return json(res, 400, { success: false, error: 'Unknown plan for payment' });
+      return json(res, 400, { success: false, error: 'Unknown plan for payment: ' + planId });
     }
 
     const amountCents =
       payment.total_amount != null
         ? Number(payment.total_amount)
-        : payment.amount != null
-          ? Number(payment.amount)
-          : null;
+        : payment.settlement_amount != null
+          ? Number(payment.settlement_amount)
+          : payment.amount != null
+            ? Number(payment.amount)
+            : null;
 
-    const entitlement = await grantFromVerifiedPayment({
-      userId: user.id,
-      productId: planId,
-      paymentId,
-      orderId: payment.subscription_id || payment.subscriptionId || paymentId,
-      amountCents,
-      currency: (payment.currency || 'USD').toUpperCase(),
-      skipAmountCheck: true,
-      raw: { source: 'dodo', status, verify: true },
-    });
+    let entitlement;
+    try {
+      entitlement = await grantFromVerifiedPayment({
+        userId: user.id,
+        productId: planId,
+        paymentId,
+        orderId: payment.subscription_id || payment.subscriptionId || paymentId,
+        amountCents,
+        currency: (payment.currency || payment.settlement_currency || 'USD').toUpperCase(),
+        skipAmountCheck: true,
+        expiresAt: null,
+        raw: {
+          source: 'dodo',
+          status,
+          verify: true,
+          subscription_id: payment.subscription_id || null,
+        },
+      });
+    } catch (grantErr) {
+      console.error('grantFromVerifiedPayment failed', grantErr);
+      /* Duplicate payment race — load existing entitlement */
+      const row = await getEntitlementForUser(user.id);
+      if (row && publicEntitlement(row).isPro) {
+        return json(res, 200, {
+          success: true,
+          provider: 'dodo',
+          paymentId,
+          planId,
+          entitlement: publicEntitlement(row),
+          granted: true,
+          recovered: true,
+        });
+      }
+      return json(res, 500, {
+        success: false,
+        error: grantErr.message || 'Failed to activate Pro',
+        code: 'grant_failed',
+      });
+    }
 
     return json(res, 200, {
       success: true,
@@ -120,6 +153,7 @@ module.exports = async function handler(req, res) {
     return json(res, err.status || 500, {
       success: false,
       error: err.message || 'Verification failed',
+      details: err.data || null,
     });
   }
 };

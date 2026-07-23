@@ -1,17 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" data-xf-meta-title="Payment successful - X Freeze" data-xf-meta-desc="Your X Freeze purchase is confirmed." data-xf-meta-path="checkout-success">
+<html lang="en" data-xf-meta-title="Payment result - X Freeze" data-xf-meta-desc="Your X Freeze purchase result." data-xf-meta-path="checkout-success">
 <head>
   <link rel="icon" href="/favicon.ico?v=share3" type="image/x-icon">
   <link rel="icon" href="/favicon.png?v=share3" type="image/png" sizes="48x48">
-  <link rel="icon" href="/assets/images/logo/favicon-32.png?v=share3" type="image/png" sizes="32x32">
-  <link rel="icon" href="/assets/images/logo/favicon-96.png?v=share3" type="image/png" sizes="96x96">
-  <link rel="icon" href="/assets/images/logo/favicon-192.png?v=share3" type="image/png" sizes="192x192">
-  <link rel="apple-touch-icon" href="/assets/images/logo/apple-touch-icon.png?v=share3" sizes="180x180">
-  <link rel="manifest" href="/site.webmanifest">
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>You're in - X Freeze</title>
+  <title>Payment result - X Freeze</title>
   <script>
     (function () {
       var stored = localStorage.getItem('xfreeze-theme');
@@ -35,6 +29,10 @@
       --surface-muted: #f4f4f5;
       --success: #15803d;
       --success-soft: #dcfce7;
+      --danger: #dc2626;
+      --danger-soft: #fee2e2;
+      --warn: #ca8a04;
+      --warn-soft: #fef9c3;
     }
     html.dark {
       color-scheme: dark;
@@ -46,6 +44,10 @@
       --surface-muted: #1c1c1c;
       --success: #4ade80;
       --success-soft: rgba(74, 222, 128, 0.12);
+      --danger: #f87171;
+      --danger-soft: rgba(248, 113, 113, 0.12);
+      --warn: #facc15;
+      --warn-soft: rgba(250, 204, 21, 0.12);
     }
     * { box-sizing: border-box; }
     body {
@@ -72,9 +74,6 @@
       background: var(--surface-elevated);
       box-shadow: 0 24px 48px -28px rgba(0, 0, 0, 0.35);
     }
-    html.dark .xf-success-card {
-      box-shadow: 0 28px 56px -24px rgba(0, 0, 0, 0.7);
-    }
     .xf-success-mark {
       width: 4rem;
       height: 4rem;
@@ -86,11 +85,14 @@
       background: var(--success-soft);
       color: var(--success);
       font-size: 1.5rem;
-      animation: xf-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
-    @keyframes xf-pop {
-      from { transform: scale(0.6); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+    .xf-success-card.is-failed .xf-success-mark {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+    .xf-success-card.is-pending .xf-success-mark {
+      background: var(--warn-soft);
+      color: var(--warn);
     }
     .xf-success-eyebrow {
       margin: 0 0 0.4rem;
@@ -126,10 +128,7 @@
       text-align: left;
     }
     .xf-success-plan[hidden] { display: none; }
-    .xf-success-plan__name {
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
+    .xf-success-plan__name { font-size: 0.9rem; font-weight: 600; }
     .xf-success-plan__price {
       font-size: 1.05rem;
       font-weight: 650;
@@ -145,6 +144,7 @@
       flex-direction: column;
       gap: 0.65rem;
     }
+    .xf-success-steps[hidden] { display: none; }
     .xf-success-steps li {
       display: flex;
       align-items: flex-start;
@@ -212,14 +212,6 @@
       text-decoration: none;
     }
     .xf-success-logo:hover { color: var(--text); }
-    .xf-success-card.is-failed .xf-success-mark {
-      background: rgba(239, 68, 68, 0.12);
-      color: #ef4444;
-    }
-    .xf-success-card.is-pending .xf-success-mark {
-      background: rgba(234, 179, 8, 0.14);
-      color: #ca8a04;
-    }
   </style>
 </head>
 <body>
@@ -228,10 +220,10 @@
       <div class="xf-success-mark" id="success-mark" aria-hidden="true">
         <i class="fa-solid fa-spinner fa-spin" id="success-icon"></i>
       </div>
-      <p class="xf-success-eyebrow" id="success-eyebrow">Checking payment…</p>
+      <p class="xf-success-eyebrow" id="success-eyebrow">Confirming payment…</p>
       <h1 class="xf-success-title" id="success-title">One moment</h1>
       <p class="xf-success-lead" id="success-lead">
-        Confirming your payment status with Dodo.
+        Unlocking Pro on your account. This can take a few seconds.
       </p>
 
       <div class="xf-success-plan" id="success-plan" hidden>
@@ -250,11 +242,11 @@
         </li>
         <li>
           <i class="fa-solid fa-check" aria-hidden="true"></i>
-          <span>Pro unlocks after the payment is verified</span>
+          <span>Pro unlocks after payment is verified on the server</span>
         </li>
       </ul>
 
-      <div class="xf-success-actions" id="success-actions">
+      <div class="xf-success-actions">
         <a class="xf-success-btn xf-success-btn--primary" id="success-primary" href="account">View account</a>
         <a class="xf-success-btn xf-success-btn--ghost" id="success-secondary" href="pricing">Back to pricing</a>
         <a class="xf-success-btn xf-success-btn--ghost" href="skills">Explore skills</a>
@@ -273,11 +265,6 @@
   <script src="js/auth.js"></script>
   <script>
     (function () {
-      /*
-       * Dodo redirects here after checkout with query params, e.g.
-       * ?payment_id=pay_…&status=succeeded|failed|processing&plan=pro-monthly
-       * Never show "confirmed" for failed payments.
-       */
       var params = new URLSearchParams(window.location.search);
       var paymentId = params.get('payment_id') || params.get('paymentId') || '';
       var planId = params.get('plan') || '';
@@ -289,37 +276,10 @@
       ).toLowerCase();
 
       function isFailedStatus(s) {
-        return (
-          s === 'failed' ||
-          s === 'fail' ||
-          s === 'declined' ||
-          s === 'cancelled' ||
-          s === 'canceled' ||
-          s === 'error'
-        );
+        return /^(failed|fail|declined|cancelled|canceled|error)$/.test(s);
       }
       function isSuccessStatus(s) {
-        return (
-          s === 'succeeded' ||
-          s === 'success' ||
-          s === 'paid' ||
-          s === 'active' ||
-          s === 'completed'
-        );
-      }
-
-      var product = null;
-
-      function readProduct() {
-        try {
-          var a = sessionStorage.getItem('xf_pending_product');
-          if (a) return JSON.parse(a);
-        } catch (e) {}
-        try {
-          var b = localStorage.getItem('xf_pending_product');
-          if (b) return JSON.parse(b);
-        } catch (e2) {}
-        return null;
+        return /^(succeeded|success|paid|active|completed)$/.test(s);
       }
 
       function catalogPlan(id) {
@@ -336,26 +296,50 @@
         return null;
       }
 
-      function waitAuthReady() {
-        return new Promise(function (resolve) {
-          var tries = 0;
-          (function tick() {
-            tries += 1;
-            if (
-              window.XFreezeAuth &&
-              (window.XFreezeAuth.getSession() || tries > 40)
-            ) {
-              resolve();
-              return;
-            }
-            setTimeout(tick, 80);
-          })();
+      function readProduct() {
+        try {
+          var a = sessionStorage.getItem('xf_pending_product');
+          if (a) return JSON.parse(a);
+        } catch (e) {}
+        try {
+          var b = localStorage.getItem('xf_pending_product');
+          if (b) return JSON.parse(b);
+        } catch (e2) {}
+        return null;
+      }
+
+      function sleep(ms) {
+        return new Promise(function (r) {
+          setTimeout(r, ms);
         });
+      }
+
+      /** Wait until Supabase session + access token exist (return from Dodo needs this). */
+      async function waitForToken() {
+        for (var i = 0; i < 30; i++) {
+          try {
+            if (window.XFreezeAuth && window.XFreezeAuth.refreshSession) {
+              await window.XFreezeAuth.refreshSession();
+            }
+          } catch (e) {}
+          var token = '';
+          try {
+            if (window.XFreezeEntitlement && window.XFreezeEntitlement.getAccessToken) {
+              token = window.XFreezeEntitlement.getAccessToken() || '';
+            }
+            if (!token && window.XFreezeAuth && window.XFreezeAuth.getSession) {
+              var s = window.XFreezeAuth.getSession();
+              token = (s && s.access_token) || '';
+            }
+          } catch (e2) {}
+          if (token) return token;
+          await sleep(250);
+        }
+        return '';
       }
 
       function setUi(mode, leadText) {
         var card = document.getElementById('success-card');
-        var mark = document.getElementById('success-mark');
         var icon = document.getElementById('success-icon');
         var eyebrow = document.getElementById('success-eyebrow');
         var title = document.getElementById('success-title');
@@ -398,10 +382,10 @@
         lead.textContent = leadText || '';
       }
 
-      product = readProduct();
+      var product = readProduct();
       if (!product && planId) product = catalogPlan(planId);
 
-      var plan = document.getElementById('success-plan');
+      var planEl = document.getElementById('success-plan');
       var planName = document.getElementById('success-plan-name');
       var planPrice = document.getElementById('success-plan-price');
       var ref = document.getElementById('success-ref');
@@ -409,20 +393,19 @@
       if (product && product.name) {
         var priceNum = Number(product.price);
         var price = '$' + (Number.isInteger(priceNum) ? priceNum : priceNum.toFixed(2));
-        plan.hidden = false;
+        planEl.hidden = false;
         planName.textContent = product.name;
         planPrice.textContent = price;
       }
 
-      /* Immediate fail UI if Dodo says failed (real card in test mode, etc.) */
       if (isFailedStatus(statusRaw)) {
         setUi(
           'failed',
-          'Your card was declined or the payment did not go through. In Dodo test mode you must use a test card (for example 4242 4242 4242 4242) — real cards are rejected. No charge was made and Pro was not unlocked.'
+          'Your card was declined or the payment did not complete. In Dodo test mode use card 4242 4242 4242 4242 (any future expiry, any CVC). Real cards are rejected. Pro was not unlocked.'
         );
         if (paymentId) {
           ref.hidden = false;
-          ref.textContent = 'Reference: ' + paymentId + (statusRaw ? ' · status: ' + statusRaw : '');
+          ref.textContent = 'Reference: ' + paymentId + ' · status: ' + statusRaw;
         }
         try {
           sessionStorage.removeItem('xf_pending_product');
@@ -431,95 +414,101 @@
         return;
       }
 
-      waitAuthReady().then(function () {
-        function finish(snap, verifyOk) {
-          if (snap && snap.isPro) {
-            setUi(
-              'success',
-              'Your Pro plan is active. Open Account anytime to see billing and usage.'
-            );
-          } else if (isSuccessStatus(statusRaw) || verifyOk) {
-            setUi(
-              'pending',
-              'Payment looks successful, but Pro is not active yet. Wait a few seconds and refresh Account, or contact support with your payment reference.'
-            );
-          } else if (paymentId) {
-            setUi(
-              'pending',
-              'We could not confirm this payment yet. If you completed checkout, open Account in a minute — or try again with a Dodo test card.'
-            );
-          } else {
-            setUi(
-              'pending',
-              'No payment reference found. If you just paid, open Account — otherwise return to Pricing.'
-            );
-          }
-          try {
-            sessionStorage.removeItem('xf_pending_product');
-            localStorage.removeItem('xf_pending_product');
-          } catch (e3) {}
-          if (paymentId) {
-            ref.hidden = false;
-            ref.textContent = 'Reference: ' + paymentId + (statusRaw ? ' · status: ' + statusRaw : '');
-          }
-        }
+      (async function run() {
+        var token = await waitForToken();
+        var verifyOk = false;
+        var lastErr = '';
 
-        /* Only verify/grant when status is success (or missing — then server decides) */
-        var chain = Promise.resolve({ verifyOk: false });
         var mayVerify =
           paymentId &&
           !isFailedStatus(statusRaw) &&
           (isSuccessStatus(statusRaw) || !statusRaw);
 
-        if (mayVerify && window.XFreezeAuth && window.XFreezeAuth.getSession) {
-          var sess = window.XFreezeAuth.getSession();
-          var token = sess && sess.access_token;
-          if (token) {
-            chain = fetch('/api/verify-payment', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
-              },
-              body: JSON.stringify({
-                payment_id: paymentId,
-                planId: planId || (product && product.id) || 'pro-monthly',
-              }),
-            })
-              .then(function (r) {
-                return r.json().then(function (v) {
-                  return { ok: r.ok, v: v };
-                });
-              })
-              .then(function (pair) {
-                if (pair.ok && pair.v && pair.v.entitlement && window.XFreezeEntitlement) {
-                  window.XFreezeEntitlement.applyServerEntitlement(pair.v.entitlement);
-                }
-                return {
-                  verifyOk: Boolean(pair.ok && pair.v && pair.v.success && pair.v.granted),
-                };
-              })
-              .catch(function () {
-                return { verifyOk: false };
+        if (mayVerify && token) {
+          for (var attempt = 0; attempt < 6; attempt++) {
+            try {
+              document.getElementById('success-lead').textContent =
+                attempt === 0
+                  ? 'Confirming payment with Dodo…'
+                  : 'Still unlocking Pro… attempt ' + (attempt + 1);
+              var res = await fetch('/api/verify-payment', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: 'Bearer ' + token,
+                },
+                body: JSON.stringify({
+                  payment_id: paymentId,
+                  planId: planId || (product && product.id) || 'pro-monthly',
+                }),
               });
+              var data = await res.json().catch(function () {
+                return {};
+              });
+              if (res.ok && data.success) {
+                if (data.entitlement && window.XFreezeEntitlement) {
+                  window.XFreezeEntitlement.applyServerEntitlement(data.entitlement);
+                }
+                if (data.granted || (data.entitlement && data.entitlement.isPro)) {
+                  verifyOk = true;
+                  break;
+                }
+                lastErr = data.error || 'Grant not complete yet';
+              } else {
+                lastErr = (data && data.error) || ('HTTP ' + res.status);
+              }
+            } catch (err) {
+              lastErr = (err && err.message) || 'Network error';
+            }
+            await sleep(1200);
           }
+        } else if (mayVerify && !token) {
+          lastErr = 'Not signed in — open Account after signing in to unlock Pro.';
         }
 
-        return chain
-          .then(function (meta) {
-            if (window.XFreezeEntitlement && window.XFreezeEntitlement.refresh) {
-              return window.XFreezeEntitlement.refresh({ force: true }).then(function (snap) {
-                return { snap: snap, verifyOk: meta.verifyOk };
-              });
-            }
-            return { snap: { isPro: false }, verifyOk: meta.verifyOk };
-          })
-          .then(function (result) {
-            finish(result.snap, result.verifyOk);
-          });
-      });
+        var snap = { isPro: false };
+        if (window.XFreezeEntitlement && window.XFreezeEntitlement.refresh) {
+          snap = await window.XFreezeEntitlement.refresh({ force: true });
+        }
+
+        try {
+          sessionStorage.removeItem('xf_pending_product');
+          localStorage.removeItem('xf_pending_product');
+        } catch (e3) {}
+
+        if (paymentId) {
+          ref.hidden = false;
+          ref.textContent =
+            'Reference: ' +
+            paymentId +
+            (statusRaw ? ' · status: ' + statusRaw : '') +
+            (lastErr && !(snap && snap.isPro) ? ' · ' + lastErr : '');
+        }
+
+        if (snap && snap.isPro) {
+          setUi(
+            'success',
+            'Your Pro plan is active. Open Account anytime to see billing and usage.'
+          );
+        } else if (verifyOk) {
+          setUi(
+            'success',
+            'Payment verified. Open Account — Pro should show as active.'
+          );
+        } else if (isSuccessStatus(statusRaw) || paymentId) {
+          setUi(
+            'pending',
+            'Payment looks successful at Dodo, but Pro is not active on your account yet. Stay signed in, open Account, and refresh. If it stays Free, contact support with your payment reference.' +
+              (lastErr ? ' (' + lastErr + ')' : '')
+          );
+        } else {
+          setUi(
+            'pending',
+            'No payment reference found. If you just paid, open Account while signed in — otherwise return to Pricing.'
+          );
+        }
+      })();
     })();
   </script>
 </body>
 </html>
-

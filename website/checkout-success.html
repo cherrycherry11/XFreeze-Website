@@ -17,46 +17,293 @@
   <link rel="stylesheet" href="css/site-fonts.css">
   <link rel="stylesheet" href="css/theme-dark.css">
   <style>
+    :root {
+      --xf-ok: #22c55e;
+      --xf-ok-deep: #16a34a;
+      --xf-ok-soft: rgba(34, 197, 94, 0.18);
+      --xf-err: #ef4444;
+      --xf-card: #ffffff;
+      --xf-text: #0a0a0a;
+      --xf-muted: #6b7280;
+      --xf-border: #e5e7eb;
+      --xf-bg: #eef1f0;
+      --xf-btn: #0a0a0a;
+      --xf-btn-text: #fff;
+    }
+    html.dark {
+      --xf-card: #141816;
+      --xf-text: #f2f5f3;
+      --xf-muted: #9ca3af;
+      --xf-border: #2a312e;
+      --xf-bg: #0a0c0b;
+      --xf-btn: #f2f5f3;
+      --xf-btn-text: #0a0a0a;
+    }
+
+    * { box-sizing: border-box; }
     body {
-      font-family: var(--font-sans, system-ui, sans-serif);
+      font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
       min-height: 100vh;
       margin: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
-      background: #fff;
-      color: #0a0a0a;
+      background: var(--xf-bg);
+      color: var(--xf-text);
     }
-    html.dark body { background: #0a0a0a; color: #f2f5f3; }
-    .card { max-width: 28rem; width: 100%; text-align: center; }
-    h1 { font-size: 1.4rem; margin: 0 0 0.75rem; }
-    p { color: #52525b; font-size: 0.9rem; line-height: 1.5; }
-    html.dark p { color: #8a958c; }
-    .err { color: #dc2626; }
-    .ok { color: #15803d; }
-    a.btn {
+
+    /* Soft stage behind the card */
+    .stage {
+      position: relative;
+      width: 100%;
+      max-width: 22.5rem;
+    }
+
+    .card {
+      position: relative;
+      background: var(--xf-card);
+      border-radius: 1.35rem;
+      padding: 2.25rem 1.75rem 1.75rem;
+      text-align: center;
+      box-shadow:
+        0 24px 64px -20px rgba(0, 0, 0, 0.18),
+        0 0 0 1px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+    }
+    html.dark .card {
+      box-shadow:
+        0 24px 64px -16px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    /* Icon stack */
+    .icon-wrap {
+      position: relative;
+      width: 7.5rem;
+      height: 7.5rem;
+      margin: 0.25rem auto 1.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid var(--xf-ok);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .ring--1 {
+      width: 5.5rem;
+      height: 5.5rem;
+      animation: xf-ring 1.6s ease-out 0.15s infinite;
+    }
+    .ring--2 {
+      width: 7rem;
+      height: 7rem;
+      animation: xf-ring 1.6s ease-out 0.45s infinite;
+    }
+
+    @keyframes xf-ring {
+      0% { transform: scale(0.72); opacity: 0.45; }
+      70% { opacity: 0.12; }
+      100% { transform: scale(1.15); opacity: 0; }
+    }
+
+    .badge {
+      position: relative;
+      z-index: 1;
+      width: 4.5rem;
+      height: 4.5rem;
+      border-radius: 50%;
+      background: linear-gradient(160deg, #4ade80 0%, var(--xf-ok) 45%, var(--xf-ok-deep) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        0 10px 28px var(--xf-ok-soft),
+        0 0 0 8px var(--xf-ok-soft);
+      animation: xf-pop 0.55s cubic-bezier(0.22, 1.2, 0.36, 1) both;
+    }
+
+    @keyframes xf-pop {
+      0% { transform: scale(0.4); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .badge svg {
+      width: 2.1rem;
+      height: 2.1rem;
+      stroke: #fff;
+      stroke-width: 2.75;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .badge svg path {
+      stroke-dasharray: 36;
+      stroke-dashoffset: 36;
+      animation: xf-draw 0.45s ease-out 0.25s forwards;
+    }
+    @keyframes xf-draw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* Soft sparkles */
+    .spark {
+      position: absolute;
+      width: 0.35rem;
+      height: 0.35rem;
+      border-radius: 1px;
+      background: var(--xf-ok);
+      opacity: 0.55;
+      animation: xf-spark 1.8s ease-in-out infinite;
+    }
+    .spark:nth-child(1) { top: 12%; left: 18%; animation-delay: 0s; }
+    .spark:nth-child(2) { top: 18%; right: 14%; width: 0.28rem; height: 0.28rem; animation-delay: 0.3s; }
+    .spark:nth-child(3) { bottom: 22%; left: 12%; width: 0.22rem; height: 0.22rem; animation-delay: 0.55s; }
+    .spark:nth-child(4) { bottom: 16%; right: 18%; animation-delay: 0.8s; }
+    .spark:nth-child(5) { top: 42%; left: 4%; width: 0.2rem; height: 0.2rem; animation-delay: 0.2s; }
+    .spark:nth-child(6) { top: 48%; right: 6%; width: 0.25rem; height: 0.25rem; animation-delay: 0.65s; }
+
+    @keyframes xf-spark {
+      0%, 100% { opacity: 0.2; transform: scale(0.85) rotate(0deg); }
+      50% { opacity: 0.75; transform: scale(1.15) rotate(18deg); }
+    }
+
+    .label {
+      margin: 0 0 0.35rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--xf-muted);
+    }
+
+    h1 {
+      margin: 0 0 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.25;
+      color: var(--xf-text);
+    }
+
+    .msg {
+      margin: 0 auto;
+      max-width: 18rem;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      color: var(--xf-muted);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      justify-content: center;
+      margin-top: 1.65rem;
+    }
+
+    .btn {
       display: inline-flex;
-      margin: 0.35rem;
-      padding: 0.65rem 1.15rem;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.65rem;
+      padding: 0.6rem 1.25rem;
       border-radius: 9999px;
-      border: 1px solid #e5e7eb;
-      color: inherit;
-      text-decoration: none;
       font-size: 0.875rem;
       font-weight: 600;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+    .btn:hover { opacity: 0.92; }
+    .btn:active { transform: scale(0.98); }
+    .btn--primary {
+      background: var(--xf-btn);
+      color: var(--xf-btn-text);
+    }
+    .btn--ghost {
+      background: transparent;
+      color: var(--xf-text);
+      border-color: var(--xf-border);
+    }
+
+    /* State variants */
+    .is-loading .badge {
+      background: linear-gradient(160deg, #a3a3a3, #737373);
+      box-shadow: 0 0 0 8px rgba(115, 115, 115, 0.12);
+      animation: xf-pulse 1.1s ease-in-out infinite;
+    }
+    .is-loading .ring,
+    .is-loading .spark { display: none; }
+    .is-loading .badge svg { opacity: 0.85; }
+    @keyframes xf-pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.96); opacity: 0.9; }
+    }
+
+    .is-error .badge {
+      background: linear-gradient(160deg, #f87171, var(--xf-err));
+      box-shadow: 0 10px 28px rgba(239, 68, 68, 0.2), 0 0 0 8px rgba(239, 68, 68, 0.12);
+    }
+    .is-error .ring { border-color: var(--xf-err); }
+    .is-error .spark { background: var(--xf-err); }
+
+    .is-success h1 { color: var(--xf-ok-deep); }
+    html.dark .is-success h1 { color: #4ade80; }
+
+    [hidden] { display: none !important; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ring, .badge, .badge svg path, .spark, .is-loading .badge {
+        animation: none !important;
+      }
+      .badge svg path { stroke-dashoffset: 0; }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1 id="title">Confirming payment…</h1>
-    <p id="msg">Please wait while we activate Pro on your account.</p>
-    <div id="actions" hidden>
-      <a class="btn" href="account">Open Account</a>
-      <a class="btn" href="pricing">Pricing</a>
+  <div class="stage">
+    <div class="card is-loading" id="card" data-state="loading">
+      <div class="icon-wrap" aria-hidden="true">
+        <span class="spark"></span>
+        <span class="spark"></span>
+        <span class="spark"></span>
+        <span class="spark"></span>
+        <span class="spark"></span>
+        <span class="spark"></span>
+        <span class="ring ring--1"></span>
+        <span class="ring ring--2"></span>
+        <div class="badge" id="badge">
+          <!-- check (swapped for spinner/error via JS) -->
+          <svg id="icon-check" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 13l4 4L19 7"></path>
+          </svg>
+          <svg id="icon-spin" viewBox="0 0 24 24" aria-hidden="true" hidden>
+            <circle cx="12" cy="12" r="8" stroke="rgba(255,255,255,0.35)" stroke-width="2.5" fill="none"></circle>
+            <path d="M12 4a8 8 0 0 1 8 8" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"></path>
+          </svg>
+          <svg id="icon-x" viewBox="0 0 24 24" aria-hidden="true" hidden>
+            <path d="M7 7l10 10M17 7L7 17"></path>
+          </svg>
+        </div>
+      </div>
+
+      <p class="label" id="label">Please wait</p>
+      <h1 id="title">Confirming payment</h1>
+      <p class="msg" id="msg">Activating Pro on your account…</p>
+
+      <div class="actions" id="actions" hidden>
+        <a class="btn btn--primary" href="account" id="btn-primary">Open Account</a>
+        <a class="btn btn--ghost" href="pricing" id="btn-secondary">Back to Pricing</a>
+      </div>
     </div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/auth-config.js"></script>
   <script src="js/auth.js"></script>
@@ -65,23 +312,81 @@
     (function () {
       var params = new URLSearchParams(window.location.search);
       var planId = params.get('plan') || '';
-      var paymentId =
-        params.get('payment_id') ||
-        params.get('paymentId') ||
-        params.get('status') === 'failed'
-          ? null
-          : params.get('payment_id');
       var status = (params.get('status') || '').toLowerCase();
+      var card = document.getElementById('card');
       var title = document.getElementById('title');
       var msg = document.getElementById('msg');
+      var label = document.getElementById('label');
       var actions = document.getElementById('actions');
+      var btnPrimary = document.getElementById('btn-primary');
+      var btnSecondary = document.getElementById('btn-secondary');
+      var iconCheck = document.getElementById('icon-check');
+      var iconSpin = document.getElementById('icon-spin');
+      var iconX = document.getElementById('icon-x');
+
+      function setIcons(mode) {
+        iconCheck.hidden = mode !== 'check';
+        iconSpin.hidden = mode !== 'spin';
+        iconX.hidden = mode !== 'x';
+      }
+
+      function setState(state) {
+        card.classList.remove('is-loading', 'is-success', 'is-error');
+        if (state === 'loading') {
+          card.classList.add('is-loading');
+          setIcons('spin');
+        } else if (state === 'success') {
+          card.classList.add('is-success');
+          setIcons('check');
+        } else {
+          card.classList.add('is-error');
+          setIcons('x');
+        }
+      }
+
+      function showActions(primaryHref, primaryText, secondaryHref, secondaryText) {
+        if (primaryHref) {
+          btnPrimary.href = primaryHref;
+          btnPrimary.textContent = primaryText || 'Open Account';
+          btnPrimary.hidden = false;
+        } else {
+          btnPrimary.hidden = true;
+        }
+        if (secondaryHref) {
+          btnSecondary.href = secondaryHref;
+          btnSecondary.textContent = secondaryText || 'Back to Pricing';
+          btnSecondary.hidden = false;
+        } else {
+          btnSecondary.hidden = true;
+        }
+        actions.hidden = false;
+      }
+
+      function fail(heading, body, primaryHref, primaryText) {
+        setState('error');
+        label.textContent = 'Something went wrong';
+        title.textContent = heading;
+        msg.textContent = body;
+        showActions(primaryHref || 'pricing', primaryText || 'Try again', 'account', 'Open Account');
+      }
+
+      function success(heading, body) {
+        setState('success');
+        label.textContent = 'Payment confirmed';
+        title.textContent = heading || 'Welcome to Pro';
+        msg.textContent =
+          body ||
+          'You’re all set — full library access is active on your account.';
+        showActions('account', 'Open Account', 'templates', 'Explore library');
+      }
 
       if (status === 'failed' || status === 'cancelled' || status === 'canceled') {
-        title.textContent = 'Payment not completed';
-        title.className = 'err';
-        msg.textContent =
-          'No charge completed (or the card was declined). Pro was not unlocked. You can try again from Pricing.';
-        actions.hidden = false;
+        fail(
+          'Payment not completed',
+          'No charge went through, so Pro was not unlocked. You can try again anytime from Pricing.',
+          'pricing',
+          'Back to Pricing'
+        );
         return;
       }
 
@@ -110,12 +415,17 @@
         });
       }
 
+      setState('loading');
+      setIcons('spin');
+
       waitAuth().then(function (t) {
         if (!t) {
-          title.textContent = 'Sign in required';
-          msg.textContent =
-            'Sign in with the same account you used at checkout, then open Account.';
-          actions.hidden = false;
+          fail(
+            'Sign in required',
+            'Sign in with the same account you used at checkout, then open Account to finish activating Pro.',
+            'login',
+            'Sign in'
+          );
           return;
         }
         return fetch('/api/verify-payment', {
@@ -126,7 +436,8 @@
           },
           body: JSON.stringify({
             planId: planId || undefined,
-            payment_id: params.get('payment_id') || params.get('paymentId') || undefined,
+            payment_id:
+              params.get('payment_id') || params.get('paymentId') || undefined,
           }),
         })
           .then(function (r) {
@@ -144,21 +455,35 @@
                 pair.data.already ||
                 (pair.data.entitlement && pair.data.entitlement.isPro))
             ) {
-              title.textContent = 'You are Pro';
-              title.className = 'ok';
-              msg.textContent = 'Payment confirmed. Your Pro plan is active.';
+              var planLabel =
+                planId === 'pro-yearly'
+                  ? 'Pro Yearly'
+                  : planId === 'pro-monthly'
+                    ? 'Pro Monthly'
+                    : 'Pro';
+              success(
+                'Welcome to Pro',
+                planLabel +
+                  ' is active. Full templates, skills, and library access are unlocked.'
+              );
             } else {
-              title.textContent = 'Payment received — activating…';
+              setState('loading');
+              label.textContent = 'Almost there';
+              title.textContent = 'Activating Pro…';
               msg.textContent =
                 (pair.data && pair.data.error) ||
-                'If Account still shows Free, stay signed in and refresh in a moment.';
+                'Payment looks good. If Account still shows Free, stay signed in and refresh in a moment.';
+              showActions('account', 'Open Account', 'pricing', 'Pricing');
             }
-            actions.hidden = false;
           })
           .catch(function (err) {
-            title.textContent = 'Could not confirm yet';
-            msg.textContent = (err && err.message) || 'Open Account and refresh.';
-            actions.hidden = false;
+            fail(
+              'Could not confirm yet',
+              (err && err.message) ||
+                'Open Account and refresh — Pro may still activate shortly.',
+              'account',
+              'Open Account'
+            );
           });
       });
     })();

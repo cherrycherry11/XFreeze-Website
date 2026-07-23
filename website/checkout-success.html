@@ -424,23 +424,41 @@
           !isFailedStatus(statusRaw) &&
           (isSuccessStatus(statusRaw) || !statusRaw);
 
-        if (mayVerify && token) {
-          for (var attempt = 0; attempt < 6; attempt++) {
+        if (token) {
+          /* Prefer explicit payment_id; otherwise recover latest succeeded Dodo pay for this user */
+          for (var attempt = 0; attempt < 8; attempt++) {
             try {
               document.getElementById('success-lead').textContent =
                 attempt === 0
-                  ? 'Confirming payment with Dodo…'
-                  : 'Still unlocking Pro… attempt ' + (attempt + 1);
-              var res = await fetch('/api/verify-payment', {
+                  ? 'Confirming payment and unlocking Pro…'
+                  : 'Still unlocking Pro… (' + (attempt + 1) + '/8)';
+
+              var endpoint = paymentId ? '/api/verify-payment' : '/api/recover-pro';
+              var payload = paymentId
+                ? {
+                    payment_id: paymentId,
+                    planId: planId || (product && product.id) || 'pro-monthly',
+                  }
+                : {
+                    planId: planId || (product && product.id) || 'pro-monthly',
+                  };
+
+              /* Always try recover-pro on later attempts (finds payment by user_id) */
+              if (attempt >= 2 || !paymentId) {
+                endpoint = '/api/recover-pro';
+                payload = {
+                  payment_id: paymentId || undefined,
+                  planId: planId || (product && product.id) || 'pro-monthly',
+                };
+              }
+
+              var res = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                   Authorization: 'Bearer ' + token,
                 },
-                body: JSON.stringify({
-                  payment_id: paymentId,
-                  planId: planId || (product && product.id) || 'pro-monthly',
-                }),
+                body: JSON.stringify(payload),
               });
               var data = await res.json().catch(function () {
                 return {};
@@ -449,7 +467,8 @@
                 if (data.entitlement && window.XFreezeEntitlement) {
                   window.XFreezeEntitlement.applyServerEntitlement(data.entitlement);
                 }
-                if (data.granted || (data.entitlement && data.entitlement.isPro)) {
+                if (data.paymentId && !paymentId) paymentId = data.paymentId;
+                if (data.granted || (data.entitlement && data.entitlement.isPro) || data.already) {
                   verifyOk = true;
                   break;
                 }
@@ -460,10 +479,11 @@
             } catch (err) {
               lastErr = (err && err.message) || 'Network error';
             }
-            await sleep(1200);
+            await sleep(1500);
           }
-        } else if (mayVerify && !token) {
-          lastErr = 'Not signed in — open Account after signing in to unlock Pro.';
+        } else {
+          lastErr =
+            'Not signed in. Sign in with the same account you used at checkout, then open Account or reload this page.';
         }
 
         var snap = { isPro: false };

@@ -212,18 +212,26 @@
       text-decoration: none;
     }
     .xf-success-logo:hover { color: var(--text); }
+    .xf-success-card.is-failed .xf-success-mark {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+    }
+    .xf-success-card.is-pending .xf-success-mark {
+      background: rgba(234, 179, 8, 0.14);
+      color: #ca8a04;
+    }
   </style>
 </head>
 <body>
   <main class="xf-success">
-    <div class="xf-success-card">
-      <div class="xf-success-mark" aria-hidden="true">
-        <i class="fa-solid fa-check"></i>
+    <div class="xf-success-card" id="success-card">
+      <div class="xf-success-mark" id="success-mark" aria-hidden="true">
+        <i class="fa-solid fa-spinner fa-spin" id="success-icon"></i>
       </div>
-      <p class="xf-success-eyebrow">Payment confirmed</p>
-      <h1 class="xf-success-title">You're all set</h1>
+      <p class="xf-success-eyebrow" id="success-eyebrow">Checking payment…</p>
+      <h1 class="xf-success-title" id="success-title">One moment</h1>
       <p class="xf-success-lead" id="success-lead">
-        Welcome to X Freeze. Your purchase went through — start creating with the full library.
+        Confirming your payment status with Dodo.
       </p>
 
       <div class="xf-success-plan" id="success-plan" hidden>
@@ -231,7 +239,7 @@
         <span class="xf-success-plan__price" id="success-plan-price"></span>
       </div>
 
-      <ul class="xf-success-steps">
+      <ul class="xf-success-steps" id="success-steps" hidden>
         <li>
           <i class="fa-solid fa-check" aria-hidden="true"></i>
           <span>Access templates, motion prompts, and AI skills</span>
@@ -242,13 +250,13 @@
         </li>
         <li>
           <i class="fa-solid fa-check" aria-hidden="true"></i>
-          <span>Keep this tab open — your receipt is saved with your payment</span>
+          <span>Pro unlocks after the payment is verified</span>
         </li>
       </ul>
 
-      <div class="xf-success-actions">
-        <a class="xf-success-btn xf-success-btn--primary" href="account">View account</a>
-        <a class="xf-success-btn xf-success-btn--ghost" href="templates">Browse templates</a>
+      <div class="xf-success-actions" id="success-actions">
+        <a class="xf-success-btn xf-success-btn--primary" id="success-primary" href="account">View account</a>
+        <a class="xf-success-btn xf-success-btn--ghost" id="success-secondary" href="pricing">Back to pricing</a>
         <a class="xf-success-btn xf-success-btn--ghost" href="skills">Explore skills</a>
       </div>
 
@@ -265,11 +273,41 @@
   <script src="js/auth.js"></script>
   <script>
     (function () {
-      /* Success page never self-grants Pro from URL params.
-         It only refreshes server entitlement after a real verify-payment grant. */
+      /*
+       * Dodo redirects here after checkout with query params, e.g.
+       * ?payment_id=pay_…&status=succeeded|failed|processing&plan=pro-monthly
+       * Never show "confirmed" for failed payments.
+       */
       var params = new URLSearchParams(window.location.search);
-      var paymentId = params.get('payment_id') || '';
+      var paymentId = params.get('payment_id') || params.get('paymentId') || '';
       var planId = params.get('plan') || '';
+      var statusRaw = (
+        params.get('status') ||
+        params.get('payment_status') ||
+        params.get('paymentStatus') ||
+        ''
+      ).toLowerCase();
+
+      function isFailedStatus(s) {
+        return (
+          s === 'failed' ||
+          s === 'fail' ||
+          s === 'declined' ||
+          s === 'cancelled' ||
+          s === 'canceled' ||
+          s === 'error'
+        );
+      }
+      function isSuccessStatus(s) {
+        return (
+          s === 'succeeded' ||
+          s === 'success' ||
+          s === 'paid' ||
+          s === 'active' ||
+          s === 'completed'
+        );
+      }
+
       var product = null;
 
       function readProduct() {
@@ -315,33 +353,106 @@
         });
       }
 
+      function setUi(mode, leadText) {
+        var card = document.getElementById('success-card');
+        var mark = document.getElementById('success-mark');
+        var icon = document.getElementById('success-icon');
+        var eyebrow = document.getElementById('success-eyebrow');
+        var title = document.getElementById('success-title');
+        var lead = document.getElementById('success-lead');
+        var steps = document.getElementById('success-steps');
+        var primary = document.getElementById('success-primary');
+        var secondary = document.getElementById('success-secondary');
+
+        card.classList.remove('is-failed', 'is-pending');
+        if (mode === 'failed') {
+          card.classList.add('is-failed');
+          icon.className = 'fa-solid fa-xmark';
+          eyebrow.textContent = 'Payment failed';
+          title.textContent = 'Payment not completed';
+          steps.hidden = true;
+          primary.href = 'pricing';
+          primary.textContent = 'Try again';
+          secondary.href = 'account';
+          secondary.textContent = 'View account';
+        } else if (mode === 'success') {
+          icon.className = 'fa-solid fa-check';
+          eyebrow.textContent = 'Payment confirmed';
+          title.textContent = "You're all set";
+          steps.hidden = false;
+          primary.href = 'account';
+          primary.textContent = 'View account';
+          secondary.href = 'templates';
+          secondary.textContent = 'Browse templates';
+        } else {
+          card.classList.add('is-pending');
+          icon.className = 'fa-solid fa-circle-exclamation';
+          eyebrow.textContent = 'Almost there';
+          title.textContent = 'Payment pending';
+          steps.hidden = true;
+          primary.href = 'account';
+          primary.textContent = 'View account';
+          secondary.href = 'pricing';
+          secondary.textContent = 'Back to pricing';
+        }
+        lead.textContent = leadText || '';
+      }
+
       product = readProduct();
       if (!product && planId) product = catalogPlan(planId);
 
-      var lead = document.getElementById('success-lead');
       var plan = document.getElementById('success-plan');
       var planName = document.getElementById('success-plan-name');
       var planPrice = document.getElementById('success-plan-price');
       var ref = document.getElementById('success-ref');
 
-      waitAuthReady().then(function () {
-        if (product && product.name) {
-          var priceNum = Number(product.price);
-          var price = '$' + (Number.isInteger(priceNum) ? priceNum : priceNum.toFixed(2));
-          plan.hidden = false;
-          planName.textContent = product.name;
-          planPrice.textContent = price;
-        }
+      if (product && product.name) {
+        var priceNum = Number(product.price);
+        var price = '$' + (Number.isInteger(priceNum) ? priceNum : priceNum.toFixed(2));
+        plan.hidden = false;
+        planName.textContent = product.name;
+        planPrice.textContent = price;
+      }
 
-        function showStatus(snap) {
+      /* Immediate fail UI if Dodo says failed (real card in test mode, etc.) */
+      if (isFailedStatus(statusRaw)) {
+        setUi(
+          'failed',
+          'Your card was declined or the payment did not go through. In Dodo test mode you must use a test card (for example 4242 4242 4242 4242) — real cards are rejected. No charge was made and Pro was not unlocked.'
+        );
+        if (paymentId) {
+          ref.hidden = false;
+          ref.textContent = 'Reference: ' + paymentId + (statusRaw ? ' · status: ' + statusRaw : '');
+        }
+        try {
+          sessionStorage.removeItem('xf_pending_product');
+          localStorage.removeItem('xf_pending_product');
+        } catch (e0) {}
+        return;
+      }
+
+      waitAuthReady().then(function () {
+        function finish(snap, verifyOk) {
           if (snap && snap.isPro) {
-            lead.textContent =
-              'Your Pro plan is active. Open Account anytime to see billing and usage.';
+            setUi(
+              'success',
+              'Your Pro plan is active. Open Account anytime to see billing and usage.'
+            );
+          } else if (isSuccessStatus(statusRaw) || verifyOk) {
+            setUi(
+              'pending',
+              'Payment looks successful, but Pro is not active yet. Wait a few seconds and refresh Account, or contact support with your payment reference.'
+            );
           } else if (paymentId) {
-            lead.textContent =
-              'Payment received. If Pro is not active yet, wait a few seconds and refresh Account — or contact support with your reference.';
+            setUi(
+              'pending',
+              'We could not confirm this payment yet. If you completed checkout, open Account in a minute — or try again with a Dodo test card.'
+            );
           } else {
-            lead.textContent = 'Thanks for your purchase. Open the library and start creating.';
+            setUi(
+              'pending',
+              'No payment reference found. If you just paid, open Account — otherwise return to Pricing.'
+            );
           }
           try {
             sessionStorage.removeItem('xf_pending_product');
@@ -349,17 +460,21 @@
           } catch (e3) {}
           if (paymentId) {
             ref.hidden = false;
-            ref.textContent = 'Reference: ' + paymentId;
+            ref.textContent = 'Reference: ' + paymentId + (statusRaw ? ' · status: ' + statusRaw : '');
           }
         }
 
-        /* Dodo return_url may include payment_id — verify + grant as backup to webhook */
-        var chain = Promise.resolve();
-        if (paymentId && window.XFreezeAuth && window.XFreezeAuth.getSession) {
+        /* Only verify/grant when status is success (or missing — then server decides) */
+        var chain = Promise.resolve({ verifyOk: false });
+        var mayVerify =
+          paymentId &&
+          !isFailedStatus(statusRaw) &&
+          (isSuccessStatus(statusRaw) || !statusRaw);
+
+        if (mayVerify && window.XFreezeAuth && window.XFreezeAuth.getSession) {
           var sess = window.XFreezeAuth.getSession();
           var token = sess && sess.access_token;
           if (token) {
-            lead.textContent = 'Confirming payment…';
             chain = fetch('/api/verify-payment', {
               method: 'POST',
               headers: {
@@ -372,25 +487,36 @@
               }),
             })
               .then(function (r) {
-                return r.json().catch(function () {
-                  return {};
+                return r.json().then(function (v) {
+                  return { ok: r.ok, v: v };
                 });
               })
-              .then(function (v) {
-                if (v && v.entitlement && window.XFreezeEntitlement) {
-                  window.XFreezeEntitlement.applyServerEntitlement(v.entitlement);
+              .then(function (pair) {
+                if (pair.ok && pair.v && pair.v.entitlement && window.XFreezeEntitlement) {
+                  window.XFreezeEntitlement.applyServerEntitlement(pair.v.entitlement);
                 }
+                return {
+                  verifyOk: Boolean(pair.ok && pair.v && pair.v.success && pair.v.granted),
+                };
               })
-              .catch(function () {});
+              .catch(function () {
+                return { verifyOk: false };
+              });
           }
         }
 
-        return chain.then(function () {
-          if (window.XFreezeEntitlement && window.XFreezeEntitlement.refresh) {
-            return window.XFreezeEntitlement.refresh({ force: true });
-          }
-          return { isPro: false };
-        }).then(showStatus);
+        return chain
+          .then(function (meta) {
+            if (window.XFreezeEntitlement && window.XFreezeEntitlement.refresh) {
+              return window.XFreezeEntitlement.refresh({ force: true }).then(function (snap) {
+                return { snap: snap, verifyOk: meta.verifyOk };
+              });
+            }
+            return { snap: { isPro: false }, verifyOk: meta.verifyOk };
+          })
+          .then(function (result) {
+            finish(result.snap, result.verifyOk);
+          });
       });
     })();
   </script>

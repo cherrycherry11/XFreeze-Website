@@ -81,6 +81,11 @@ module.exports = async function handler(req, res) {
       body.returnUrl ||
       `${site}/checkout-success?provider=dodo&plan=${encodeURIComponent(planId)}`;
 
+    /*
+     * Default Dodo checkout only — no allowed_payment_method_types, no forced
+     * currency, no custom feature_flags. Payment methods/currency follow the
+     * merchant dashboard defaults for the buyer’s location.
+     */
     const session = await dodoFetch('/checkouts', {
       method: 'POST',
       body: {
@@ -91,20 +96,6 @@ module.exports = async function handler(req, res) {
             user.user_metadata?.full_name ||
             user.email ||
             'X Freeze customer',
-        },
-        minimal_address: true,
-        show_saved_payment_methods: true,
-        feature_flags: {
-          allow_customer_editing_country: true,
-          allow_customer_editing_street: true,
-          allow_customer_editing_city: true,
-          allow_customer_editing_state: true,
-          allow_customer_editing_zipcode: true,
-          allow_customer_editing_name: true,
-          allow_customer_editing_email: true,
-          allow_currency_selection: true,
-          allow_discount_code: true,
-          allow_phone_number_collection: true,
         },
         return_url: returnUrl,
         metadata: {

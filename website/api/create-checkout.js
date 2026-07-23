@@ -81,10 +81,18 @@ module.exports = async function handler(req, res) {
       body.returnUrl ||
       `${site}/checkout-success?provider=dodo&plan=${encodeURIComponent(planId)}`;
 
+    /* Match X Freeze site theme so checkout is not stuck on Dodo dark default */
+    const rawTheme = String(body.theme || body.colorScheme || '')
+      .toLowerCase()
+      .trim();
+    const checkoutTheme =
+      rawTheme === 'dark' || rawTheme === 'light' || rawTheme === 'system'
+        ? rawTheme
+        : 'system';
+
     /*
-     * Default Dodo checkout only — no allowed_payment_method_types, no forced
-     * currency, no custom feature_flags. Payment methods/currency follow the
-     * merchant dashboard defaults for the buyer’s location.
+     * Default Dodo payment methods/currency — no method allow-list.
+     * Theme follows the website (light / dark / system).
      */
     const session = await dodoFetch('/checkouts', {
       method: 'POST',
@@ -97,12 +105,16 @@ module.exports = async function handler(req, res) {
             user.email ||
             'X Freeze customer',
         },
+        customization: {
+          theme: checkoutTheme,
+        },
         return_url: returnUrl,
         metadata: {
           user_id: user.id,
           plan_id: planId,
           product_type: 'subscription',
           source: 'xfreeze',
+          site_theme: checkoutTheme,
         },
       },
     });

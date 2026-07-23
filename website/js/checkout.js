@@ -83,6 +83,31 @@
     return 'test';
   }
 
+  /** Match current X Freeze theme for Dodo checkout (light | dark | system). */
+  function getSiteTheme() {
+    try {
+      var stored = localStorage.getItem('xfreeze-theme');
+      if (stored === 'dark' || stored === 'light') return stored;
+    } catch (e) {}
+    try {
+      if (
+        document.documentElement &&
+        document.documentElement.classList.contains('dark')
+      ) {
+        return 'dark';
+      }
+    } catch (e2) {}
+    try {
+      if (
+        window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches
+      ) {
+        return 'dark';
+      }
+    } catch (e3) {}
+    return 'light';
+  }
+
   function getDodoApi() {
     if (global.DodoPaymentsCheckout && global.DodoPaymentsCheckout.DodoPayments) {
       return global.DodoPaymentsCheckout.DodoPayments;
@@ -114,25 +139,62 @@
 
   function ensureStatus() {
     var el = document.getElementById('xf-checkout-status');
-    if (el) return el;
+    var isDark = getSiteTheme() === 'dark';
+    if (el) {
+      el.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      return el;
+    }
     el = document.createElement('div');
     el.id = 'xf-checkout-status';
     el.setAttribute('role', 'status');
+    el.setAttribute('data-theme', isDark ? 'dark' : 'light');
     el.style.cssText =
       'position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.4);padding:1rem';
     el.innerHTML =
-      '<div style="background:var(--surface,#fff);color:var(--text,#0a0a0a);border-radius:1rem;padding:1.25rem 1.5rem;max-width:20rem;text-align:center;font:600 0.95rem/1.4 system-ui,sans-serif">' +
+      '<div id="xf-checkout-status-card" style="background:#fff;color:#0a0a0a;border-radius:1rem;padding:1.25rem 1.5rem;max-width:20rem;text-align:center;font:600 0.95rem/1.4 Inter,system-ui,sans-serif;border:1px solid #e5e7eb">' +
       '<p id="xf-checkout-status-title" style="margin:0">Opening secure checkout…</p>' +
       '<p id="xf-checkout-status-msg" style="margin:.5rem 0 0;font-weight:400;font-size:.8rem;color:#52525b"></p>' +
-      '<button type="button" id="xf-checkout-status-close" style="display:none;margin-top:1rem;padding:.5rem 1rem;border-radius:999px;border:1px solid #e5e7eb;background:#f4f4f5;cursor:pointer">Close</button>' +
+      '<button type="button" id="xf-checkout-status-close" style="display:none;margin-top:1rem;padding:.5rem 1rem;border-radius:999px;border:1px solid #e5e7eb;background:#f4f4f5;color:#0a0a0a;cursor:pointer">Close</button>' +
       '</div>';
     document.body.appendChild(el);
     document.getElementById('xf-checkout-status-close').onclick = hideStatus;
     return el;
   }
 
+  function paintStatusTheme() {
+    var el = document.getElementById('xf-checkout-status');
+    var card = document.getElementById('xf-checkout-status-card');
+    var msg = document.getElementById('xf-checkout-status-msg');
+    var closeBtn = document.getElementById('xf-checkout-status-close');
+    if (!el || !card) return;
+    var isDark = getSiteTheme() === 'dark';
+    el.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    if (isDark) {
+      card.style.background = '#141816';
+      card.style.color = '#f2f5f3';
+      card.style.borderColor = '#2a312e';
+      if (msg) msg.style.color = '#9ca3af';
+      if (closeBtn) {
+        closeBtn.style.background = '#1f2623';
+        closeBtn.style.color = '#f2f5f3';
+        closeBtn.style.borderColor = '#2a312e';
+      }
+    } else {
+      card.style.background = '#fff';
+      card.style.color = '#0a0a0a';
+      card.style.borderColor = '#e5e7eb';
+      if (msg) msg.style.color = '#52525b';
+      if (closeBtn) {
+        closeBtn.style.background = '#f4f4f5';
+        closeBtn.style.color = '#0a0a0a';
+        closeBtn.style.borderColor = '#e5e7eb';
+      }
+    }
+  }
+
   function showStatus(title, msg, canClose) {
     var el = ensureStatus();
+    paintStatusTheme();
     document.getElementById('xf-checkout-status-title').textContent =
       title || 'Opening secure checkout…';
     var m = document.getElementById('xf-checkout-status-msg');
@@ -222,6 +284,7 @@
         sessionStorage.setItem('xf_pending_product', JSON.stringify(product));
       } catch (e) {}
 
+      var siteTheme = getSiteTheme();
       var res = await fetch(apiBase + '/api/create-checkout', {
         method: 'POST',
         headers: {
@@ -232,6 +295,7 @@
           planId: product.id,
           email: getSessionEmail() || undefined,
           returnUrl: successUrl(product.id),
+          theme: siteTheme,
         }),
       });
       var data = await res.json().catch(function () {
@@ -242,30 +306,29 @@
 
       try {
         var Dodo = await loadDodoSdk();
-        if (!sdkInitialized) {
-          Dodo.Initialize({
-            mode: dodoModeFromConfig(cfg),
-            displayType: 'overlay',
-            onEvent: function (ev) {
-              var t = (ev && (ev.event_type || ev.type)) || '';
-              if (
-                t === 'checkout.opened' ||
-                t === 'checkout.form_ready' ||
-                t === 'checkout.closed'
-              ) {
-                hideStatus();
-              }
-              if (t === 'checkout.error') {
-                showStatus(
-                  'Checkout error',
-                  (ev.data && ev.data.message) || 'Try again',
-                  true
-                );
-              }
-            },
-          });
-          sdkInitialized = true;
-        }
+        /* Re-init each open so overlay picks current mode; theme is on session */
+        Dodo.Initialize({
+          mode: dodoModeFromConfig(cfg),
+          displayType: 'overlay',
+          onEvent: function (ev) {
+            var t = (ev && (ev.event_type || ev.type)) || '';
+            if (
+              t === 'checkout.opened' ||
+              t === 'checkout.form_ready' ||
+              t === 'checkout.closed'
+            ) {
+              hideStatus();
+            }
+            if (t === 'checkout.error') {
+              showStatus(
+                'Checkout error',
+                (ev.data && ev.data.message) || 'Try again',
+                true
+              );
+            }
+          },
+        });
+        sdkInitialized = true;
         await Dodo.Checkout.open({ checkoutUrl: data.checkoutUrl });
         setTimeout(function () {
           hideStatus();

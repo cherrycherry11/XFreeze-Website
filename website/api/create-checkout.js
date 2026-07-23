@@ -80,7 +80,11 @@ module.exports = async function handler(req, res) {
     /*
      * Prefer USD + card methods (avoids INR local methods that fail with
      * "Payment mode not enabled for this merchant" on some Dodo accounts).
-     * Do not lock address fields — customer must be able to edit/confirm.
+     *
+     * minimal_address: digital/SaaS only needs country (+ PIN where tax requires
+     * it). Full street validation on Dodo’s form often blocks India buyers when
+     * city/PIN don’t match autocomplete — not an X Freeze bug.
+     *
      * Recurring auto-renew is owned by Dodo subscription products, not our UI.
      */
     const session = await dodoFetch('/checkouts', {
@@ -92,6 +96,7 @@ module.exports = async function handler(req, res) {
           name: user.user_metadata?.full_name || user.email || 'X Freeze customer',
         },
         billing_currency: 'USD',
+        minimal_address: true,
         allowed_payment_method_types: ['credit', 'debit'],
         feature_flags: {
           allow_customer_editing_country: true,

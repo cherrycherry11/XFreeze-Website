@@ -78,11 +78,15 @@ module.exports = async function handler(req, res) {
       `${site}/checkout-success?provider=dodo&plan=${encodeURIComponent(planId)}`;
 
     /*
-     * International card-only checkout (no UPI / local India rails):
-     * - USD + credit/debit → Visa, Mastercard, Amex, Discover, JCB, UnionPay, etc.
-     * - Explicit allow-list excludes upi_*, rupee local methods, BNPL, etc.
-     * - minimal_address: country (+ zip when tax needs it) for global SaaS tax.
-     * - 3DS left to Dodo/issuer (do not force_3ds) so more international cards pass.
+     * Local + international methods (whatever Dodo has enabled for this merchant
+     * and the buyer’s country). Do not force USD-only or cards-only — that hid
+     * UPI/wallets/local rails and blocked many domestic cards.
+     *
+     * - No allowed_payment_method_types → Dodo offers all eligible methods
+     * - No fixed billing_currency → adaptive/local currency when available
+     * - allow_currency_selection → customer can switch when Dodo supports it
+     * - minimal_address → less form friction; tax still uses country (+ zip)
+     * - credit/debit still work as the global card baseline
      * Recurring renewals are owned by Dodo subscription products.
      */
     const session = await dodoFetch('/checkouts', {
@@ -93,10 +97,7 @@ module.exports = async function handler(req, res) {
           email,
           name: user.user_metadata?.full_name || user.email || 'X Freeze customer',
         },
-        billing_currency: 'USD',
         minimal_address: true,
-        /* Dodo: always include both credit + debit for global card acceptance */
-        allowed_payment_method_types: ['credit', 'debit'],
         show_saved_payment_methods: true,
         feature_flags: {
           allow_customer_editing_country: true,
@@ -106,9 +107,9 @@ module.exports = async function handler(req, res) {
           allow_customer_editing_zipcode: true,
           allow_customer_editing_name: true,
           allow_customer_editing_email: true,
-          allow_currency_selection: false,
+          allow_currency_selection: true,
           allow_discount_code: true,
-          allow_phone_number_collection: false,
+          allow_phone_number_collection: true,
         },
         return_url: returnUrl,
         metadata: {
@@ -116,7 +117,7 @@ module.exports = async function handler(req, res) {
           plan_id: planId,
           product_type: 'subscription',
           source: 'xfreeze',
-          checkout_mode: 'international_cards_usd',
+          checkout_mode: 'local_and_international',
         },
       },
     });

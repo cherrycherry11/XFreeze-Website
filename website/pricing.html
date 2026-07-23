@@ -221,8 +221,8 @@
               Works with Grok, Claude, Cursor, GPT
             </li>
           </ul>
-          <button type="button" class="xf-price-card__cta" disabled aria-disabled="true">
-            Checkout offline
+          <button type="button" class="xf-price-card__cta" data-checkout-plan="pro-monthly">
+            Start monthly
           </button>
         </article>
 
@@ -260,15 +260,11 @@
               Full year of library updates
             </li>
           </ul>
-          <button type="button" class="xf-price-card__cta xf-price-card__cta--primary" disabled aria-disabled="true">
-            Checkout offline
+          <button type="button" class="xf-price-card__cta xf-price-card__cta--primary" data-checkout-plan="pro-yearly">
+            Get yearly access
           </button>
         </article>
       </div>
-
-      <p class="xf-pricing-offline-note scroll-reveal-in" style="text-align:center;margin:1.5rem auto 0;max-width:36rem;font-size:0.9rem;color:var(--text-secondary,#52525b);">
-        Online checkout is temporarily offline while we rebuild payments from a clean slate. Free plans still work.
-      </p>
 
       <section class="xf-pricing-faq scroll-reveal-in" aria-labelledby="faq-title">
         <h2 id="faq-title" class="xf-pricing-faq__title">Questions</h2>
@@ -277,8 +273,8 @@
           <p>Same library access. Yearly is $499/year (~$41.58/mo) and saves $89 versus twelve monthly payments of $49.</p>
         </details>
         <details>
-          <summary>Can I buy Pro right now?</summary>
-          <p>Not yet — paid checkout is offline while payments are rebuilt. Browse free templates and skills in the meantime.</p>
+          <summary>How do I pay?</summary>
+          <p>Sign in, choose a plan, and complete checkout with Dodo Payments (test mode uses Dodo test cards such as 4242 4242 4242 4242).</p>
         </details>
       </section>
 
@@ -292,6 +288,10 @@
 
   <footer class="xf-site-footer" data-xf-footer-root></footer>
 
+  <script src="data/products.js"></script>
+  <script src="js/entitlement.js"></script>
+  <script src="js/usage.js"></script>
+  <script src="js/checkout.js"></script>
   <script src="js/scroll-reveal.js"></script>
   <script>
     function getPreferredTheme() {
@@ -313,14 +313,20 @@
     }
     applyTheme(getPreferredTheme());
 
+    document.querySelectorAll('[data-checkout-plan]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-checkout-plan');
+        if (window.XFreezeCheckout && window.XFreezeCheckout.openSubscription) {
+          window.XFreezeCheckout.openSubscription(id, btn);
+        }
+      });
+    });
+
     try {
       var params = new URLSearchParams(window.location.search);
       if (params.get('reason') === 'premium') {
         var ban = document.getElementById('xf-pricing-premium-banner');
-        if (ban) {
-          ban.hidden = false;
-          ban.textContent = 'Premium checkout is offline while payments are rebuilt. Free content stays available.';
-        }
+        if (ban) ban.hidden = false;
       }
     } catch (e) {}
   </script>

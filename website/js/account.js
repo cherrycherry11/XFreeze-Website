@@ -78,22 +78,71 @@
   }
 
   /**
-   * Load Pro status from server entitlement only (no payment recovery).
+   * Load Pro from server; if Free, try verify-payment recovery (latest Dodo pay).
    */
   function ensureProFromPayment(user) {
     if (!user) return Promise.resolve(null);
-    recovering = false;
-    if (window.XFreezeEntitlement && window.XFreezeEntitlement.refresh) {
-      return window.XFreezeEntitlement
-        .refresh({ force: true })
-        .then(function (snap) {
-          return (snap && snap.subscription) || null;
-        })
-        .catch(function () {
-          return null;
-        });
+    recovering = true;
+
+    function token() {
+      try {
+        if (window.XFreezeEntitlement && window.XFreezeEntitlement.getAccessToken) {
+          return window.XFreezeEntitlement.getAccessToken() || '';
+        }
+        if (window.XFreezeAuth && window.XFreezeAuth.getSession) {
+          var s = window.XFreezeAuth.getSession();
+          return (s && s.access_token) || '';
+        }
+      } catch (e) {}
+      return '';
     }
-    return Promise.resolve(null);
+
+    function refresh() {
+      if (window.XFreezeEntitlement && window.XFreezeEntitlement.refresh) {
+        return window.XFreezeEntitlement.refresh({ force: true });
+      }
+      return Promise.resolve({ isPro: false, subscription: null });
+    }
+
+    return refresh()
+      .then(function (snap) {
+        if (snap && snap.isPro) {
+          recovering = false;
+          return snap.subscription || null;
+        }
+        var t = token();
+        if (!t) {
+          recovering = false;
+          return null;
+        }
+        return fetch('/api/verify-payment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + t,
+          },
+          body: JSON.stringify({}),
+        })
+          .then(function (r) {
+            return r.json().catch(function () {
+              return {};
+            });
+          })
+          .then(function (data) {
+            if (data && data.entitlement && window.XFreezeEntitlement) {
+              window.XFreezeEntitlement.applyServerEntitlement(data.entitlement);
+            }
+            return refresh();
+          })
+          .then(function (snap2) {
+            recovering = false;
+            return (snap2 && snap2.subscription) || null;
+          });
+      })
+      .catch(function () {
+        recovering = false;
+        return null;
+      });
   }
 
   function showTab(name) {

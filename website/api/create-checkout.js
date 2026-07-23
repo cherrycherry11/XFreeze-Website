@@ -77,6 +77,11 @@ module.exports = async function handler(req, res) {
       body.returnUrl ||
       `${site}/checkout-success?provider=dodo&plan=${encodeURIComponent(planId)}`;
 
+    /*
+     * Force USD + card methods for reliable test/live card checkout.
+     * Indian INR local methods (UPI etc.) can return
+     * "Payment mode not enabled for this merchant" until Dodo enables them.
+     */
     const session = await dodoFetch('/checkouts', {
       method: 'POST',
       body: {
@@ -85,6 +90,15 @@ module.exports = async function handler(req, res) {
           email,
           name: user.user_metadata?.full_name || user.email || 'X Freeze customer',
         },
+        billing_currency: 'USD',
+        billing_address: {
+          country: 'US',
+          city: 'New York',
+          state: 'NY',
+          street: '1 Main St',
+          zipcode: '10001',
+        },
+        allowed_payment_method_types: ['credit', 'debit'],
         return_url: returnUrl,
         metadata: {
           user_id: user.id,

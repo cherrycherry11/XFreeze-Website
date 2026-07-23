@@ -1,4 +1,73 @@
-/* X Freeze checkout modal - matches site Inter / neutral palette */
+/* Direct redirect overlay (no payment form — Dodo owns checkout) */
+.xf-checkout-redirect {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+}
+.xf-checkout-redirect.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+.xf-checkout-redirect[hidden] {
+  display: none !important;
+}
+.xf-checkout-redirect.is-open[hidden] {
+  display: flex !important;
+}
+.xf-checkout-redirect__card {
+  width: 100%;
+  max-width: 22rem;
+  padding: 1.5rem 1.35rem;
+  border-radius: 1.15rem;
+  background: var(--surface, #fff);
+  color: var(--text, #0a0a0a);
+  border: 1px solid var(--border, #e5e7eb);
+  box-shadow: 0 20px 48px -16px rgba(0, 0, 0, 0.22);
+  text-align: center;
+}
+.xf-checkout-redirect__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.xf-checkout-redirect__sub {
+  margin: 0.4rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #52525b);
+}
+.xf-checkout-redirect__error {
+  margin: 0.85rem 0 0;
+  font-size: 0.8125rem;
+  color: #dc2626;
+  line-height: 1.4;
+}
+.xf-checkout-redirect__retry {
+  margin-top: 1rem;
+  padding: 0.55rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border, #e5e7eb);
+  background: var(--surface-subtle, #f4f4f5);
+  color: var(--text, #0a0a0a);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.xf-checkout-redirect__retry:hover {
+  opacity: 0.9;
+}
+
+/* Legacy modal styles (unused for Pro direct-redirect flow) */
 .xf-checkout-overlay {
   position: fixed;
   inset: 0;

@@ -1,8 +1,8 @@
 /**
- * X Freeze checkout — Dodo Payments (hosted checkout session)
+ * X Freeze checkout — Dodo Payments (direct redirect)
  *
- * Flow: create session on server → redirect to Dodo checkout_url
- * Pro is granted via webhook + optional return_url verify.
+ * Click plan → create session → jump to Dodo checkout_url.
+ * No intermediate website payment UI.
  */
 (function (global) {
   function resolveDefaultApiBase() {
@@ -18,32 +18,18 @@
   }
 
   let apiBase = resolveDefaultApiBase();
-  let currentProduct = null;
   let config = null;
+  let inflight = false;
 
-  function getOverlay() {
-    return document.getElementById('xf-checkout-overlay');
-  }
-
-  function setMessage(text, type) {
-    const el = document.getElementById('xf-checkout-message');
-    if (!el) return;
-    el.textContent = text || '';
-    el.className = 'xf-checkout-message' + (type ? ' is-' + type : '');
-  }
-
-  function formatPrice(amount) {
-    if (global.XFreezeProducts) return global.XFreezeProducts.formatUSD(amount);
-    const n = Number(amount);
-    return '$' + (Number.isInteger(n) ? n.toFixed(0) : n.toFixed(2));
-  }
-
-  async function fetchConfig() {
-    if (config) return config;
-    const res = await fetch(apiBase + '/api/config');
-    if (!res.ok) throw new Error('Config request failed');
-    config = await res.json();
-    return config;
+  function fetchConfig() {
+    if (config) return Promise.resolve(config);
+    return fetch(apiBase + '/api/config').then(function (res) {
+      if (!res.ok) throw new Error('Config request failed');
+      return res.json().then(function (data) {
+        config = data;
+        return config;
+      });
+    });
   }
 
   function getAccessToken() {
@@ -54,6 +40,16 @@
       if (global.XFreezeAuth && global.XFreezeAuth.getSession) {
         var s = global.XFreezeAuth.getSession();
         return (s && s.access_token) || '';
+      }
+    } catch (e) {}
+    return '';
+  }
+
+  function getSessionEmail() {
+    try {
+      if (global.XFreezeAuth && global.XFreezeAuth.getSession) {
+        var s = global.XFreezeAuth.getSession();
+        if (s && s.user && s.user.email) return String(s.user.email).trim();
       }
     } catch (e) {}
     return '';
@@ -77,176 +73,165 @@
     }
   }
 
-  function injectModal() {
-    if (document.getElementById('xf-checkout-overlay')) return;
-
-    const html = `
-      <div id="xf-checkout-overlay" class="xf-checkout-overlay" role="dialog" aria-modal="true" aria-labelledby="xf-checkout-title" hidden>
-        <div class="xf-checkout-modal">
-          <div class="xf-checkout-header">
-            <div>
-              <h2 id="xf-checkout-title" class="xf-checkout-title">Checkout</h2>
-              <p id="xf-checkout-subtitle" class="xf-checkout-subtitle">Secure payment via Dodo</p>
-            </div>
-            <button type="button" class="xf-checkout-close" aria-label="Close checkout" data-xf-close>&times;</button>
-          </div>
-          <div class="xf-checkout-body">
-            <div class="xf-checkout-summary">
-              <span id="xf-checkout-product-name" class="xf-checkout-summary-name">-</span>
-              <span id="xf-checkout-product-price" class="xf-checkout-summary-price">-</span>
-            </div>
-            <div id="xf-checkout-setup" class="xf-checkout-setup" hidden></div>
-            <div id="xf-checkout-form-wrap">
-              <input type="email" id="xf-checkout-email" class="xf-checkout-email" placeholder="Email" autocomplete="email">
-              <button type="button" id="xf-pay-dodo-btn" class="xf-checkout-pay-btn">Continue to payment</button>
-              <p id="xf-checkout-message" class="xf-checkout-message" aria-live="polite"></p>
-              <p class="xf-checkout-message" style="margin-top:0.5rem;opacity:0.75;font-size:0.8rem">
-                You will complete payment on Dodo’s secure checkout page.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>`;
-
-    document.body.insertAdjacentHTML('beforeend', html);
-
-    const overlay = getOverlay();
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) close();
-    });
-    overlay.querySelector('[data-xf-close]').addEventListener('click', close);
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && overlay.classList.contains('is-open')) close();
-    });
-    document.getElementById('xf-pay-dodo-btn').addEventListener('click', payWithDodo);
+  function requireLoginForCheckout() {
+    var auth = global.XFreezeAuth;
+    if (!auth || !auth.isConfigured || !auth.isConfigured()) return false;
+    if (auth.isLoggedIn && auth.isLoggedIn()) return false;
+    try {
+      sessionStorage.setItem(
+        'xf-auth-redirect',
+        (window.location.pathname.split('/').pop() || 'pricing') +
+          window.location.search +
+          window.location.hash
+      );
+    } catch (e) {}
+    if (auth.rememberRedirect) auth.rememberRedirect();
+    window.location.href = 'login';
+    return true;
   }
 
-  function open(product) {
-    if (product && product.type === 'subscription') {
-      var auth = global.XFreezeAuth;
-      if (auth && auth.isConfigured && auth.isConfigured()) {
-        if (!auth.isLoggedIn || !auth.isLoggedIn()) {
-          try {
-            sessionStorage.setItem(
-              'xf-auth-redirect',
-              (window.location.pathname.split('/').pop() || 'pricing') +
-                window.location.search +
-                window.location.hash
-            );
-          } catch (e) {}
-          if (auth.rememberRedirect) auth.rememberRedirect();
-          window.location.href = 'login';
-          return;
-        }
-      }
+  function ensureRedirectOverlay() {
+    var el = document.getElementById('xf-checkout-redirect');
+    if (el) return el;
+    el = document.createElement('div');
+    el.id = 'xf-checkout-redirect';
+    el.className = 'xf-checkout-redirect';
+    el.hidden = true;
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    el.innerHTML =
+      '<div class="xf-checkout-redirect__card">' +
+      '<p class="xf-checkout-redirect__title">Taking you to secure payment…</p>' +
+      '<p class="xf-checkout-redirect__sub">Dodo Payments · encrypted checkout</p>' +
+      '<p class="xf-checkout-redirect__error" id="xf-checkout-redirect-error" hidden></p>' +
+      '<button type="button" class="xf-checkout-redirect__retry" id="xf-checkout-redirect-close" hidden>Close</button>' +
+      '</div>';
+    document.body.appendChild(el);
+    var closeBtn = document.getElementById('xf-checkout-redirect-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', hideRedirectOverlay);
     }
+    return el;
+  }
 
-    injectModal();
-    currentProduct = product;
-    config = null;
-    const overlay = getOverlay();
-    overlay.hidden = false;
-    requestAnimationFrame(() => overlay.classList.add('is-open'));
+  function showRedirectOverlay(msg) {
+    var el = ensureRedirectOverlay();
+    var err = document.getElementById('xf-checkout-redirect-error');
+    var closeBtn = document.getElementById('xf-checkout-redirect-close');
+    var title = el.querySelector('.xf-checkout-redirect__title');
+    if (title) title.textContent = msg || 'Taking you to secure payment…';
+    if (err) {
+      err.hidden = true;
+      err.textContent = '';
+    }
+    if (closeBtn) closeBtn.hidden = true;
+    el.hidden = false;
+    el.classList.add('is-open');
     document.body.style.overflow = 'hidden';
-
-    document.getElementById('xf-checkout-product-name').textContent = product.name;
-    document.getElementById('xf-checkout-product-price').textContent = formatPrice(
-      product.price
-    );
-    document.getElementById('xf-checkout-subtitle').textContent =
-      product.type === 'subscription'
-        ? product.interval === 'year'
-          ? 'Pro · billed yearly via Dodo'
-          : 'Pro · billed monthly via Dodo'
-        : 'Secure payment via Dodo';
-
-    setMessage('');
-    try {
-      var session =
-        global.XFreezeAuth && global.XFreezeAuth.getSession
-          ? global.XFreezeAuth.getSession()
-          : null;
-      var emailInput = document.getElementById('xf-checkout-email');
-      if (emailInput && session && session.user && session.user.email) {
-        emailInput.value = session.user.email;
-      }
-    } catch (e2) {}
-    initCheckout();
   }
 
-  function close() {
-    const overlay = getOverlay();
-    if (!overlay) return;
-    overlay.classList.remove('is-open');
+  function showRedirectError(message) {
+    var el = ensureRedirectOverlay();
+    var err = document.getElementById('xf-checkout-redirect-error');
+    var closeBtn = document.getElementById('xf-checkout-redirect-close');
+    var title = el.querySelector('.xf-checkout-redirect__title');
+    if (title) title.textContent = 'Could not start checkout';
+    if (err) {
+      err.hidden = false;
+      err.textContent = message || 'Try again in a moment.';
+    }
+    if (closeBtn) closeBtn.hidden = false;
+    el.hidden = false;
+    el.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function hideRedirectOverlay() {
+    var el = document.getElementById('xf-checkout-redirect');
+    if (!el) return;
+    el.classList.remove('is-open');
+    el.hidden = true;
     document.body.style.overflow = '';
-    setTimeout(() => {
-      overlay.hidden = true;
-    }, 200);
+    inflight = false;
+    document.querySelectorAll('[data-checkout-plan][disabled]').forEach(function (btn) {
+      btn.disabled = false;
+      if (btn.dataset.xfLabel) {
+        btn.textContent = btn.dataset.xfLabel;
+        delete btn.dataset.xfLabel;
+      }
+    });
   }
 
-  async function initCheckout() {
-    const setupEl = document.getElementById('xf-checkout-setup');
-    const formWrap = document.getElementById('xf-checkout-form-wrap');
-
-    try {
-      const cfg = await fetchConfig();
-      if (!cfg.configured || !cfg.dodo) {
-        setupEl.hidden = false;
-        formWrap.hidden = true;
-        setupEl.innerHTML =
-          '<strong>Dodo Payments is not configured yet.</strong><br>' +
-          'Add <code>DODO_PAYMENTS_API_KEY</code> and product IDs in Vercel, then redeploy.';
-        return;
+  function setButtonBusy(btn, busy) {
+    if (!btn) return;
+    if (busy) {
+      if (!btn.dataset.xfLabel) btn.dataset.xfLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Redirecting…';
+    } else {
+      btn.disabled = false;
+      if (btn.dataset.xfLabel) {
+        btn.textContent = btn.dataset.xfLabel;
+        delete btn.dataset.xfLabel;
       }
-      setupEl.hidden = true;
-      formWrap.hidden = false;
-    } catch (err) {
-      setupEl.hidden = false;
-      formWrap.hidden = true;
-      setupEl.innerHTML =
-        '<strong>Cannot reach payment config.</strong><br>' +
-        (err && err.message ? err.message : 'Try again.');
     }
   }
 
-  async function payWithDodo() {
-    const btn = document.getElementById('xf-pay-dodo-btn');
-    if (!currentProduct) return;
+  /**
+   * Create Dodo session and hard-redirect. No email form / intermediate UI.
+   * @param {object} product
+   * @param {HTMLElement} [triggerBtn]
+   */
+  async function startDodoCheckout(product, triggerBtn) {
+    if (!product || product.type !== 'subscription') {
+      showRedirectError('Only Pro subscriptions are available right now.');
+      return;
+    }
+    if (inflight) return;
+    inflight = true;
 
-    btn.disabled = true;
-    setMessage('Creating secure checkout…');
+    if (requireLoginForCheckout()) {
+      inflight = false;
+      return;
+    }
+
+    setButtonBusy(triggerBtn, true);
+    showRedirectOverlay('Taking you to secure payment…');
 
     try {
-      const cfg = await fetchConfig();
-      if (!cfg.dodo) throw new Error('Dodo Payments is not configured');
-
-      if (currentProduct.type !== 'subscription') {
-        throw new Error('Only Pro subscriptions are available right now');
+      var cfg = await fetchConfig();
+      if (!cfg.dodo) {
+        throw new Error(
+          'Payments are not configured yet. Please try again later or contact support.'
+        );
       }
 
-      const token = getAccessToken();
-      if (!token) throw new Error('Sign in required before purchasing');
-
-      const emailEl = document.getElementById('xf-checkout-email');
-      const email = (emailEl && emailEl.value.trim()) || '';
+      var token = getAccessToken();
+      if (!token) {
+        inflight = false;
+        if (requireLoginForCheckout()) return;
+        throw new Error('Sign in required before purchasing');
+      }
 
       try {
-        sessionStorage.setItem('xf_pending_product', JSON.stringify(currentProduct));
+        sessionStorage.setItem('xf_pending_product', JSON.stringify(product));
       } catch (e) {}
 
-      const res = await fetch(apiBase + '/api/create-checkout', {
+      var res = await fetch(apiBase + '/api/create-checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + token,
         },
         body: JSON.stringify({
-          planId: currentProduct.id,
-          email: email || undefined,
-          returnUrl: successUrl(currentProduct.id),
+          planId: product.id,
+          email: getSessionEmail() || undefined,
+          returnUrl: successUrl(product.id),
         }),
       });
-      const data = await res.json();
+      var data = await res.json().catch(function () {
+        return {};
+      });
       if (!res.ok) {
         throw new Error(data.error || 'Could not create checkout');
       }
@@ -254,33 +239,42 @@
         throw new Error('No checkout URL returned');
       }
 
-      setMessage('Redirecting to Dodo…');
+      showRedirectOverlay('Opening Dodo checkout…');
       window.location.href = data.checkoutUrl;
     } catch (err) {
-      setMessage((err && err.message) || 'Checkout failed', 'error');
-      btn.disabled = false;
+      inflight = false;
+      setButtonBusy(triggerBtn, false);
+      showRedirectError((err && err.message) || 'Checkout failed');
     }
   }
 
-  function openBundle(bundleId) {
-    const bundle = global.XFreezeProducts && global.XFreezeProducts.getBundle(bundleId);
-    if (!bundle) return;
-    open(bundle);
+  function open(product, triggerBtn) {
+    if (product && product.type === 'subscription') {
+      return startDodoCheckout(product, triggerBtn);
+    }
+    showRedirectError('Only Pro subscriptions are available right now.');
   }
 
-  function openSubscription(planId) {
-    const plan =
+  function openSubscription(planId, triggerBtn) {
+    var plan =
       global.XFreezeProducts && global.XFreezeProducts.getSubscription(planId);
-    if (!plan) return;
-    open(plan);
+    if (!plan) {
+      showRedirectError('Unknown plan. Choose monthly or yearly.');
+      return;
+    }
+    return startDodoCheckout(plan, triggerBtn);
   }
 
-  function openTemplate(code, category) {
-    const product =
-      global.XFreezeProducts &&
-      global.XFreezeProducts.getTemplateProduct(code, category);
-    if (!product) return;
-    open(product);
+  function openBundle(bundleId) {
+    showRedirectError('Bundle checkout is not available. Choose a Pro plan.');
+  }
+
+  function openTemplate() {
+    showRedirectError('Template checkout is not available. Choose a Pro plan.');
+  }
+
+  function openCustom() {
+    showRedirectError('Custom payments are not available. Choose a Pro plan.');
   }
 
   function setApiBase(url) {
@@ -288,8 +282,8 @@
     config = null;
   }
 
-  function openCustom() {
-    setMessage('Custom payments are not available. Choose a Pro plan.', 'error');
+  function close() {
+    hideRedirectOverlay();
   }
 
   global.XFreezeCheckout = {
@@ -303,7 +297,10 @@
     getApiBase: function () {
       return apiBase;
     },
-    payWithDodo: payWithDodo,
-    payWithRazorpay: payWithDodo,
+    startDodoCheckout: startDodoCheckout,
+    payWithDodo: function () {
+      /* legacy no-op — payments go straight to Dodo */
+    },
+    payWithRazorpay: function () {},
   };
 })(window);

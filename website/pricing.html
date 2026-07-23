@@ -321,11 +321,12 @@
     document.querySelectorAll('[data-checkout-plan]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var id = btn.getAttribute('data-checkout-plan');
+        /* Direct to Dodo — no intermediate website checkout UI */
         if (window.XFreezeCheckout && window.XFreezeCheckout.openSubscription) {
-          window.XFreezeCheckout.openSubscription(id);
+          window.XFreezeCheckout.openSubscription(id, btn);
         } else if (window.XFreezeProducts && window.XFreezeCheckout) {
           var plan = window.XFreezeProducts.getSubscription(id);
-          if (plan) window.XFreezeCheckout.open(plan);
+          if (plan) window.XFreezeCheckout.open(plan, btn);
         }
       });
     });

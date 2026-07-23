@@ -1,10 +1,16 @@
 /**
- * X Freeze checkout — Dodo Payments (direct redirect)
+ * X Freeze checkout — Dodo Payments Overlay
  *
- * Click plan → create session → jump to Dodo checkout_url.
- * No intermediate website payment UI.
+ * Click plan → create session → open Dodo overlay modal on this page
+ * (user stays on xfreeze.com; no full-page leave until payment redirect).
  */
 (function (global) {
+  var SDK_CDN =
+    'https://cdn.jsdelivr.net/npm/dodopayments-checkout@latest/dist/index.js';
+  var sdkLoadPromise = null;
+  var sdkInitialized = false;
+  var pendingPlanId = '';
+
   function resolveDefaultApiBase() {
     try {
       var h = (global.location && global.location.hostname) || '';
@@ -73,6 +79,112 @@
     }
   }
 
+  function dodoModeFromConfig(cfg) {
+    var env = String((cfg && cfg.dodoEnv) || 'test_mode').toLowerCase();
+    if (env === 'live' || env === 'live_mode' || env === 'production') {
+      return 'live';
+    }
+    return 'test';
+  }
+
+  function getDodoApi() {
+    /* CDN build: DodoPaymentsCheckout.DodoPayments
+       ESM/global variants: DodoPayments */
+    if (global.DodoPaymentsCheckout && global.DodoPaymentsCheckout.DodoPayments) {
+      return global.DodoPaymentsCheckout.DodoPayments;
+    }
+    if (global.DodoPayments) return global.DodoPayments;
+    return null;
+  }
+
+  function loadDodoSdk() {
+    if (getDodoApi()) return Promise.resolve(getDodoApi());
+    if (sdkLoadPromise) return sdkLoadPromise;
+
+    sdkLoadPromise = new Promise(function (resolve, reject) {
+      var existing = document.querySelector('script[data-xf-dodo-checkout]');
+      if (existing) {
+        var wait = 0;
+        var t = setInterval(function () {
+          wait += 50;
+          if (getDodoApi()) {
+            clearInterval(t);
+            resolve(getDodoApi());
+          } else if (wait > 10000) {
+            clearInterval(t);
+            reject(new Error('Dodo Checkout SDK timed out'));
+          }
+        }, 50);
+        return;
+      }
+
+      var s = document.createElement('script');
+      s.src = SDK_CDN;
+      s.async = true;
+      s.setAttribute('data-xf-dodo-checkout', '1');
+      s.onload = function () {
+        var api = getDodoApi();
+        if (api) resolve(api);
+        else reject(new Error('Dodo Checkout SDK loaded but API not found'));
+      };
+      s.onerror = function () {
+        sdkLoadPromise = null;
+        reject(new Error('Failed to load Dodo Checkout SDK'));
+      };
+      document.head.appendChild(s);
+    });
+
+    return sdkLoadPromise;
+  }
+
+  function handleCheckoutEvent(event) {
+    var type = (event && (event.event_type || event.type)) || '';
+    switch (type) {
+      case 'checkout.opened':
+      case 'checkout.form_ready':
+        hideStatusOverlay();
+        break;
+      case 'checkout.closed':
+        inflight = false;
+        resetBusyButtons();
+        hideStatusOverlay();
+        break;
+      case 'checkout.error':
+        inflight = false;
+        resetBusyButtons();
+        showStatusError(
+          (event.data && event.data.message) ||
+            'Checkout error. Please try again.'
+        );
+        break;
+      case 'checkout.link_expired':
+        inflight = false;
+        resetBusyButtons();
+        showStatusError('This checkout session expired. Please try again.');
+        break;
+      case 'checkout.redirect':
+        /* Payment complete or forced navigation — leave overlay state clean */
+        hideStatusOverlay();
+        break;
+      default:
+        break;
+    }
+  }
+
+  function ensureSdkInitialized(cfg) {
+    return loadDodoSdk().then(function (Dodo) {
+      if (!sdkInitialized) {
+        Dodo.Initialize({
+          mode: dodoModeFromConfig(cfg),
+          displayType: 'overlay',
+          onEvent: handleCheckoutEvent,
+        });
+        sdkInitialized = true;
+      }
+      return Dodo;
+    });
+  }
+
   function requireLoginForCheckout() {
     var auth = global.XFreezeAuth;
     if (!auth || !auth.isConfigured || !auth.isConfigured()) return false;
@@ -90,7 +202,7 @@
     return true;
   }
 
-  function ensureRedirectOverlay() {
+  function ensureStatusOverlay() {
     var el = document.getElementById('xf-checkout-redirect');
     if (el) return el;
     el = document.createElement('div');
@@ -101,25 +213,25 @@
     el.setAttribute('aria-live', 'polite');
     el.innerHTML =
       '<div class="xf-checkout-redirect__card">' +
-      '<p class="xf-checkout-redirect__title">Taking you to secure payment…</p>' +
-      '<p class="xf-checkout-redirect__sub">Dodo Payments · encrypted checkout</p>' +
+      '<p class="xf-checkout-redirect__title">Opening secure payment…</p>' +
+      '<p class="xf-checkout-redirect__sub">Dodo Payments · stays on this page</p>' +
       '<p class="xf-checkout-redirect__error" id="xf-checkout-redirect-error" hidden></p>' +
       '<button type="button" class="xf-checkout-redirect__retry" id="xf-checkout-redirect-close" hidden>Close</button>' +
       '</div>';
     document.body.appendChild(el);
     var closeBtn = document.getElementById('xf-checkout-redirect-close');
     if (closeBtn) {
-      closeBtn.addEventListener('click', hideRedirectOverlay);
+      closeBtn.addEventListener('click', hideStatusOverlay);
     }
     return el;
   }
 
-  function showRedirectOverlay(msg) {
-    var el = ensureRedirectOverlay();
+  function showStatusOverlay(msg) {
+    var el = ensureStatusOverlay();
     var err = document.getElementById('xf-checkout-redirect-error');
     var closeBtn = document.getElementById('xf-checkout-redirect-close');
     var title = el.querySelector('.xf-checkout-redirect__title');
-    if (title) title.textContent = msg || 'Taking you to secure payment…';
+    if (title) title.textContent = msg || 'Opening secure payment…';
     if (err) {
       err.hidden = true;
       err.textContent = '';
@@ -127,11 +239,10 @@
     if (closeBtn) closeBtn.hidden = true;
     el.hidden = false;
     el.classList.add('is-open');
-    document.body.style.overflow = 'hidden';
   }
 
-  function showRedirectError(message) {
-    var el = ensureRedirectOverlay();
+  function showStatusError(message) {
+    var el = ensureStatusOverlay();
     var err = document.getElementById('xf-checkout-redirect-error');
     var closeBtn = document.getElementById('xf-checkout-redirect-close');
     var title = el.querySelector('.xf-checkout-redirect__title');
@@ -143,16 +254,16 @@
     if (closeBtn) closeBtn.hidden = false;
     el.hidden = false;
     el.classList.add('is-open');
-    document.body.style.overflow = 'hidden';
   }
 
-  function hideRedirectOverlay() {
+  function hideStatusOverlay() {
     var el = document.getElementById('xf-checkout-redirect');
     if (!el) return;
     el.classList.remove('is-open');
     el.hidden = true;
-    document.body.style.overflow = '';
-    inflight = false;
+  }
+
+  function resetBusyButtons() {
     document.querySelectorAll('[data-checkout-plan][disabled]').forEach(function (btn) {
       btn.disabled = false;
       if (btn.dataset.xfLabel) {
@@ -167,7 +278,7 @@
     if (busy) {
       if (!btn.dataset.xfLabel) btn.dataset.xfLabel = btn.textContent;
       btn.disabled = true;
-      btn.textContent = 'Redirecting…';
+      btn.textContent = 'Opening…';
     } else {
       btn.disabled = false;
       if (btn.dataset.xfLabel) {
@@ -177,18 +288,30 @@
     }
   }
 
+  function openOverlayCheckout(Dodo, checkoutUrl) {
+    return Promise.resolve(
+      Dodo.Checkout.open({
+        checkoutUrl: checkoutUrl,
+        options: {
+          showTimer: true,
+          showSecurityBadge: true,
+        },
+      })
+    );
+  }
+
   /**
-   * Create Dodo session and hard-redirect. No email form / intermediate UI.
-   * @param {object} product
-   * @param {HTMLElement} [triggerBtn]
+   * Create Dodo session and open overlay modal on this page.
+   * Falls back to full-page redirect if the overlay SDK fails.
    */
   async function startDodoCheckout(product, triggerBtn) {
     if (!product || product.type !== 'subscription') {
-      showRedirectError('Only Pro subscriptions are available right now.');
+      showStatusError('Only Pro subscriptions are available right now.');
       return;
     }
     if (inflight) return;
     inflight = true;
+    pendingPlanId = product.id || '';
 
     if (requireLoginForCheckout()) {
       inflight = false;
@@ -196,7 +319,7 @@
     }
 
     setButtonBusy(triggerBtn, true);
-    showRedirectOverlay('Taking you to secure payment…');
+    showStatusOverlay('Opening secure payment…');
 
     try {
       var cfg = await fetchConfig();
@@ -239,12 +362,27 @@
         throw new Error('No checkout URL returned');
       }
 
-      showRedirectOverlay('Opening Dodo checkout…');
-      window.location.href = data.checkoutUrl;
+      try {
+        var Dodo = await ensureSdkInitialized(cfg);
+        await openOverlayCheckout(Dodo, data.checkoutUrl);
+        /* Overlay owns the UI; drop our spinner once open event fires.
+           Also hide soon in case opened event is delayed. */
+        setTimeout(function () {
+          hideStatusOverlay();
+          setButtonBusy(triggerBtn, false);
+        }, 400);
+      } catch (overlayErr) {
+        console.warn(
+          '[xf-checkout] Overlay failed, falling back to hosted page',
+          overlayErr
+        );
+        showStatusOverlay('Opening payment page…');
+        window.location.href = data.checkoutUrl;
+      }
     } catch (err) {
       inflight = false;
       setButtonBusy(triggerBtn, false);
-      showRedirectError((err && err.message) || 'Checkout failed');
+      showStatusError((err && err.message) || 'Checkout failed');
     }
   }
 
@@ -252,29 +390,29 @@
     if (product && product.type === 'subscription') {
       return startDodoCheckout(product, triggerBtn);
     }
-    showRedirectError('Only Pro subscriptions are available right now.');
+    showStatusError('Only Pro subscriptions are available right now.');
   }
 
   function openSubscription(planId, triggerBtn) {
     var plan =
       global.XFreezeProducts && global.XFreezeProducts.getSubscription(planId);
     if (!plan) {
-      showRedirectError('Unknown plan. Choose monthly or yearly.');
+      showStatusError('Unknown plan. Choose monthly or yearly.');
       return;
     }
     return startDodoCheckout(plan, triggerBtn);
   }
 
-  function openBundle(bundleId) {
-    showRedirectError('Bundle checkout is not available. Choose a Pro plan.');
+  function openBundle() {
+    showStatusError('Bundle checkout is not available. Choose a Pro plan.');
   }
 
   function openTemplate() {
-    showRedirectError('Template checkout is not available. Choose a Pro plan.');
+    showStatusError('Template checkout is not available. Choose a Pro plan.');
   }
 
   function openCustom() {
-    showRedirectError('Custom payments are not available. Choose a Pro plan.');
+    showStatusError('Custom payments are not available. Choose a Pro plan.');
   }
 
   function setApiBase(url) {
@@ -283,7 +421,13 @@
   }
 
   function close() {
-    hideRedirectOverlay();
+    try {
+      var Dodo = getDodoApi();
+      if (Dodo && Dodo.Checkout && Dodo.Checkout.close) Dodo.Checkout.close();
+    } catch (e) {}
+    hideStatusOverlay();
+    inflight = false;
+    resetBusyButtons();
   }
 
   global.XFreezeCheckout = {
@@ -298,9 +442,7 @@
       return apiBase;
     },
     startDodoCheckout: startDodoCheckout,
-    payWithDodo: function () {
-      /* legacy no-op — payments go straight to Dodo */
-    },
+    payWithDodo: function () {},
     payWithRazorpay: function () {},
   };
 })(window);

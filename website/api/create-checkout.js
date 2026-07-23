@@ -63,18 +63,6 @@ module.exports = async function handler(req, res) {
       return json(res, 400, { error: 'No Dodo product mapped for ' + planId });
     }
 
-    /* Auto-debit / auto-renew — default ON unless explicitly disabled */
-    const autoDebitRaw = body.autoDebit != null ? body.autoDebit : body.auto_debit;
-    const autoDebit =
-      autoDebitRaw === undefined || autoDebitRaw === null
-        ? true
-        : !(
-            autoDebitRaw === false ||
-            autoDebitRaw === 'false' ||
-            autoDebitRaw === 0 ||
-            autoDebitRaw === '0'
-          );
-
     const email =
       (body.email && String(body.email).trim()) ||
       user.email ||
@@ -93,10 +81,7 @@ module.exports = async function handler(req, res) {
      * Prefer USD + card methods (avoids INR local methods that fail with
      * "Payment mode not enabled for this merchant" on some Dodo accounts).
      * Do not lock address fields — customer must be able to edit/confirm.
-     *
-     * Auto-debit ON: normal Dodo subscription (renews each period).
-     * Auto-debit OFF: still use the subscription product for this period,
-     * then we schedule cancel_at_next_billing_date after payment succeeds.
+     * Recurring auto-renew is owned by Dodo subscription products, not our UI.
      */
     const session = await dodoFetch('/checkouts', {
       method: 'POST',
@@ -126,8 +111,6 @@ module.exports = async function handler(req, res) {
           plan_id: planId,
           product_type: 'subscription',
           source: 'xfreeze',
-          auto_debit: autoDebit ? 'true' : 'false',
-          auto_renew: autoDebit ? 'true' : 'false',
         },
       },
     });
@@ -139,7 +122,6 @@ module.exports = async function handler(req, res) {
       checkoutUrl: session.checkout_url,
       planId,
       productId,
-      autoDebit,
     });
   } catch (err) {
     console.error('create-checkout error:', err);

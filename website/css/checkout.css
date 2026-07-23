@@ -113,46 +113,6 @@
   outline-offset: 1px;
 }
 
-.xf-checkout-autodebit {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin: 0 0 0.875rem;
-  padding: 0.75rem 0.875rem;
-  border: 1px solid var(--border, #e5e7eb);
-  border-radius: 0.875rem;
-  background: var(--surface-subtle, #f4f4f5);
-  cursor: pointer;
-  user-select: none;
-}
-.xf-checkout-autodebit[hidden] {
-  display: none !important;
-}
-.xf-checkout-autodebit input[type="checkbox"] {
-  margin-top: 0.2rem;
-  width: 1.05rem;
-  height: 1.05rem;
-  flex-shrink: 0;
-  accent-color: var(--text, #0a0a0a);
-  cursor: pointer;
-}
-.xf-checkout-autodebit__text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
-}
-.xf-checkout-autodebit__text strong {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text, #0a0a0a);
-}
-.xf-checkout-autodebit__hint {
-  font-size: 0.75rem;
-  line-height: 1.35;
-  color: var(--text-secondary, #52525b);
-}
-
 .xf-checkout-pay-btn {
   width: 100%;
   margin-top: 0.5rem;

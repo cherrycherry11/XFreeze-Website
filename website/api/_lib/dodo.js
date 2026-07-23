@@ -147,63 +147,6 @@ function publicDodoConfig() {
   };
 }
 
-/** True unless metadata explicitly disables auto-debit / auto-renew. */
-function metaWantsAutoDebit(meta) {
-  if (!meta || typeof meta !== 'object') return true;
-  const v =
-    meta.auto_debit != null
-      ? meta.auto_debit
-      : meta.autoDebit != null
-        ? meta.autoDebit
-        : meta.auto_renew != null
-          ? meta.auto_renew
-          : meta.autoRenew;
-  if (v === undefined || v === null || v === '') return true;
-  if (v === false || v === 0) return false;
-  const s = String(v).toLowerCase().trim();
-  if (s === 'false' || s === '0' || s === 'no' || s === 'off') return false;
-  return true;
-}
-
-/**
- * Schedule subscription cancellation at end of current period (no further charges).
- * Access continues until the paid period ends.
- */
-async function cancelSubscriptionAtPeriodEnd(subscriptionId) {
-  if (!subscriptionId) return null;
-  return dodoFetch(`/subscriptions/${encodeURIComponent(subscriptionId)}`, {
-    method: 'PATCH',
-    body: { cancel_at_next_billing_date: true },
-  });
-}
-
-/**
- * If checkout metadata requested no auto-debit, stop renewals after this period.
- * Safe to call more than once; ignores missing subscription ids.
- */
-async function applyAutoDebitPreference(meta, subscriptionId) {
-  if (!subscriptionId) return { applied: false, reason: 'no_subscription' };
-  if (metaWantsAutoDebit(meta)) {
-    return { applied: false, reason: 'auto_debit_on' };
-  }
-  try {
-    await cancelSubscriptionAtPeriodEnd(subscriptionId);
-    return { applied: true, subscriptionId };
-  } catch (err) {
-    console.error(
-      'cancel_at_next_billing_date failed',
-      subscriptionId,
-      err && err.message
-    );
-    return {
-      applied: false,
-      reason: 'api_error',
-      error: (err && err.message) || 'cancel failed',
-      subscriptionId,
-    };
-  }
-}
-
 module.exports = {
   dodoEnv,
   dodoApiKey,
@@ -217,7 +160,4 @@ module.exports = {
   dodoFetch,
   verifyDodoWebhook,
   publicDodoConfig,
-  metaWantsAutoDebit,
-  cancelSubscriptionAtPeriodEnd,
-  applyAutoDebitPreference,
 };

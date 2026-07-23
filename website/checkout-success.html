@@ -333,12 +333,7 @@
           planPrice.textContent = price;
         }
 
-        var refresh =
-          window.XFreezeEntitlement && window.XFreezeEntitlement.refresh
-            ? window.XFreezeEntitlement.refresh({ force: true })
-            : Promise.resolve({ isPro: false });
-
-        return refresh.then(function (snap) {
+        function showStatus(snap) {
           if (snap && snap.isPro) {
             lead.textContent =
               'Your Pro plan is active. Open Account anytime to see billing and usage.';
@@ -348,18 +343,54 @@
           } else {
             lead.textContent = 'Thanks for your purchase. Open the library and start creating.';
           }
-
           try {
             sessionStorage.removeItem('xf_pending_product');
             localStorage.removeItem('xf_pending_product');
-            sessionStorage.removeItem('xf_paypal_order');
           } catch (e3) {}
-
           if (paymentId) {
             ref.hidden = false;
             ref.textContent = 'Reference: ' + paymentId;
           }
-        });
+        }
+
+        /* Dodo return_url may include payment_id — verify + grant as backup to webhook */
+        var chain = Promise.resolve();
+        if (paymentId && window.XFreezeAuth && window.XFreezeAuth.getSession) {
+          var sess = window.XFreezeAuth.getSession();
+          var token = sess && sess.access_token;
+          if (token) {
+            lead.textContent = 'Confirming payment…';
+            chain = fetch('/api/verify-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
+              },
+              body: JSON.stringify({
+                payment_id: paymentId,
+                planId: planId || (product && product.id) || 'pro-monthly',
+              }),
+            })
+              .then(function (r) {
+                return r.json().catch(function () {
+                  return {};
+                });
+              })
+              .then(function (v) {
+                if (v && v.entitlement && window.XFreezeEntitlement) {
+                  window.XFreezeEntitlement.applyServerEntitlement(v.entitlement);
+                }
+              })
+              .catch(function () {});
+          }
+        }
+
+        return chain.then(function () {
+          if (window.XFreezeEntitlement && window.XFreezeEntitlement.refresh) {
+            return window.XFreezeEntitlement.refresh({ force: true });
+          }
+          return { isPro: false };
+        }).then(showStatus);
       });
     })();
   </script>

@@ -1,17 +1,17 @@
-const crypto = require('crypto');
-const { getKeys, hasRazorpay, getRazorpay, json, readBody } = require('./_lib/razorpay-client');
+const { json, readBody } = require('./_lib/razorpay-client');
 const { handlePreflight, applyCors } = require('./_lib/cors');
 const { getUserFromRequest, hasServiceRole } = require('./_lib/supabase');
-const { grantFromVerifiedPayment, publicEntitlement, getEntitlementForUser } = require('./_lib/entitlements');
+const { hasDodo, dodoFetch, planIdFromProductId } = require('./_lib/dodo');
+const { grantFromVerifiedPayment, getPaymentById, publicEntitlement, getEntitlementForUser } = require('./_lib/entitlements');
 const { SUBSCRIPTIONS } = require('./_lib/products');
 
-function safeEqualHex(a, b) {
-  const ba = Buffer.from(String(a), 'utf8');
-  const bb = Buffer.from(String(b), 'utf8');
-  if (ba.length !== bb.length) return false;
-  return crypto.timingSafeEqual(ba, bb);
-}
-
+/**
+ * After Dodo return_url, optionally re-check payment and grant Pro.
+ * POST { payment_id, planId? }
+ *
+ * Primary grant path is still the webhook; this is a UX backup when
+ * the browser returns with payment_id + status=succeeded.
+ */
 module.exports = async function handler(req, res) {
   if (handlePreflight(req, res, 'POST,OPTIONS')) return;
   applyCors(req, res, 'POST,OPTIONS');
@@ -21,83 +21,14 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    if (!hasRazorpay()) {
-      return json(res, 503, { success: false, error: 'Razorpay is not configured' });
+    if (!hasDodo()) {
+      return json(res, 503, { success: false, error: 'Dodo Payments not configured' });
     }
-
-    const { key_secret } = getKeys();
-    const body = await readBody(req);
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body || {};
-
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-      return json(res, 400, {
+    if (!hasServiceRole()) {
+      return json(res, 503, {
         success: false,
-        error: 'Missing razorpay_order_id, razorpay_payment_id, or razorpay_signature',
-      });
-    }
-
-    const payload = `${razorpay_order_id}|${razorpay_payment_id}`;
-    const expected = crypto.createHmac('sha256', key_secret).update(payload).digest('hex');
-    if (!safeEqualHex(expected, razorpay_signature)) {
-      return json(res, 400, {
-        success: false,
-        error: 'Signature mismatch — payment not verified',
-      });
-    }
-
-    const razorpay = getRazorpay();
-    const [payment, order] = await Promise.all([
-      razorpay.payments.fetch(razorpay_payment_id),
-      razorpay.orders.fetch(razorpay_order_id),
-    ]);
-
-    if (!payment || !order) {
-      return json(res, 400, { success: false, error: 'Could not load payment or order from Razorpay' });
-    }
-
-    if (String(payment.order_id) !== String(razorpay_order_id)) {
-      return json(res, 400, { success: false, error: 'Payment does not belong to this order' });
-    }
-
-    const status = String(payment.status || '').toLowerCase();
-    if (status !== 'captured' && status !== 'authorized') {
-      return json(res, 400, {
-        success: false,
-        error: 'Payment is not successful (status: ' + status + ')',
-      });
-    }
-
-    if (Number(payment.amount) !== Number(order.amount)) {
-      return json(res, 400, { success: false, error: 'Payment amount does not match order' });
-    }
-
-    const notes = order.notes || payment.notes || {};
-    const productType = notes.product_type || notes.productType || '';
-    const productId = notes.product_id || notes.productId || '';
-    const noteUserId = notes.user_id || notes.userId || '';
-
-    /* Non-subscription purchases: signature OK, no Pro grant */
-    if (productType !== 'subscription') {
-      return json(res, 200, {
-        success: true,
-        orderId: razorpay_order_id,
-        paymentId: razorpay_payment_id,
-        productType: productType || null,
-        productId: productId || null,
-        entitlement: { isPro: false, subscription: null },
-        granted: false,
-      });
-    }
-
-    if (!SUBSCRIPTIONS[productId]) {
-      return json(res, 400, { success: false, error: 'Order product is not a known plan' });
-    }
-
-    const expectedCents = Math.round(Number(SUBSCRIPTIONS[productId].price) * 100);
-    if (Number(order.amount) !== expectedCents) {
-      return json(res, 400, {
-        success: false,
-        error: `Order amount ${order.amount} does not match plan price ${expectedCents}`,
+        error: 'Entitlement store not configured',
+        code: 'entitlement_store_missing',
       });
     }
 
@@ -105,68 +36,90 @@ module.exports = async function handler(req, res) {
     if (!user || !user.id) {
       return json(res, 401, {
         success: false,
-        error: 'Sign in required to activate your plan',
+        error: 'Sign in required',
         code: 'auth_required',
       });
     }
 
-    /* Bind payment to the user who created the order when note present */
-    if (noteUserId && noteUserId !== user.id) {
+    const body = await readBody(req);
+    const paymentId = body.payment_id || body.paymentId || '';
+    if (!paymentId) {
+      return json(res, 400, { success: false, error: 'payment_id required' });
+    }
+
+    /* Already granted? */
+    const existing = await getPaymentById(paymentId);
+    if (existing) {
+      const row = await getEntitlementForUser(user.id);
+      return json(res, 200, {
+        success: true,
+        entitlement: publicEntitlement(row),
+        granted: true,
+        idempotent: true,
+      });
+    }
+
+    const payment = await dodoFetch(`/payments/${encodeURIComponent(paymentId)}`);
+    const status = String(payment.status || payment.payment_status || '').toLowerCase();
+    if (status !== 'succeeded' && status !== 'paid' && status !== 'active') {
+      return json(res, 400, {
+        success: false,
+        error: 'Payment not successful (status: ' + status + ')',
+        status,
+      });
+    }
+
+    const meta = payment.metadata || {};
+    let planId = body.planId || meta.plan_id || meta.planId || '';
+    const metaUser = meta.user_id || meta.userId || '';
+    if (metaUser && metaUser !== user.id) {
       return json(res, 403, {
         success: false,
-        error: 'This payment belongs to a different account. Sign in with the purchasing account.',
+        error: 'This payment belongs to a different account',
         code: 'user_mismatch',
       });
     }
 
-    if (!hasServiceRole()) {
-      return json(res, 503, {
-        success: false,
-        error: 'Entitlement store not configured on server',
-        code: 'entitlement_store_missing',
-      });
+    if (!planId) {
+      const cart = payment.product_cart || payment.productCart || [];
+      const pid = cart[0] && (cart[0].product_id || cart[0].productId);
+      planId = planIdFromProductId(pid) || 'pro-monthly';
     }
+    if (!SUBSCRIPTIONS[planId]) {
+      return json(res, 400, { success: false, error: 'Unknown plan for payment' });
+    }
+
+    const amountCents =
+      payment.total_amount != null
+        ? Number(payment.total_amount)
+        : payment.amount != null
+          ? Number(payment.amount)
+          : null;
 
     const entitlement = await grantFromVerifiedPayment({
       userId: user.id,
-      productId,
-      paymentId: razorpay_payment_id,
-      orderId: razorpay_order_id,
-      amountCents: Number(order.amount),
-      currency: order.currency || payment.currency || 'USD',
-      raw: {
-        payment_status: payment.status,
-        method: payment.method,
-        email: payment.email,
-      },
+      productId: planId,
+      paymentId,
+      orderId: payment.subscription_id || payment.subscriptionId || paymentId,
+      amountCents,
+      currency: (payment.currency || 'USD').toUpperCase(),
+      skipAmountCheck: true,
+      raw: { source: 'dodo', status, verify: true },
     });
 
     return json(res, 200, {
       success: true,
-      orderId: razorpay_order_id,
-      paymentId: razorpay_payment_id,
-      productType: 'subscription',
-      productId,
+      provider: 'dodo',
+      paymentId,
+      planId,
       entitlement,
       granted: Boolean(entitlement && entitlement.isPro),
     });
   } catch (err) {
-    console.error('verify-payment error:', err);
-    /* Unique violation = race; return existing entitlement if possible */
-    if (err && (err.status === 409 || String(err.message || '').includes('duplicate'))) {
-      try {
-        const user = await getUserFromRequest(req);
-        if (user) {
-          const row = await getEntitlementForUser(user.id);
-          return json(res, 200, {
-            success: true,
-            entitlement: publicEntitlement(row),
-            granted: true,
-            idempotent: true,
-          });
-        }
-      } catch (e2) {}
-    }
-    return json(res, 500, { success: false, error: err.message || 'Verification failed' });
+    console.error('verify-payment (dodo) error:', err);
+    return json(res, err.status || 500, {
+      success: false,
+      error: err.message || 'Verification failed',
+    });
   }
 };

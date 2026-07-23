@@ -395,7 +395,7 @@
       },
       {
         question: 'What are offline template bundles?',
-        answer: 'Paid <strong>download packs</strong> ($9-$79) for archiving templates offline - Starter, Product Bundle, Style Edit Vault, Creator Pro, Ultimate Library, and more. Checkout uses <strong>Razorpay</strong> (USD).',
+        answer: 'Paid <strong>download packs</strong> ($9-$79) for archiving templates offline - Starter, Product Bundle, Style Edit Vault, Creator Pro, Ultimate Library, and more. Checkout uses <strong>Dodo Payments</strong> (USD).',
         tags: ['bundle', 'offline', 'download', 'pack', 'buy']
       },
       {
@@ -405,7 +405,7 @@
       },
       {
         question: 'How does checkout work?',
-        answer: 'Select a plan or product, pay via <strong>Razorpay</strong> (card). Success page confirms payment; Pro unlocks after server verification. Receipt email if provided.',
+        answer: 'Select a plan or product, pay via <strong>Dodo Payments</strong> (card). Success page confirms payment; Pro unlocks after server verification. Receipt email if provided.',
         tags: ['checkout', 'stripe', 'paypal', 'pay', 'buy']
       },
       {

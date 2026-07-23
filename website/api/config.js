@@ -1,6 +1,7 @@
-const { hasRazorpay, getKeys, json } = require('./_lib/razorpay-client');
+const { json } = require('./_lib/razorpay-client');
 const { handlePreflight, applyCors } = require('./_lib/cors');
 const { hasServiceRole } = require('./_lib/supabase');
+const { publicDodoConfig, hasDodo } = require('./_lib/dodo');
 
 module.exports = function handler(req, res) {
   if (handlePreflight(req, res, 'GET,OPTIONS')) return;
@@ -10,22 +11,21 @@ module.exports = function handler(req, res) {
     return json(res, 405, { error: 'Method not allowed' });
   }
 
-  const { key_id } = getKeys();
-  const ok = hasRazorpay();
+  const dodo = publicDodoConfig();
+  const ok = Boolean(dodo.dodo && hasServiceRole());
 
   return json(res, 200, {
     configured: ok,
-    provider: 'razorpay',
-    razorpay: ok,
-    razorpayKeyId: ok ? key_id : null,
+    provider: 'dodo',
+    dodo: dodo.dodo,
+    dodoEnv: dodo.dodoEnv,
+    dodoProductsReady: dodo.productsReady,
     entitlements: hasServiceRole(),
-    /* Other gateways disabled */
+    razorpay: false,
+    razorpayKeyId: null,
     paddle: false,
     stripe: false,
-    stripePublishableKey: null,
     paypal: false,
-    paypalClientId: null,
-    paypalMode: null,
     paymentApiUrl: process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
       : process.env.SITE_URL || null,

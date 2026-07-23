@@ -1,41 +1,40 @@
-# Payments — clean slate
+# Payments — clean slate (keys wiped)
 
-All previous payment providers (Razorpay, Paddle, Dodo), checkout APIs,
-webhooks, and client checkout UI have been **removed** so you can re-integrate
-from zero.
+All payment **code**, **Vercel secrets**, and the **Dodo production webhook**
+have been removed. Rebuild from zero when ready.
 
-## What is gone
+## Deleted from Vercel
 
-- `api/create-checkout.js`, `api/verify-payment.js`, `api/webhooks/*`
-- `api/_lib/dodo.js`, `paddle.js`, `razorpay-client.js`
-- Active checkout JS (stub only remains: `js/checkout.js`)
-- `pay-demo.html`, provider-specific setup docs
+- `DODO_PAYMENTS_API_KEY`
+- `DODO_PAYMENTS_ENVIRONMENT`
+- `DODO_PRODUCT_PRO_MONTHLY` / `DODO_PRODUCT_PRO_YEARLY`
+- `DODO_PAYMENTS_WEBHOOK_KEY`
+- `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET`
 
-## What remains (not a payment provider)
+## Deleted connections
 
-- Auth (Supabase)
-- Optional `entitlements` table + `GET /api/me/entitlement` (read-only Pro status)
-- Pricing page **display** of Free / $49 / $499 (buttons offline)
-- Gated content APIs (still require Pro entitlement if you grant it manually)
+- Dodo webhook endpoint → `https://xfreeze.com/api/webhooks/dodo` (removed in Dodo live)
 
-## Health check
+## Deleted from repo
 
-`GET /api/health` → `"payments": false`, `"configured": false`
+- Checkout/create/verify/webhook APIs and provider libs
+- `payment-server/`
+- Local payment env files / debug grant scripts
 
-## When you rebuild
+## Still on Vercel (not payment)
 
-1. Pick one provider
-2. Add create-session + webhook + verify APIs
-3. Wire pricing CTAs again
-4. Set Vercel secrets for that provider only
-5. Do not re-use old Dodo/Razorpay/Paddle env vars unless intentional
+- Supabase URL / anon / service role
+- `SITE_URL`, `ALLOWED_ORIGINS`
 
-## Vercel env (you can delete unused)
+## Health
 
-You may remove from Production when ready:
+`GET /api/health` → `"payments": false`
 
-- `DODO_*`
-- `RAZORPAY_*`
-- `PADDLE_*` (if any)
+## Rebuild later
 
-Keep Supabase + `SITE_URL` + `ALLOWED_ORIGINS`.
+1. Choose a provider
+2. Add new API routes + env vars (new keys only)
+3. Wire pricing CTAs
+4. Create a new webhook for the new stack
+
+**Do not re-paste old keys into chat.** Rotate any key that was ever shared.

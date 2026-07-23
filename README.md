@@ -14,7 +14,6 @@ XFreeze-Website/
 │   ├── css/  js/  data/  assets/  grok-templates/
 ├── docs/             ← AUTH-SETUP.md, PAYMENT-SETUP.md
 ├── scripts/          ← Optional skills sync helpers
-└── payment-server/   ← Optional Stripe/PayPal backend
 ```
 
 ## Deploy

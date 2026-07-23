@@ -1,16 +1,20 @@
 const { json, readBody } = require('./_lib/razorpay-client');
 const { handlePreflight, applyCors } = require('./_lib/cors');
 const { getUserFromRequest, hasServiceRole } = require('./_lib/supabase');
-const { hasDodo, dodoFetch, planIdFromProductId } = require('./_lib/dodo');
-const { grantFromVerifiedPayment, getPaymentById, publicEntitlement, getEntitlementForUser } = require('./_lib/entitlements');
+const { hasDodo, dodoFetch, planIdFromProductId, dodoEnv } = require('./_lib/dodo');
+const {
+  grantFromVerifiedPayment,
+  getPaymentById,
+  publicEntitlement,
+  getEntitlementForUser,
+} = require('./_lib/entitlements');
 const { SUBSCRIPTIONS } = require('./_lib/products');
 
 /**
- * After Dodo return_url, optionally re-check payment and grant Pro.
- * POST { payment_id, planId? }
- *
- * Primary grant path is still the webhook; this is a UX backup when
- * the browser returns with payment_id + status=succeeded.
+ * Verify Dodo payment + grant Pro.
+ * POST { payment_id?, planId? }
+ * - With payment_id: verify that payment
+ * - Without: find latest succeeded Dodo payment for this user (recovery)
  */
 module.exports = async function handler(req, res) {
   if (handlePreflight(req, res, 'POST,OPTIONS')) return;
@@ -41,25 +45,43 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const body = await readBody(req);
-    const paymentId = body.payment_id || body.paymentId || '';
-    if (!paymentId) {
-      return json(res, 400, { success: false, error: 'payment_id required' });
-    }
-
-    /* Already granted? */
-    const existing = await getPaymentById(paymentId);
-    if (existing) {
-      const row = await getEntitlementForUser(user.id);
+    const existingEnt = await getEntitlementForUser(user.id);
+    if (existingEnt && publicEntitlement(existingEnt).isPro) {
       return json(res, 200, {
         success: true,
-        entitlement: publicEntitlement(row),
         granted: true,
-        idempotent: true,
+        already: true,
+        entitlement: publicEntitlement(existingEnt),
       });
     }
 
-    const payment = await dodoFetch(`/payments/${encodeURIComponent(paymentId)}`);
+    const body = await readBody(req);
+    let paymentId = body.payment_id || body.paymentId || '';
+    let payment = null;
+
+    if (paymentId) {
+      payment = await dodoFetch(`/payments/${encodeURIComponent(paymentId)}`);
+    } else {
+      const list = await dodoFetch('/payments?page_size=20');
+      const items = (list && list.items) || [];
+      payment =
+        items.find((p) => {
+          const st = String(p.status || '').toLowerCase();
+          if (st !== 'succeeded' && st !== 'paid') return false;
+          const meta = p.metadata || {};
+          return meta.user_id === user.id || meta.userId === user.id;
+        }) || null;
+      if (payment) paymentId = payment.payment_id || payment.id || '';
+    }
+
+    if (!payment || !paymentId) {
+      return json(res, 404, {
+        success: false,
+        error: 'No successful Dodo payment found for this account',
+        code: 'no_payment',
+      });
+    }
+
     const status = String(payment.status || payment.payment_status || '').toLowerCase();
     if (status !== 'succeeded' && status !== 'paid' && status !== 'active') {
       return json(res, 400, {
@@ -72,8 +94,6 @@ module.exports = async function handler(req, res) {
     const meta = payment.metadata || {};
     let planId = body.planId || meta.plan_id || meta.planId || '';
     const metaUser = meta.user_id || meta.userId || '';
-    /* If metadata has user_id, it must match the signed-in user.
-       If missing (edge case), still allow grant to the signed-in buyer. */
     if (metaUser && metaUser !== user.id) {
       return json(res, 403, {
         success: false,
@@ -87,8 +107,21 @@ module.exports = async function handler(req, res) {
       const pid = cart[0] && (cart[0].product_id || cart[0].productId);
       planId = planIdFromProductId(pid) || 'pro-monthly';
     }
-    if (!SUBSCRIPTIONS[planId]) {
-      return json(res, 400, { success: false, error: 'Unknown plan for payment: ' + planId });
+    if (!SUBSCRIPTIONS[planId]) planId = 'pro-monthly';
+
+    const existingPay = await getPaymentById(paymentId);
+    if (existingPay) {
+      const row = await getEntitlementForUser(user.id);
+      if (row && publicEntitlement(row).isPro) {
+        return json(res, 200, {
+          success: true,
+          entitlement: publicEntitlement(row),
+          granted: true,
+          idempotent: true,
+          paymentId,
+          planId,
+        });
+      }
     }
 
     const amountCents =
@@ -110,17 +143,15 @@ module.exports = async function handler(req, res) {
         amountCents,
         currency: (payment.currency || payment.settlement_currency || 'USD').toUpperCase(),
         skipAmountCheck: true,
-        expiresAt: null,
         raw: {
-          source: 'dodo',
+          source: 'dodo_verify',
           status,
-          verify: true,
+          env: dodoEnv(),
           subscription_id: payment.subscription_id || null,
         },
       });
     } catch (grantErr) {
       console.error('grantFromVerifiedPayment failed', grantErr);
-      /* Duplicate payment race — load existing entitlement */
       const row = await getEntitlementForUser(user.id);
       if (row && publicEntitlement(row).isPro) {
         return json(res, 200, {

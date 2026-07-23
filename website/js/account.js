@@ -115,7 +115,7 @@
           recovering = false;
           return null;
         }
-        return fetch('/api/recover-pro', {
+        return fetch('/api/verify-payment', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

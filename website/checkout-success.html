@@ -433,7 +433,7 @@
                   ? 'Confirming payment and unlocking Pro…'
                   : 'Still unlocking Pro… (' + (attempt + 1) + '/8)';
 
-              var endpoint = paymentId ? '/api/verify-payment' : '/api/recover-pro';
+              var endpoint = paymentId ? '/api/verify-payment' : '/api/verify-payment';
               var payload = paymentId
                 ? {
                     payment_id: paymentId,
@@ -445,7 +445,7 @@
 
               /* Always try recover-pro on later attempts (finds payment by user_id) */
               if (attempt >= 2 || !paymentId) {
-                endpoint = '/api/recover-pro';
+                endpoint = '/api/verify-payment';
                 payload = {
                   payment_id: paymentId || undefined,
                   planId: planId || (product && product.id) || 'pro-monthly',

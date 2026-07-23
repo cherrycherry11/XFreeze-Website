@@ -395,7 +395,7 @@
       },
       {
         question: 'What are offline template bundles?',
-        answer: 'Paid <strong>download packs</strong> ($9-$79) for archiving templates offline - Starter, Product Bundle, Style Edit Vault, Creator Pro, Ultimate Library, and more. Checkout uses Stripe or PayPal.',
+        answer: 'Paid <strong>download packs</strong> ($9-$79) for archiving templates offline - Starter, Product Bundle, Style Edit Vault, Creator Pro, Ultimate Library, and more. Checkout uses <strong>Razorpay</strong> (USD).',
         tags: ['bundle', 'offline', 'download', 'pack', 'buy']
       },
       {
@@ -405,7 +405,7 @@
       },
       {
         question: 'How does checkout work?',
-        answer: 'Select a bundle, pay via <strong>Stripe (card)</strong> or <strong>PayPal</strong>. Success page confirms payment; download delivery connects when fulfillment is fully wired. Receipt email if provided.',
+        answer: 'Select a plan or product, pay via <strong>Razorpay</strong> (card). Success page confirms payment; Pro unlocks after server verification. Receipt email if provided.',
         tags: ['checkout', 'stripe', 'paypal', 'pay', 'buy']
       },
       {

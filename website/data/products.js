@@ -13,7 +13,7 @@
     ultimate: { id: 'ultimate', name: 'Ultimate Library', price: 79, type: 'bundle' },
   };
 
-  /** Subscription plans — billed in USD via Paddle */
+  /** Subscription plans — billed in USD via Razorpay */
   const SUBSCRIPTIONS = {
     'pro-monthly': {
       id: 'pro-monthly',

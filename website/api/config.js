@@ -1,7 +1,6 @@
-const { json } = require('./_lib/razorpay-client');
+const { hasRazorpay, getKeys, json } = require('./_lib/razorpay-client');
 const { handlePreflight, applyCors } = require('./_lib/cors');
 const { hasServiceRole } = require('./_lib/supabase');
-const { publicPaddleConfig, hasPaddleServer, hasPaddleWebhook } = require('./_lib/paddle');
 
 module.exports = function handler(req, res) {
   if (handlePreflight(req, res, 'GET,OPTIONS')) return;
@@ -11,27 +10,22 @@ module.exports = function handler(req, res) {
     return json(res, 405, { error: 'Method not allowed' });
   }
 
-  const paddle = publicPaddleConfig();
-  const ok = Boolean(paddle.paddle && hasServiceRole());
+  const { key_id } = getKeys();
+  const ok = hasRazorpay();
 
   return json(res, 200, {
     configured: ok,
-    /* Payment provider: Paddle (Razorpay retired for checkout) */
-    provider: 'paddle',
-    paddle: paddle.paddle,
-    paddleEnv: paddle.paddleEnv,
-    paddleClientToken: paddle.paddleClientToken,
-    paddlePrices: paddle.prices,
+    provider: 'razorpay',
+    razorpay: ok,
+    razorpayKeyId: ok ? key_id : null,
     entitlements: hasServiceRole(),
-    paddleWebhook: hasPaddleWebhook(),
-    paddleServer: hasPaddleServer(),
-    razorpay: false,
-    razorpayKeyId: null,
+    /* Other gateways disabled */
+    paddle: false,
     stripe: false,
     stripePublishableKey: null,
     paypal: false,
     paypalClientId: null,
-    paypalMode: 'sandbox',
+    paypalMode: null,
     paymentApiUrl: process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
       : process.env.SITE_URL || null,

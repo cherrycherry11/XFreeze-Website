@@ -47,15 +47,18 @@ function isConfigured() {
 }
 
 function configPayload() {
+  /* Razorpay only — Stripe/PayPal/Paddle disabled for storefront */
   return {
-    configured: isConfigured(),
+    configured: hasRazorpay(),
+    provider: 'razorpay',
     razorpay: hasRazorpay(),
     razorpayKeyId: hasRazorpay() ? razorpayKeyId : null,
-    stripe: Boolean(stripe),
-    stripePublishableKey: stripePublishable || null,
-    paypal: Boolean(paypalClientId && paypalClientSecret),
-    paypalClientId: paypalClientId || null,
-    paypalMode,
+    stripe: false,
+    stripePublishableKey: null,
+    paypal: false,
+    paypalClientId: null,
+    paypalMode: null,
+    paddle: false,
     paymentApiUrl: `http://localhost:${PORT}`,
   };
 }

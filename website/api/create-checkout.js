@@ -78,14 +78,12 @@ module.exports = async function handler(req, res) {
       `${site}/checkout-success?provider=dodo&plan=${encodeURIComponent(planId)}`;
 
     /*
-     * Prefer USD + card methods (avoids INR local methods that fail with
-     * "Payment mode not enabled for this merchant" on some Dodo accounts).
-     *
-     * minimal_address: digital/SaaS only needs country (+ PIN where tax requires
-     * it). Full street validation on Dodo’s form often blocks India buyers when
-     * city/PIN don’t match autocomplete — not an X Freeze bug.
-     *
-     * Recurring auto-renew is owned by Dodo subscription products, not our UI.
+     * International card-only checkout (no UPI / local India rails):
+     * - USD + credit/debit → Visa, Mastercard, Amex, Discover, JCB, UnionPay, etc.
+     * - Explicit allow-list excludes upi_*, rupee local methods, BNPL, etc.
+     * - minimal_address: country (+ zip when tax needs it) for global SaaS tax.
+     * - 3DS left to Dodo/issuer (do not force_3ds) so more international cards pass.
+     * Recurring renewals are owned by Dodo subscription products.
      */
     const session = await dodoFetch('/checkouts', {
       method: 'POST',
@@ -97,7 +95,9 @@ module.exports = async function handler(req, res) {
         },
         billing_currency: 'USD',
         minimal_address: true,
+        /* Dodo: always include both credit + debit for global card acceptance */
         allowed_payment_method_types: ['credit', 'debit'],
+        show_saved_payment_methods: true,
         feature_flags: {
           allow_customer_editing_country: true,
           allow_customer_editing_street: true,
@@ -108,7 +108,7 @@ module.exports = async function handler(req, res) {
           allow_customer_editing_email: true,
           allow_currency_selection: false,
           allow_discount_code: true,
-          allow_phone_number_collection: true,
+          allow_phone_number_collection: false,
         },
         return_url: returnUrl,
         metadata: {
@@ -116,6 +116,7 @@ module.exports = async function handler(req, res) {
           plan_id: planId,
           product_type: 'subscription',
           source: 'xfreeze',
+          checkout_mode: 'international_cards_usd',
         },
       },
     });

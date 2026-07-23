@@ -13,19 +13,22 @@
     ultimate: { id: 'ultimate', name: 'Ultimate Library', price: 79, type: 'bundle' },
   };
 
-  /** Subscription plans — billed in USD via Dodo Payments */
+  /**
+   * Subscription plans — billed in USD via Dodo Payments.
+   * TEMP: $1 test pricing for live smoke tests (restore $49 / $499 for retail).
+   */
   const SUBSCRIPTIONS = {
     'pro-monthly': {
       id: 'pro-monthly',
       name: 'Pro Monthly',
-      price: 49,
+      price: 1,
       type: 'subscription',
       interval: 'month',
     },
     'pro-yearly': {
       id: 'pro-yearly',
       name: 'Pro Yearly',
-      price: 499,
+      price: 1,
       type: 'subscription',
       interval: 'year',
     },

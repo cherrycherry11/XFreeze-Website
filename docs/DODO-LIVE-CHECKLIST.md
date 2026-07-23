@@ -5,8 +5,8 @@
 - [x] Live API key set on Vercel Production (`DODO_PAYMENTS_API_KEY`)
 - [x] `DODO_PAYMENTS_ENVIRONMENT=live_mode`
 - [x] Live products created:
-  - Monthly `$49` → `pdt_0NjofZzNUmAj7F2orOfiZ`
-  - Yearly `$499` → `pdt_0Njofa161VEeG8I8Lgrym`
+  - Monthly → `pdt_0NjofZzNUmAj7F2orOfiZ` (**TEMP $1** for smoke tests; retail $49 later)
+  - Yearly → `pdt_0Njofa161VEeG8I8Lgrym` (**TEMP $1** for smoke tests; retail $499 later)
 - [x] Product IDs on Vercel Production
 - [x] Production redeployed; `/api/health` shows `dodoEnv: live_mode`
 - [x] Webhook endpoint created → `https://xfreeze.com/api/webhooks/dodo`

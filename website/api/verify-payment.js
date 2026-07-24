@@ -182,6 +182,13 @@ module.exports = async function handler(req, res) {
             ? Number(payment.amount)
             : null;
 
+    const upgradeFromMonthly =
+      planId === 'pro-yearly' &&
+      (currentPlanId === 'pro-monthly' ||
+        (existingEnt &&
+          existingPublic.isPro &&
+          String(existingEnt.interval || '').toLowerCase() === 'month'));
+
     const entitlement = await grantFromVerifiedPayment({
       userId: user.id,
       productId: planId,
@@ -194,12 +201,14 @@ module.exports = async function handler(req, res) {
         'USD'
       ).toUpperCase(),
       skipAmountCheck: true,
+      upgradeFromMonthly,
       raw: {
         source: 'dodo_verify',
         status,
         env: dodoEnv(),
         subscription_id: payment.subscription_id || null,
         upgraded_from: currentPlanId || null,
+        year_months: upgradeFromMonthly ? 13 : planId === 'pro-yearly' ? 12 : 1,
       },
     });
 
@@ -213,6 +222,7 @@ module.exports = async function handler(req, res) {
       upgraded: Boolean(
         currentPlanId && currentPlanId !== planId && entitlement && entitlement.isPro
       ),
+      upgradeFromMonthly: Boolean(upgradeFromMonthly),
     });
   } catch (err) {
     console.error('verify-payment error:', err);

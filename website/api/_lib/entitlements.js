@@ -58,26 +58,48 @@ async function getPaymentById(paymentId) {
   return rows[0];
 }
 
-function computeExpiry(interval, fromDate) {
+/**
+ * @param {string} interval - month | year
+ * @param {Date} [fromDate]
+ * @param {{ yearMonths?: number }} [opts]
+ *   yearMonths: 12 (default direct yearly) or 13 (monthly → yearly upgrade bonus)
+ */
+function computeExpiry(interval, fromDate, opts) {
   const started = fromDate ? new Date(fromDate) : new Date();
   const expires = new Date(started);
   if (interval === 'year') {
-    /* Yearly Pro includes a free extra month (13 months total access). */
-    expires.setMonth(expires.getMonth() + 13);
+    const months =
+      opts && opts.yearMonths === 13
+        ? 13
+        : opts && typeof opts.yearMonths === 'number' && opts.yearMonths > 0
+          ? opts.yearMonths
+          : 12;
+    expires.setMonth(expires.getMonth() + months);
   } else {
     expires.setMonth(expires.getMonth() + 1);
   }
   return { started, expires };
 }
 
+function isActiveMonthlyEntitlement(row) {
+  if (!row || !isActiveRow(row)) return false;
+  if (row.plan_id === 'pro-monthly') return true;
+  if (String(row.interval || '').toLowerCase() === 'month') return true;
+  return false;
+}
+
 /**
  * Grant Pro from a verified catalog subscription payment.
  * Idempotent on payment_id.
+ *
+ * Monthly → yearly upgrade only: access lasts 13 months.
+ * Direct yearly purchase / renewal: 12 months.
  *
  * @param {object} opts
  * @param {boolean} [opts.skipAmountCheck] - Paddle tax/locale may differ; skip strict cents match
  * @param {string} [opts.expiresAt] - ISO end of period from provider
  * @param {string} [opts.status] - entitlement status (default active)
+ * @param {boolean} [opts.upgradeFromMonthly] - force upgrade bonus if known
  */
 async function grantFromVerifiedPayment({
   userId,
@@ -91,6 +113,7 @@ async function grantFromVerifiedPayment({
   expiresAt,
   status,
   paddleCustomerId,
+  upgradeFromMonthly,
 }) {
   if (!hasServiceRole()) {
     throw new Error('Entitlement store not configured (SUPABASE_SERVICE_ROLE_KEY)');
@@ -127,7 +150,21 @@ async function grantFromVerifiedPayment({
     /* Different plan on same payment id (rare) or stale monthly row — fall through to upsert */
   }
 
-  const { started, expires } = computeExpiry(plan.interval);
+  const existingEnt = await getEntitlementForUser(userId);
+  const fromMeta =
+    raw &&
+    (raw.upgraded_from === 'pro-monthly' ||
+      raw.upgradedFrom === 'pro-monthly' ||
+      raw.upgrade_from_monthly === true);
+  const isMonthlyToYearly =
+    plan.interval === 'year' &&
+    (upgradeFromMonthly === true ||
+      fromMeta ||
+      isActiveMonthlyEntitlement(existingEnt));
+
+  const { started, expires } = computeExpiry(plan.interval, null, {
+    yearMonths: isMonthlyToYearly ? 13 : 12,
+  });
   let finalExpires = expires;
   if (expiresAt) {
     try {

@@ -105,6 +105,7 @@ module.exports = async function handler(req, res) {
         return json(res, 200, { ok: true, revoked: true });
       }
 
+      /* grantFromVerifiedPayment detects active monthly → yearly and applies 13 months */
       await grantFromVerifiedPayment({
         userId,
         productId: planId,
@@ -118,7 +119,13 @@ module.exports = async function handler(req, res) {
               : null,
         currency: (data.currency || 'USD').toUpperCase(),
         skipAmountCheck: true,
-        raw: { source: 'dodo_webhook', type },
+        raw: {
+          source: 'dodo_webhook',
+          type,
+          upgraded_from:
+            (data.metadata && (data.metadata.upgraded_from || data.metadata.plan_id)) ||
+            null,
+        },
       });
       return json(res, 200, { ok: true, granted: true, planId, userId });
     }

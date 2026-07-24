@@ -898,7 +898,18 @@
     var params = new URLSearchParams(window.location.search || '');
     var oauthError = params.get('error_description') || params.get('error');
     if (oauthError) {
-      setStatus(statusEl, 'error', decodeURIComponent(oauthError.replace(/\+/g, ' ')));
+      var decoded = decodeURIComponent(String(oauthError).replace(/\+/g, ' '));
+      /* X often fails before return; when it does return an error, surface a fix hint. */
+      if (/access_denied|user_cancelled|user canceled/i.test(decoded)) {
+        decoded = 'X sign-in was cancelled. Try again, or use Google / email.';
+      } else if (/email|users\.email|scope/i.test(decoded)) {
+        decoded =
+          'X email permission is missing. In the X Developer Portal, turn ON “Request email from users”, then retry.';
+      } else if (/redirect|callback|uri/i.test(decoded)) {
+        decoded =
+          'X callback URL mismatch. Set callback to https://ekmllicbgmuodptvgxsl.supabase.co/auth/v1/callback';
+      }
+      setStatus(statusEl, 'error', decoded);
       cleanAuthParamsFromUrl();
       return;
     }

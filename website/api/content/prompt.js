@@ -57,10 +57,10 @@ module.exports = async function handler(req, res) {
       return json(res, 404, { error: 'Prompt not found' });
     }
 
-    const usage = await consumeUsage(user.id, 'prompts');
+    const usage = await consumeUsage(user.id, 'prompts', id);
     if (!usage.ok) {
       return json(res, usage.code === 'limit_exceeded' ? 429 : 400, {
-        error: usage.error || 'Usage limit reached',
+        error: usage.error || 'Daily limit reached for prompts.',
         code: usage.code || 'limit_exceeded',
         kind: 'prompts',
         used: usage.used,

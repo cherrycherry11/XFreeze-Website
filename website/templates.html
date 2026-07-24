@@ -1446,6 +1446,11 @@
         }
         var openLink = e.target.closest('[data-template-open]');
         if (openLink) {
+          if (openLink.getAttribute('data-xf-opening') === '1') {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
           var tile = openLink.closest('[data-template-code]');
           var openCode = tile ? tile.getAttribute('data-template-code') : '';
           var openT = visualTemplates.find(function (x) {
@@ -1474,7 +1479,9 @@
           ) {
             e.preventDefault();
             e.stopPropagation();
+            openLink.setAttribute('data-xf-opening', '1');
             window.XFreezeAccess.resolveTemplateLink(openT).then(function (link) {
+              openLink.removeAttribute('data-xf-opening');
               if (!link) return;
               if (window.XFreezeSupportToast) {
                 window.XFreezeSupportToast.afterAction({
@@ -1482,6 +1489,8 @@
                 });
               }
               window.open(link, '_blank', 'noopener,noreferrer');
+            }).catch(function () {
+              openLink.removeAttribute('data-xf-opening');
             });
             return;
           }

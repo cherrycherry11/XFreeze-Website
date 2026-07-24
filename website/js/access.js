@@ -134,14 +134,108 @@
     return canUse('template', t) && t && t.link && String(t.link).indexOf('http') === 0;
   }
 
+  function kindFromErr(err) {
+    var k =
+      (err && err.data && err.data.kind) ||
+      (err && err.kind) ||
+      '';
+    k = String(k).toLowerCase();
+    if (k.indexOf('template') !== -1) return 'templates';
+    if (k.indexOf('skill') !== -1) return 'skills';
+    if (k.indexOf('prompt') !== -1) return 'prompts';
+    var msg = String(
+      (err && err.data && err.data.error) || (err && err.message) || ''
+    ).toLowerCase();
+    if (msg.indexOf('template') !== -1) return 'templates';
+    if (msg.indexOf('skill') !== -1) return 'skills';
+    if (msg.indexOf('prompt') !== -1) return 'prompts';
+    return 'templates';
+  }
+
+  function kindPhrase(kind) {
+    if (kind === 'skills') return 'skills';
+    if (kind === 'prompts') return 'prompts';
+    return 'templates';
+  }
+
+  function ensureLimitModal() {
+    var el = document.getElementById('xf-limit-modal');
+    if (el) return el;
+    el = document.createElement('div');
+    el.id = 'xf-limit-modal';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    el.setAttribute('aria-labelledby', 'xf-limit-title');
+    el.hidden = true;
+    el.innerHTML =
+      '<div class="xf-limit-modal__backdrop" data-xf-limit-close></div>' +
+      '<div class="xf-limit-modal__card">' +
+      '<div class="xf-limit-modal__icon" aria-hidden="true">' +
+      '<svg width="28" height="28" viewBox="0 0 24 24" fill="none">' +
+      '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.75"/>' +
+      '<path d="M12 7v6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>' +
+      '<circle cx="12" cy="16.5" r="1" fill="currentColor"/>' +
+      '</svg></div>' +
+      '<h2 class="xf-limit-modal__title" id="xf-limit-title">Daily limit reached</h2>' +
+      '<p class="xf-limit-modal__msg" id="xf-limit-msg"></p>' +
+      '<div class="xf-limit-modal__actions">' +
+      '<button type="button" class="xf-limit-modal__btn xf-limit-modal__btn--primary" data-xf-limit-close>Got it</button>' +
+      '<a class="xf-limit-modal__btn xf-limit-modal__btn--ghost" id="xf-limit-usage" href="account#usage">View usage</a>' +
+      '</div></div>';
+    document.body.appendChild(el);
+
+    if (!document.getElementById('xf-limit-modal-style')) {
+      var style = document.createElement('style');
+      style.id = 'xf-limit-modal-style';
+      style.textContent =
+        '#xf-limit-modal{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;padding:1.25rem;}' +
+        '#xf-limit-modal[hidden]{display:none!important;}' +
+        '.xf-limit-modal__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}' +
+        '.xf-limit-modal__card{position:relative;width:100%;max-width:22rem;border-radius:1.25rem;padding:1.6rem 1.4rem 1.35rem;text-align:center;' +
+        'background:#fff;color:#0a0a0a;border:1px solid #e5e7eb;box-shadow:0 24px 64px -16px rgba(0,0,0,.35);font-family:Inter,system-ui,sans-serif;}' +
+        'html.dark .xf-limit-modal__card{background:#141816;color:#f2f5f3;border-color:#2a312e;box-shadow:0 24px 64px -12px rgba(0,0,0,.65);}' +
+        '.xf-limit-modal__icon{width:3.25rem;height:3.25rem;margin:0 auto .9rem;border-radius:999px;display:flex;align-items:center;justify-content:center;' +
+        'background:rgba(245,158,11,.12);color:#d97706;}' +
+        'html.dark .xf-limit-modal__icon{background:rgba(251,191,36,.12);color:#fbbf24;}' +
+        '.xf-limit-modal__title{margin:0 0 .45rem;font-size:1.15rem;font-weight:600;letter-spacing:-.02em;line-height:1.25;}' +
+        '.xf-limit-modal__msg{margin:0 auto;max-width:18rem;font-size:.9375rem;line-height:1.5;color:#6b7280;}' +
+        'html.dark .xf-limit-modal__msg{color:#9ca3af;}' +
+        '.xf-limit-modal__actions{display:flex;flex-wrap:wrap;gap:.55rem;justify-content:center;margin-top:1.25rem;}' +
+        '.xf-limit-modal__btn{display:inline-flex;align-items:center;justify-content:center;min-height:2.5rem;padding:.55rem 1.15rem;border-radius:999px;' +
+        'font-size:.875rem;font-weight:600;text-decoration:none;border:1px solid transparent;cursor:pointer;}' +
+        '.xf-limit-modal__btn--primary{background:#0a0a0a;color:#fff;border:none;}' +
+        'html.dark .xf-limit-modal__btn--primary{background:#f2f5f3;color:#0a0a0a;}' +
+        '.xf-limit-modal__btn--ghost{background:transparent;color:inherit;border-color:#e5e7eb;}' +
+        'html.dark .xf-limit-modal__btn--ghost{border-color:#2a312e;}';
+      document.head.appendChild(style);
+    }
+
+    el.addEventListener('click', function (e) {
+      if (e.target && e.target.closest && e.target.closest('[data-xf-limit-close]')) {
+        hideLimitModal();
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && el && !el.hidden) hideLimitModal();
+    });
+    return el;
+  }
+
+  function hideLimitModal() {
+    var el = document.getElementById('xf-limit-modal');
+    if (el) el.hidden = true;
+  }
+
   function showUsageLimit(err) {
-    var msg =
-      (err && err.data && err.data.error) ||
-      (err && err.message) ||
-      'Daily usage limit reached. Try again after UTC midnight or upgrade to Pro.';
-    try {
-      if (global.alert) global.alert(msg);
-    } catch (e) {}
+    var kind = kindFromErr(err);
+    var title = 'Daily limit reached for ' + kindPhrase(kind);
+    var msg = 'Try again in the next 24 hours.';
+    var el = ensureLimitModal();
+    var titleEl = document.getElementById('xf-limit-title');
+    var msgEl = document.getElementById('xf-limit-msg');
+    if (titleEl) titleEl.textContent = title;
+    if (msgEl) msgEl.textContent = msg;
+    el.hidden = false;
   }
 
   function requireSignedIn() {
@@ -167,13 +261,19 @@
       if (!global.XFreezeUsage || !global.XFreezeUsage.consume) {
         return Promise.resolve(t.link || null);
       }
-      return global.XFreezeUsage.consume('templates').then(function (result) {
-        if (!result || !result.ok) {
-          showUsageLimit({ message: (result && result.error) || 'Limit reached' });
-          return null;
-        }
-        return t.link || null;
-      });
+      return global.XFreezeUsage
+        .consume('templates', t.code || t.id)
+        .then(function (result) {
+          if (!result || !result.ok) {
+            showUsageLimit({
+              kind: 'templates',
+              message: (result && result.error) || 'Daily limit reached for templates.',
+              data: result,
+            });
+            return null;
+          }
+          return t.link || null;
+        });
     }
 
     if (!isPro()) {

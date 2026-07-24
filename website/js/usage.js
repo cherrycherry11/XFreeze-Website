@@ -163,9 +163,10 @@
 
   /**
    * Server consume — required before free template open.
+   * resourceId keeps reopening the same item free for the day.
    * Returns Promise<{ok, ...}>.
    */
-  function consume(kind) {
+  function consume(kind, resourceId) {
     var token = getAccessToken();
     if (!token) {
       return Promise.resolve({
@@ -174,6 +175,10 @@
         error: 'Sign in required',
       });
     }
+    var body = { kind: kind };
+    if (resourceId != null && String(resourceId).trim()) {
+      body.resourceId = String(resourceId).trim();
+    }
     return fetch(apiBase() + '/api/usage/consume', {
       method: 'POST',
       headers: {
@@ -181,7 +186,7 @@
         Authorization: 'Bearer ' + token,
         Accept: 'application/json',
       },
-      body: JSON.stringify({ kind: kind }),
+      body: JSON.stringify(body),
       cache: 'no-store',
     })
       .then(function (res) {
@@ -390,14 +395,14 @@
     bump: bump,
     consume: consume,
     refreshFromServer: refreshFromServer,
-    trackPrompt: function () {
-      return consume('prompts');
+    trackPrompt: function (id) {
+      return consume('prompts', id);
     },
-    trackTemplate: function () {
-      return consume('templates');
+    trackTemplate: function (id) {
+      return consume('templates', id);
     },
-    trackSkill: function () {
-      return consume('skills');
+    trackSkill: function (id) {
+      return consume('skills', id);
     },
     getSubscription: getSubscription,
     setSubscription: setSubscription,

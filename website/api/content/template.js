@@ -56,10 +56,10 @@ module.exports = async function handler(req, res) {
       return json(res, 404, { error: 'Template not found' });
     }
 
-    const usage = await consumeUsage(user.id, 'templates');
+    const usage = await consumeUsage(user.id, 'templates', code);
     if (!usage.ok) {
       return json(res, usage.code === 'limit_exceeded' ? 429 : 400, {
-        error: usage.error || 'Usage limit reached',
+        error: usage.error || 'Daily limit reached for templates.',
         code: usage.code || 'limit_exceeded',
         kind: 'templates',
         used: usage.used,

@@ -83,11 +83,19 @@ async function getUsageSnapshot(userId) {
   };
 }
 
+function kindLabel(k) {
+  if (k === 'templates') return 'templates';
+  if (k === 'skills') return 'skills';
+  if (k === 'prompts') return 'prompts';
+  return k;
+}
+
 /**
  * Atomically consume 1 unit of kind for user.
  * Prefer Supabase RPC xf_consume_usage; fallback optimistic lock.
+ * resourceId: unique key so reopening the same item does not re-count.
  */
-async function consumeUsage(userId, kind) {
+async function consumeUsage(userId, kind, resourceId) {
   if (!hasServiceRole()) {
     return {
       ok: false,
@@ -104,18 +112,26 @@ async function consumeUsage(userId, kind) {
     return { ok: false, code: 'invalid_kind', error: 'Invalid usage kind' };
   }
 
+  const rid =
+    resourceId != null && String(resourceId).trim()
+      ? String(resourceId).trim().slice(0, 200)
+      : null;
+
   const { isPro, limits } = await getLimitsForUser(userId);
   const limit = limits[k];
 
-  /* Prefer atomic RPC */
+  /* Prefer atomic RPC (with optional resource id for unique counting) */
   try {
+    const body = {
+      p_user_id: userId,
+      p_kind: k,
+      p_limit: limit,
+    };
+    if (rid) body.p_resource_id = rid;
+
     const rpc = await rest('rpc/xf_consume_usage', {
       method: 'POST',
-      body: {
-        p_user_id: userId,
-        p_kind: k,
-        p_limit: limit,
-      },
+      body,
     });
     if (rpc && typeof rpc === 'object' && rpc.ok === false) {
       return {
@@ -129,9 +145,7 @@ async function consumeUsage(userId, kind) {
         day: rpc.day || utcDayKey(),
         error:
           rpc.code === 'limit_exceeded'
-            ? `Daily ${k} limit reached (${limit}/${limit}). ${
-                isPro ? 'Resets at UTC midnight.' : 'Upgrade to Pro for higher limits.'
-              }`
+            ? `Daily limit reached for ${kindLabel(k)}.`
             : rpc.error || 'Usage check failed',
       };
     }
@@ -147,6 +161,7 @@ async function consumeUsage(userId, kind) {
             : Math.max(limit - Number(rpc.used), 0),
         isPro,
         day: rpc.day || utcDayKey(),
+        duplicate: Boolean(rpc.duplicate),
       };
     }
   } catch (rpcErr) {
@@ -171,12 +186,11 @@ async function consumeUsage(userId, kind) {
       remaining: 0,
       isPro,
       day,
-      error: `Daily ${k} limit reached (${current}/${limit}). ${
-        isPro ? 'Resets at UTC midnight.' : 'Upgrade to Pro for higher limits.'
-      }`,
+      error: `Daily limit reached for ${kindLabel(k)}.`,
     };
   }
 
+  /* Fallback cannot uniquely dedupe without key columns — still count once. */
   try {
     await rest(
       `usage_daily?on_conflict=user_id,day`,
@@ -209,7 +223,7 @@ async function consumeUsage(userId, kind) {
       remaining: 0,
       isPro,
       day,
-      error: `Daily ${k} limit reached (${before}/${limit}).`,
+      error: `Daily limit reached for ${kindLabel(k)}.`,
     };
   }
 
@@ -244,13 +258,13 @@ async function consumeUsage(userId, kind) {
         remaining: 0,
         isPro,
         day,
-        error: `Daily ${k} limit reached (${used}/${limit}).`,
+        error: `Daily limit reached for ${kindLabel(k)}.`,
       };
     }
     return {
       ok: false,
       code: 'conflict',
-      error: 'Usage update conflict — retry',
+      error: 'Usage update conflict. Please try again.',
       kind: k,
       used,
       limit,

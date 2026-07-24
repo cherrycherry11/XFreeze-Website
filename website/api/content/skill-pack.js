@@ -78,10 +78,10 @@ module.exports = async function handler(req, res) {
       return json(res, 404, { error: 'Pack not found' });
     }
 
-    const usage = await consumeUsage(user.id, 'skills');
+    const usage = await consumeUsage(user.id, 'skills', id);
     if (!usage.ok) {
       return json(res, usage.code === 'limit_exceeded' ? 429 : 400, {
-        error: usage.error || 'Usage limit reached',
+        error: usage.error || 'Daily limit reached for skills.',
         code: usage.code || 'limit_exceeded',
         kind: 'skills',
         used: usage.used,

@@ -4,8 +4,9 @@ const { getUserFromRequest, hasServiceRole } = require('../_lib/supabase');
 const { consumeUsage, getUsageSnapshot } = require('../_lib/usage');
 
 /**
- * POST /api/usage/consume { kind: 'templates'|'skills'|'prompts' }
- * Atomic server consume for client-tracked free actions (and double-check).
+ * POST /api/usage/consume
+ * { kind: 'templates'|'skills'|'prompts', resourceId?: string }
+ * Atomic server consume. Same resourceId again the same day does not re-count.
  */
 module.exports = async function handler(req, res) {
   if (handlePreflight(req, res, 'POST,OPTIONS')) return;
@@ -35,7 +36,8 @@ module.exports = async function handler(req, res) {
 
     const body = await readBody(req);
     const kind = body.kind || body.type || '';
-    const result = await consumeUsage(user.id, kind);
+    const resourceId = body.resourceId || body.resource_id || body.id || body.code || null;
+    const result = await consumeUsage(user.id, kind, resourceId);
 
     if (!result.ok) {
       const status =

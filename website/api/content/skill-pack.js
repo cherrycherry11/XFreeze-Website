@@ -4,6 +4,7 @@ const { json } = require('../_lib/http');
 const { handlePreflight, applyCors } = require('../_lib/cors');
 const { getUserFromRequest } = require('../_lib/supabase');
 const { userIsPro } = require('../_lib/entitlements');
+const { consumeUsage } = require('../_lib/usage');
 
 function safeId(id) {
   return String(id || '').replace(/[^a-zA-Z0-9._-]/g, '');
@@ -14,12 +15,10 @@ function isPremiumPackId(id) {
 }
 
 function packPath(id) {
-  /* Private premium packs live next to API (not CDN-public). */
   return path.join(__dirname, '..', '_private', 'skills-packs', id + '.json');
 }
 
 function publicPackPath(id) {
-  /* Free packs remain under website/data (static). For serverless, also try sibling. */
   return path.join(__dirname, '..', '..', 'data', 'skills-packs', id + '.json');
 }
 
@@ -56,14 +55,15 @@ module.exports = async function handler(req, res) {
       return json(res, 400, { error: 'Missing pack id' });
     }
 
+    const user = await getUserFromRequest(req);
+    if (!user || !user.id) {
+      return json(res, 401, {
+        error: 'Sign in required to open skills',
+        code: 'auth_required',
+      });
+    }
+
     if (isPremiumPackId(id)) {
-      const user = await getUserFromRequest(req);
-      if (!user || !user.id) {
-        return json(res, 401, {
-          error: 'Sign in required',
-          code: 'auth_required',
-        });
-      }
       const pro = await userIsPro(user.id);
       if (!pro) {
         return json(res, 403, {
@@ -78,8 +78,22 @@ module.exports = async function handler(req, res) {
       return json(res, 404, { error: 'Pack not found' });
     }
 
+    const usage = await consumeUsage(user.id, 'skills');
+    if (!usage.ok) {
+      return json(res, usage.code === 'limit_exceeded' ? 429 : 400, {
+        error: usage.error || 'Usage limit reached',
+        code: usage.code || 'limit_exceeded',
+        kind: 'skills',
+        used: usage.used,
+        limit: usage.limit,
+        remaining: usage.remaining,
+        isPro: usage.isPro,
+        day: usage.day,
+      });
+    }
+
     res.setHeader('Cache-Control', 'private, no-store');
-    return json(res, 200, pack);
+    return json(res, 200, Object.assign({}, pack, { usage }));
   } catch (err) {
     console.error('content/skill-pack error:', err);
     return json(res, 500, { error: err.message || 'Failed to load pack' });

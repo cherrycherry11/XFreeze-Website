@@ -241,7 +241,7 @@
       : { prompts: 0, templates: 0, skills: 0 };
     var limits = window.XFreezeUsage
       ? window.XFreezeUsage.getLimits(sub)
-      : { prompts: 50, templates: 30, skills: 40 };
+      : { prompts: 5, templates: 3, skills: 5 };
 
     var planLabel = pro
       ? (sub && sub.name) || (sub && sub.interval === 'year' ? 'Pro Yearly' : 'Pro Monthly')
@@ -288,11 +288,21 @@
       }
     }
 
-    var periodLabel = '—';
+    var periodLabel = 'Today (UTC)';
     try {
-      periodLabel = new Date().toLocaleString(undefined, { month: 'short', year: 'numeric' });
+      if (usage.day) {
+        periodLabel = 'Day: ' + usage.day + ' (UTC)';
+      } else {
+        periodLabel =
+          'Today · ' +
+          new Date().toLocaleString(undefined, {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+          });
+      }
     } catch (e) {
-      periodLabel = usage.month || '—';
+      periodLabel = usage.day || 'Today (UTC)';
     }
 
     var ovP = $('xf-ov-stat-prompts');
@@ -826,9 +836,21 @@
     ensureProFromPayment(user)
       .catch(function () {})
       .then(function () {
+        if (window.XFreezeUsage && window.XFreezeUsage.refreshFromServer) {
+          return window.XFreezeUsage.refreshFromServer();
+        }
+      })
+      .catch(function () {})
+      .then(function () {
         render();
       });
   }
+
+  window.addEventListener('xf-usage-change', function () {
+    try {
+      render();
+    } catch (e) {}
+  });
 
   function init() {
     bindTabs();

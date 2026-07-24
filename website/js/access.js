@@ -134,21 +134,53 @@
     return canUse('template', t) && t && t.link && String(t.link).indexOf('http') === 0;
   }
 
+  function showUsageLimit(err) {
+    var msg =
+      (err && err.data && err.data.error) ||
+      (err && err.message) ||
+      'Daily usage limit reached. Try again after UTC midnight or upgrade to Pro.';
+    try {
+      if (global.alert) global.alert(msg);
+    } catch (e) {}
+  }
+
+  function requireSignedIn() {
+    if (getUser()) return true;
+    if (global.XFreezeAuth && global.XFreezeAuth.redirectToLogin) {
+      global.XFreezeAuth.redirectToLogin();
+    } else {
+      global.location.href = 'login';
+    }
+    return false;
+  }
+
   /**
-   * Resolve openable template URL (async for premium — server gated).
+   * Resolve openable template URL.
+   * Free: sign-in + server daily quota, then public link.
+   * Premium: Pro + server content API (quota + secret link).
    */
   function resolveTemplateLink(t) {
     if (!t) return Promise.resolve(null);
+
     if (!isPremiumTemplate(t)) {
-      return Promise.resolve(t.link || null);
+      if (!requireSignedIn()) return Promise.resolve(null);
+      if (!global.XFreezeUsage || !global.XFreezeUsage.consume) {
+        return Promise.resolve(t.link || null);
+      }
+      return global.XFreezeUsage.consume('templates').then(function (result) {
+        if (!result || !result.ok) {
+          showUsageLimit({ message: (result && result.error) || 'Limit reached' });
+          return null;
+        }
+        return t.link || null;
+      });
     }
+
     if (!isPro()) {
       goToPricing({ reason: 'premium', from: 'templates', code: t.code });
       return Promise.resolve(null);
     }
-    if (t.link && String(t.link).indexOf('http') === 0) {
-      return Promise.resolve(t.link);
-    }
+    if (!requireSignedIn()) return Promise.resolve(null);
     if (!global.XFreezeEntitlement || !global.XFreezeEntitlement.fetchTemplateLink) {
       goToPricing({ reason: 'premium', from: 'templates', code: t.code });
       return Promise.resolve(null);
@@ -162,14 +194,14 @@
         return null;
       })
       .catch(function (err) {
-        if (err && (err.code === 'pro_required' || err.status === 403)) {
+        if (err && (err.code === 'limit_exceeded' || err.status === 429)) {
+          showUsageLimit(err);
+        } else if (err && (err.code === 'pro_required' || err.status === 403)) {
           goToPricing({ reason: 'premium', from: 'templates', code: t.code });
         } else if (err && (err.code === 'auth_required' || err.status === 401)) {
-          if (global.XFreezeAuth && global.XFreezeAuth.redirectToLogin) {
-            global.XFreezeAuth.redirectToLogin();
-          } else {
-            global.location.href = 'login';
-          }
+          requireSignedIn();
+        } else {
+          showUsageLimit(err);
         }
         return null;
       });

@@ -223,7 +223,7 @@
       'position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.4);padding:1rem';
     el.innerHTML =
       '<div id="xf-checkout-status-card" style="background:#fff;color:#0a0a0a;border-radius:1rem;padding:1.25rem 1.5rem;max-width:20rem;text-align:center;font:600 0.95rem/1.4 Inter,system-ui,sans-serif;border:1px solid #e5e7eb">' +
-      '<p id="xf-checkout-status-title" style="margin:0">Opening secure checkout…</p>' +
+      '<p id="xf-checkout-status-title" style="margin:0">Opening checkout…</p>' +
       '<p id="xf-checkout-status-msg" style="margin:.5rem 0 0;font-weight:400;font-size:.8rem;color:#52525b"></p>' +
       '<button type="button" id="xf-checkout-status-close" style="display:none;margin-top:1rem;padding:.5rem 1rem;border-radius:999px;border:1px solid #e5e7eb;background:#f4f4f5;color:#0a0a0a;cursor:pointer">Close</button>' +
       '</div>';
@@ -267,7 +267,7 @@
     var el = ensureStatus();
     paintStatusTheme();
     document.getElementById('xf-checkout-status-title').textContent =
-      title || 'Opening secure checkout…';
+      title || 'Opening checkout…';
     var m = document.getElementById('xf-checkout-status-msg');
     m.textContent = msg || '';
     document.getElementById('xf-checkout-status-close').style.display = canClose
@@ -335,7 +335,7 @@
 
     pendingTriggerBtn = triggerBtn || null;
     setBusy(triggerBtn, true);
-    showStatus('Opening secure checkout…', 'Stay on this page — popup opens over X Freeze');
+    showStatus('Opening checkout…', 'Please wait');
 
     try {
       var cfg = await fetchConfig();
@@ -411,9 +411,8 @@
       pendingTriggerBtn = null;
       console.error('[xf-checkout] overlay failed', err);
       showStatus(
-        'Could not open checkout popup',
-        (err && err.message) ||
-          'Allow popups for xfreeze.com and try again. We keep you on this site.',
+        'Could not open checkout',
+        (err && err.message) || 'Try again in a moment.',
         true
       );
     }

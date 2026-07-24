@@ -62,7 +62,8 @@ function computeExpiry(interval, fromDate) {
   const started = fromDate ? new Date(fromDate) : new Date();
   const expires = new Date(started);
   if (interval === 'year') {
-    expires.setFullYear(expires.getFullYear() + 1);
+    /* Yearly Pro includes a free extra month (13 months total access). */
+    expires.setMonth(expires.getMonth() + 13);
   } else {
     expires.setMonth(expires.getMonth() + 1);
   }

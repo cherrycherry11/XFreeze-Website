@@ -256,6 +256,19 @@
     .is-success h1 { color: var(--xf-ok-deep); }
     html.dark .is-success h1 { color: #4ade80; }
 
+    .redirect-hint {
+      margin: 1rem auto 0;
+      max-width: 18rem;
+      font-size: 0.8125rem;
+      line-height: 1.45;
+      color: var(--xf-muted);
+    }
+    .redirect-hint strong {
+      color: var(--xf-text);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
     [hidden] { display: none !important; }
 
     @media (prefers-reduced-motion: reduce) {
@@ -296,6 +309,7 @@
       <p class="label" id="label">Please wait</p>
       <h1 id="title">Confirming payment</h1>
       <p class="msg" id="msg">Activating Pro on your account…</p>
+      <p class="redirect-hint" id="redirect-hint" hidden></p>
 
       <div class="actions" id="actions" hidden>
         <a class="btn btn--primary" href="account" id="btn-primary">Open Account</a>
@@ -362,7 +376,52 @@
         actions.hidden = false;
       }
 
+      var redirectTimer = null;
+      var redirectCountdown = null;
+      var REDIRECT_SECONDS = 4;
+      var DEFAULT_REDIRECT = 'account';
+
+      function clearRedirect() {
+        if (redirectTimer) {
+          clearTimeout(redirectTimer);
+          redirectTimer = null;
+        }
+        if (redirectCountdown) {
+          clearInterval(redirectCountdown);
+          redirectCountdown = null;
+        }
+      }
+
+      function startAutoRedirect(href) {
+        var target = href || DEFAULT_REDIRECT;
+        var hint = document.getElementById('redirect-hint');
+        var left = REDIRECT_SECONDS;
+        clearRedirect();
+        if (hint) {
+          hint.hidden = false;
+          hint.innerHTML =
+            'Taking you back to X Freeze in <strong id="redirect-secs">' +
+            left +
+            '</strong>s…';
+        }
+        redirectCountdown = setInterval(function () {
+          left -= 1;
+          var el = document.getElementById('redirect-secs');
+          if (el) el.textContent = String(Math.max(left, 0));
+          if (left <= 0 && redirectCountdown) {
+            clearInterval(redirectCountdown);
+            redirectCountdown = null;
+          }
+        }, 1000);
+        redirectTimer = setTimeout(function () {
+          window.location.href = target;
+        }, REDIRECT_SECONDS * 1000);
+      }
+
       function fail(heading, body, primaryHref, primaryText) {
+        clearRedirect();
+        var hint = document.getElementById('redirect-hint');
+        if (hint) hint.hidden = true;
         setState('error');
         label.textContent = 'Something went wrong';
         title.textContent = heading;
@@ -378,6 +437,7 @@
           body ||
           'You’re all set — full library access is active on your account.';
         showActions('account', 'Open Account', 'templates', 'Explore library');
+        startAutoRedirect(DEFAULT_REDIRECT);
       }
 
       if (status === 'failed' || status === 'cancelled' || status === 'canceled') {

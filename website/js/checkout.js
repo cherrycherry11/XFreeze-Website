@@ -1,11 +1,13 @@
 /**
- * X Freeze checkout — Dodo Payments (overlay preferred, redirect fallback)
+ * X Freeze checkout — Dodo Payments overlay (modal on top of the site).
+ * Full-page redirect is avoided so pricing stays visible under the popup.
  */
 (function (global) {
   var SDK_CDN =
-    'https://cdn.jsdelivr.net/npm/dodopayments-checkout@latest/dist/index.js';
+    'https://cdn.jsdelivr.net/npm/dodopayments-checkout@1.9.5/dist/index.js';
   var sdkLoadPromise = null;
   var sdkInitialized = false;
+  var pendingTriggerBtn = null;
 
   function resolveDefaultApiBase() {
     try {
@@ -137,6 +139,75 @@
     return sdkLoadPromise;
   }
 
+  /**
+   * Ensure session URL is in overlay form so Dodo opens as a modal iframe
+   * on this page (site remains visible underneath), not a full-page leave.
+   */
+  function toOverlayCheckoutUrl(rawUrl, Dodo) {
+    var url = String(rawUrl || '').trim();
+    if (!url) return url;
+    try {
+      if (Dodo && Dodo.Checkout && typeof Dodo.Checkout.buildUrl === 'function') {
+        return Dodo.Checkout.buildUrl(url) || url;
+      }
+    } catch (e) {}
+    try {
+      var u = new URL(url);
+      var parts = u.pathname.split('/').filter(Boolean);
+      if (parts[0] === 'overlay' || parts[0] === 'inline') return url;
+      /* /session/cks_… → /overlay/session/cks_… */
+      if (parts[0] === 'session' && parts[1]) {
+        u.pathname = '/overlay/session/' + parts[1];
+        return u.toString();
+      }
+      /* bare session id path variants */
+      if (parts.length === 1 && /^cks_/.test(parts[0])) {
+        u.pathname = '/overlay/session/' + parts[0];
+        return u.toString();
+      }
+    } catch (e2) {}
+    return url;
+  }
+
+  function ensureDodoInitialized(Dodo, mode) {
+    if (sdkInitialized) return;
+    Dodo.Initialize({
+      mode: mode || 'live',
+      displayType: 'overlay',
+      onEvent: function (ev) {
+        var t = (ev && (ev.event_type || ev.type)) || '';
+        if (
+          t === 'checkout.opened' ||
+          t === 'checkout.form_ready' ||
+          t === 'checkout.payment_page_opened'
+        ) {
+          hideStatus();
+          setBusy(pendingTriggerBtn, false);
+        }
+        if (t === 'checkout.closed') {
+          hideStatus();
+          setBusy(pendingTriggerBtn, false);
+          inflight = false;
+          pendingTriggerBtn = null;
+        }
+        if (t === 'checkout.error') {
+          showStatus(
+            'Checkout error',
+            (ev.data && ev.data.message) || 'Try again',
+            true
+          );
+          setBusy(pendingTriggerBtn, false);
+          inflight = false;
+        }
+        /* After pay, Dodo may navigate this tab to return_url (success page). */
+        if (t === 'checkout.redirect') {
+          hideStatus();
+        }
+      },
+    });
+    sdkInitialized = true;
+  }
+
   function ensureStatus() {
     var el = document.getElementById('xf-checkout-status');
     var isDark = getSiteTheme() === 'dark';
@@ -262,14 +333,15 @@
       return;
     }
 
+    pendingTriggerBtn = triggerBtn || null;
     setBusy(triggerBtn, true);
-    showStatus('Opening secure checkout…', 'Dodo Payments');
+    showStatus('Opening secure checkout…', 'Stay on this page — popup opens over X Freeze');
 
     try {
       var cfg = await fetchConfig();
       if (!cfg.dodo && !cfg.payments) {
         throw new Error(
-          'Payments not configured. Add your Dodo test key in Vercel.'
+          'Payments not configured. Add your Dodo live key in Vercel.'
         );
       }
 
@@ -304,46 +376,44 @@
       if (!res.ok) throw new Error(data.error || 'Could not create checkout');
       if (!data.checkoutUrl) throw new Error('No checkout URL returned');
 
-      try {
-        var Dodo = await loadDodoSdk();
-        /* Re-init each open so overlay picks current mode; theme is on session */
-        Dodo.Initialize({
-          mode: dodoModeFromConfig(cfg),
-          displayType: 'overlay',
-          onEvent: function (ev) {
-            var t = (ev && (ev.event_type || ev.type)) || '';
-            if (
-              t === 'checkout.opened' ||
-              t === 'checkout.form_ready' ||
-              t === 'checkout.closed'
-            ) {
-              hideStatus();
-            }
-            if (t === 'checkout.error') {
-              showStatus(
-                'Checkout error',
-                (ev.data && ev.data.message) || 'Try again',
-                true
-              );
-            }
-          },
-        });
-        sdkInitialized = true;
-        await Dodo.Checkout.open({ checkoutUrl: data.checkoutUrl });
-        setTimeout(function () {
-          hideStatus();
-          setBusy(triggerBtn, false);
-        }, 500);
-      } catch (overlayErr) {
-        console.warn('[xf-checkout] overlay failed, redirect', overlayErr);
-        window.location.href = data.checkoutUrl;
+      var Dodo = await loadDodoSdk();
+      ensureDodoInitialized(Dodo, dodoModeFromConfig(cfg));
+
+      var overlayUrl = toOverlayCheckoutUrl(data.checkoutUrl, Dodo);
+      var openResult = Dodo.Checkout.open({
+        checkoutUrl: overlayUrl,
+        options: {
+          showTimer: true,
+          showSecurityBadge: true,
+        },
+      });
+      /* open() may be sync or return a Promise depending on SDK version */
+      if (openResult && typeof openResult.then === 'function') {
+        await openResult;
       }
+
+      /* Overlay should be on top of pricing; never navigate this tab to Dodo. */
+      setTimeout(function () {
+        try {
+          if (Dodo.Checkout.isOpen && Dodo.Checkout.isOpen()) {
+            hideStatus();
+            setBusy(triggerBtn, false);
+            return;
+          }
+        } catch (e) {}
+        /* Still hide spinner so the site is not stuck under a fake loading sheet */
+        hideStatus();
+        setBusy(triggerBtn, false);
+      }, 1200);
     } catch (err) {
       inflight = false;
       setBusy(triggerBtn, false);
+      pendingTriggerBtn = null;
+      console.error('[xf-checkout] overlay failed', err);
       showStatus(
-        'Could not start checkout',
-        (err && err.message) || 'Try again',
+        'Could not open checkout popup',
+        (err && err.message) ||
+          'Allow popups for xfreeze.com and try again. We keep you on this site.',
         true
       );
     }
@@ -361,6 +431,25 @@
 
   function open(product, triggerBtn) {
     return startCheckout(product, triggerBtn);
+  }
+
+  /* Warm SDK on pricing so the first click opens overlay faster */
+  function warmSdk() {
+    fetchConfig()
+      .then(function (cfg) {
+        if (!cfg || (!cfg.dodo && !cfg.payments)) return null;
+        return loadDodoSdk().then(function (Dodo) {
+          ensureDodoInitialized(Dodo, dodoModeFromConfig(cfg));
+          return Dodo;
+        });
+      })
+      .catch(function () {});
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', warmSdk);
+  } else {
+    warmSdk();
   }
 
   global.XFreezeCheckout = {

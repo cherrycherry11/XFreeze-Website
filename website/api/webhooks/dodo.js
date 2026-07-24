@@ -2,7 +2,7 @@ const { json } = require('../_lib/http');
 const {
   dodoWebhookKey,
   verifyDodoWebhook,
-  planIdFromProductId,
+  resolvePlanIdFromPayment,
 } = require('../_lib/dodo');
 const { hasServiceRole } = require('../_lib/supabase');
 const {
@@ -37,15 +37,7 @@ function extractUserId(data) {
 }
 
 function extractPlanId(data) {
-  const m = extractMeta(data);
-  if (m.plan_id || m.planId) return m.plan_id || m.planId;
-  const cart = data.product_cart || data.productCart || [];
-  if (cart[0]) {
-    const pid = cart[0].product_id || cart[0].productId;
-    return planIdFromProductId(pid);
-  }
-  if (data.product_id) return planIdFromProductId(data.product_id);
-  return null;
+  return resolvePlanIdFromPayment(data, null);
 }
 
 module.exports = async function handler(req, res) {

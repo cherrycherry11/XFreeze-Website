@@ -4,8 +4,9 @@ const { getUserFromRequest, hasServiceRole } = require('./_lib/supabase');
 const {
   hasDodo,
   dodoFetch,
-  planIdFromProductId,
   dodoEnv,
+  resolvePlanIdFromPayment,
+  planRank,
 } = require('./_lib/dodo');
 const {
   grantFromVerifiedPayment,
@@ -16,8 +17,11 @@ const {
 const { SUBSCRIPTIONS } = require('./_lib/products');
 
 /**
- * Verify Dodo payment + grant Pro.
+ * Verify Dodo payment + grant / upgrade Pro.
  * POST { payment_id?, planId? }
+ *
+ * Always considers the latest succeeded payment for this user so monthly → yearly
+ * upgrades are applied (does not return early just because already Pro).
  */
 module.exports = async function handler(req, res) {
   if (handlePreflight(req, res, 'POST,OPTIONS')) return;
@@ -51,16 +55,6 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const existingEnt = await getEntitlementForUser(user.id);
-    if (existingEnt && publicEntitlement(existingEnt).isPro) {
-      return json(res, 200, {
-        success: true,
-        granted: true,
-        already: true,
-        entitlement: publicEntitlement(existingEnt),
-      });
-    }
-
     const body = await readBody(req);
     let paymentId = body.payment_id || body.paymentId || '';
     let payment = null;
@@ -68,19 +62,45 @@ module.exports = async function handler(req, res) {
     if (paymentId) {
       payment = await dodoFetch(`/payments/${encodeURIComponent(paymentId)}`);
     } else {
-      const list = await dodoFetch('/payments?page_size=20');
+      const list = await dodoFetch('/payments?page_size=50');
       const items = (list && list.items) || [];
+      const mine = items.filter((p) => {
+        const st = String(p.status || '').toLowerCase();
+        if (st !== 'succeeded' && st !== 'paid') return false;
+        const meta = p.metadata || {};
+        return meta.user_id === user.id || meta.userId === user.id;
+      });
+      /* Prefer newest payment so yearly upgrade beats older monthly */
+      mine.sort(function (a, b) {
+        const ta = new Date(a.created_at || a.createdAt || 0).getTime();
+        const tb = new Date(b.created_at || b.createdAt || 0).getTime();
+        return tb - ta;
+      });
+      /* Prefer highest plan among recent succeeds (yearly over monthly) */
       payment =
-        items.find((p) => {
-          const st = String(p.status || '').toLowerCase();
-          if (st !== 'succeeded' && st !== 'paid') return false;
-          const meta = p.metadata || {};
-          return meta.user_id === user.id || meta.userId === user.id;
-        }) || null;
+        mine.find(function (p) {
+          return (
+            planRank(resolvePlanIdFromPayment(p, body.planId)) >=
+            planRank('pro-yearly')
+          );
+        }) ||
+        mine[0] ||
+        null;
       if (payment) paymentId = payment.payment_id || payment.id || '';
     }
 
+    const existingEnt = await getEntitlementForUser(user.id);
+    const existingPublic = publicEntitlement(existingEnt);
+
     if (!payment || !paymentId) {
+      if (existingPublic.isPro) {
+        return json(res, 200, {
+          success: true,
+          granted: true,
+          already: true,
+          entitlement: existingPublic,
+        });
+      }
       return json(res, 404, {
         success: false,
         error: 'No successful Dodo payment found for this account',
@@ -100,7 +120,6 @@ module.exports = async function handler(req, res) {
     }
 
     const meta = payment.metadata || {};
-    let planId = body.planId || meta.plan_id || meta.planId || '';
     const metaUser = meta.user_id || meta.userId || '';
     if (metaUser && metaUser !== user.id) {
       return json(res, 403, {
@@ -110,26 +129,48 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    if (!planId) {
-      const cart = payment.product_cart || payment.productCart || [];
-      const pid = cart[0] && (cart[0].product_id || cart[0].productId);
-      planId = planIdFromProductId(pid) || 'pro-monthly';
-    }
+    let planId = resolvePlanIdFromPayment(payment, body.planId || body.plan_id);
     if (!SUBSCRIPTIONS[planId]) planId = 'pro-monthly';
 
-    const existingPay = await getPaymentById(paymentId);
-    if (existingPay) {
-      const row = await getEntitlementForUser(user.id);
-      if (row && publicEntitlement(row).isPro) {
-        return json(res, 200, {
-          success: true,
-          entitlement: publicEntitlement(row),
-          granted: true,
-          idempotent: true,
-          paymentId,
-          planId,
-        });
-      }
+    const currentPlanId =
+      (existingEnt && existingEnt.plan_id) ||
+      (existingPublic.subscription && existingPublic.subscription.planId) ||
+      '';
+
+    /*
+     * Already Pro on the same (or higher) plan for this payment — no-op.
+     * If yearly was just paid but row is still monthly, continue and upgrade.
+     */
+    if (
+      existingPublic.isPro &&
+      planRank(currentPlanId) >= planRank(planId) &&
+      existingEnt &&
+      existingEnt.payment_id === paymentId
+    ) {
+      return json(res, 200, {
+        success: true,
+        granted: true,
+        already: true,
+        entitlement: existingPublic,
+        planId: currentPlanId,
+      });
+    }
+
+    if (
+      existingPublic.isPro &&
+      planRank(currentPlanId) > planRank(planId) &&
+      !body.payment_id &&
+      !body.paymentId
+    ) {
+      /* Do not downgrade from yearly to older monthly payment by accident */
+      return json(res, 200, {
+        success: true,
+        granted: true,
+        already: true,
+        entitlement: existingPublic,
+        planId: currentPlanId,
+        note: 'kept_higher_plan',
+      });
     }
 
     const amountCents =
@@ -158,6 +199,7 @@ module.exports = async function handler(req, res) {
         status,
         env: dodoEnv(),
         subscription_id: payment.subscription_id || null,
+        upgraded_from: currentPlanId || null,
       },
     });
 
@@ -168,6 +210,9 @@ module.exports = async function handler(req, res) {
       planId,
       entitlement,
       granted: Boolean(entitlement && entitlement.isPro),
+      upgraded: Boolean(
+        currentPlanId && currentPlanId !== planId && entitlement && entitlement.isPro
+      ),
     });
   } catch (err) {
     console.error('verify-payment error:', err);

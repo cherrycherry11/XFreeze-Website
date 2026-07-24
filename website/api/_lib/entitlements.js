@@ -113,11 +113,17 @@ async function grantFromVerifiedPayment({
     );
   }
 
-  /* Idempotency: already processed this payment */
+  /*
+   * Idempotency: same payment_id already ledgered.
+   * Still allow plan upgrade (e.g. monthly → yearly) if this grant is a better plan.
+   */
   const existingPay = await getPaymentById(paymentId);
   if (existingPay) {
     const row = await getEntitlementForUser(existingPay.user_id || userId);
-    return publicEntitlement(row);
+    if (row && row.plan_id === plan.id && isActiveRow(row)) {
+      return publicEntitlement(row);
+    }
+    /* Different plan on same payment id (rare) or stale monthly row — fall through to upsert */
   }
 
   const { started, expires } = computeExpiry(plan.interval);

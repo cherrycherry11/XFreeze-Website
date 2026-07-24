@@ -76,6 +76,62 @@ function planIdFromProductId(productId) {
   return null;
 }
 
+/** Higher wins when upgrading (monthly → yearly). */
+function planRank(planId) {
+  if (planId === 'pro-yearly') return 2;
+  if (planId === 'pro-monthly') return 1;
+  return 0;
+}
+
+/**
+ * Resolve plan from body, payment metadata, product cart, amount, or name.
+ * Avoids defaulting upgrades to pro-monthly when product IDs are not env-mapped.
+ */
+function resolvePlanIdFromPayment(payment, bodyPlanId) {
+  if (bodyPlanId && (bodyPlanId === 'pro-monthly' || bodyPlanId === 'pro-yearly')) {
+    return bodyPlanId;
+  }
+  const meta = (payment && (payment.metadata || payment.meta)) || {};
+  const fromMeta = meta.plan_id || meta.planId;
+  if (fromMeta === 'pro-monthly' || fromMeta === 'pro-yearly') return fromMeta;
+
+  const cart = (payment && (payment.product_cart || payment.productCart)) || [];
+  if (cart[0]) {
+    const pid = cart[0].product_id || cart[0].productId;
+    const mapped = planIdFromProductId(pid);
+    if (mapped) return mapped;
+  }
+  if (payment && payment.product_id) {
+    const mapped = planIdFromProductId(payment.product_id);
+    if (mapped) return mapped;
+  }
+
+  /* Amount in lowest currency unit (e.g. cents): $499 → ~49900, $49 → ~4900 */
+  const amt =
+    payment &&
+    (payment.total_amount != null
+      ? Number(payment.total_amount)
+      : payment.settlement_amount != null
+        ? Number(payment.settlement_amount)
+        : payment.amount != null
+          ? Number(payment.amount)
+          : null);
+  if (amt != null && !Number.isNaN(amt)) {
+    if (amt >= 20000) return 'pro-yearly'; /* >= $200 → yearly */
+    if (amt >= 1000) return 'pro-monthly';
+  }
+
+  const name = String(
+    (payment && (payment.product_name || payment.description || '')) ||
+      (cart[0] && (cart[0].name || cart[0].product_name)) ||
+      ''
+  ).toLowerCase();
+  if (name.includes('year')) return 'pro-yearly';
+  if (name.includes('month')) return 'pro-monthly';
+
+  return 'pro-monthly';
+}
+
 function productsReady() {
   const m = productMap();
   return Boolean(m['pro-monthly'] && m['pro-yearly']);
@@ -249,6 +305,8 @@ module.exports = {
   productMap,
   productIdForPlan,
   planIdFromProductId,
+  planRank,
+  resolvePlanIdFromPayment,
   productsReady,
   dodoFetch,
   ensureDefaultProducts,

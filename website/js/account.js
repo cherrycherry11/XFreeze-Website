@@ -305,15 +305,6 @@
       periodLabel = usage.day || 'Today (UTC)';
     }
 
-    var ovP = $('xf-ov-stat-prompts');
-    var ovT = $('xf-ov-stat-templates');
-    var ovS = $('xf-ov-stat-skills');
-    var ovPeriod = $('xf-ov-period');
-    if (ovP) ovP.textContent = usage.prompts || 0;
-    if (ovT) ovT.textContent = usage.templates || 0;
-    if (ovS) ovS.textContent = usage.skills || 0;
-    if (ovPeriod) ovPeriod.textContent = 'Period: ' + periodLabel;
-
     renderFavoritesSummary();
     renderFavoritesList();
 

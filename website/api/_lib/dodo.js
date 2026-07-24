@@ -168,33 +168,38 @@ async function dodoFetch(path, { method = 'GET', body } = {}) {
   return data;
 }
 
+function priceAmount(p) {
+  if (p == null) return null;
+  if (typeof p === 'number') return p;
+  if (typeof p.price === 'number') return p.price;
+  if (p.price && typeof p.price.price === 'number') return p.price.price;
+  return null;
+}
+
 /**
- * Ensure test catalog products exist. Creates them once if env IDs missing
- * and returns { monthlyId, yearlyId, created }.
+ * Ensure catalog products exist at live prices ($49 / $499).
+ * Creates them once if missing; PATCHes amount when wrong.
+ * Returns { monthlyId, yearlyId, created, priceFixed }.
  * Prefer setting DODO_PRODUCT_* in Vercel after first create.
  */
 async function ensureDefaultProducts() {
   const map = productMap();
-  if (map['pro-monthly'] && map['pro-yearly']) {
-    return {
-      monthlyId: map['pro-monthly'],
-      yearlyId: map['pro-yearly'],
-      created: false,
-    };
-  }
-
   const list = await dodoFetch('/products?page_size=50');
   const items = (list && list.items) || [];
+
   let monthly = items.find(
     (p) =>
-      p.product_id === map['pro-monthly'] ||
+      (map['pro-monthly'] && p.product_id === map['pro-monthly']) ||
       /pro monthly/i.test(p.name || '')
   );
   let yearly = items.find(
     (p) =>
-      p.product_id === map['pro-yearly'] ||
+      (map['pro-yearly'] && p.product_id === map['pro-yearly']) ||
       /pro yearly/i.test(p.name || '')
   );
+
+  let created = false;
+  let priceFixed = false;
 
   if (!monthly) {
     monthly = await dodoFetch('/products', {
@@ -216,7 +221,27 @@ async function ensureDefaultProducts() {
         },
       },
     });
+    created = true;
+  } else if (priceAmount(monthly) !== 4900) {
+    await dodoFetch(`/products/${monthly.product_id}`, {
+      method: 'PATCH',
+      body: {
+        price: {
+          type: 'recurring_price',
+          price: 4900,
+          currency: 'USD',
+          discount: 0,
+          purchasing_power_parity: false,
+          payment_frequency_count: 1,
+          payment_frequency_interval: 'Month',
+          subscription_period_count: 1,
+          subscription_period_interval: 'Month',
+        },
+      },
+    });
+    priceFixed = true;
   }
+
   if (!yearly) {
     yearly = await dodoFetch('/products', {
       method: 'POST',
@@ -237,12 +262,32 @@ async function ensureDefaultProducts() {
         },
       },
     });
+    created = true;
+  } else if (priceAmount(yearly) !== 49900) {
+    await dodoFetch(`/products/${yearly.product_id}`, {
+      method: 'PATCH',
+      body: {
+        price: {
+          type: 'recurring_price',
+          price: 49900,
+          currency: 'USD',
+          discount: 0,
+          purchasing_power_parity: false,
+          payment_frequency_count: 1,
+          payment_frequency_interval: 'Year',
+          subscription_period_count: 1,
+          subscription_period_interval: 'Year',
+        },
+      },
+    });
+    priceFixed = true;
   }
 
   return {
-    monthlyId: monthly.product_id || monthly.productId,
-    yearlyId: yearly.product_id || yearly.productId,
-    created: true,
+    monthlyId: monthly.product_id || monthly.productId || map['pro-monthly'],
+    yearlyId: yearly.product_id || yearly.productId || map['pro-yearly'],
+    created,
+    priceFixed,
   };
 }
 

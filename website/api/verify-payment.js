@@ -161,7 +161,17 @@ module.exports = async function handler(req, res) {
 
     const meta = payment.metadata || {};
     const metaUser = meta.user_id || meta.userId || '';
-    if (metaUser && metaUser !== user.id) {
+    /* Checkout always stamps user_id server-side. A payment without one cannot
+       be proven to belong to the caller, so refuse rather than assume it does. */
+    if (!metaUser) {
+      return json(res, 403, {
+        success: false,
+        granted: false,
+        error: 'This payment is not linked to an account',
+        code: 'user_unverified',
+      });
+    }
+    if (metaUser !== user.id) {
       return json(res, 403, {
         success: false,
         granted: false,

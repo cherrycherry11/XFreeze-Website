@@ -35,7 +35,7 @@
         { href: 'templates', label: 'Templates', nav: 'templates' },
         { href: 'prompt-library', label: 'Motion prompts', nav: 'prompts' },
         { href: 'skills', label: 'Skills', nav: 'skills' },
-        { href: 'pricing', label: 'Pricing', nav: 'pricing' },
+
         { href: 'about', label: 'About', nav: 'about' },
         { href: 'contact', label: 'Contact', nav: 'contact' },
       ],
@@ -67,7 +67,7 @@
         { href: 'https://x.com/XFreeze', label: '@XFreeze', external: true },
         { href: 'https://grok.com', label: 'grok.com', external: true },
         { href: 'https://grok.com/imagine', label: 'Grok Imagine', external: true },
-        { href: 'pricing', label: 'Get Pro', nav: 'pricing' },
+        { href: 'pricing', label: 'Go Pro', nav: 'pricing' },
         { href: 'privacy', label: 'Privacy', nav: 'privacy' },
         { href: 'terms', label: 'Terms', nav: 'terms' },
         { href: 'refund', label: 'Refunds', nav: 'refund' },
@@ -150,9 +150,9 @@
       '<p class="xf-footer-eyebrow">AI library for</p>' +
       '<a href="' + base + 'home" class="xf-footer-logo">X Freeze</a>' +
       '<p class="xf-footer-tagline" data-xf-tagline>Ready-made AI assets for everything you ship.</p>' +
-      '<a href="' + base + 'pricing" class="xf-footer-coffee xf-footer-get-pro">' +
+      '<a href="' + base + 'pricing" class="xf-footer-coffee xf-footer-go-pro">' +
       '<i class="fa-solid fa-crown" aria-hidden="true"></i>' +
-      '<span>Get Pro</span>' +
+      '<span>Go Pro</span>' +
       '</a>' +
       renderFooterThemeSwitch() +
       '</div>' +

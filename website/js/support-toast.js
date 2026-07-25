@@ -46,7 +46,7 @@
     if (!subtitle) {
       subtitle = context === 'open'
         ? 'Want the full library? Unlock Pro for more templates and skills.'
-        : 'Free tools to start. Get Pro for the full library.';
+        : 'Free tools to start. Go Pro for the full library.';
     }
 
     var toast = document.createElement('div');
@@ -57,11 +57,11 @@
       '<div class="xf-support-toast-inner">' +
         '<span class="xf-support-toast-icon" aria-hidden="true"><i class="fa-solid fa-crown"></i></span>' +
         '<div class="xf-support-toast-copy">' +
-          '<span class="xf-support-toast-title">Get Pro</span>' +
+          '<span class="xf-support-toast-title">Go Pro</span>' +
           '<span class="xf-support-toast-sub">' + subtitle + '</span>' +
         '</div>' +
         '<a class="xf-support-toast-cta" href="' + pricingUrl() + '">' +
-          '<i class="fa-solid fa-crown" aria-hidden="true"></i> Get Pro' +
+          '<i class="fa-solid fa-crown" aria-hidden="true"></i> Go Pro' +
         '</a>' +
         '<button type="button" class="xf-support-toast-close" aria-label="Dismiss">&times;</button>' +
       '</div>';

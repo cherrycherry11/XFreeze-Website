@@ -382,7 +382,7 @@ html.dark .site-nav-logo__img--on-dark {
     color 0.15s ease;
 }
 
-/* “Get Pro” text only on wide screens — icon alone mid-width */
+/* “Go Pro” text only on wide screens — icon alone mid-width */
 .site-nav-coffee__label {
   display: none !important;
 }

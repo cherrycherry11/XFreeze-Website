@@ -276,7 +276,7 @@ html.dark .skills-hero-stat-divider {
   padding: 0 1rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  border-radius: var(--xf-radius-sm);
+  border-radius: 9999px;
 }
 
 /* ── Skills hero: clean professional (no decorative line clutter) ── */

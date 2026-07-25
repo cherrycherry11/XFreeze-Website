@@ -354,14 +354,15 @@ html.dark .site-nav-logo__img--on-dark {
   background: transparent;
 }
 
-.site-nav-coffee {
+.site-nav-coffee,
+.site-nav-go-pro {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
   height: 2.25rem;
   padding: 0 1rem;
-  border-radius: 9999px;
+  border-radius: 9999px !important; /* fully rounded pill */
   font-size: 0.8125rem;
   font-weight: 600;
   line-height: 1;

@@ -316,12 +316,31 @@
     });
   }
 
+  /* Local preview: /templates?demoLimit=templates|skills|prompts */
+  function maybeShowLimitDemo() {
+    try {
+      var params = new URLSearchParams(global.location.search || '');
+      var demo = params.get('demoLimit');
+      if (!demo) return;
+      var kind = String(demo).toLowerCase();
+      if (kind === '1' || kind === 'true') kind = 'templates';
+      if (kind !== 'templates' && kind !== 'skills' && kind !== 'prompts') {
+        kind = 'templates';
+      }
+      setTimeout(function () {
+        showUsageLimit({ kind: kind });
+      }, 400);
+    } catch (e) {}
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       setTimeout(bootRefresh, 200);
+      maybeShowLimitDemo();
     });
   } else {
     setTimeout(bootRefresh, 200);
+    maybeShowLimitDemo();
   }
 
   global.addEventListener('xf-entitlement-change', function () {
@@ -346,5 +365,6 @@
     templateOpenHref: templateOpenHref,
     templateOpensExternally: templateOpensExternally,
     resolveTemplateLink: resolveTemplateLink,
+    showUsageLimit: showUsageLimit,
   };
 })(window);

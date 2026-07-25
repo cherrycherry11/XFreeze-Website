@@ -84,52 +84,45 @@ function planRank(planId) {
 }
 
 /**
- * Resolve plan from body, payment metadata, product cart, amount, or name.
- * Avoids defaulting upgrades to pro-monthly when product IDs are not env-mapped.
+ * Resolve plan strictly from configured Dodo product IDs (env) and
+ * checkout metadata we set ourselves. Never guess from amount or name.
+ * Returns null if the product cannot be identified — callers must refuse.
  */
 function resolvePlanIdFromPayment(payment, bodyPlanId) {
-  if (bodyPlanId && (bodyPlanId === 'pro-monthly' || bodyPlanId === 'pro-yearly')) {
-    return bodyPlanId;
-  }
+  const cart = (payment && (payment.product_cart || payment.productCart)) || [];
+  const cartProductId =
+    (cart[0] && (cart[0].product_id || cart[0].productId)) ||
+    (payment && (payment.product_id || payment.productId)) ||
+    '';
+
+  const fromProduct = planIdFromProductId(cartProductId);
+  if (fromProduct) return fromProduct;
+
   const meta = (payment && (payment.metadata || payment.meta)) || {};
   const fromMeta = meta.plan_id || meta.planId;
-  if (fromMeta === 'pro-monthly' || fromMeta === 'pro-yearly') return fromMeta;
-
-  const cart = (payment && (payment.product_cart || payment.productCart)) || [];
-  if (cart[0]) {
-    const pid = cart[0].product_id || cart[0].productId;
-    const mapped = planIdFromProductId(pid);
-    if (mapped) return mapped;
-  }
-  if (payment && payment.product_id) {
-    const mapped = planIdFromProductId(payment.product_id);
-    if (mapped) return mapped;
+  if (fromMeta === 'pro-monthly' || fromMeta === 'pro-yearly') {
+    /* Only trust metadata if product IDs are configured and cart is empty
+       (some webhooks omit cart) OR metadata matches the cart product. */
+    if (!cartProductId) return fromMeta;
+    const expectedId = productIdForPlan(fromMeta);
+    if (expectedId && expectedId === cartProductId) return fromMeta;
   }
 
-  /* Amount in lowest currency unit (e.g. cents): $499 → ~49900, $49 → ~4900 */
-  const amt =
-    payment &&
-    (payment.total_amount != null
-      ? Number(payment.total_amount)
-      : payment.settlement_amount != null
-        ? Number(payment.settlement_amount)
-        : payment.amount != null
-          ? Number(payment.amount)
-          : null);
-  if (amt != null && !Number.isNaN(amt)) {
-    if (amt >= 20000) return 'pro-yearly'; /* >= $200 → yearly */
-    if (amt >= 1000) return 'pro-monthly';
+  /* body plan_id is client-supplied — only accept if it matches cart product */
+  if (
+    bodyPlanId &&
+    (bodyPlanId === 'pro-monthly' || bodyPlanId === 'pro-yearly')
+  ) {
+    const expectedId = productIdForPlan(bodyPlanId);
+    if (expectedId && cartProductId && expectedId === cartProductId) {
+      return bodyPlanId;
+    }
+    if (expectedId && !cartProductId && fromMeta === bodyPlanId) {
+      return bodyPlanId;
+    }
   }
 
-  const name = String(
-    (payment && (payment.product_name || payment.description || '')) ||
-      (cart[0] && (cart[0].name || cart[0].product_name)) ||
-      ''
-  ).toLowerCase();
-  if (name.includes('year')) return 'pro-yearly';
-  if (name.includes('month')) return 'pro-monthly';
-
-  return 'pro-monthly';
+  return null;
 }
 
 function productsReady() {
@@ -310,6 +303,12 @@ function verifyDodoWebhook(rawBody, headers, secret) {
       key = Buffer.from(secret, 'utf8');
     }
   }
+
+  /* Reject stale webhook deliveries (replay window: 5 minutes) */
+  const tsNum = Number(ts);
+  if (!Number.isFinite(tsNum) || tsNum <= 0) return false;
+  const ageSec = Math.abs(Date.now() / 1000 - tsNum);
+  if (ageSec > 5 * 60) return false;
 
   const signed = `${id}.${ts}.${rawBody}`;
   const expected = crypto

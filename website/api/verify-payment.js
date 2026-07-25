@@ -111,7 +111,9 @@ module.exports = async function handler(req, res) {
         const st = String(p.status || '').toLowerCase();
         if (!isPaidStatus(st)) return false;
         const meta = p.metadata || {};
-        return meta.user_id === user.id || meta.userId === user.id;
+        if (!(meta.user_id === user.id || meta.userId === user.id)) return false;
+        /* Only payments that map to a known product ID */
+        return Boolean(resolvePlanIdFromPayment(p, body.planId));
       });
       mine.sort(function (a, b) {
         const ta = new Date(a.created_at || a.createdAt || 0).getTime();
@@ -168,8 +170,19 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    let planId = resolvePlanIdFromPayment(payment, body.planId || body.plan_id);
-    if (!SUBSCRIPTIONS[planId]) planId = 'pro-monthly';
+    const planId = resolvePlanIdFromPayment(
+      payment,
+      body.planId || body.plan_id
+    );
+    if (!planId || !SUBSCRIPTIONS[planId]) {
+      return json(res, 400, {
+        success: false,
+        granted: false,
+        error:
+          'Could not identify plan from payment product. Product IDs must be configured.',
+        code: 'plan_unresolved',
+      });
+    }
 
     const currentPlanId =
       (existingEnt && existingEnt.plan_id) ||
@@ -177,12 +190,10 @@ module.exports = async function handler(req, res) {
       '';
 
     /*
-     * Same payment already granted this plan — idempotent success.
-     * Only when this exact payment_id matches.
+     * Same payment already granted — idempotent success (no re-extend).
      */
     if (
       existingPublic.isPro &&
-      planRank(currentPlanId) >= planRank(planId) &&
       existingEnt &&
       existingEnt.payment_id === paymentId
     ) {
@@ -191,7 +202,7 @@ module.exports = async function handler(req, res) {
         granted: true,
         already: true,
         entitlement: existingPublic,
-        planId: currentPlanId,
+        planId: currentPlanId || planId,
         paymentId,
       });
     }
@@ -240,7 +251,6 @@ module.exports = async function handler(req, res) {
         payment.settlement_currency ||
         'USD'
       ).toUpperCase(),
-      skipAmountCheck: true,
       upgradeFromMonthly,
       raw: {
         source: 'dodo_verify',
@@ -248,7 +258,6 @@ module.exports = async function handler(req, res) {
         env: dodoEnv(),
         subscription_id: payment.subscription_id || null,
         upgraded_from: currentPlanId || null,
-        year_months: upgradeFromMonthly ? 13 : planId === 'pro-yearly' ? 12 : 1,
       },
     });
 

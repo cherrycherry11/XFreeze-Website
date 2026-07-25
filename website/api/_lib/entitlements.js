@@ -89,17 +89,36 @@ function isActiveMonthlyEntitlement(row) {
 }
 
 /**
+ * True if this user already has a ledgered yearly payment (blocks 13-mo farming).
+ */
+async function userHasPriorYearlyPayment(userId, exceptPaymentId) {
+  if (!hasServiceRole() || !userId) return false;
+  try {
+    const rows = await rest(
+      `payments?user_id=eq.${encodeURIComponent(userId)}` +
+        `&product_id=eq.pro-yearly&status=eq.captured&select=payment_id&limit=5`
+    );
+    if (!Array.isArray(rows) || !rows.length) return false;
+    return rows.some(
+      (r) => r.payment_id && r.payment_id !== exceptPaymentId
+    );
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
  * Grant Pro from a verified catalog subscription payment.
- * Idempotent on payment_id.
+ * Idempotent on payment_id — replaying the same payment never extends access.
  *
- * Monthly → yearly upgrade only: access lasts 13 months.
+ * Monthly → yearly upgrade (first time only): access lasts 13 months.
  * Direct yearly purchase / renewal: 12 months.
  *
  * @param {object} opts
- * @param {boolean} [opts.skipAmountCheck] - Paddle tax/locale may differ; skip strict cents match
+ * @param {boolean} [opts.skipAmountCheck] - allow tax variance; still rejects amounts under 50% list
  * @param {string} [opts.expiresAt] - ISO end of period from provider
  * @param {string} [opts.status] - entitlement status (default active)
- * @param {boolean} [opts.upgradeFromMonthly] - force upgrade bonus if known
+ * @param {boolean} [opts.upgradeFromMonthly] - hint from verify-payment
  */
 async function grantFromVerifiedPayment({
   userId,
@@ -127,40 +146,44 @@ async function grantFromVerifiedPayment({
   }
 
   const expectedCents = Math.round(Number(plan.price) * 100);
+  const paid = amountCents != null ? Number(amountCents) : null;
+  /*
+   * Product ID is source of truth. Still reject obviously underpaid amounts
+   * (e.g. $1 test product) unless skipAmountCheck is forced.
+   */
   if (
     !skipAmountCheck &&
-    amountCents != null &&
-    Number(amountCents) !== expectedCents
+    paid != null &&
+    !Number.isNaN(paid) &&
+    paid > 0 &&
+    paid < expectedCents * 0.5
   ) {
     throw new Error(
-      `Amount mismatch: paid ${amountCents}, expected ${expectedCents} for ${productId}`
+      `Amount too low for plan: paid ${paid}, expected ~${expectedCents} for ${productId}`
     );
   }
 
   /*
-   * Idempotency: same payment_id already ledgered.
-   * Still allow plan upgrade (e.g. monthly → yearly) if this grant is a better plan.
+   * Replay protection: same payment_id never re-grants or extends.
+   * Return current entitlement only.
    */
   const existingPay = await getPaymentById(paymentId);
   if (existingPay) {
     const row = await getEntitlementForUser(existingPay.user_id || userId);
-    if (row && row.plan_id === plan.id && isActiveRow(row)) {
-      return publicEntitlement(row);
-    }
-    /* Different plan on same payment id (rare) or stale monthly row — fall through to upsert */
+    return publicEntitlement(row);
   }
 
   const existingEnt = await getEntitlementForUser(userId);
-  const fromMeta =
-    raw &&
-    (raw.upgraded_from === 'pro-monthly' ||
-      raw.upgradedFrom === 'pro-monthly' ||
-      raw.upgrade_from_monthly === true);
+  const priorYearly = await userHasPriorYearlyPayment(userId, paymentId);
+  /*
+   * 13-month bonus only once: active monthly → first yearly purchase.
+   * Cannot farm by flipping monthly/yearly repeatedly.
+   */
   const isMonthlyToYearly =
     plan.interval === 'year' &&
-    (upgradeFromMonthly === true ||
-      fromMeta ||
-      isActiveMonthlyEntitlement(existingEnt));
+    !priorYearly &&
+    isActiveMonthlyEntitlement(existingEnt) &&
+    (upgradeFromMonthly === true || upgradeFromMonthly == null);
 
   const { started, expires } = computeExpiry(plan.interval, null, {
     yearMonths: isMonthlyToYearly ? 13 : 12,
@@ -173,7 +196,7 @@ async function grantFromVerifiedPayment({
     } catch (e) {}
   }
 
-  /* Ledger first — ignore duplicate payment_id races */
+  /* Ledger first — unique payment_id */
   try {
     await rest('payments', {
       method: 'POST',
@@ -184,18 +207,29 @@ async function grantFromVerifiedPayment({
         user_id: userId,
         product_type: 'subscription',
         product_id: plan.id,
-        amount_cents: amountCents != null ? Number(amountCents) : expectedCents,
+        amount_cents: paid != null ? paid : expectedCents,
         currency: (currency || 'USD').toUpperCase(),
         status: 'captured',
-        raw: raw || null,
+        raw: Object.assign({}, raw || {}, {
+          upgrade_bonus_13mo: Boolean(isMonthlyToYearly),
+        }),
       },
     });
   } catch (payErr) {
     const already = await getPaymentById(paymentId);
-    if (!already) {
-      /* Don't block entitlement if ledger insert fails for schema reasons */
-      console.error('payments ledger insert failed', payErr.message || payErr);
+    if (already) {
+      /* Race: another worker ledgered first — do not extend */
+      const row = await getEntitlementForUser(userId);
+      return publicEntitlement(row);
     }
+    console.error('payments ledger insert failed', payErr.message || payErr);
+    throw new Error('Could not record payment');
+  }
+
+  /* Double-check ledger won the race */
+  const ledgered = await getPaymentById(paymentId);
+  if (ledgered && ledgered.user_id && ledgered.user_id !== userId) {
+    throw new Error('Payment belongs to another account');
   }
 
   const payload = {
@@ -209,7 +243,7 @@ async function grantFromVerifiedPayment({
     expires_at: finalExpires.toISOString(),
     payment_id: paymentId,
     order_id: orderId || null,
-    amount_cents: amountCents != null ? Number(amountCents) : expectedCents,
+    amount_cents: paid != null ? paid : expectedCents,
     currency: (currency || 'USD').toUpperCase(),
     updated_at: new Date().toISOString(),
   };
@@ -243,7 +277,7 @@ async function grantFromVerifiedPayment({
 }
 
 /**
- * Mark user free / canceled (Paddle subscription.canceled).
+ * Mark user free / canceled (Dodo subscription cancelled / expired).
  */
 async function revokeEntitlement(userId) {
   if (!hasServiceRole() || !userId) return null;

@@ -36,15 +36,10 @@ function extractUserId(data) {
   return m.user_id || m.userId || '';
 }
 
-function extractPlanId(data) {
-  return resolvePlanIdFromPayment(data, null);
-}
-
 function paymentStatusOk(data) {
   const st = String(
     (data && (data.status || data.payment_status || data.paymentStatus)) || ''
   ).toLowerCase();
-  /* Only treat clear paid outcomes as grantable */
   return (
     st === 'succeeded' ||
     st === 'paid' ||
@@ -82,23 +77,25 @@ module.exports = async function handler(req, res) {
     const raw = await readRawBody(req);
     const secret = dodoWebhookKey();
 
-    if (secret) {
-      const ok = verifyDodoWebhook(raw, req.headers, secret);
-      if (!ok) {
-        console.error('Dodo webhook signature failed');
-        return json(res, 401, { error: 'Invalid signature' });
-      }
-    } else {
-      console.warn(
-        'DODO_PAYMENTS_WEBHOOK_KEY not set — accepting unsigned webhook (test only)'
-      );
+    /* Never accept unsigned webhooks — refuse if secret is missing */
+    if (!secret) {
+      console.error('DODO_PAYMENTS_WEBHOOK_KEY is not set — rejecting webhook');
+      return json(res, 503, {
+        error: 'Webhook secret not configured',
+        code: 'webhook_secret_missing',
+      });
+    }
+
+    const ok = verifyDodoWebhook(raw, req.headers, secret);
+    if (!ok) {
+      console.error('Dodo webhook signature failed');
+      return json(res, 401, { error: 'Invalid signature' });
     }
 
     const event = JSON.parse(raw || '{}');
     const type = event.type || event.event_type || '';
     const data = event.data || {};
 
-    /* Never grant on failed / incomplete payments */
     if (
       type === 'payment.failed' ||
       (String(type).indexOf('payment') === 0 && isFailedStatus(data))
@@ -108,8 +105,7 @@ module.exports = async function handler(req, res) {
 
     /*
      * Only grant Pro after payment.succeeded (or a paid renewal).
-     * Do NOT grant on subscription.active/updated alone — incomplete
-     * checkouts were unlocking Pro when the card failed.
+     * Never grant on subscription.active/updated alone.
      */
     const canGrant =
       type === 'payment.succeeded' ||
@@ -126,25 +122,29 @@ module.exports = async function handler(req, res) {
       }
 
       const userId = extractUserId(data);
-      let planId = extractPlanId(data);
+      const planId = resolvePlanIdFromPayment(data, null);
       const paymentId =
         data.payment_id ||
         data.paymentId ||
         (type === 'payment.succeeded' ? data.id : '') ||
-        data.subscription_id ||
-        data.subscriptionId ||
         '';
 
       if (!userId) {
         return json(res, 200, { ok: true, ignored: 'missing_user_id', type });
       }
       if (!planId || !SUBSCRIPTIONS[planId]) {
-        planId = planId || 'pro-monthly';
-        if (!SUBSCRIPTIONS[planId]) {
-          return json(res, 200, { ok: true, ignored: 'unknown_plan', type });
-        }
+        console.error('webhook: unknown product, refusing grant', {
+          type,
+          product_id: data.product_id,
+          cart: data.product_cart || data.productCart,
+        });
+        return json(res, 200, {
+          ok: true,
+          ignored: 'unknown_plan',
+          type,
+          code: 'plan_unresolved',
+        });
       }
-
       if (!paymentId) {
         return json(res, 200, { ok: true, ignored: 'missing_payment_id', type });
       }
@@ -161,14 +161,9 @@ module.exports = async function handler(req, res) {
               ? Number(data.amount)
               : null,
         currency: (data.currency || 'USD').toUpperCase(),
-        skipAmountCheck: true,
         raw: {
           source: 'dodo_webhook',
           type,
-          upgraded_from:
-            (data.metadata &&
-              (data.metadata.upgraded_from || data.metadata.plan_id)) ||
-            null,
         },
       });
       return json(res, 200, { ok: true, granted: true, planId, userId });
@@ -185,7 +180,6 @@ module.exports = async function handler(req, res) {
       return json(res, 200, { ok: true, revoked: Boolean(userId), type });
     }
 
-    /* subscription.updated: only revoke on bad statuses, never grant */
     if (type === 'subscription.updated') {
       const userId = extractUserId(data);
       const st = String(data.status || '').toLowerCase();

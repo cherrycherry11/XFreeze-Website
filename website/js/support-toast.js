@@ -2,7 +2,15 @@
  * X Freeze - slide-in "Support my work" tab after copy / valuable actions.
  */
 (function (global) {
-  var SUPPORT_URL = 'https://buymeacoffee.com/xfreeze';
+  function pricingUrl() {
+    try {
+      var path = (global.location && global.location.pathname) || '';
+      return path.indexOf('/blog/') !== -1 ? '../pricing' : 'pricing';
+    } catch (e) {
+      return 'pricing';
+    }
+  }
+
   var AUTO_HIDE_MS = 7000;
   var activeToast = null;
   var hideTimer = null;
@@ -37,8 +45,8 @@
     var subtitle = options.subtitle;
     if (!subtitle) {
       subtitle = context === 'open'
-        ? 'Enjoying the templates? A coffee keeps them free.'
-        : 'Free skills & templates - tips help me build more.';
+        ? 'Want the full library? Unlock Pro for more templates and skills.'
+        : 'Free tools to start. Get Pro for the full library.';
     }
 
     var toast = document.createElement('div');
@@ -47,13 +55,13 @@
     toast.setAttribute('aria-live', 'polite');
     toast.innerHTML =
       '<div class="xf-support-toast-inner">' +
-        '<span class="xf-support-toast-icon" aria-hidden="true"><i class="fa-solid fa-mug-hot"></i></span>' +
+        '<span class="xf-support-toast-icon" aria-hidden="true"><i class="fa-solid fa-crown"></i></span>' +
         '<div class="xf-support-toast-copy">' +
-          '<span class="xf-support-toast-title">Support my work</span>' +
+          '<span class="xf-support-toast-title">Get Pro</span>' +
           '<span class="xf-support-toast-sub">' + subtitle + '</span>' +
         '</div>' +
-        '<a class="xf-support-toast-cta" href="' + SUPPORT_URL + '" target="_blank" rel="noopener noreferrer">' +
-          '<i class="fa-solid fa-mug-hot" aria-hidden="true"></i> Coffee' +
+        '<a class="xf-support-toast-cta" href="' + pricingUrl() + '">' +
+          '<i class="fa-solid fa-crown" aria-hidden="true"></i> Get Pro' +
         '</a>' +
         '<button type="button" class="xf-support-toast-close" aria-label="Dismiss">&times;</button>' +
       '</div>';

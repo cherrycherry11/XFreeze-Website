@@ -432,7 +432,7 @@
       },
       {
         question: 'How do I support X Freeze?',
-        answer: '<a href="https://buymeacoffee.com/xfreeze" target="_blank" rel="noopener noreferrer">Buy me a coffee</a> or use optional crypto wallets in the footer (SOL, BTC, ETH). Tips are voluntary - the library stays free to browse.',
+        answer: 'Unlock the full library on <a href="pricing">Pricing</a> with Pro. Optional crypto wallets remain in the footer if you want to tip.',
         tags: ['support', 'tip', 'coffee', 'crypto', 'donate']
       },
       {

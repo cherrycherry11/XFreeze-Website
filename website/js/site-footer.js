@@ -67,7 +67,7 @@
         { href: 'https://x.com/XFreeze', label: '@XFreeze', external: true },
         { href: 'https://grok.com', label: 'grok.com', external: true },
         { href: 'https://grok.com/imagine', label: 'Grok Imagine', external: true },
-        { href: 'https://buymeacoffee.com/xfreeze', label: 'Buy me a coffee', external: true },
+        { href: 'pricing', label: 'Get Pro', nav: 'pricing' },
         { href: 'privacy', label: 'Privacy', nav: 'privacy' },
         { href: 'terms', label: 'Terms', nav: 'terms' },
         { href: 'refund', label: 'Refunds', nav: 'refund' },
@@ -150,9 +150,9 @@
       '<p class="xf-footer-eyebrow">AI library for</p>' +
       '<a href="' + base + 'home" class="xf-footer-logo">X Freeze</a>' +
       '<p class="xf-footer-tagline" data-xf-tagline>Ready-made AI assets for everything you ship.</p>' +
-      '<a href="https://buymeacoffee.com/xfreeze" class="xf-footer-coffee" target="_blank" rel="noopener noreferrer">' +
-      '<i class="fa-solid fa-mug-hot" aria-hidden="true"></i>' +
-      '<span>Buy me a coffee</span>' +
+      '<a href="' + base + 'pricing" class="xf-footer-coffee xf-footer-get-pro">' +
+      '<i class="fa-solid fa-crown" aria-hidden="true"></i>' +
+      '<span>Get Pro</span>' +
       '</a>' +
       renderFooterThemeSwitch() +
       '</div>' +

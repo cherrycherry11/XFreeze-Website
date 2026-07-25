@@ -10,18 +10,34 @@ const {
 } = require('./_lib/dodo');
 const {
   grantFromVerifiedPayment,
-  getPaymentById,
   publicEntitlement,
   getEntitlementForUser,
 } = require('./_lib/entitlements');
 const { SUBSCRIPTIONS } = require('./_lib/products');
 
+const FAIL_STATUSES = {
+  failed: true,
+  cancelled: true,
+  canceled: true,
+  requires_payment_method: true,
+  incomplete: true,
+  error: true,
+  declined: true,
+  expired: true,
+  on_hold: true,
+};
+
+function isPaidStatus(st) {
+  const s = String(st || '').toLowerCase();
+  return s === 'succeeded' || s === 'paid' || s === 'captured' || s === 'active';
+}
+
 /**
  * Verify Dodo payment + grant / upgrade Pro.
- * POST { payment_id?, planId? }
+ * POST { payment_id?, planId?, checkout_status?, subscription_id? }
  *
- * Always considers the latest succeeded payment for this user so monthly → yearly
- * upgrades are applied (does not return early just because already Pro).
+ * Never grants on failed checkout status. When payment_id is provided,
+ * only that payment can unlock Pro (old payments cannot fake a new success).
  */
 module.exports = async function handler(req, res) {
   if (handlePreflight(req, res, 'POST,OPTIONS')) return;
@@ -56,27 +72,52 @@ module.exports = async function handler(req, res) {
     }
 
     const body = await readBody(req);
+    const checkoutStatus = String(
+      body.checkout_status || body.status || body.return_status || ''
+    ).toLowerCase();
+
+    if (FAIL_STATUSES[checkoutStatus]) {
+      return json(res, 400, {
+        success: false,
+        granted: false,
+        error: 'Payment was not completed',
+        code: 'payment_failed',
+        status: checkoutStatus,
+      });
+    }
+
     let paymentId = body.payment_id || body.paymentId || '';
     let payment = null;
 
     if (paymentId) {
       payment = await dodoFetch(`/payments/${encodeURIComponent(paymentId)}`);
+      const st = String(
+        (payment && (payment.status || payment.payment_status)) || ''
+      ).toLowerCase();
+      if (!isPaidStatus(st)) {
+        return json(res, 400, {
+          success: false,
+          granted: false,
+          error: 'Payment not successful (status: ' + (st || 'unknown') + ')',
+          code: 'payment_not_paid',
+          status: st,
+        });
+      }
     } else {
+      /* No payment id: only look up truly paid payments for this user */
       const list = await dodoFetch('/payments?page_size=50');
       const items = (list && list.items) || [];
       const mine = items.filter((p) => {
         const st = String(p.status || '').toLowerCase();
-        if (st !== 'succeeded' && st !== 'paid') return false;
+        if (!isPaidStatus(st)) return false;
         const meta = p.metadata || {};
         return meta.user_id === user.id || meta.userId === user.id;
       });
-      /* Prefer newest payment so yearly upgrade beats older monthly */
       mine.sort(function (a, b) {
         const ta = new Date(a.created_at || a.createdAt || 0).getTime();
         const tb = new Date(b.created_at || b.createdAt || 0).getTime();
         return tb - ta;
       });
-      /* Prefer highest plan among recent succeeds (yearly over monthly) */
       payment =
         mine.find(function (p) {
           return (
@@ -93,28 +134,25 @@ module.exports = async function handler(req, res) {
     const existingPublic = publicEntitlement(existingEnt);
 
     if (!payment || !paymentId) {
-      if (existingPublic.isPro) {
-        return json(res, 200, {
-          success: true,
-          granted: true,
-          already: true,
-          entitlement: existingPublic,
-        });
-      }
+      /* Do not treat "already Pro from an old grant" as this checkout succeeding */
       return json(res, 404, {
         success: false,
-        error: 'No successful Dodo payment found for this account',
+        granted: false,
+        error: 'No successful payment found for this checkout',
         code: 'no_payment',
+        alreadyPro: Boolean(existingPublic.isPro),
       });
     }
 
     const status = String(
       payment.status || payment.payment_status || ''
     ).toLowerCase();
-    if (status !== 'succeeded' && status !== 'paid' && status !== 'active') {
+    if (!isPaidStatus(status)) {
       return json(res, 400, {
         success: false,
+        granted: false,
         error: 'Payment not successful (status: ' + status + ')',
+        code: 'payment_not_paid',
         status,
       });
     }
@@ -124,6 +162,7 @@ module.exports = async function handler(req, res) {
     if (metaUser && metaUser !== user.id) {
       return json(res, 403, {
         success: false,
+        granted: false,
         error: 'This payment belongs to a different account',
         code: 'user_mismatch',
       });
@@ -138,8 +177,8 @@ module.exports = async function handler(req, res) {
       '';
 
     /*
-     * Already Pro on the same (or higher) plan for this payment — no-op.
-     * If yearly was just paid but row is still monthly, continue and upgrade.
+     * Same payment already granted this plan — idempotent success.
+     * Only when this exact payment_id matches.
      */
     if (
       existingPublic.isPro &&
@@ -153,6 +192,7 @@ module.exports = async function handler(req, res) {
         already: true,
         entitlement: existingPublic,
         planId: currentPlanId,
+        paymentId,
       });
     }
 
@@ -162,7 +202,6 @@ module.exports = async function handler(req, res) {
       !body.payment_id &&
       !body.paymentId
     ) {
-      /* Do not downgrade from yearly to older monthly payment by accident */
       return json(res, 200, {
         success: true,
         granted: true,
@@ -170,6 +209,7 @@ module.exports = async function handler(req, res) {
         entitlement: existingPublic,
         planId: currentPlanId,
         note: 'kept_higher_plan',
+        paymentId,
       });
     }
 
@@ -220,7 +260,10 @@ module.exports = async function handler(req, res) {
       entitlement,
       granted: Boolean(entitlement && entitlement.isPro),
       upgraded: Boolean(
-        currentPlanId && currentPlanId !== planId && entitlement && entitlement.isPro
+        currentPlanId &&
+          currentPlanId !== planId &&
+          entitlement &&
+          entitlement.isPro
       ),
       upgradeFromMonthly: Boolean(upgradeFromMonthly),
     });
@@ -228,6 +271,7 @@ module.exports = async function handler(req, res) {
     console.error('verify-payment error:', err);
     return json(res, err.status || 500, {
       success: false,
+      granted: false,
       error: err.message || 'Verification failed',
       details: err.data || null,
     });

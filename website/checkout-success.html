@@ -423,27 +423,49 @@
         var hint = document.getElementById('redirect-hint');
         if (hint) hint.hidden = true;
         setState('error');
-        label.textContent = 'Something went wrong';
-        title.textContent = heading;
-        msg.textContent = body;
-        showActions(primaryHref || 'pricing', primaryText || 'Try again', 'account', 'Open Account');
+        setIcons('x');
+        label.textContent = 'Payment failed';
+        title.textContent = heading || 'Payment not completed';
+        msg.textContent =
+          body ||
+          'No charge went through. Pro was not unlocked. You can try again from Pricing.';
+        showActions(
+          primaryHref || 'pricing',
+          primaryText || 'Try again',
+          'account',
+          'Open Account'
+        );
       }
 
       function success(heading, body) {
         setState('success');
+        setIcons('check');
         label.textContent = 'Payment confirmed';
         title.textContent = heading || 'Welcome to Pro';
         msg.textContent =
           body ||
-          'You’re all set — full library access is active on your account.';
+          'You are all set. Full library access is active on your account.';
         showActions('account', 'Open Account', 'templates', 'Explore library');
         startAutoRedirect(DEFAULT_REDIRECT);
       }
 
-      if (status === 'failed' || status === 'cancelled' || status === 'canceled') {
+      var FAIL = {
+        failed: true,
+        cancelled: true,
+        canceled: true,
+        requires_payment_method: true,
+        incomplete: true,
+        error: true,
+        declined: true,
+        expired: true,
+        on_hold: true,
+      };
+
+      /* Failed / incomplete checkout: always show X, never unlock Pro */
+      if (FAIL[status]) {
         fail(
           'Payment not completed',
-          'No charge went through, so Pro was not unlocked. You can try again anytime from Pricing.',
+          'No charge went through. Pro was not unlocked. Try again from Pricing when you are ready.',
           'pricing',
           'Back to Pricing'
         );
@@ -482,12 +504,17 @@
         if (!t) {
           fail(
             'Sign in required',
-            'Sign in with the same account you used at checkout, then open Account to finish activating Pro.',
+            'Sign in with the same account you used at checkout, then open Account to finish activating Pro if payment succeeded.',
             'login',
             'Sign in'
           );
           return;
         }
+        var paymentId =
+          params.get('payment_id') ||
+          params.get('paymentId') ||
+          params.get('paymentId') ||
+          '';
         return fetch('/api/verify-payment', {
           method: 'POST',
           headers: {
@@ -496,8 +523,12 @@
           },
           body: JSON.stringify({
             planId: planId || undefined,
-            payment_id:
-              params.get('payment_id') || params.get('paymentId') || undefined,
+            payment_id: paymentId || undefined,
+            subscription_id:
+              params.get('subscription_id') ||
+              params.get('subscriptionId') ||
+              undefined,
+            checkout_status: status || undefined,
           }),
         })
           .then(function (r) {
@@ -506,43 +537,50 @@
             });
           })
           .then(function (pair) {
-            if (pair.data && pair.data.entitlement && window.XFreezeEntitlement) {
-              window.XFreezeEntitlement.applyServerEntitlement(pair.data.entitlement);
-            }
-            if (
-              pair.data &&
-              (pair.data.granted ||
-                pair.data.already ||
-                (pair.data.entitlement && pair.data.entitlement.isPro))
-            ) {
-              var planLabel =
-                planId === 'pro-yearly'
-                  ? 'Pro Yearly'
-                  : planId === 'pro-monthly'
-                    ? 'Pro Monthly'
-                    : 'Pro';
-              success(
-                'Welcome to Pro',
-                planLabel +
-                  ' is active. Full templates, skills, and library access are unlocked.'
+            var data = pair.data || {};
+            var paidOk =
+              pair.r.ok &&
+              data.success === true &&
+              data.granted === true &&
+              data.code !== 'payment_failed' &&
+              data.code !== 'payment_not_paid' &&
+              data.code !== 'no_payment';
+
+            if (!paidOk) {
+              fail(
+                'Payment not completed',
+                (data && data.error) ||
+                  'We could not confirm a successful payment. Pro was not unlocked.',
+                'pricing',
+                'Try again'
               );
-            } else {
-              setState('loading');
-              label.textContent = 'Almost there';
-              title.textContent = 'Activating Pro…';
-              msg.textContent =
-                (pair.data && pair.data.error) ||
-                'Payment looks good. If Account still shows Free, stay signed in and refresh in a moment.';
-              showActions('account', 'Open Account', 'pricing', 'Pricing');
+              return;
             }
+
+            /* Only apply Pro after server confirmed a paid payment */
+            if (data.entitlement && window.XFreezeEntitlement) {
+              window.XFreezeEntitlement.applyServerEntitlement(data.entitlement);
+            }
+
+            var planLabel =
+              data.planId === 'pro-yearly' || planId === 'pro-yearly'
+                ? 'Pro Yearly'
+                : data.planId === 'pro-monthly' || planId === 'pro-monthly'
+                  ? 'Pro Monthly'
+                  : 'Pro';
+            success(
+              'Welcome to Pro',
+              planLabel +
+                ' is active. Full templates, skills, and library access are unlocked.'
+            );
           })
           .catch(function (err) {
             fail(
-              'Could not confirm yet',
+              'Could not confirm payment',
               (err && err.message) ||
-                'Open Account and refresh — Pro may still activate shortly.',
-              'account',
-              'Open Account'
+                'We could not verify this checkout. If you were charged, contact support with your email.',
+              'pricing',
+              'Back to Pricing'
             );
           });
       });

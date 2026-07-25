@@ -40,6 +40,35 @@ function extractPlanId(data) {
   return resolvePlanIdFromPayment(data, null);
 }
 
+function paymentStatusOk(data) {
+  const st = String(
+    (data && (data.status || data.payment_status || data.paymentStatus)) || ''
+  ).toLowerCase();
+  /* Only treat clear paid outcomes as grantable */
+  return (
+    st === 'succeeded' ||
+    st === 'paid' ||
+    st === 'captured' ||
+    st === 'active'
+  );
+}
+
+function isFailedStatus(data) {
+  const st = String(
+    (data && (data.status || data.payment_status || data.paymentStatus)) || ''
+  ).toLowerCase();
+  return (
+    st === 'failed' ||
+    st === 'cancelled' ||
+    st === 'canceled' ||
+    st === 'expired' ||
+    st === 'requires_payment_method' ||
+    st === 'on_hold' ||
+    st === 'incomplete' ||
+    st === 'declined'
+  );
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return json(res, 405, { error: 'Method not allowed' });
@@ -69,20 +98,41 @@ module.exports = async function handler(req, res) {
     const type = event.type || event.event_type || '';
     const data = event.data || {};
 
+    /* Never grant on failed / incomplete payments */
     if (
-      type === 'payment.succeeded' ||
-      type === 'subscription.active' ||
-      type === 'subscription.renewed' ||
-      type === 'subscription.updated'
+      type === 'payment.failed' ||
+      (String(type).indexOf('payment') === 0 && isFailedStatus(data))
     ) {
+      return json(res, 200, { ok: true, ignored: type || 'payment_failed' });
+    }
+
+    /*
+     * Only grant Pro after payment.succeeded (or a paid renewal).
+     * Do NOT grant on subscription.active/updated alone — incomplete
+     * checkouts were unlocking Pro when the card failed.
+     */
+    const canGrant =
+      type === 'payment.succeeded' ||
+      (type === 'subscription.renewed' && paymentStatusOk(data));
+
+    if (canGrant) {
+      if (isFailedStatus(data)) {
+        return json(res, 200, {
+          ok: true,
+          ignored: 'failed_status',
+          type,
+          status: data.status || null,
+        });
+      }
+
       const userId = extractUserId(data);
       let planId = extractPlanId(data);
       const paymentId =
         data.payment_id ||
         data.paymentId ||
+        (type === 'payment.succeeded' ? data.id : '') ||
         data.subscription_id ||
         data.subscriptionId ||
-        data.id ||
         '';
 
       if (!userId) {
@@ -95,21 +145,14 @@ module.exports = async function handler(req, res) {
         }
       }
 
-      const subStatus = String(data.status || '').toLowerCase();
-      if (
-        subStatus === 'cancelled' ||
-        subStatus === 'canceled' ||
-        subStatus === 'expired'
-      ) {
-        await revokeEntitlement(userId);
-        return json(res, 200, { ok: true, revoked: true });
+      if (!paymentId) {
+        return json(res, 200, { ok: true, ignored: 'missing_payment_id', type });
       }
 
-      /* grantFromVerifiedPayment detects active monthly → yearly and applies 13 months */
       await grantFromVerifiedPayment({
         userId,
         productId: planId,
-        paymentId: paymentId || `dodo_${event.timestamp || Date.now()}`,
+        paymentId,
         orderId: data.subscription_id || data.subscriptionId || paymentId,
         amountCents:
           data.total_amount != null
@@ -123,7 +166,8 @@ module.exports = async function handler(req, res) {
           source: 'dodo_webhook',
           type,
           upgraded_from:
-            (data.metadata && (data.metadata.upgraded_from || data.metadata.plan_id)) ||
+            (data.metadata &&
+              (data.metadata.upgraded_from || data.metadata.plan_id)) ||
             null,
         },
       });
@@ -133,11 +177,30 @@ module.exports = async function handler(req, res) {
     if (
       type === 'subscription.cancelled' ||
       type === 'subscription.canceled' ||
-      type === 'subscription.expired'
+      type === 'subscription.expired' ||
+      type === 'subscription.on_hold'
     ) {
       const userId = extractUserId(data);
       if (userId) await revokeEntitlement(userId);
-      return json(res, 200, { ok: true, revoked: Boolean(userId) });
+      return json(res, 200, { ok: true, revoked: Boolean(userId), type });
+    }
+
+    /* subscription.updated: only revoke on bad statuses, never grant */
+    if (type === 'subscription.updated') {
+      const userId = extractUserId(data);
+      const st = String(data.status || '').toLowerCase();
+      if (
+        userId &&
+        (st === 'cancelled' ||
+          st === 'canceled' ||
+          st === 'expired' ||
+          st === 'on_hold' ||
+          st === 'failed')
+      ) {
+        await revokeEntitlement(userId);
+        return json(res, 200, { ok: true, revoked: true, type, status: st });
+      }
+      return json(res, 200, { ok: true, ignored: type, status: st });
     }
 
     return json(res, 200, { ok: true, ignored: type });

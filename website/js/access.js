@@ -341,9 +341,38 @@
       });
   }
 
+  /**
+   * Nav CTA: free users see "Go Pro"; existing Pro sees "Upgrade".
+   */
+  function updateProNavCta() {
+    var pro = isPro();
+    var label = pro ? 'Upgrade' : 'Go Pro';
+    var nodes = document.querySelectorAll(
+      '.site-nav-coffee, .site-nav-go-pro, a.xf-auth-support-coffee'
+    );
+    nodes.forEach(function (el) {
+      el.setAttribute('aria-label', label);
+      el.setAttribute('data-pro-state', pro ? 'pro' : 'free');
+      var text = el.querySelector('.site-nav-coffee__label, span:not(.fa-solid):not([aria-hidden])');
+      if (text && /Go Pro|Upgrade|Get Pro/i.test(text.textContent || '')) {
+        text.textContent = label;
+      } else if (
+        el.classList.contains('xf-auth-support-coffee') &&
+        /Go Pro|Upgrade|Get Pro/i.test(el.textContent || '')
+      ) {
+        /* Keep crown icon, replace label text node */
+        var icon = el.querySelector('i');
+        el.textContent = '';
+        if (icon) el.appendChild(icon);
+        el.appendChild(document.createTextNode(' ' + label));
+      }
+    });
+  }
+
   /* Refresh entitlement after auth is ready */
   function bootRefresh() {
     refreshEntitlement().then(function () {
+      updateProNavCta();
       try {
         global.dispatchEvent(new CustomEvent('xf-access-ready'));
       } catch (e) {}
@@ -369,24 +398,32 @@
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
+      updateProNavCta();
       setTimeout(bootRefresh, 200);
       maybeShowLimitDemo();
     });
   } else {
+    updateProNavCta();
     setTimeout(bootRefresh, 200);
     maybeShowLimitDemo();
   }
 
   global.addEventListener('xf-entitlement-change', function () {
+    updateProNavCta();
     try {
       global.dispatchEvent(new CustomEvent('xf-access-ready'));
     } catch (e) {}
+  });
+
+  global.addEventListener('xf-access-ready', function () {
+    updateProNavCta();
   });
 
   global.XFreezeAccess = {
     isPro: isPro,
     getSubscription: getSubscription,
     refreshEntitlement: refreshEntitlement,
+    updateProNavCta: updateProNavCta,
     isPremiumTemplate: isPremiumTemplate,
     isPremiumSkill: isPremiumSkill,
     isPremiumPrompt: isPremiumPrompt,

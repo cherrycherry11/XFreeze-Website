@@ -67,7 +67,6 @@
         { href: 'https://x.com/XFreeze', label: '@XFreeze', external: true },
         { href: 'https://grok.com', label: 'grok.com', external: true },
         { href: 'https://grok.com/imagine', label: 'Grok Imagine', external: true },
-        { href: 'pricing', label: 'Go Pro', nav: 'pricing' },
         { href: 'privacy', label: 'Privacy', nav: 'privacy' },
         { href: 'terms', label: 'Terms', nav: 'terms' },
         { href: 'refund', label: 'Refunds', nav: 'refund' },
@@ -150,10 +149,6 @@
       '<p class="xf-footer-eyebrow">AI library for</p>' +
       '<a href="' + base + 'home" class="xf-footer-logo">X Freeze</a>' +
       '<p class="xf-footer-tagline" data-xf-tagline>Ready-made AI assets for everything you ship.</p>' +
-      '<a href="' + base + 'pricing" class="xf-footer-coffee xf-footer-go-pro">' +
-      '<i class="fa-solid fa-crown" aria-hidden="true"></i>' +
-      '<span>Go Pro</span>' +
-      '</a>' +
       renderFooterThemeSwitch() +
       '</div>' +
       '<div class="xf-footer-columns">' + columns + '</div>' +

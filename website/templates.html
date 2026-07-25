@@ -1470,34 +1470,51 @@
             });
             return;
           }
-          /* Premium links are not in public data — resolve via gated API */
+          /* Every open goes through the gated resolver so usage is recorded:
+             free templates need sign-in + the server daily quota, premium
+             needs Pro + the content API (premium links are not in public
+             data). Opening the anchor directly would skip the counter. */
           if (
             openT &&
             window.XFreezeAccess &&
-            window.XFreezeAccess.isPremiumTemplate(openT) &&
-            (!openT.link || openT.lockedLink)
+            window.XFreezeAccess.resolveTemplateLink
           ) {
             e.preventDefault();
             e.stopPropagation();
             openLink.setAttribute('data-xf-opening', '1');
+            /* Claim the tab now, while the user gesture is still active, so
+               the async quota check does not trip the popup blocker. */
+            var signedIn =
+              !window.XFreezeAuth ||
+              !window.XFreezeAuth.isLoggedIn ||
+              window.XFreezeAuth.isLoggedIn();
+            var pending = signedIn ? window.open('', '_blank') : null;
+            if (pending) {
+              try {
+                pending.opener = null;
+              } catch (err) {}
+            }
             window.XFreezeAccess.resolveTemplateLink(openT).then(function (link) {
               openLink.removeAttribute('data-xf-opening');
-              if (!link) return;
+              if (!link) {
+                if (pending) pending.close();
+                return;
+              }
               if (window.XFreezeSupportToast) {
                 window.XFreezeSupportToast.afterAction({
                   subtitle: 'Opening in Grok - support my work if this helped.',
                 });
               }
-              window.open(link, '_blank', 'noopener,noreferrer');
+              if (pending) {
+                pending.location = link;
+              } else {
+                window.open(link, '_blank', 'noopener,noreferrer');
+              }
             }).catch(function () {
               openLink.removeAttribute('data-xf-opening');
+              if (pending) pending.close();
             });
             return;
-          }
-          if (openLink && window.XFreezeSupportToast && openT) {
-            window.XFreezeSupportToast.afterAction({
-              subtitle: 'Opening in Grok - support my work if this helped.',
-            });
           }
         }
       });

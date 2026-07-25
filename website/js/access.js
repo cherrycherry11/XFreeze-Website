@@ -307,6 +307,40 @@
       });
   }
 
+  /**
+   * Count one use of a free (public) item against the server daily quota.
+   * Premium items are counted by /api/content/* instead, so callers must only
+   * use this for free content. Resolves true when the action may proceed.
+   */
+  function consumeFreeUsage(kind, resourceId) {
+    if (!requireSignedIn()) return Promise.resolve(false);
+    if (!global.XFreezeUsage || !global.XFreezeUsage.consume) {
+      return Promise.resolve(true);
+    }
+    return global.XFreezeUsage
+      .consume(kind, resourceId)
+      .then(function (result) {
+        if (result && result.ok) return true;
+        var code = (result && result.code) || '';
+        /* Only a real quota decision blocks the user. Infrastructure faults
+           (store not reachable, network blip) must not lock people out of
+           content that is public anyway. */
+        if (code && code !== 'limit_exceeded') {
+          return true;
+        }
+        showUsageLimit({
+          kind: kind,
+          message:
+            (result && result.error) || 'Daily limit reached for ' + kind + '.',
+          data: result,
+        });
+        return false;
+      })
+      .catch(function () {
+        return true;
+      });
+  }
+
   /* Refresh entitlement after auth is ready */
   function bootRefresh() {
     refreshEntitlement().then(function () {
@@ -365,6 +399,7 @@
     templateOpenHref: templateOpenHref,
     templateOpensExternally: templateOpensExternally,
     resolveTemplateLink: resolveTemplateLink,
+    consumeFreeUsage: consumeFreeUsage,
     showUsageLimit: showUsageLimit,
   };
 })(window);

@@ -443,7 +443,18 @@
   function ensurePromptText(row) {
     if (!row || !row.prompt) return Promise.resolve('');
     if (!isPremiumRow(row)) {
-      return Promise.resolve(row.prompt.text || '');
+      /* Free text is public, but using it still counts against the daily
+         quota. Premium is counted server-side by /api/content/prompt. */
+      var freeText = row.prompt.text || '';
+      if (!freeText) return Promise.resolve('');
+      if (!window.XFreezeAccess || !window.XFreezeAccess.consumeFreeUsage) {
+        return Promise.resolve(freeText);
+      }
+      return window.XFreezeAccess
+        .consumeFreeUsage('prompts', promptContentId(row))
+        .then(function (allowed) {
+          return allowed ? freeText : '';
+        });
     }
     if (row.prompt.text && !row.prompt.lockedText) {
       return Promise.resolve(row.prompt.text);

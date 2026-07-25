@@ -56,6 +56,19 @@
     return false;
   }
 
+  /**
+   * Count one use of a skill from a free pack against the daily quota.
+   * Premium packs are counted server-side by /api/content/skill-pack.
+   * Resolves true when the copy / preview may proceed.
+   */
+  function countFreeSkillUse(b, skillId) {
+    if (isPremiumPack(b)) return Promise.resolve(true);
+    if (!global.XFreezeAccess || !global.XFreezeAccess.consumeFreeUsage) {
+      return Promise.resolve(true);
+    }
+    return global.XFreezeAccess.consumeFreeUsage('skills', skillId);
+  }
+
   function isConnectorPack(b) {
     if (TAX && typeof TAX.isConnectorPack === 'function') return TAX.isConnectorPack(b, CONNECTOR);
     return CONNECTOR.has(b && b.id);
@@ -591,21 +604,28 @@
         const skillId = btn.getAttribute('data-copy-skill');
         const skill = b.skills.find(function (x) { return x.id === skillId; });
         if (!skill) return;
-        if (skill.aiInstallPrompt) {
-          copyText(buildCopyText(skill), btn);
-          return;
-        }
         const original = btn.textContent;
         btn.disabled = true;
-        btn.textContent = 'Loading…';
-        loadPack(b.id).then(function () {
-          const loaded = b.skills.find(function (x) { return x.id === skillId; });
-          copyText(loaded ? buildCopyText(loaded) : '', btn);
-        }).catch(function () {
-          window.alert('Could not load this skill. Please try again.');
-        }).finally(function () {
-          btn.disabled = false;
-          btn.textContent = original;
+        countFreeSkillUse(b, skillId).then(function (allowed) {
+          if (!allowed) {
+            btn.disabled = false;
+            return;
+          }
+          if (skill.aiInstallPrompt) {
+            btn.disabled = false;
+            copyText(buildCopyText(skill), btn);
+            return;
+          }
+          btn.textContent = 'Loading…';
+          return loadPack(b.id).then(function () {
+            const loaded = b.skills.find(function (x) { return x.id === skillId; });
+            copyText(loaded ? buildCopyText(loaded) : '', btn);
+          }).catch(function () {
+            window.alert('Could not load this skill. Please try again.');
+          }).finally(function () {
+            btn.disabled = false;
+            btn.textContent = original;
+          });
         });
       });
     });
@@ -616,21 +636,28 @@
         const skillId = btn.getAttribute('data-preview-skill');
         const skill = b.skills.find(function (x) { return x.id === skillId; });
         if (!skill) return;
-        if (skill.skillContent) {
-          openModal(skill);
-          return;
-        }
         const original = btn.textContent;
         btn.disabled = true;
-        btn.textContent = 'Loading…';
-        loadPack(b.id).then(function () {
-          const loaded = b.skills.find(function (x) { return x.id === skillId; });
-          if (loaded) openModal(loaded);
-        }).catch(function () {
-          window.alert('Could not load preview. Please try again.');
-        }).finally(function () {
-          btn.disabled = false;
-          btn.textContent = original;
+        countFreeSkillUse(b, skillId).then(function (allowed) {
+          if (!allowed) {
+            btn.disabled = false;
+            return;
+          }
+          if (skill.skillContent) {
+            btn.disabled = false;
+            openModal(skill);
+            return;
+          }
+          btn.textContent = 'Loading…';
+          return loadPack(b.id).then(function () {
+            const loaded = b.skills.find(function (x) { return x.id === skillId; });
+            if (loaded) openModal(loaded);
+          }).catch(function () {
+            window.alert('Could not load preview. Please try again.');
+          }).finally(function () {
+            btn.disabled = false;
+            btn.textContent = original;
+          });
         });
       });
     });
@@ -862,6 +889,9 @@
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
       });
       c.addEventListener('mouseenter', function () {
+        /* Never prefetch premium packs: that calls the gated content API and
+           would spend a daily unit just for hovering the card. */
+        if (isPremiumPack({ id: packId })) return;
         loadPack(packId).catch(function () {});
       }, { once: true });
     });
@@ -1033,20 +1063,29 @@
       copyBtn.addEventListener('click', function () {
         if (!modalSkill || !currentBundle) return;
         if (!requireSkillPackAccess(currentBundle)) return;
-        if (modalSkill.aiInstallPrompt) {
-          copyText(buildCopyText(modalSkill), copyBtn);
-          return;
-        }
         const original = copyBtn.textContent;
         copyBtn.disabled = true;
-        copyBtn.textContent = 'Loading…';
-        loadPack(currentBundle.id).then(function () {
-          copyText(buildCopyText(modalSkill), copyBtn);
-        }).catch(function () {
-          window.alert('Could not load this skill. Please try again.');
-        }).finally(function () {
-          copyBtn.disabled = false;
-          copyBtn.textContent = original;
+        /* Same skill id already counted when the preview opened, so the
+           server dedupes this rather than charging a second unit. */
+        countFreeSkillUse(currentBundle, modalSkill.id).then(function (allowed) {
+          if (!allowed) {
+            copyBtn.disabled = false;
+            return;
+          }
+          if (modalSkill.aiInstallPrompt) {
+            copyBtn.disabled = false;
+            copyText(buildCopyText(modalSkill), copyBtn);
+            return;
+          }
+          copyBtn.textContent = 'Loading…';
+          return loadPack(currentBundle.id).then(function () {
+            copyText(buildCopyText(modalSkill), copyBtn);
+          }).catch(function () {
+            window.alert('Could not load this skill. Please try again.');
+          }).finally(function () {
+            copyBtn.disabled = false;
+            copyBtn.textContent = original;
+          });
         });
       });
     }

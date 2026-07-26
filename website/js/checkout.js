@@ -59,16 +59,6 @@
     return '';
   }
 
-  function getSessionUser() {
-    try {
-      if (global.XFreezeAuth && global.XFreezeAuth.getSession) {
-        var s = global.XFreezeAuth.getSession();
-        return (s && s.user) || null;
-      }
-    } catch (e) {}
-    return null;
-  }
-
   function successUrl(planId) {
     try {
       var base =

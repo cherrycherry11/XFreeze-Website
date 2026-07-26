@@ -27,9 +27,10 @@ const FAIL_STATUSES = {
   on_hold: true,
 };
 
+/** Payment object paid statuses only — not subscription "active". */
 function isPaidStatus(st) {
   const s = String(st || '').toLowerCase();
-  return s === 'succeeded' || s === 'paid' || s === 'captured' || s === 'active';
+  return s === 'succeeded' || s === 'paid' || s === 'captured';
 }
 
 /**
@@ -104,16 +105,30 @@ module.exports = async function handler(req, res) {
         });
       }
     } else {
-      /* No payment id: only look up truly paid payments for this user */
+      /*
+       * No payment_id: only accept a very recent paid payment for this user
+       * (default 30 minutes). Prevents an older paid order from faking a
+       * new checkout success when Dodo omits payment_id on the return URL.
+       */
+      const maxAgeMs = Math.min(
+        Math.max(Number(body.max_age_ms) || 30 * 60 * 1000, 60 * 1000),
+        24 * 60 * 60 * 1000
+      );
+      const startedAt = Number(body.checkout_started_at) || 0;
       const list = await dodoFetch('/payments?page_size=50');
       const items = (list && list.items) || [];
+      const now = Date.now();
       const mine = items.filter((p) => {
         const st = String(p.status || '').toLowerCase();
         if (!isPaidStatus(st)) return false;
         const meta = p.metadata || {};
         if (!(meta.user_id === user.id || meta.userId === user.id)) return false;
-        /* Only payments that map to a known product ID */
-        return Boolean(resolvePlanIdFromPayment(p, body.planId));
+        if (!resolvePlanIdFromPayment(p, body.planId)) return false;
+        const created = new Date(p.created_at || p.createdAt || 0).getTime();
+        if (!created || Number.isNaN(created)) return false;
+        if (startedAt > 0 && created + 5000 < startedAt) return false;
+        if (now - created > maxAgeMs) return false;
+        return true;
       });
       mine.sort(function (a, b) {
         const ta = new Date(a.created_at || a.createdAt || 0).getTime();

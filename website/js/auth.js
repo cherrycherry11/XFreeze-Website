@@ -7,6 +7,8 @@
   var client = null;
   var session = null;
   var authMode = 'signin';
+  /* Prevent double finishLogin from onAuthStateChange + handleLoginCallback. */
+  var loginFinishStarted = false;
   /* Raw nonce for signInWithIdToken; hashed version is sent to Google GIS. */
   var googleOneTapNonce = null;
   var googleOneTapBusy = false;
@@ -390,6 +392,8 @@
   }
 
   function finishLogin(statusEl) {
+    if (loginFinishStarted) return;
+    loginFinishStarted = true;
     clearSignInIntent();
     setStatus(statusEl, 'success', 'Signed in. Redirecting…');
     var target = redirectAfterLogin();
@@ -631,12 +635,33 @@
     /* Always start a fresh OAuth request (PKCE verifier must match this attempt). */
     var data = await fetchOAuthUrl(provider);
     var url = data && data.url;
-    if (url && /^https?:\/\//i.test(url) && url.indexOf('error') === -1) {
-      /* Avoid navigating to Supabase JSON error pages (e.g. provider disabled). */
-      window.location.assign(url);
-      return data;
+    if (!url || !/^https?:\/\//i.test(url)) {
+      throw new Error('Could not start sign-in. Try Google or email instead.');
     }
-    throw new Error('Could not start sign-in. Try Google or email instead.');
+    /* Reject Supabase/provider error URLs instead of full-page navigating to JSON. */
+    try {
+      var u = new URL(url);
+      var errQ =
+        u.searchParams.get('error') ||
+        u.searchParams.get('error_description') ||
+        u.searchParams.get('error_code');
+      if (errQ || /error/i.test(u.pathname)) {
+        var detail = u.searchParams.get('error_description') || errQ || 'provider_error';
+        throw new Error(
+          String(detail).replace(/\+/g, ' ') +
+            ' Try Google or email instead.'
+        );
+      }
+    } catch (parseErr) {
+      if (parseErr && parseErr.message && /Try Google/i.test(parseErr.message)) {
+        throw parseErr;
+      }
+    }
+    if (url.indexOf('error') !== -1 && url.indexOf('error=') !== -1) {
+      throw new Error('Could not start sign-in. Try Google or email instead.');
+    }
+    window.location.assign(url);
+    return data;
   }
 
   async function signInWithPassword(email, password) {
@@ -663,7 +688,8 @@
       email: email,
       password: password,
       options: {
-        emailRedirectTo: loginPageUrl(),
+        /* Absolute allowlisted URL — relative "login" breaks confirm links. */
+        emailRedirectTo: loginUrl(),
       },
     });
 
@@ -926,7 +952,18 @@
         finishLogin(statusEl);
         return;
       }
-      setStatus(statusEl, 'error', 'Sign-in did not complete. Try Google or email again.');
+      var hint =
+        'Sign-in did not complete. Try Google or email again. If you switched tabs or devices during sign-in, start over on this browser.';
+      try {
+        var codeLeft = new URLSearchParams(window.location.search || '').get(
+          'code'
+        );
+        if (codeLeft) {
+          hint =
+            'Could not finish OAuth (session code expired or storage cleared). Close other tabs and try again.';
+        }
+      } catch (e) {}
+      setStatus(statusEl, 'error', hint);
     }
   }
 

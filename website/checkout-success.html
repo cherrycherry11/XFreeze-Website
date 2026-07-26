@@ -489,9 +489,25 @@
         tries = tries || 0;
         var t = token();
         if (t) return Promise.resolve(t);
-        if (tries > 25) return Promise.resolve('');
+        /* ~10s: cold session restore after Dodo return can be slow */
+        if (tries > 50) return Promise.resolve('');
         return new Promise(function (r) {
           setTimeout(function () {
+            /* Prefer explicit session refresh when auth lib is present */
+            if (
+              tries === 5 &&
+              window.XFreezeAuth &&
+              typeof window.XFreezeAuth.refreshSession === 'function'
+            ) {
+              window.XFreezeAuth.refreshSession()
+                .then(function () {
+                  r(waitAuth(tries + 1));
+                })
+                .catch(function () {
+                  r(waitAuth(tries + 1));
+                });
+              return;
+            }
             r(waitAuth(tries + 1));
           }, 200);
         });
@@ -502,9 +518,15 @@
 
       waitAuth().then(function (t) {
         if (!t) {
+          try {
+            sessionStorage.setItem(
+              'xf-auth-redirect',
+              'checkout-success' + window.location.search
+            );
+          } catch (e) {}
           fail(
             'Sign in required',
-            'Sign in with the same account you used at checkout, then open Account to finish activating Pro if payment succeeded.',
+            'Sign in with the same account you used at checkout, then we will finish activating Pro if payment succeeded.',
             'login',
             'Sign in'
           );
@@ -513,8 +535,14 @@
         var paymentId =
           params.get('payment_id') ||
           params.get('paymentId') ||
-          params.get('paymentId') ||
+          params.get('pay_id') ||
           '';
+        var checkoutStarted = 0;
+        try {
+          checkoutStarted = Number(
+            sessionStorage.getItem('xf_checkout_started_at') || 0
+          );
+        } catch (e2) {}
         return fetch('/api/verify-payment', {
           method: 'POST',
           headers: {
@@ -529,6 +557,7 @@
               params.get('subscriptionId') ||
               undefined,
             checkout_status: status || undefined,
+            checkout_started_at: checkoutStarted || undefined,
           }),
         })
           .then(function (r) {

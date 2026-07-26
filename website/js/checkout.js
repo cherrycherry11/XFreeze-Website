@@ -59,6 +59,16 @@
     return '';
   }
 
+  function getSessionUser() {
+    try {
+      if (global.XFreezeAuth && global.XFreezeAuth.getSession) {
+        var s = global.XFreezeAuth.getSession();
+        return (s && s.user) || null;
+      }
+    } catch (e) {}
+    return null;
+  }
+
   function successUrl(planId) {
     try {
       var base =
@@ -352,8 +362,21 @@
         throw new Error('Sign in required before purchasing');
       }
 
+      var email = getSessionEmail();
+      if (!email) {
+        inflight = false;
+        setBusy(triggerBtn, false);
+        showStatus(
+          'Email required',
+          'Your account has no email (common with X login). Add one under Account settings, or sign in with Google / email, then try again.',
+          true
+        );
+        return;
+      }
+
       try {
         sessionStorage.setItem('xf_pending_product', JSON.stringify(product));
+        sessionStorage.setItem('xf_checkout_started_at', String(Date.now()));
       } catch (e) {}
 
       var siteTheme = getSiteTheme();
@@ -365,7 +388,7 @@
         },
         body: JSON.stringify({
           planId: product.id,
-          email: getSessionEmail() || undefined,
+          email: email,
           returnUrl: successUrl(product.id),
           theme: siteTheme,
         }),

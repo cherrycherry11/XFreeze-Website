@@ -52,7 +52,14 @@ Use **X / Twitter (OAuth 2.0)** in Supabase — **not** the legacy “Twitter (O
 
 ### Why you see “Something went wrong” on X
 
-That message is from **x.com**, not X Freeze. It almost always means the X app or credentials are misconfigured. Supabase always requests the `users.email` scope, so email access must be enabled on the X app.
+That message is from **x.com**, not X Freeze. It almost always means the X app or credentials are misconfigured.
+
+**Scopes (code vs portal)**  
+- Site code requests: `tweet.read users.read offline.access` (no email in our client options).  
+- Supabase may still append `users.email` on the authorize URL. Keep **Request email from users ON** in the X portal so that does not fail.  
+- Verified: keep portal email ON even if the site omits email from `scopes`.  
+
+X users without a public email can still sign in, but **checkout requires an email**. They should add one on Account or use Google / email sign-in before buying.
 
 ### Part A — X Developer Portal
 
@@ -64,7 +71,7 @@ That message is from **x.com**, not X Freeze. It almost always means the X app o
 | Setting | Value |
 |--------|--------|
 | App permissions | **Read** (minimum) |
-| Request email from users | **ON** (required — Supabase always asks for `users.email`) |
+| Request email from users | **ON** (keep on; Supabase may still request `users.email` even when our site scopes omit it) |
 | Type of App | **Web App** |
 | Callback URI / Redirect URL | `https://ekmllicbgmuodptvgxsl.supabase.co/auth/v1/callback` |
 | Website URL | `https://xfreeze.com` |

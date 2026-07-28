@@ -307,53 +307,15 @@ html.xf-cinematic-pending #mobile-menu-backdrop {
   will-change: transform;
 }
 
-.hero-stage__orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(72px);
-  opacity: 0.5;
-  will-change: transform;
-}
-
-.hero-stage__orb--a {
-  width: min(56vw, 32rem);
-  height: min(56vw, 32rem);
-  top: 4%;
-  left: 2%;
-  background: radial-gradient(circle, rgba(148, 163, 184, 0.55) 0%, transparent 70%);
-}
-
-.hero-stage__orb--b {
-  width: min(50vw, 28rem);
-  height: min(50vw, 28rem);
-  bottom: 0%;
-  right: 0%;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.28) 0%, transparent 72%);
-}
-
-.hero-stage__orb--c {
-  width: min(30vw, 16rem);
-  height: min(30vw, 16rem);
-  top: 42%;
-  left: 48%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, transparent 70%);
-  filter: blur(48px);
-  opacity: 0.35;
-}
-
-html.dark .hero-stage__orb--a {
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%);
-  opacity: 0.6;
-}
-
-html.dark .hero-stage__orb--b {
-  background: radial-gradient(circle, rgba(129, 140, 248, 0.24) 0%, transparent 72%);
-  opacity: 0.55;
-}
-
+/* Orbs off — soft blobs read as a light haze behind the headline */
+.hero-stage__orb,
+.hero-stage__orb--a,
+.hero-stage__orb--b,
+.hero-stage__orb--c,
+html.dark .hero-stage__orb--a,
+html.dark .hero-stage__orb--b,
 html.dark .hero-stage__orb--c {
-  background: radial-gradient(circle, rgba(34, 211, 238, 0.2) 0%, transparent 70%);
-  opacity: 0.4;
+  display: none;
 }
 
 .hero-stage__grain {

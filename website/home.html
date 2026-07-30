@@ -3411,6 +3411,7 @@
         const playIfVisible = (video) => {
           if (!container._isVisible || !video) return;
           video.muted = true;
+          video.playsInline = true;
           const markFrame = () => {
             video.classList.add('is-frame-ready');
             const card = video.closest('.artistic-card');
@@ -3418,8 +3419,20 @@
           };
           if (video.readyState >= 2) markFrame();
           else video.addEventListener('loadeddata', markFrame, { once: true });
-          const p = video.play();
-          if (p && typeof p.catch === 'function') p.catch(() => {});
+          const kick = () => {
+            if (!container._isVisible || !video) return;
+            const p = video.play();
+            if (p && typeof p.catch === 'function') {
+              p.catch(() => {
+                /* Autoplay/decode hiccup — retry once shortly */
+                setTimeout(() => {
+                  if (!container._isVisible) return;
+                  video.play().catch(() => {});
+                }, 220);
+              });
+            }
+          };
+          kick();
         };
 
         const sourceMatches = (source, expected) => {
@@ -3457,6 +3470,7 @@
           }
         };
 
+        /* rVFC can hang if play() never paints — always fall through after timeout */
         const waitForPaintedFrame = (video, cb) => {
           let done = false;
           const finish = () => {
@@ -3467,10 +3481,22 @@
           if (typeof video.requestVideoFrameCallback === 'function') {
             try {
               video.requestVideoFrameCallback(() => finish());
-              return;
-            } catch (e) { /* fall through */ }
+            } catch (e) {
+              requestAnimationFrame(() => requestAnimationFrame(finish));
+            }
+          } else {
+            requestAnimationFrame(() => requestAnimationFrame(finish));
           }
-          requestAnimationFrame(() => requestAnimationFrame(finish));
+          /* Hard fallback so crossfades never hang forever */
+          setTimeout(finish, 900);
+        };
+
+        const forceClearSwap = (card) => {
+          if (!card) return;
+          clearCardSwap(card);
+          card._isSwapping = false;
+          card._pendingSrc = null;
+          card._swapStuckSince = 0;
         };
 
         const playActive = (card, src) => {
@@ -3484,6 +3510,9 @@
           }
           updateCardCaption(card, src, poolKey);
           playIfVisible(stack.active);
+          queueMicrotask(() => {
+            try { bindActiveWatchdogs(card); } catch (e) { /* init order */ }
+          });
         };
 
         /**
@@ -3515,6 +3544,7 @@
           card._swapToken = (card._swapToken || 0) + 1;
           const token = card._swapToken;
           card._isSwapping = true;
+          card._swapStuckSince = Date.now();
           card._pendingSrc = src;
 
           /* Keep next clip fully hidden while buffering */
@@ -3526,7 +3556,14 @@
             if (!sourceMatches(idleSource, src)) return;
             if (idle.readyState < 2) return;
 
-            clearCardSwap(card);
+            /* Keep _swapRevealTimer until finalize so paint hangs still recover */
+            if (card._readyHandler && card._readyTarget) {
+              card._readyTarget.removeEventListener('loadeddata', card._readyHandler);
+              card._readyTarget.removeEventListener('canplay', card._readyHandler);
+              card._readyTarget.removeEventListener('error', card._readyHandler);
+              card._readyHandler = null;
+              card._readyTarget = null;
+            }
 
             try { idle.currentTime = 0; } catch (e) { /* ignore */ }
 
@@ -3559,8 +3596,8 @@
                     active.load();
                   } catch (e) { /* ignore */ }
                   card._videoStack = { active: idle, idle: active };
-                  card._isSwapping = false;
-                  card._pendingSrc = null;
+                  forceClearSwap(card);
+                  bindActiveWatchdogs(card);
                 };
 
                 if (animate) {
@@ -3591,10 +3628,11 @@
 
           const onError = () => {
             if (token !== card._swapToken) return;
-            card._isSwapping = false;
-            card._pendingSrc = null;
+            forceClearSwap(card);
             idle.classList.add('is-pending');
             idle.classList.remove('is-active');
+            /* Keep current active playing so the slot never freezes blank */
+            playIfVisible(active);
           };
 
           /* Preloaded next clip is already on idle - reveal without reloading */
@@ -3613,15 +3651,16 @@
           idleSource.setAttribute('src', src);
           idle.load();
 
-          /* Safety: if events never fire, do not force-show a blank frame */
+          /* Safety: reveal if ready, else abandon swap and keep current clip alive */
           card._swapRevealTimer = setTimeout(() => {
             if (token !== card._swapToken) return;
-            if (idle.readyState >= 2 && sourceMatches(idleSource, src)) reveal();
-            else {
-              card._isSwapping = false;
-              card._pendingSrc = null;
+            if (idle.readyState >= 2 && sourceMatches(idleSource, src)) {
+              reveal();
+            } else {
+              forceClearSwap(card);
+              playIfVisible(active);
             }
-          }, 4000);
+          }, 3500);
         };
 
         /** Preload next index onto idle layer without revealing yet. */
@@ -3648,7 +3687,19 @@
         const advanceCard = (cardIndex) => {
           const card = cards[cardIndex];
           if (!card) return false;
-          if (card._isSwapping) return false;
+          if (card._isSwapping) {
+            const stuckFor = card._swapStuckSince
+              ? Date.now() - card._swapStuckSince
+              : 0;
+            /* Force-clear hung crossfades so the grid never freezes */
+            if (stuckFor > 4500) {
+              forceClearSwap(card);
+            } else {
+              if (!card._swapStuckSince) card._swapStuckSince = Date.now();
+              return false;
+            }
+          }
+          card._swapStuckSince = 0;
 
           let nextIdx = typeof card._nextIndex === 'number'
             ? card._nextIndex
@@ -3661,8 +3712,52 @@
           }
           indices[cardIndex] = nextIdx;
           card._nextIndex = null;
+          card._swapStuckSince = Date.now();
           applyVideo(card, pool[nextIdx], true);
           return true;
+        };
+
+        /* When active clip ends or stalls, advance / re-kick instead of freezing */
+        const bindActiveWatchdogs = (card) => {
+          const stack = card && card._videoStack;
+          if (!stack || !stack.active) return;
+          const video = stack.active;
+          if (video._xfWatchBound) return;
+          video._xfWatchBound = true;
+
+          video.addEventListener('ended', () => {
+            if (!container._isVisible || !container._cycleReady) return;
+            const idx = cards.indexOf(card);
+            if (idx < 0) return;
+            /* Clip finished before timer — advance now */
+            if (card._isSwapping) forceClearSwap(card);
+            advanceCard(idx);
+            clearCardSchedule(card);
+            card._advanceTimer = setTimeout(() => {
+              scheduleCardCycle(idx, 0);
+            }, VIDEO_FADE_MS + 100);
+          });
+
+          video.addEventListener('stalled', () => {
+            if (!container._isVisible) return;
+            playIfVisible(video);
+          });
+
+          video.addEventListener('waiting', () => {
+            if (!container._isVisible) return;
+            /* Brief stall during decode — nudge play */
+            setTimeout(() => {
+              if (container._isVisible && video.paused) playIfVisible(video);
+            }, 400);
+          });
+
+          video.addEventListener('error', () => {
+            if (!container._isVisible || !container._cycleReady) return;
+            const idx = cards.indexOf(card);
+            if (idx < 0) return;
+            forceClearSwap(card);
+            advanceCard(idx);
+          });
         };
 
         const clipDurationMs = (card) => {
@@ -3706,12 +3801,21 @@
               preloadNext(cardIndex);
             }, preloadIn);
 
-            card._advanceTimer = setTimeout(function tryAdvance() {
+            card._advanceTimer = setTimeout(function tryAdvance(retries) {
               if (!container._isVisible || !container._cycleReady) return;
+              const n = typeof retries === 'number' ? retries : 0;
               const ok = advanceCard(cardIndex);
               if (!ok) {
-                /* Previous crossfade still running - retry shortly */
-                card._advanceTimer = setTimeout(tryAdvance, 180);
+                /* Previous crossfade still running - retry, then force clear */
+                if (n > 28) {
+                  forceClearSwap(card);
+                  advanceCard(cardIndex);
+                  card._advanceTimer = setTimeout(() => {
+                    scheduleCardCycle(cardIndex, 0);
+                  }, VIDEO_FADE_MS + 100);
+                  return;
+                }
+                card._advanceTimer = setTimeout(() => tryAdvance(n + 1), 180);
                 return;
               }
               /* After swap, wait for fade then schedule the next clip */
@@ -3737,6 +3841,7 @@
         const primeCards = () => {
           cards.forEach((card, i) => {
             applyVideo(card, pool[indices[i]], false);
+            bindActiveWatchdogs(card);
           });
           scheduleAllCards(180);
         };
@@ -3759,14 +3864,19 @@
           cards.forEach((card) => {
             const stack = card._videoStack;
             if (!stack) return;
-            /* Don't abort an in-flight swap on resume */
-            if (card._isSwapping) return;
+            /* Don't abort a fresh swap; clear ones stuck >4.5s */
+            if (card._isSwapping) {
+              const stuckFor = card._swapStuckSince
+                ? Date.now() - card._swapStuckSince
+                : 5000;
+              if (stuckFor < 4500) return;
+              forceClearSwap(card);
+            }
             stack.active.classList.add('is-active');
             stack.active.classList.remove('is-pending');
+            bindActiveWatchdogs(card);
             /* Force play while container is considered visible */
-            stack.active.muted = true;
-            const p = stack.active.play();
-            if (p && typeof p.catch === 'function') p.catch(() => {});
+            playIfVisible(stack.active);
           });
         };
 

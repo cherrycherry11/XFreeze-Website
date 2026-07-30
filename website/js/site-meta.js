@@ -39,6 +39,9 @@
     if (host === 'xfreeze.com' || host === 'www.xfreeze.com') {
       return 'https://xfreeze.com/' + path.replace(/^\//, '');
     }
+    if (host === 'freezestack.com' || host === 'www.freezestack.com') {
+      return 'https://freezestack.com/' + path.replace(/^\//, '');
+    }
     return assetUrl(path);
   }
 
@@ -67,8 +70,8 @@
     document.head.appendChild(link);
   }
 
-  /* share3 - multi-size ico + dedicated 48/96 PNGs at site root for Google SERP */
-  var v = 'share3';
+  /* fs-logo1 - FreezeStack mark favicon ico + dedicated 48/96 PNGs at site root for Google SERP */
+  var v = 'fs-logo1';
   var png48 = iconUrl('favicon-48x48.png') + '?v=' + v;
   var png96 = iconUrl('favicon-96x96.png') + '?v=' + v;
   var pngRoot = iconUrl('favicon.png') + '?v=' + v;

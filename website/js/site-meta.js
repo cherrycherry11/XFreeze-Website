@@ -70,8 +70,8 @@
     document.head.appendChild(link);
   }
 
-  /* fs-logo1 - FreezeStack mark favicon ico + dedicated 48/96 PNGs at site root for Google SERP */
-  var v = 'fs-logo1';
+  /* fs-logo2 - FreezeStack mark favicon ico + dedicated 48/96 PNGs at site root for Google SERP */
+  var v = 'fs-logo2';
   var png48 = iconUrl('favicon-48x48.png') + '?v=' + v;
   var png96 = iconUrl('favicon-96x96.png') + '?v=' + v;
   var pngRoot = iconUrl('favicon.png') + '?v=' + v;

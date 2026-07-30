@@ -1,0 +1,343 @@
+/* X Freeze - X post library (home section) */
+
+#xf-post-library {
+  --lib-bg: #ffffff;
+  --lib-surface: #fafafa;
+  --lib-text: #0a0a0a;
+  --lib-dim: #3f3f46;
+  --lib-muted: #71717a;
+  --lib-line: rgba(15, 23, 42, 0.1);
+  --lib-line-strong: rgba(15, 23, 42, 0.18);
+  --lib-accent: #0a0a0a;
+  --lib-accent-soft: rgba(10, 10, 10, 0.08);
+  --lib-on-accent: #ffffff;
+  --lib-card: #ffffff;
+  --lib-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.dark #xf-post-library {
+  --lib-bg: #0a0a0a;
+  --lib-surface: #111113;
+  --lib-text: #f5f5f5;
+  --lib-dim: #d4d4d8;
+  --lib-muted: #a1a1aa;
+  --lib-line: rgba(255, 255, 255, 0.1);
+  --lib-line-strong: rgba(255, 255, 255, 0.18);
+  --lib-accent: #f5f5f5;
+  --lib-accent-soft: rgba(255, 255, 255, 0.1);
+  --lib-on-accent: #0a0a0a;
+  --lib-card: #111113;
+}
+
+#xf-post-library .lib-sub-note {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--lib-muted);
+}
+
+#xf-post-library .lib-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--lib-line);
+  border: 1px solid var(--lib-line);
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 1.75rem 0 1.5rem;
+}
+
+#xf-post-library .lib-stat {
+  background: var(--lib-card);
+  padding: 1.1rem 1.15rem;
+}
+
+#xf-post-library .lib-stat b {
+  display: block;
+  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--lib-text);
+}
+
+#xf-post-library .lib-stat span {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lib-muted);
+}
+
+@media (max-width: 720px) {
+  #xf-post-library .lib-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+#xf-post-library .lib-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+#xf-post-library .lib-search {
+  position: relative;
+  flex: 1 1 280px;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+}
+
+#xf-post-library .lib-search svg {
+  position: absolute;
+  left: 1rem;
+  width: 15px;
+  height: 15px;
+  color: var(--lib-muted);
+  pointer-events: none;
+}
+
+#xf-post-library .lib-search input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 1rem 0 2.6rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  color: var(--lib-text);
+  background: var(--lib-surface);
+  border: 1px solid var(--lib-line);
+  border-radius: 9999px;
+  transition: border-color 0.2s ease;
+}
+
+#xf-post-library .lib-search input::placeholder {
+  color: var(--lib-muted);
+}
+
+#xf-post-library .lib-search input:focus {
+  outline: none;
+  border-color: var(--lib-line-strong);
+}
+
+#xf-post-library .lib-sort {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--lib-line);
+  border-radius: 9999px;
+  background: var(--lib-surface);
+}
+
+#xf-post-library .lib-sort-btn {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--lib-muted);
+  padding: 0.5rem 0.9rem;
+  border-radius: 9999px;
+  min-height: 2.25rem;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+#xf-post-library .lib-sort-btn:hover {
+  color: var(--lib-text);
+}
+
+#xf-post-library .lib-sort-btn.is-active {
+  color: var(--lib-on-accent);
+  background: var(--lib-accent);
+}
+
+#xf-post-library .lib-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+#xf-post-library .lib-filter {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--lib-muted);
+  border: 1px solid var(--lib-line);
+  border-radius: 9999px;
+  padding: 0.45rem 0.9rem;
+  min-height: 2.15rem;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+#xf-post-library .lib-filter:hover {
+  color: var(--lib-dim);
+  border-color: var(--lib-line-strong);
+}
+
+#xf-post-library .lib-filter.is-active {
+  color: var(--lib-on-accent);
+  background: var(--lib-accent);
+  border-color: var(--lib-accent);
+}
+
+#xf-post-library .lib-count {
+  margin: 0.25rem 0 1.15rem;
+  font-size: 0.8125rem;
+  color: var(--lib-muted);
+}
+
+#xf-post-library .lib-grid {
+  columns: 3;
+  column-gap: 1rem;
+}
+
+@media (max-width: 1000px) {
+  #xf-post-library .lib-grid {
+    columns: 2;
+  }
+}
+
+@media (max-width: 660px) {
+  #xf-post-library .lib-grid {
+    columns: 1;
+  }
+}
+
+#xf-post-library .lib-card {
+  break-inside: avoid;
+  display: block;
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--lib-line);
+  border-radius: 1rem;
+  background: var(--lib-card);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s var(--lib-ease), transform 0.2s var(--lib-ease), box-shadow 0.2s ease;
+}
+
+#xf-post-library .lib-card:hover {
+  border-color: var(--lib-line-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+}
+
+html.dark #xf-post-library .lib-card:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+#xf-post-library .lib-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+#xf-post-library .lib-tag {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lib-text);
+  border: 1px solid var(--lib-line);
+  background: var(--lib-accent-soft);
+  border-radius: 9999px;
+  padding: 0.3rem 0.65rem;
+  white-space: nowrap;
+}
+
+#xf-post-library .lib-date {
+  font-size: 0.6875rem;
+  color: var(--lib-muted);
+  white-space: nowrap;
+}
+
+#xf-post-library .lib-text {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--lib-dim);
+  white-space: pre-line;
+  margin: 0 0 1rem;
+}
+
+#xf-post-library .lib-card:hover .lib-text {
+  color: var(--lib-text);
+}
+
+#xf-post-library .lib-quoting {
+  font-size: 0.6875rem;
+  color: var(--lib-muted);
+  margin: 0 0 0.55rem;
+}
+
+#xf-post-library .lib-metrics {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--lib-line);
+  font-size: 0.6875rem;
+  color: var(--lib-muted);
+}
+
+#xf-post-library .lib-metrics .v {
+  color: var(--lib-text);
+  font-weight: 600;
+}
+
+#xf-post-library .lib-metrics .go {
+  margin-left: auto;
+  color: var(--lib-muted);
+  transition: color 0.2s ease, transform 0.2s var(--lib-ease);
+}
+
+#xf-post-library .lib-card:hover .go {
+  color: var(--lib-text);
+  transform: translate(2px, -2px);
+}
+
+#xf-post-library .lib-empty {
+  padding: 2.5rem 0;
+  color: var(--lib-muted);
+  column-span: all;
+}
+
+#xf-post-library .lib-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.75rem;
+}
+
+#xf-post-library .lib-more.is-done {
+  display: none;
+}
+
+#xf-post-library .lib-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding: 0 1.25rem;
+  border-radius: 9999px;
+  border: 1px solid var(--lib-line-strong);
+  background: transparent;
+  color: var(--lib-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+#xf-post-library .lib-more-btn:hover {
+  background: var(--lib-accent-soft);
+  border-color: var(--lib-text);
+}

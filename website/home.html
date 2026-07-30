@@ -1732,6 +1732,7 @@
     }
   </style>
   <link rel="stylesheet" href="css/home-liquid-theme.css">
+  <link rel="stylesheet" href="css/post-library.css">
   <link rel="stylesheet" href="css/dark-nebula-bg.css">
   <link rel="stylesheet" href="css/theme-dark.css">
 </head>
@@ -2323,6 +2324,52 @@
       <span class="xf-spotlight-links__sep" aria-hidden="true">·</span>
       <a href="use-cases" class="font-semibold underline-offset-2 hover:underline">Use cases</a>
     </div>
+    </div>
+  </section>
+
+
+  <!-- ==================== X POST LIBRARY ==================== -->
+  <section id="xf-post-library" class="section border-t border-[#e5e7eb] py-20 md:py-24" data-scroll-reveal aria-label="Post library">
+    <div class="content-container xf-home-section">
+      <div class="scroll-reveal-in max-w-3xl xf-home-head">
+        <p class="xf-section-eyebrow">From X</p>
+        <h2 class="xf-section-title">Ideas worth more than one post</h2>
+        <p class="xf-section-lead">
+          Highest-reach posts from the archive, organised by topic. Search, filter, and open the original on X.
+          <span class="lib-sub-note">Archive as of July 2026 · 236 top posts</span>
+        </p>
+      </div>
+
+      <div class="lib-stats scroll-reveal-in" id="lib-stats" style="transition-delay: 40ms"></div>
+
+      <div class="lib-controls scroll-reveal-in" style="transition-delay: 60ms">
+        <div class="lib-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" />
+          </svg>
+          <input
+            type="search"
+            id="lib-q"
+            placeholder="Search the library..."
+            aria-label="Search posts"
+            autocomplete="off"
+          />
+        </div>
+        <div class="lib-sort" role="group" aria-label="Sort posts">
+          <button type="button" class="lib-sort-btn is-active" data-sort="views" aria-pressed="true">Most viewed</button>
+          <button type="button" class="lib-sort-btn" data-sort="date" aria-pressed="false">Newest</button>
+        </div>
+      </div>
+
+      <div class="lib-filters scroll-reveal-in" id="lib-filters" role="group" aria-label="Filter posts by topic" style="transition-delay: 80ms"></div>
+
+      <p class="lib-count mono scroll-reveal-in" id="lib-count" role="status" aria-live="polite"></p>
+      <div class="lib-grid scroll-reveal-in" id="lib-grid" style="transition-delay: 100ms"></div>
+      <div class="lib-more">
+        <button class="lib-more-btn" id="lib-more" type="button">
+          Load more <span aria-hidden="true">↓</span>
+        </button>
+      </div>
     </div>
   </section>
 
@@ -4004,6 +4051,8 @@
     })();
   </script>
   <script src="js/motion.js" defer></script>
+  <script src="data/x-posts-library.js" defer></script>
+  <script src="js/post-library.js" defer></script>
   <script src="js/video-perf.js" defer></script>
   <script src="js/cinematic.js" defer></script>
   <script src="js/home-workflow.js" defer></script>

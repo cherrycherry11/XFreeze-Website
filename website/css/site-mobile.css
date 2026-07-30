@@ -58,7 +58,7 @@ html {
   }
 
   /*
-   * Avoid content-visibility on animated sections — breaks entrance geometry.
+   * Avoid content-visibility on animated sections - breaks entrance geometry.
    * Keep only on footer (no scroll-reveal flow required).
    */
   .xf-site-footer {

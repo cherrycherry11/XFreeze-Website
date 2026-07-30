@@ -48,7 +48,7 @@ html.dark .xf-fav-btn.is-active {
   pointer-events: none;
 }
 
-/* Templates gallery — heart alone on top-right; premium crown on top-left */
+/* Templates gallery - heart alone on top-right; premium crown on top-left */
 .template-gallery-tile {
   position: relative;
 }
@@ -213,7 +213,7 @@ html.dark .xf-fav-item__thumb {
   flex-shrink: 0;
 }
 
-/* Matched rectangular chips — not uneven pills */
+/* Matched rectangular chips - not uneven pills */
 .xf-fav-action {
   appearance: none;
   display: inline-flex;

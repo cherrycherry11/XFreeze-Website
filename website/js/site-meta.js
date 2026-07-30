@@ -67,7 +67,7 @@
     document.head.appendChild(link);
   }
 
-  /* share3 — multi-size ico + dedicated 48/96 PNGs at site root for Google SERP */
+  /* share3 - multi-size ico + dedicated 48/96 PNGs at site root for Google SERP */
   var v = 'share3';
   var png48 = iconUrl('favicon-48x48.png') + '?v=' + v;
   var png96 = iconUrl('favicon-96x96.png') + '?v=' + v;

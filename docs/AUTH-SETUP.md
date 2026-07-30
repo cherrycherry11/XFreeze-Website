@@ -48,7 +48,7 @@ If `https://xfreeze.com/login` is missing, OAuth can start but fail when returni
 
 ## Enable X sign-in
 
-Use **X / Twitter (OAuth 2.0)** in Supabase — **not** the legacy “Twitter (OAuth 1.0a)” provider.
+Use **X / Twitter (OAuth 2.0)** in Supabase - **not** the legacy “Twitter (OAuth 1.0a)” provider.
 
 ### Why you see “Something went wrong” on X
 
@@ -61,7 +61,7 @@ That message is from **x.com**, not X Freeze. It almost always means the X app o
 
 X users without a public email can still sign in, but **checkout requires an email**. They should add one on Account or use Google / email sign-in before buying.
 
-### Part A — X Developer Portal
+### Part A - X Developer Portal
 
 1. Go to [developer.x.com](https://developer.x.com) and sign in  
 2. Open your **Project → App** (or create one)  
@@ -83,7 +83,7 @@ X users without a public email can still sign in, but **checkout requires an ema
    - Use the **OAuth 2.0** Client ID / Secret  
    - **Do not** paste the API Key / API Secret (those are OAuth 1.0a)
 
-### Part B — Supabase Dashboard
+### Part B - Supabase Dashboard
 
 1. [supabase.com/dashboard](https://supabase.com/dashboard) → project `ekmllicbgmuodptvgxsl`  
 2. **Authentication → Providers**  
@@ -92,7 +92,7 @@ X users without a public email can still sign in, but **checkout requires an ema
 5. Save  
 6. Confirm redirect URLs from the section above include `https://xfreeze.com/login`
 
-### Part C — Site config
+### Part C - Site config
 
 `website/js/auth-config.js`:
 
@@ -152,5 +152,5 @@ Add the localhost redirect URLs above in Supabase first.
 
 ## Security
 
-- Only the **publishable/anon** key goes in `auth-config.js` — never the **service_role** key  
+- Only the **publishable/anon** key goes in `auth-config.js` - never the **service_role** key  
 - Use Row Level Security (RLS) on any user data tables  

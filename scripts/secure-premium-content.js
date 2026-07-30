@@ -73,7 +73,7 @@ function movePremiumPacks() {
       const id = f.replace(/\.js$/, '');
       fs.writeFileSync(
         src,
-        `/* Premium pack gated — use /api/content/skill-pack?id=${id} */\n` +
+        `/* Premium pack gated - use /api/content/skill-pack?id=${id} */\n` +
           `(function(g){g.__XF_SKILL_PACKS__=g.__XF_SKILL_PACKS__||{};` +
           `g.__XF_SKILL_PACKS__[${JSON.stringify(id)}]={id:${JSON.stringify(id)},locked:true,skills:[]};})(window);\n`
       );
@@ -86,7 +86,7 @@ function movePremiumPacks() {
 function redactTemplates() {
   const file = path.join(WEB, 'data', 'visual-templates-data.js');
   const src = fs.readFileSync(file, 'utf8');
-  /* File is JS object notation with unquoted keys — not strict JSON */
+  /* File is JS object notation with unquoted keys - not strict JSON */
   const start = src.indexOf('[');
   const end = src.lastIndexOf(']');
   if (start < 0 || end < 0) throw new Error('Could not find templates array');
@@ -110,7 +110,7 @@ function redactTemplates() {
   );
 
   const out =
-    '// Auto-generated / secured — premium links served only via /api/content/template\n' +
+    '// Auto-generated / secured - premium links served only via /api/content/template\n' +
     'const visualTemplates = ' +
     JSON.stringify(publicList, null, 2) +
     ';\n' +
@@ -180,7 +180,7 @@ function redactPrompts() {
   );
 
   const out =
-    '/** Premium prompt body text removed — fetch via /api/content/prompt?id=categoryId::promptId */\n' +
+    '/** Premium prompt body text removed - fetch via /api/content/prompt?id=categoryId::promptId */\n' +
     '(function (global) {\n' +
     '  var data = ' +
     JSON.stringify(data) +

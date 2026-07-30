@@ -1,4 +1,4 @@
-# Payments — clean slate (keys wiped)
+# Payments - clean slate (keys wiped)
 
 All payment **code**, **Vercel secrets**, and the **Dodo production webhook**
 have been removed. Rebuild from zero when ready.

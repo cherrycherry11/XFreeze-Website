@@ -4,7 +4,7 @@ const { getUserFromRequest, hasServiceRole } = require('../_lib/supabase');
 const { getUsageSnapshot, FREE_LIMITS, PRO_LIMITS } = require('../_lib/usage');
 
 /**
- * GET /api/me/usage — server daily usage for signed-in user.
+ * GET /api/me/usage - server daily usage for signed-in user.
  */
 module.exports = async function handler(req, res) {
   if (handlePreflight(req, res, 'GET,OPTIONS')) return;

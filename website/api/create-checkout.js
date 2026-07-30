@@ -91,7 +91,7 @@ module.exports = async function handler(req, res) {
         : 'system';
 
     /*
-     * Default Dodo payment methods/currency — no method allow-list.
+     * Default Dodo payment methods/currency - no method allow-list.
      * Theme follows the website (light / dark / system).
      */
     const session = await dodoFetch('/checkouts', {

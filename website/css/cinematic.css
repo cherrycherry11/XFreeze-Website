@@ -1,5 +1,5 @@
 /**
- * X Freeze — sitewide cinematic motion
+ * X Freeze - sitewide cinematic motion
  * Home: pinned hero + depth. All pages: calm GSAP reveals + soft lifts.
  */
 
@@ -39,7 +39,7 @@ html.xf-cinematic .site-nav.page-nav {
 }
 
 /*
- * Fixed pin hero (HOME ONLY) — more reliable than sticky with Lenis + overflow-x:clip.
+ * Fixed pin hero (HOME ONLY) - more reliable than sticky with Lenis + overflow-x:clip.
  * Hero freezes; spacer keeps flow; sections paint on top as you scroll.
  */
 html.xf-cinematic-home #hero-header.hero-header--studio,
@@ -67,7 +67,7 @@ html.xf-cinematic-pending #hero-header .hero-stage {
   backface-visibility: hidden;
 }
 
-/* Frost overlay — opacity scrubbed on scroll */
+/* Frost overlay - opacity scrubbed on scroll */
 .hero-stage__frost {
   position: absolute;
   inset: 0;
@@ -115,7 +115,7 @@ html.xf-cinematic-pending body > footer.xf-site-footer {
   z-index: 2;
 }
 
-/* Next section slides over hero — no growing “gap” / floating sheet */
+/* Next section slides over hero - no growing “gap” / floating sheet */
 html.xf-cinematic #selected-work,
 html.xf-cinematic-pending #selected-work {
   border-top-left-radius: 0;
@@ -154,7 +154,7 @@ html.dark.xf-cinematic-pending body > section.bg-white {
 }
 
 /*
- * home.css raises .hero-header:has(.site-nav.is-scrolled) to z-index 300 —
+ * home.css raises .hero-header:has(.site-nav.is-scrolled) to z-index 300 -
  * that would cover all sections. Keep the pinned hero under content always.
  */
 html.xf-cinematic #hero-header.hero-header--studio,
@@ -165,7 +165,7 @@ html.xf-cinematic-pending #hero-header.hero-header--studio:has(.site-nav.is-scro
 }
 
 /*
- * Elevated nav (reparented to body) — always above sliding sections.
+ * Elevated nav (reparented to body) - always above sliding sections.
  * Transparent at top of page; solid when .is-scrolled (motion.js).
  * No longer under .hero-header, so set light/dark logo colors here.
  */
@@ -307,7 +307,7 @@ html.xf-cinematic-pending #mobile-menu-backdrop {
   will-change: transform;
 }
 
-/* Orbs off — soft blobs read as a light haze behind the headline */
+/* Orbs off - soft blobs read as a light haze behind the headline */
 .hero-stage__orb,
 .hero-stage__orb--a,
 .hero-stage__orb--b,
@@ -339,7 +339,7 @@ html.xf-cinematic .hero-stage__base {
 }
 
 html.xf-cinematic .hero-stage__video {
-  /* slight overscan for parallax only — keep sharp */
+  /* slight overscan for parallax only - keep sharp */
   transform: scale(1.04);
 }
 
@@ -375,7 +375,7 @@ html.xf-cinematic-pending .hero-copy .hero-theme {
   opacity: 0;
   transform: translateY(28px);
 }
-/* Eyebrow lives inside .hero-proof — do not pre-hide separately (was stuck invisible) */
+/* Eyebrow lives inside .hero-proof - do not pre-hide separately (was stuck invisible) */
 
 html.xf-cinematic .hero-copy [data-xf-hero-title].is-split {
   opacity: 1;
@@ -387,7 +387,7 @@ html.xf-cinematic .hero-copy [data-xf-hero-title].is-split .xf-word__inner {
   transform: translateY(110%);
 }
 
-/* Scroll cue — compact bottom center */
+/* Scroll cue - compact bottom center */
 .xf-scroll-cue {
   position: absolute;
   left: 50%;
@@ -457,7 +457,7 @@ html.xf-cinematic-home [data-xf-reveal] {
 }
 
 /*
- * Only mark individual blocks revealed — do NOT force every
+ * Only mark individual blocks revealed - do NOT force every
  * [data-scroll-reveal].is-revealed .scroll-reveal-in visible, or the first
  * block’s complete kills the entrance flow for chips/cards below.
  * Override scroll-reveal.css’s section-level reveal rule on home.
@@ -491,7 +491,7 @@ html.xf-cinematic-home #xf-final-cta[data-scroll-reveal].is-revealed .xf-final-c
 
 /*
  * Template system (#selected-work): dedicated entrance flow.
- * Only when full cinematic is active (GSAP bound) — not pending/home-only flags.
+ * Only when full cinematic is active (GSAP bound) - not pending/home-only flags.
  * Parent shell stays paint-ready so child stagger is never multiplied by opacity:0.
  * Children stay hidden until GSAP plays (or .is-flow-done after complete).
  */
@@ -524,7 +524,7 @@ html.xf-cinematic.xf-cinematic-home #selected-work .xf-selected-work-copy.is-flo
   will-change: auto;
 }
 
-/* Marquee row: hide until flow reaches it (no !important — GSAP must animate) */
+/* Marquee row: hide until flow reaches it (no !important - GSAP must animate) */
 html.xf-cinematic.xf-cinematic-home #selected-work .scroll-reveal-in.mt-4:not(.is-revealed):not(.is-cinematic-revealed) {
   opacity: 0;
   transform: translate3d(0, 28px, 0);
@@ -539,7 +539,7 @@ html.xf-cinematic-pending:not(.xf-cinematic-home) .scroll-reveal-in {
   transition: none !important;
 }
 
-/* About: do NOT force-visible — pre-hide + GSAP own the entrance (no FOUC flash) */
+/* About: do NOT force-visible - pre-hide + GSAP own the entrance (no FOUC flash) */
 html.xf-about-page.xf-cinematic .xf-content-hero.scroll-reveal-in:not(.is-hero-ready):not(.is-cinematic-revealing),
 html.xf-about-page.xf-cinematic-pending .xf-content-hero.scroll-reveal-in,
 html.xf-about-page.xf-cinematic .xf-about-section:not(.is-revealed):not(.is-cinematic-revealed):not(.is-cinematic-revealing),
@@ -549,7 +549,7 @@ html.xf-about-page.xf-cinematic-pending .xf-about-section {
   transition: none !important;
 }
 
-/* Contact: same FOUC fix — centered hero, no first-second full paint */
+/* Contact: same FOUC fix - centered hero, no first-second full paint */
 html.xf-contact-page.xf-cinematic .contact-hero__content:not(.is-hero-ready):not(.is-cinematic-revealing),
 html.xf-contact-page.xf-cinematic-pending .contact-hero__content,
 html.xf-contact-page.xf-cinematic .contact-panel:not(.is-revealed):not(.is-cinematic-revealed):not(.is-cinematic-revealing),
@@ -567,7 +567,7 @@ html.xf-contact-page.xf-cinematic .contact-hero .xf-hero-line {
 }
 
 /*
- * Templates page — lock filters + dynamic grid against stagger/GSAP thrash.
+ * Templates page - lock filters + dynamic grid against stagger/GSAP thrash.
  * Banner copy fades via opacity only (see initTemplatesPageFlow).
  */
 html.xf-templates-page .templates-main .scroll-reveal-in,
@@ -593,7 +593,7 @@ html.xf-cinematic-pending .templates-banner:not(.templates-banner--ready) .xf-se
 html.xf-cinematic-pending .templates-banner:not(.templates-banner--ready) .xf-section-lead,
 html.xf-cinematic-pending .templates-banner:not(.templates-banner--ready) .templates-subscription-note {
   opacity: 0;
-  /* No translateY — that caused post-intro layout jump */
+  /* No translateY - that caused post-intro layout jump */
 }
 
 html.xf-cinematic .templates-banner.templates-banner--ready .xf-section-eyebrow,
@@ -627,7 +627,7 @@ html.xf-templates-page .templates-banner .xf-section-title {
 }
 
 /*
- * Skills hero — home-style word flow (pre-hide until split + GSAP).
+ * Skills hero - home-style word flow (pre-hide until split + GSAP).
  * Body grid stays solid (no stagger thrash).
  */
 html.xf-cinematic .skills-hero h1:not(.is-split),
@@ -695,7 +695,7 @@ html.xf-cinematic .xf-word__inner {
   display: inline-block;
 }
 
-/* Skills title lines — always page-centered after word-split */
+/* Skills title lines - always page-centered after word-split */
 html.xf-cinematic .skills-hero h1,
 html.xf-cinematic .skills-hero h1.is-split,
 html.xf-cinematic .skills-hero h1.is-split .xf-hero-line,
@@ -743,7 +743,7 @@ html.xf-cinematic img {
   backface-visibility: hidden;
 }
 
-/* Image expand — keep site rounded corners (never inherit 0 from grid) */
+/* Image expand - keep site rounded corners (never inherit 0 from grid) */
 html.xf-cinematic [data-xf-expand] {
   overflow: hidden;
   border-radius: 24px;
@@ -769,7 +769,7 @@ html.xf-cinematic [data-xf-expand] video {
   /* start scale handled by GSAP scrub; keep radius clipped by parent */
 }
 
-/* 3D tilt cards — overflow + radius so corners stay soft under transform */
+/* 3D tilt cards - overflow + radius so corners stay soft under transform */
 html.xf-cinematic [data-xf-tilt] {
   overflow: hidden;
   border-radius: 24px;
@@ -852,7 +852,7 @@ html.xf-cinematic .hero-proof__chip {
   will-change: transform, opacity;
 }
 
-/* Native cursor only — custom cursor disabled */
+/* Native cursor only - custom cursor disabled */
 html.xf-cursor-on,
 html.xf-cursor-on body,
 html.xf-cursor-on a,
@@ -867,7 +867,7 @@ html.xf-cursor-on button {
 
 /*
  * Skills dynamic cards: hide only until revealed.
- * MUST release with .is-revealed — otherwise clearProps leaves CSS opacity:0 forever
+ * MUST release with .is-revealed - otherwise clearProps leaves CSS opacity:0 forever
  * (empty Free/Premium combo grids).
  */
 html.xf-cinematic #xf-skills-spotlight-section [data-xf-stagger-in] > *:not(.is-revealed):not(.is-cinematic-revealed),
@@ -905,7 +905,7 @@ html.xf-cinematic #selected-work .scroll-reveal-in.mt-4.is-cinematic-revealed {
 html.xf-cinematic #selected-work-marquee {
   opacity: 1 !important;
   filter: none !important;
-  /* do NOT force transform: none — that freezes the marquee */
+  /* do NOT force transform: none - that freezes the marquee */
 }
 
 html.xf-cinematic #selected-work-marquee.animate-marquee {
@@ -919,7 +919,7 @@ html.xf-cinematic .site-nav.is-scrolled {
   -webkit-backdrop-filter: blur(18px) saturate(1.25);
 }
 
-/* Soft section separators — no bright hairlines in dark mode */
+/* Soft section separators - no bright hairlines in dark mode */
 html.xf-cinematic .border-t {
   border-top-color: transparent !important;
   box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.055);
@@ -976,7 +976,7 @@ html.dark.xf-cinematic #selected-work .relative.overflow-hidden::after {
  */
 html.xf-cinematic #xf-final-cta,
 html.xf-cinematic-pending #xf-final-cta {
-  /* Soft neutral field — barely cool, not blue-heavy */
+  /* Soft neutral field - barely cool, not blue-heavy */
   background:
     radial-gradient(ellipse 70% 60% at 50% 40%, rgba(226, 232, 240, 0.45) 0%, transparent 65%),
     #f4f5f7 !important;
@@ -986,7 +986,7 @@ html.xf-cinematic-pending #xf-final-cta {
 
 html.dark.xf-cinematic #xf-final-cta,
 html.dark.xf-cinematic-pending #xf-final-cta {
-  /* Deep stage — soft steel pocket only, no bright blue wash */
+  /* Deep stage - soft steel pocket only, no bright blue wash */
   background:
     radial-gradient(ellipse 72% 60% at 50% 42%, rgba(22, 30, 44, 0.55) 0%, transparent 68%),
     #050506 !important;

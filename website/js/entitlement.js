@@ -1,6 +1,6 @@
 /**
  * Server-owned Pro entitlement client.
- * localStorage is a display cache only — never grants access.
+ * localStorage is a display cache only - never grants access.
  * Premium content APIs re-check entitlement with the user's JWT.
  */
 (function (global) {
@@ -55,7 +55,7 @@
     try {
       localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
     } catch (e) {}
-    /* Mirror into usage cache for Account UI only — marked source:server */
+    /* Mirror into usage cache for Account UI only - marked source:server */
     if (global.XFreezeUsage && global.XFreezeUsage.setSubscription) {
       if (cache.isPro && cache.subscription) {
         global.XFreezeUsage.setSubscription(

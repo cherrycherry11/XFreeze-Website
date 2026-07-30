@@ -15,9 +15,9 @@ html.dark .pl-main {
 }
 
 /*
- * Hero — full-bleed glass over dual droplet plates.
+ * Hero - full-bleed glass over dual droplet plates.
  * Frost is done with (1) filter:blur on the photo itself + (2) a solid
- * translucent glass sheet. That paints immediately — no backdrop-filter lag.
+ * translucent glass sheet. That paints immediately - no backdrop-filter lag.
  */
 .pl-hero {
   position: relative;
@@ -58,7 +58,7 @@ html.dark .pl-hero {
   transform: none !important;
 }
 
-/* Grid shell stays solid — cards use pl-card-in once */
+/* Grid shell stays solid - cards use pl-card-in once */
 .pl-grid {
   opacity: 1 !important;
   transform: none !important;
@@ -66,7 +66,7 @@ html.dark .pl-hero {
 
 /*
  * Home-style word flow: pre-hide title words + supports (no FOUC flash).
- * Layout structure is unchanged — only opacity/y for the intro timeline.
+ * Layout structure is unchanged - only opacity/y for the intro timeline.
  */
 html.xf-cinematic .pl-hero h1:not(.is-split),
 html.xf-cinematic-pending .pl-hero h1:not(.is-split),
@@ -147,7 +147,7 @@ html.xf-cinematic .pl-hero.pl-hero--ready h1.is-split .xf-word__inner {
   object-fit: cover;
   object-position: center center;
   display: block;
-  /* Light plate is already soft — no extra blur */
+  /* Light plate is already soft - no extra blur */
   filter: none;
   transform: none;
   transform-origin: center center;
@@ -174,7 +174,7 @@ html.dark .pl-hero__bg--dark {
 }
 
 /*
- * Full-hero glass sheet — solid translucent fill (always looks frosted).
+ * Full-hero glass sheet - solid translucent fill (always looks frosted).
  * Light mode: stronger white wash so the section reads bright / premium.
  */
 .pl-hero__glass-sheet {
@@ -185,7 +185,7 @@ html.dark .pl-hero__bg--dark {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.85),
     inset 0 -1px 0 rgba(15, 23, 42, 0.03);
-  /* Light silk plate is already bright — light frost only */
+  /* Light silk plate is already bright - light frost only */
   background-image:
     linear-gradient(
       180deg,
@@ -223,7 +223,7 @@ html.dark .pl-hero__glass-sheet {
 
 /*
  * Premium film-grain noise on the glass.
- * SVG fractal noise (no extra asset) — soft monochrome texture.
+ * SVG fractal noise (no extra asset) - soft monochrome texture.
  */
 .pl-hero__noise {
   position: absolute;
@@ -260,7 +260,7 @@ html.dark .pl-hero__noise::after {
   mix-blend-mode: soft-light;
 }
 
-/* Soft readability wash — light only (no extra blur on the plate) */
+/* Soft readability wash - light only (no extra blur on the plate) */
 .pl-hero__media-shade {
   position: absolute;
   inset: 0;
@@ -280,7 +280,7 @@ html.dark .pl-hero__media-shade {
   background: rgba(0, 0, 0, 0.2);
 }
 
-/* Legacy layers no longer in markup — keep inert if present */
+/* Legacy layers no longer in markup - keep inert if present */
 .pl-hero__grain,
 .pl-hero__perfs,
 .pl-hero__glow,
@@ -331,7 +331,7 @@ html.dark .pl-hero__marquee {
   to { transform: translateX(-50%); }
 }
 
-/* Content frame — same layout/spacing as pre-backdrop work */
+/* Content frame - same layout/spacing as pre-backdrop work */
 .pl-hero__inner {
   position: relative;
   z-index: 5;
@@ -395,7 +395,7 @@ html.dark .pl-hero__marquee {
   }
 }
 
-/* Typewriter card — restored to pre-cinematic layout (as of 2026-07-12) */
+/* Typewriter card - restored to pre-cinematic layout (as of 2026-07-12) */
 .pl-hero__typewriter {
   position: relative;
   display: flex;
@@ -606,7 +606,7 @@ html.dark .pl-hero__tw-best strong {
   50% { opacity: 0; }
 }
 
-/* Copy stack — tight vertical rhythm, ~60–70ch measure for easy reading */
+/* Copy stack - tight vertical rhythm, ~60-70ch measure for easy reading */
 .pl-hero__copy {
   display: flex;
   flex-direction: column;
@@ -1205,7 +1205,7 @@ html.dark .pl-suitable {
   min-height: 12rem;
 }
 
-/* First paint only — re-filtering must not re-trigger card y-motion (feels like flicker) */
+/* First paint only - re-filtering must not re-trigger card y-motion (feels like flicker) */
 .pl-grid.is-ready.pl-grid--enter .pl-card {
   animation: pl-card-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -1334,7 +1334,7 @@ html.dark .pl-card--premium {
   border-color: rgba(120, 175, 235, 0.18);
 }
 
-/* Free user: premium text hidden — no full prompt on card */
+/* Free user: premium text hidden - no full prompt on card */
 .pl-card--locked .pl-card__preview {
   font-style: italic;
   opacity: 0.85;

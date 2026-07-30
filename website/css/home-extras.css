@@ -1027,12 +1027,12 @@ html.dark .xf-faq-item[open] {
   }
 }
 
-/* ── Final CTA — real frosted glass over glowing stage ── */
+/* ── Final CTA - real frosted glass over glowing stage ── */
 
 #xf-final-cta {
   border-top: 1px solid var(--border);
   overflow: hidden;
-  /* Stable paint on reload — no content-visibility skip / pop */
+  /* Stable paint on reload - no content-visibility skip / pop */
   content-visibility: visible;
   contain: layout style;
 }
@@ -1041,7 +1041,7 @@ html.dark .xf-faq-item[open] {
   position: relative;
   margin-top: 0.5rem;
   padding: 1.25rem 0.35rem;
-  /* Do not isolate the stage — orbs must paint under the glass for blur */
+  /* Do not isolate the stage - orbs must paint under the glass for blur */
   /* Always visible: GSAP only soft-fades the box, not the stage */
   opacity: 1;
   transform: none;
@@ -1056,7 +1056,7 @@ html.dark .xf-faq-item[open] {
   filter: blur(2px);
 }
 
-/* Light mode: soft neutral frost only — minimal blue */
+/* Light mode: soft neutral frost only - minimal blue */
 .xf-final-cta-orb--a {
   width: min(28rem, 70vw);
   height: min(28rem, 70vw);
@@ -1084,7 +1084,7 @@ html.dark .xf-faq-item[open] {
   opacity: 0.4;
 }
 
-/* Dark orbs: deep steel only — less blue wash, more depth */
+/* Dark orbs: deep steel only - less blue wash, more depth */
 html.dark .xf-final-cta-orb--a {
   background: radial-gradient(circle, rgba(36, 52, 78, 0.55) 0%, transparent 70%);
   opacity: 0.55;
@@ -1166,7 +1166,7 @@ html.dark .xf-final-cta-orb--c {
   }
 }
 
-/* Dark: denser charcoal glass — higher contrast against stage */
+/* Dark: denser charcoal glass - higher contrast against stage */
 html.dark .xf-final-cta-box {
   background: rgba(6, 6, 8, 0.78) !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;

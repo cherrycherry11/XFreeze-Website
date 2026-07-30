@@ -131,7 +131,7 @@
       :root { --page-gutter: 2rem; }
     }
 
-    /* x.ai charcoal — never pure black (#000 / #050505) */
+    /* x.ai charcoal - never pure black (#000 / #050505) */
     html.dark {
       color-scheme: dark;
       --text: #f5f5f5;
@@ -165,7 +165,7 @@
     }
 
     /*
-     * Unified stats panel (no gaps between columns) — earlier look.
+     * Unified stats panel (no gaps between columns) - earlier look.
      * Hover hairlines fixed: no per-column transform/shadow; dividers via
      * internal border only (not on outer edges).
      */
@@ -214,7 +214,7 @@
       box-shadow: none !important;
       backdrop-filter: none !important;
       padding: 1.85rem 1.5rem !important;
-      /* Soft hover: background only — no transform (avoids hairline glitches) */
+      /* Soft hover: background only - no transform (avoids hairline glitches) */
       transition: background-color 0.18s ease;
     }
     #creator-library .bundles-stat-col + .bundles-stat-col {
@@ -526,9 +526,9 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 6px 16px rgba(0, 0, 0, 0.05);
     }
 
-    /* Creator library — plain grid + light cursor interaction */
+    /* Creator library - plain grid + light cursor interaction */
     /*
-     * Creator library — solid opaque sheet over the fixed hero video.
+     * Creator library - solid opaque sheet over the fixed hero video.
      * No heavy transforms / will-change on power layers (those punched
      * holes and let the hero bleed through).
      */
@@ -536,13 +536,13 @@
       --lib-x: 50%;
       --lib-y: 50%;
       --lib-cell: 72px;
-      /* Match page soft surface (not pure white — was too bright vs neighbors) */
+      /* Match page soft surface (not pure white - was too bright vs neighbors) */
       --lib-base: #f6f5f8;
       position: relative;
       z-index: 2;
       overflow: hidden;
       isolation: isolate;
-      /* Force fully opaque paint — critical over fixed hero */
+      /* Force fully opaque paint - critical over fixed hero */
       background: var(--lib-base) !important;
       background-color: var(--lib-base) !important;
       color: #0a0a0a;
@@ -571,7 +571,7 @@
       opacity: 0 !important;
     }
 
-    /* Solid plate — first paint under grid so nothing behind ever shows */
+    /* Solid plate - first paint under grid so nothing behind ever shows */
     .xf-lib-base {
       position: absolute;
       inset: 0;
@@ -599,14 +599,14 @@
         linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
     }
 
-    /* No cursor spotlight — it looked like a messy hover popup on white */
+    /* No cursor spotlight - it looked like a messy hover popup on white */
     .xf-lib-grid-spot {
       display: none !important;
     }
 
     /*
      * Power beads on grid wires only.
-     * No transform / will-change — only background-position animation
+     * No transform / will-change - only background-position animation
      * (avoids compositor holes over the fixed hero).
      */
     .xf-lib-grid-power {
@@ -692,7 +692,7 @@
       animation: xf-lib-power-v 11s linear infinite;
     }
 
-    /* Staggered tracks — same medium range, different phase / direction */
+    /* Staggered tracks - same medium range, different phase / direction */
     .xf-lib-grid-power--h1 {
       -webkit-mask-position: 0 0;
       mask-position: 0 0;
@@ -783,7 +783,7 @@
       background: rgba(0, 0, 0, 0.12);
     }
 
-    /* Fade grid out at top and bottom — solid section color at edges */
+    /* Fade grid out at top and bottom - solid section color at edges */
     .xf-lib-grid-fade {
       position: absolute;
       inset: 0;
@@ -838,7 +838,7 @@
       }
     }
 
-    /* Built for — tool logos under hero CTAs */
+    /* Built for - tool logos under hero CTAs */
     .hero-header--studio .hero-layout--center .hero-proof--built {
       display: flex !important;
       flex-direction: column !important;
@@ -1591,7 +1591,7 @@
       border-color: rgba(255, 255, 255, 0.1) !important;
     }
 
-    /* Charcoal veil — same x.ai base, not pitch black */
+    /* Charcoal veil - same x.ai base, not pitch black */
     html.dark #selected-work .xf-glass-backdrop__veil,
     html.dark #xf-motion-prompts .xf-glass-backdrop__veil,
     html.dark #xf-newsletter-cta .xf-glass-backdrop__veil {
@@ -1646,7 +1646,7 @@
       color: #c4c4c4 !important;
     }
 
-    /* Final CTA secondary copy — brighter for contrast on deep glass */
+    /* Final CTA secondary copy - brighter for contrast on deep glass */
     html.dark #xf-final-cta .xf-final-cta-eyebrow {
       color: rgba(255, 255, 255, 0.72) !important;
     }
@@ -1661,7 +1661,7 @@
       color: #f0f0f0 !important;
     }
 
-    /* Elevated cards — one step above charcoal (#121212), not pure black */
+    /* Elevated cards - one step above charcoal (#121212), not pure black */
     html.dark #selected-work .simple-card,
     html.dark #xf-motion-prompts .xf-motion-card,
     html.dark #xf-motion-prompts .xf-motion-flow,
@@ -1673,7 +1673,7 @@
         0 18px 40px -16px rgba(0, 0, 0, 0.45) !important;
       color: #f5f5f5 !important;
     }
-    /* Final CTA uses frosted glass (home-extras.css) — do not force opaque fill */
+    /* Final CTA uses frosted glass (home-extras.css) - do not force opaque fill */
 
     html.dark #creator-library .bundles-stats-panel {
       color: #f2f2f2 !important;
@@ -1741,7 +1741,7 @@
   <!-- sticky/fixed pin shell: next sections slide over the hero -->
   <header id="hero-header" class="hero-header hero-header--studio">
 
-    <!-- Liquid glass hero — poster paints instantly; video streams after (faststart) -->
+    <!-- Liquid glass hero - poster paints instantly; video streams after (faststart) -->
     <div class="hero-stage" aria-hidden="true">
       <div class="hero-stage__base" id="hero-stage-base"></div>
       <div class="hero-stage__depth">
@@ -1877,7 +1877,7 @@
 </div>
     </div>
 
-    <!-- Hero: centered — type scale & spacing modeled on premium product heroes -->
+    <!-- Hero: centered - type scale & spacing modeled on premium product heroes -->
     <div class="hero-content relative z-10 content-container">
       <div class="hero-layout hero-layout--center">
         <div class="hero-copy">
@@ -1893,7 +1893,7 @@
             <a href="#templates" class="hero-btn hero-btn--primary" data-xf-magnetic="0.32">Browse templates</a>
             <a href="skills" class="hero-btn hero-btn--ghost" data-xf-magnetic="0.28">Browse skills</a>
           </div>
-          <!-- Built for — official monochrome brand marks (reference-style lockups) -->
+          <!-- Built for - official monochrome brand marks (reference-style lockups) -->
           <div class="hero-proof hero-proof--built" aria-label="Built for modern AI tools">
             <p class="hero-proof__eyebrow">Portable AI skills</p>
             <ul class="hero-proof__tools" role="list">
@@ -2022,7 +2022,7 @@
         <div class="bundles-stat-col">
           <div class="bundles-stat-value text-5xl font-semibold leading-none tracking-[-1.8px] md:text-6xl" data-xf-count="templates" data-xf-count-suffix="+">500+</div>
           <div class="mt-5 text-[15px] font-semibold tracking-[-0.1px] bundles-stat-label">Grok Imagine Templates</div>
-          <p class="xf-section-lead xf-section-lead--compact max-w-[230px]">Product, makeup, filters, style edits, common uses, and mockups — ready for your AI workflow.</p>
+          <p class="xf-section-lead xf-section-lead--compact max-w-[230px]">Product, makeup, filters, style edits, common uses, and mockups - ready for your AI workflow.</p>
           <a href="templates" class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0a0a0a] hover:text-[#27272a] transition xf-home-stat-link">
             Browse templates <i class="fa-solid fa-arrow-right text-[10px]" aria-hidden="true"></i>
           </a>
@@ -2385,7 +2385,7 @@
     const HERO_CROSSFADE_MS = 650;
     let heroActiveKey = 'a';
     let heroThemeBootstrapped = false;
-    /* Bumps on every theme/hero swap — stale video callbacks must not paint the wrong clip */
+    /* Bumps on every theme/hero swap - stale video callbacks must not paint the wrong clip */
     let heroSwapGen = 0;
     let themeApplyLock = false;
 
@@ -2452,7 +2452,7 @@
         'error',
         () => {
           console.warn('[X Freeze] Hero video failed to load:', expectedSrc);
-          /* Do not reveal a broken/wrong frame — keep poster/base only */
+          /* Do not reveal a broken/wrong frame - keep poster/base only */
           finish(false);
         },
         { once: true }
@@ -2531,7 +2531,7 @@
         return;
       }
 
-      /* First paint / not yet visible — load on active layer only */
+      /* First paint / not yet visible - load on active layer only */
       if (!isVisible) {
         if (activeSrc !== src) prepareHeroVideo(active, src);
         waitForHeroVideo(
@@ -2553,7 +2553,7 @@
       const canCrossfade = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       document.documentElement.classList.add('xf-hero-swapping');
 
-      /* Keep active visible (correct or not) until inactive is ready — then swap */
+      /* Keep active visible (correct or not) until inactive is ready - then swap */
       const inactiveSrc =
         inactive.querySelector('source')?.getAttribute('src') ||
         inactive.getAttribute('data-active-src') ||
@@ -2570,7 +2570,7 @@
           if (!ok) {
             /* Failed load: hide broken video, keep poster/base so theme stays solid */
             hideHeroLayer(inactive);
-            /* If active is the WRONG theme, hide it too — poster is enough */
+            /* If active is the WRONG theme, hide it too - poster is enough */
             const activeIsCorrect =
               (active.getAttribute('data-active-src') || '') === src &&
               heroHasLoadedSrc(active, src);
@@ -2616,7 +2616,7 @@
       document.documentElement.setAttribute('data-hero-poster', nextPoster);
       document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
 
-      /* Poster + solid base paint first — never flash the wrong liquid */
+      /* Poster + solid base paint first - never flash the wrong liquid */
       paintHeroBase(isDark, nextPoster);
       if (active) active.setAttribute('poster', nextPoster);
       if (inactive) inactive.setAttribute('poster', nextPoster);
@@ -2655,7 +2655,7 @@
       const isDark = theme === 'dark';
       const root = document.documentElement;
 
-      /* Atomic class set — never leave half-toggled / both classes */
+      /* Atomic class set - never leave half-toggled / both classes */
       if (isDark) {
         root.classList.add('dark');
         root.classList.remove('light');
@@ -2962,7 +2962,7 @@
 
     /**
      * Standalone section videos (not dual-stack cycle). Cycle containers
-     * manage their own play/pause — observing both causes scroll thrash.
+     * manage their own play/pause - observing both causes scroll thrash.
      */
     function initSectionVideos() {
       const videos = document.querySelectorAll(
@@ -3033,7 +3033,7 @@
     }
 
     function initCreatorLibraryGrid() {
-      /* Spotlight / power beads disabled — keep a calm static grid only */
+      /* Spotlight / power beads disabled - keep a calm static grid only */
       const section = document.getElementById('creator-library');
       if (!section) return;
       section._xfLibGridBound = true;
@@ -3166,7 +3166,7 @@
       'your-product-on-models.mp4': 'Place products on models',
     };
 
-    /* Rebuild map at call time — data script is deferred and may load after this block */
+    /* Rebuild map at call time - data script is deferred and may load after this block */
     function getBeforeAfterTitleMap() {
       const map = {};
       Object.keys(BEFORE_AFTER_TITLE_ALIASES).forEach((file) => {
@@ -3349,7 +3349,7 @@
           stack.idle.pause();
           stack.idle.preload = 'none';
         }
-        /* Keep HQ files on disk — do NOT warm every video on load (was ~250MB download) */
+        /* Keep HQ files on disk - do NOT warm every video on load (was ~250MB download) */
         if (stack.active) stack.active.preload = 'none';
       });
 
@@ -3424,7 +3424,7 @@
             const p = video.play();
             if (p && typeof p.catch === 'function') {
               p.catch(() => {
-                /* Autoplay/decode hiccup — retry once shortly */
+                /* Autoplay/decode hiccup - retry once shortly */
                 setTimeout(() => {
                   if (!container._isVisible) return;
                   video.play().catch(() => {});
@@ -3470,7 +3470,7 @@
           }
         };
 
-        /* rVFC can hang if play() never paints — always fall through after timeout */
+        /* rVFC can hang if play() never paints - always fall through after timeout */
         const waitForPaintedFrame = (video, cb) => {
           let done = false;
           const finish = () => {
@@ -3729,7 +3729,7 @@
             if (!container._isVisible || !container._cycleReady) return;
             const idx = cards.indexOf(card);
             if (idx < 0) return;
-            /* Clip finished before timer — advance now */
+            /* Clip finished before timer - advance now */
             if (card._isSwapping) forceClearSwap(card);
             advanceCard(idx);
             clearCardSchedule(card);
@@ -3745,7 +3745,7 @@
 
           video.addEventListener('waiting', () => {
             if (!container._isVisible) return;
-            /* Brief stall during decode — nudge play */
+            /* Brief stall during decode - nudge play */
             setTimeout(() => {
               if (container._isVisible && video.paused) playIfVisible(video);
             }, 400);
@@ -3904,7 +3904,7 @@
               hideTimer = setTimeout(() => {
                 /* Still off-screen after grace period */
                 if (container._isVisible === false) return;
-                /* Re-check geometry — Lenis can fire stale leave events */
+                /* Re-check geometry - Lenis can fire stale leave events */
                 const rect = container.getBoundingClientRect();
                 const vh = window.innerHeight || 0;
                 const stillNear =

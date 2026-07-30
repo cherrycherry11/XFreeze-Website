@@ -357,7 +357,7 @@
           : '';
         /* Free users must not see full premium prompt text on the card */
         var previewText = locked
-          ? 'Premium motion prompt — upgrade to Pro to view and copy the full text.'
+          ? 'Premium motion prompt - upgrade to Pro to view and copy the full text.'
           : p.text;
         var copyAria = locked ? 'Unlock with Pro' : 'Copy prompt';
         var copyIcon = locked ? 'fa-solid fa-lock' : 'fa-regular fa-copy';
@@ -438,7 +438,7 @@
 
   /**
    * Free prompts: text is already public.
-   * Premium: body text is not in the client payload — fetch from gated API.
+   * Premium: body text is not in the client payload - fetch from gated API.
    */
   function ensurePromptText(row) {
     if (!row || !row.prompt) return Promise.resolve('');
@@ -704,7 +704,7 @@
           }
         }
         if (!row) return;
-        /* Favorite metadata only — never store full premium text for free users */
+        /* Favorite metadata only - never store full premium text for free users */
         var favText = canUsePromptRow(row) ? row.prompt.text || '' : '';
         window.XFreezeFavorites.toggle('prompts', {
           id: row.category.id + '::' + row.prompt.title,

@@ -1,5 +1,5 @@
 /**
- * X Freeze checkout — Dodo Payments overlay (modal on top of the site).
+ * X Freeze checkout - Dodo Payments overlay (modal on top of the site).
  * Full-page redirect is avoided so pricing stays visible under the popup.
  */
 (function (global) {

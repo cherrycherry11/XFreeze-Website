@@ -92,7 +92,7 @@ html.dark .site-nav.page-nav {
   background: var(--nav-bg, rgba(255, 255, 255, 0.94));
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  /* Soft hairline — never a hard black edge in light mode */
+  /* Soft hairline - never a hard black edge in light mode */
   border-bottom: 1px solid rgba(15, 23, 42, 0.06);
   box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
 }
@@ -375,7 +375,7 @@ html.dark .site-nav-logo__img--on-dark {
   box-sizing: border-box;
   position: relative;
   z-index: 2;
-  /* No magnetic / translate hover — stays fixed in the nav */
+  /* No magnetic / translate hover - stays fixed in the nav */
   transform: none !important;
   transition:
     opacity 0.15s ease,
@@ -383,7 +383,7 @@ html.dark .site-nav-logo__img--on-dark {
     color 0.15s ease;
 }
 
-/* “Go Pro” text only on wide screens — icon alone mid-width */
+/* “Go Pro” text only on wide screens - icon alone mid-width */
 .site-nav-coffee__label {
   display: none !important;
 }
@@ -501,7 +501,7 @@ html.dark .site-nav-logo__img--on-dark {
   display: none;
 }
 
-/* ── Mobile menu — xAI-style full panel ───────────────── */
+/* ── Mobile menu - xAI-style full panel ───────────────── */
 
 html.dark .site-nav-mobile-panel--drawer {
   background: #0a0a0a;
@@ -616,7 +616,7 @@ html.dark .site-nav-drawer-close:focus-visible {
   color: #fff;
 }
 
-/* Link list — hairline rows like xAI */
+/* Link list - hairline rows like xAI */
 .site-nav-drawer-nav {
   display: flex;
   flex-direction: column;

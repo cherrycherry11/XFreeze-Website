@@ -1,5 +1,5 @@
 /**
- * Home templates polish — category filter chips for marquee
+ * Home templates polish - category filter chips for marquee
  */
 (function () {
   'use strict';

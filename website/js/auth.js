@@ -688,7 +688,7 @@
       email: email,
       password: password,
       options: {
-        /* Absolute allowlisted URL — relative "login" breaks confirm links. */
+        /* Absolute allowlisted URL - relative "login" breaks confirm links. */
         emailRedirectTo: loginUrl(),
       },
     });

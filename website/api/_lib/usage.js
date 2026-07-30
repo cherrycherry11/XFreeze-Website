@@ -1,6 +1,6 @@
 /**
  * Server-owned daily usage limits.
- * Never trust client counters — only service-role DB writes count.
+ * Never trust client counters - only service-role DB writes count.
  */
 const { rest, hasServiceRole } = require('./supabase');
 const { userIsPro } = require('./entitlements');
@@ -165,7 +165,7 @@ async function consumeUsage(userId, kind, resourceId) {
       };
     }
   } catch (rpcErr) {
-    /* Function may not exist yet — fall through */
+    /* Function may not exist yet - fall through */
     console.warn(
       'xf_consume_usage RPC failed, using fallback',
       rpcErr && rpcErr.message
@@ -190,7 +190,7 @@ async function consumeUsage(userId, kind, resourceId) {
     };
   }
 
-  /* Fallback cannot uniquely dedupe without key columns — still count once. */
+  /* Fallback cannot uniquely dedupe without key columns - still count once. */
   try {
     await rest(
       `usage_daily?on_conflict=user_id,day`,
@@ -245,7 +245,7 @@ async function consumeUsage(userId, kind, resourceId) {
   });
 
   if (!Array.isArray(updated) || !updated.length) {
-    /* Concurrent bump — re-read */
+    /* Concurrent bump - re-read */
     const again = await getUsageRow(userId, day);
     const used = Number(again[k]) || 0;
     if (used >= limit) {

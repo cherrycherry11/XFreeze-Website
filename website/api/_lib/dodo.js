@@ -86,7 +86,7 @@ function planRank(planId) {
 /**
  * Resolve plan strictly from configured Dodo product IDs (env) and
  * checkout metadata we set ourselves. Never guess from amount or name.
- * Returns null if the product cannot be identified — callers must refuse.
+ * Returns null if the product cannot be identified - callers must refuse.
  */
 function resolvePlanIdFromPayment(payment, bodyPlanId) {
   const cart = (payment && (payment.product_cart || payment.productCart)) || [];
@@ -108,7 +108,7 @@ function resolvePlanIdFromPayment(payment, bodyPlanId) {
     if (expectedId && expectedId === cartProductId) return fromMeta;
   }
 
-  /* body plan_id is client-supplied — only accept if it matches cart product */
+  /* body plan_id is client-supplied - only accept if it matches cart product */
   if (
     bodyPlanId &&
     (bodyPlanId === 'pro-monthly' || bodyPlanId === 'pro-yearly')

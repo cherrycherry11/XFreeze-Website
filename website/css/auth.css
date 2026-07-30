@@ -25,7 +25,7 @@ html.dark.xf-auth-pending::before {
   margin-left: 0;
   min-height: 2.25rem;
   box-sizing: border-box;
-  /* Hug content — no empty reserved width next to coffee */
+  /* Hug content - no empty reserved width next to coffee */
   width: auto;
   min-width: 0;
 }
@@ -36,7 +36,7 @@ html.dark.xf-auth-pending::before {
   justify-content: flex-end;
 }
 
-/* Signed in: avatar only — sit tight next to coffee */
+/* Signed in: avatar only - sit tight next to coffee */
 .site-nav-auth[data-auth-state='signed-in'] {
   width: 2rem;
   min-width: 2rem;
@@ -141,7 +141,7 @@ html.dark .site-nav.is-scrolled .site-nav-auth-btn:hover {
   flex-shrink: 0;
 }
 
-/* Perfect circle profile button — locked square so flex never ovals it */
+/* Perfect circle profile button - locked square so flex never ovals it */
 .site-nav-user-trigger {
   display: inline-flex;
   align-items: center;

@@ -77,7 +77,7 @@
       :root { --page-gutter: 2rem; }
     }
 
-    /* x.ai charcoal — never pure black */
+    /* x.ai charcoal - never pure black */
     html.dark {
       color-scheme: dark;
       --text: #f5f5f5;
@@ -504,7 +504,7 @@
     .template-gallery-tile:hover .template-gallery-tier--premium {
       opacity: 0.92;
     }
-    /* Locked premium (free user): action label cue only — image stays visible */
+    /* Locked premium (free user): action label cue only - image stays visible */
     .template-gallery-tile.is-locked .template-gallery-label {
       opacity: 0.95;
       gap: 0.35rem;
@@ -1280,7 +1280,7 @@
         window.XFreezeFavorites && window.XFreezeFavorites.heartButtonHtml
           ? window.XFreezeFavorites.heartButtonHtml('templates', t.code)
           : '';
-      /* Free users: never expose Grok URL on premium cards — link goes to pricing */
+      /* Free users: never expose Grok URL on premium cards - link goes to pricing */
       var canOpen =
         !window.XFreezeAccess || window.XFreezeAccess.canUse('template', t);
       var openHref =
@@ -1293,7 +1293,7 @@
         : '<i class="fa-solid fa-lock" aria-hidden="true"></i> Unlock with Pro';
       var openAria = canOpen
         ? 'Open ' + name + ' in Grok'
-        : 'Unlock ' + name + ' with Pro — go to pricing';
+        : 'Unlock ' + name + ' with Pro - go to pricing';
       var lockedClass = canOpen ? '' : ' is-locked';
       return (
         '<article class="template-gallery-tile' +

@@ -1,11 +1,11 @@
 /**
- * Dark mode nebula gradient — selective only.
+ * Dark mode nebula gradient - selective only.
  * Used on a few high-impact spots so the rest of the site stays clean black.
  *
  * Where it appears:
  *   1. Login / signup full page
  *   2. Final CTA section
- *   3. Page intro heroes (about, contact, etc.) — soft, once per page
+ *   3. Page intro heroes (about, contact, etc.) - soft, once per page
  *
  * Everywhere else: plain black. No default glass-section nebula.
  */
@@ -45,7 +45,7 @@ html.dark .xf-auth-bg.xf-glass-backdrop .xf-glass-backdrop__veil {
   -webkit-backdrop-filter: blur(16px) !important;
 }
 
-/* ── 2. Final CTA only (home + glass accent) — deeper stage, stronger contrast ── */
+/* ── 2. Final CTA only (home + glass accent) - deeper stage, stronger contrast ── */
 html.dark #xf-final-cta {
   background: #050506 !important;
   position: relative;
@@ -124,7 +124,7 @@ html.dark #section-minimal::after {
   display: none !important;
 }
 
-/* ── 3. Page intro heroes (not Contact — contact uses silk plates) ── */
+/* ── 3. Page intro heroes (not Contact - contact uses silk plates) ── */
 html.dark .xf-glass-hero:not(.contact-hero) {
   background: #0a0a0a !important;
   overflow: hidden;
@@ -172,7 +172,7 @@ html.dark .xf-glass-hero:not(.contact-hero) > * {
 /* ── Explicitly off: general glass sections, creator library, motion, skills banner, etc. ── */
 html.dark .xf-glass-section:not(#xf-final-cta):not(:has(.xf-glass-backdrop))::before,
 html.dark .xf-glass-section:not(#xf-final-cta):not(:has(.xf-glass-backdrop))::after {
-  /* leave glass-backdrop.css defaults — no nebula forced here */
+  /* leave glass-backdrop.css defaults - no nebula forced here */
 }
 
 html.dark #selected-work .xf-glass-backdrop__img,
@@ -193,7 +193,7 @@ html.dark .templates-banner__media::before {
   display: none !important;
 }
 
-/* Prompt library uses its own photo backdrops + glass panel — never inject nebula */
+/* Prompt library uses its own photo backdrops + glass panel - never inject nebula */
 html.dark .pl-hero::before,
 html.dark .pl-hero::after {
   content: none !important;

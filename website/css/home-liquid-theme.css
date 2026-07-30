@@ -29,7 +29,7 @@
   --border-hover: var(--xf-line-strong);
 }
 
-/* Dark: x.ai charcoal (#0a0a0a) — never pure black */
+/* Dark: x.ai charcoal (#0a0a0a) - never pure black */
 html.dark {
   --xf-ink: #0a0a0a;
   --xf-ink-2: #121212;
@@ -158,7 +158,7 @@ html.dark .hero-video-stack {
 }
 
 .hero-stage__vignette {
-  /* Edge fades only — no center light/dark wash behind headline */
+  /* Edge fades only - no center light/dark wash behind headline */
   background:
     linear-gradient(180deg, rgba(244, 247, 248, 0.1) 0%, transparent 22%, rgba(244, 247, 248, 0.16) 100%) !important;
 }
@@ -250,7 +250,7 @@ section,
   border-color: var(--border) !important;
 }
 
-/* Light: solid sections only — no multi-section gradient wash */
+/* Light: solid sections only - no multi-section gradient wash */
 .xf-glass-section,
 #section-experimental,
 #section-minimal,
@@ -269,7 +269,7 @@ html:not(.dark) #xf-final-cta {
   background: #f7f7f9 !important;
 }
 
-/* Dark section fills: solid base only — nebula plate handled in dark-nebula-bg.css */
+/* Dark section fills: solid base only - nebula plate handled in dark-nebula-bg.css */
 html.dark .xf-glass-section,
 html.dark #section-experimental,
 html.dark #section-minimal,
@@ -286,13 +286,13 @@ html.dark #creator-library {
 
 /* Light glass layers: no forced multi-section gradients */
 
-/* Dark glass layers use nebula plate (dark-nebula-bg.css) — no competing CSS gradients */
+/* Dark glass layers use nebula plate (dark-nebula-bg.css) - no competing CSS gradients */
 
 /*
- * Creator Library interactive spotlight — MUST track --spot-x / --spot-y.
+ * Creator Library interactive spotlight - MUST track --spot-x / --spot-y.
  * Do not replace with fixed radials or ambient animations.
  */
-/* Interactive spotlight — deep muted blue, low opacity (like Final CTA) */
+/* Interactive spotlight - deep muted blue, low opacity (like Final CTA) */
 #creator-library .bundles-spotlight {
   position: absolute !important;
   inset: 0 !important;
@@ -332,7 +332,7 @@ html.dark #creator-library .bundles-spotlight {
 
 /* Light veils: only page heroes + final CTA (set in glass-backdrop.css) */
 
-/* Charcoal veils (x.ai #0a0a0a) — not pure black, so sections stay even */
+/* Charcoal veils (x.ai #0a0a0a) - not pure black, so sections stay even */
 html.dark .xf-glass-backdrop__veil,
 html.dark .xf-glass-section:not(:has(.xf-glass-backdrop))::after,
 html.dark .xf-glass-hero::after,
@@ -440,7 +440,7 @@ html.dark #creator-library {
   --grid-line: rgba(207, 226, 239, 0.13) !important;
 }
 
-/* Creator library is a solid sheet over the fixed hero — no transparent wash */
+/* Creator library is a solid sheet over the fixed hero - no transparent wash */
 #creator-library::after,
 html.dark #creator-library::after,
 html:not(.dark) #creator-library::after {
@@ -449,7 +449,7 @@ html:not(.dark) #creator-library::after {
   background: none !important;
 }
 
-/* Card frames/shadows stay in home.html — do not override artistic-card here */
+/* Card frames/shadows stay in home.html - do not override artistic-card here */
 
 .xf-section-title,
 .xf-library-title,
@@ -465,7 +465,7 @@ html:not(.dark) #creator-library::after {
   text-wrap: pretty;
 }
 
-/* Nebula plate uses static CSS transforms (scale/rotate) per section — no ambient drift */
+/* Nebula plate uses static CSS transforms (scale/rotate) per section - no ambient drift */
 
 /* spotlight interaction is driven by JS --spot-x/--spot-y; no ambient animation */
 
@@ -476,7 +476,7 @@ html.dark .xf-feature-copy__blob--2 {
 }
 
 /*
- * Final CTA orbs: no liquid-breathe — keyframes fought static opacity/filter
+ * Final CTA orbs: no liquid-breathe - keyframes fought static opacity/filter
  * (0.55 → 0.24 + blur 8 → 38) and caused a visible reload glitch.
  */
 html.dark .xf-final-cta-orb,
@@ -606,7 +606,7 @@ html.dark .xf-final-cta-orb--c {
     font-size: 0.625rem;
   }
 
-  /* Edge only on mobile — no center wash behind title */
+  /* Edge only on mobile - no center wash behind title */
   .hero-stage__vignette {
     background:
       linear-gradient(180deg, rgba(244, 247, 248, 0.14) 0%, transparent 30%, rgba(244, 247, 248, 0.22) 100%) !important;

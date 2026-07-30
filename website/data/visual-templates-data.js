@@ -1,4 +1,4 @@
-// Auto-generated / secured — premium links served only via /api/content/template
+// Auto-generated / secured - premium links served only via /api/content/template
 const visualTemplates = [
   {
     "code": "MU-1",

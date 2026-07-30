@@ -1,4 +1,4 @@
-/* X Freeze — Pricing page */
+/* X Freeze - Pricing page */
 
 .xf-pricing-page {
   padding-top: 1.5rem;
@@ -328,7 +328,7 @@ html.dark .xf-price-card__cta--primary:hover {
   opacity: 0.92;
 }
 
-/* Current plan — not clickable buy CTA */
+/* Current plan - not clickable buy CTA */
 .xf-price-card__cta--current,
 .xf-price-card__cta--current:hover {
   cursor: default;
@@ -511,7 +511,7 @@ html.dark .xf-pricing-faq summary {
 }
 
 .xf-pricing-faq details[open] summary::after {
-  content: '−';
+  content: '-';
 }
 
 .xf-pricing-faq details p {

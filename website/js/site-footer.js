@@ -174,7 +174,7 @@
   }
 
   function renderFooterThemeSwitch() {
-    /* Plain footer toggle only — flat track, simple sun/moon (not crystal nav switch) */
+    /* Plain footer toggle only - flat track, simple sun/moon (not crystal nav switch) */
     return (
       '<div class="xf-footer-theme">' +
       '<button type="button" onclick="typeof toggleTheme===\'function\'&&toggleTheme()" ' +

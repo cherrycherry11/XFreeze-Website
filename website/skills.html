@@ -400,7 +400,7 @@
         var p = video.play();
         if (p && typeof p.catch === 'function') p.catch(function () {});
       };
-      /* Same source already loading/playing — don't reset (causes empty flash) */
+      /* Same source already loading/playing - don't reset (causes empty flash) */
       if (current.indexOf(nextSrc) !== -1 || (video.getAttribute('src') || '').indexOf(nextSrc) !== -1) {
         video.muted = true;
         video.playsInline = true;

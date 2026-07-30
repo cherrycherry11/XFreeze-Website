@@ -77,9 +77,9 @@ module.exports = async function handler(req, res) {
     const raw = await readRawBody(req);
     const secret = dodoWebhookKey();
 
-    /* Never accept unsigned webhooks — refuse if secret is missing */
+    /* Never accept unsigned webhooks - refuse if secret is missing */
     if (!secret) {
-      console.error('DODO_PAYMENTS_WEBHOOK_KEY is not set — rejecting webhook');
+      console.error('DODO_PAYMENTS_WEBHOOK_KEY is not set - rejecting webhook');
       return json(res, 503, {
         error: 'Webhook secret not configured',
         code: 'webhook_secret_missing',

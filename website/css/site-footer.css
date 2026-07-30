@@ -26,7 +26,7 @@ html.dark {
   box-sizing: border-box;
   overflow-x: clip;
   background: var(--surface, #fff);
-  /* Section divider — full page width (background edge), not a content frame */
+  /* Section divider - full page width (background edge), not a content frame */
   border-top: 1px solid var(--xf-footer-border);
 }
 
@@ -152,7 +152,7 @@ html.dark .xf-footer-coffee {
   font-size: 0.8rem;
 }
 
-/* Simple flat theme toggle under coffee (footer only — not crystal/nav style) */
+/* Simple flat theme toggle under coffee (footer only - not crystal/nav style) */
 .xf-footer-theme {
   display: flex;
   align-items: center;
@@ -432,7 +432,7 @@ html.dark .xf-footer-theme-switch__icon--moon {
   box-sizing: border-box;
   margin-top: 2.25rem;
   padding-top: 1.5rem;
-  /* Divider stays inside the content column — same width as the menu */
+  /* Divider stays inside the content column - same width as the menu */
   border-top: 1px solid var(--xf-footer-border);
 }
 
@@ -451,7 +451,7 @@ html.dark .xf-footer-theme-switch__icon--moon {
   color: var(--xf-footer-muted);
 }
 
-/* Plain legal note — no pill / badge chrome */
+/* Plain legal note - no pill / badge chrome */
 .xf-footer-note {
   margin: 0;
   max-width: 22rem;

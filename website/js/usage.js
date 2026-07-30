@@ -1,5 +1,5 @@
 /**
- * Usage limits — display cache + server-authoritative daily quotas.
+ * Usage limits - display cache + server-authoritative daily quotas.
  *
  * SECURITY: Only /api/content/* and /api/usage/consume increment counters
  * via service role. localStorage is display-only and cannot unlock content.
@@ -162,7 +162,7 @@
   }
 
   /**
-   * Server consume — required before free template open.
+   * Server consume - required before free template open.
    * resourceId keeps reopening the same item free for the day.
    * Returns Promise<{ok, ...}>.
    */

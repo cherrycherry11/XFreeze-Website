@@ -112,7 +112,7 @@ html.dark .skills-builder-promo__icon {
   text-align: center;
 }
 
-/* Centered stack — never side-by-side (word-split / GSAP used to shove lead right) */
+/* Centered stack - never side-by-side (word-split / GSAP used to shove lead right) */
 .sb-hero .content-container,
 .sb-hero .sb-hero__inner {
   display: flex;

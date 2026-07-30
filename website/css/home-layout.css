@@ -1,9 +1,9 @@
 /**
- * Home layout helpers — hero stays center; body sections stay left-aligned.
+ * Home layout helpers - hero stays center; body sections stay left-aligned.
  * (Previously forced sitewide center heads; reverted per product direction.)
  */
 
-/* Optional section vertical rhythm only — no text-align changes */
+/* Optional section vertical rhythm only - no text-align changes */
 #selected-work .xf-home-section,
 #creator-library .xf-home-section,
 #xf-more-categories .xf-home-section,
@@ -73,7 +73,7 @@ html.dark .xf-home-head__link:hover {
   margin-top: 1.25rem;
 }
 
-/* Template filters — left */
+/* Template filters - left */
 #selected-work .xf-temp-filters {
   display: flex;
   flex-wrap: wrap;
@@ -87,7 +87,7 @@ html.dark .xf-home-head__link:hover {
   margin-top: 1.25rem;
 }
 
-/* Creator library stats — unified panel columns, left-aligned */
+/* Creator library stats - unified panel columns, left-aligned */
 #creator-library .bundles-stat-col {
   display: block;
   text-align: left;
@@ -122,7 +122,7 @@ html.dark #creator-library .xf-home-stat-link {
   color: #f0f0f0;
 }
 
-/* Hero only — keep center stack (do not affect page sections) */
+/* Hero only - keep center stack (do not affect page sections) */
 .hero-header--studio .hero-layout--center .hero-copy {
   display: flex;
   flex-direction: column;

@@ -27,7 +27,7 @@ const FAIL_STATUSES = {
   on_hold: true,
 };
 
-/** Payment object paid statuses only — not subscription "active". */
+/** Payment object paid statuses only - not subscription "active". */
 function isPaidStatus(st) {
   const s = String(st || '').toLowerCase();
   return s === 'succeeded' || s === 'paid' || s === 'captured';
@@ -215,7 +215,7 @@ module.exports = async function handler(req, res) {
       '';
 
     /*
-     * Same payment already granted — idempotent success (no re-extend).
+     * Same payment already granted - idempotent success (no re-extend).
      */
     if (
       existingPublic.isPro &&

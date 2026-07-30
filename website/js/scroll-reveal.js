@@ -113,7 +113,7 @@
   }
 
   function init() {
-    /* Home cinematic (GSAP) owns entrance motion — skip CSS reveals there */
+    /* Home cinematic (GSAP) owns entrance motion - skip CSS reveals there */
     if (cinematicOwnsReveals()) return;
     revealInViewNow();
     observeNew();

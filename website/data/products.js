@@ -1,6 +1,6 @@
 /**
  * X Freeze product catalog (display / plan ids).
- * Paid checkout is offline — rebuild payments separately.
+ * Paid checkout is offline - rebuild payments separately.
  */
 (function (global) {
   const BUNDLES = {

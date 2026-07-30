@@ -14,7 +14,7 @@
   color: #0a0a0a;
 }
 
-/* Full-viewport fixed pin — see cinematic.css for full rules */
+/* Full-viewport fixed pin - see cinematic.css for full rules */
 html.xf-cinematic .hero-header--studio,
 html.xf-cinematic-pending .hero-header--studio {
   min-height: 100svh;
@@ -97,7 +97,7 @@ html.dark .hero-stage__base {
   will-change: opacity;
 }
 
-/* Only fully ready + active layers paint — never flash a half-loaded clip */
+/* Only fully ready + active layers paint - never flash a half-loaded clip */
 .hero-header--studio .hero-video-layer.is-active.hero-ready {
   opacity: 1;
 }
@@ -110,7 +110,7 @@ html.dark.xf-hero-swapping .hero-stage {
   background-color: #0a0a0a;
 }
 
-/* Edge fade only — no bright center wash behind the title */
+/* Edge fade only - no bright center wash behind the title */
 .hero-stage__vignette {
   position: absolute;
   inset: 0;
@@ -164,18 +164,18 @@ html.dark .hero-header--studio .site-nav:not(.is-scrolled) {
 }
 
 /*
- * Centered hero — type + spacing only (no alignment change).
+ * Centered hero - type + spacing only (no alignment change).
  * Learned from premium product heroes (e.g. Lumen Gate):
- *   H1 ≈ 48–72px, weight 500, lh 1.05, tracking tight
- *   Lead ≈ 16–17px, muted ~60% opacity, much quieter than H1
- *   Gap title→lead ≈ 20–24px (one unit)
- *   Gap lead→CTAs ≈ 28–32px
- *   Gap CTAs→proof ≈ 28–32px
- *   Buttons ≈ 44px tall, 14–15px type
+ *   H1 ≈ 48-72px, weight 500, lh 1.05, tracking tight
+ *   Lead ≈ 16-17px, muted ~60% opacity, much quieter than H1
+ *   Gap title→lead ≈ 20-24px (one unit)
+ *   Gap lead→CTAs ≈ 28-32px
+ *   Gap CTAs→proof ≈ 28-32px
+ *   Buttons ≈ 44px tall, 14-15px type
  */
 .hero-header--studio .hero-content {
   position: relative;
-  /* Same horizontal rail as nav — vertical only for type stack */
+  /* Same horizontal rail as nav - vertical only for type stack */
   padding-top: 6rem;
   padding-bottom: 4rem;
   display: flex;
@@ -225,7 +225,7 @@ html.dark .hero-header--studio .site-nav:not(.is-scrolled) {
   gap: 0 !important;
 }
 
-/* H1 — dominant display, centered in page rail */
+/* H1 - dominant display, centered in page rail */
 .hero-header--studio .hero-layout--center .hero-headline {
   display: flex !important;
   flex-direction: column !important;
@@ -262,7 +262,7 @@ html.dark .hero-header--studio .site-nav:not(.is-scrolled) {
   text-align: center !important;
 }
 
-/* Lead — supporting voice (much smaller + softer than H1) */
+/* Lead - supporting voice (much smaller + softer than H1) */
 .hero-header--studio .hero-layout--center .hero-lead {
   margin-top: 1.5rem !important; /* ~24px under title */
   margin-bottom: 0 !important;
@@ -416,7 +416,7 @@ html.dark .hero-header--studio .hero-btn--ghost:hover {
   background: rgba(255, 255, 255, 0.06);
 }
 
-/* Quiet logo proof row — tight secondary band under CTAs */
+/* Quiet logo proof row - tight secondary band under CTAs */
 .hero-proof {
   display: flex;
   flex-wrap: wrap;

@@ -37,7 +37,7 @@
   background: linear-gradient(135deg, #1a1f2a 0%, #12151c 45%, #161b28 100%);
 }
 
-/* Static first paint — shows before video buffers */
+/* Static first paint - shows before video buffers */
 .skills-banner__poster {
   position: absolute;
   inset: 0;
@@ -164,7 +164,7 @@ html.dark .skills-browse-grid:empty::before {
 }
 
 /*
- * Hero stack — dead-center on the page.
+ * Hero stack - dead-center on the page.
  * Title is always 2 lines (via <br>) and always text-align: center,
  * including after cinematic word-split wraps each line.
  */

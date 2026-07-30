@@ -109,7 +109,7 @@ async function userHasPriorYearlyPayment(userId, exceptPaymentId) {
 
 /**
  * Grant Pro from a verified catalog subscription payment.
- * Idempotent on payment_id — replaying the same payment never extends access.
+ * Idempotent on payment_id - replaying the same payment never extends access.
  *
  * Monthly → yearly upgrade (first time only): access lasts 13 months.
  * Direct yearly purchase / renewal: 12 months.
@@ -196,7 +196,7 @@ async function grantFromVerifiedPayment({
     } catch (e) {}
   }
 
-  /* Ledger first — unique payment_id */
+  /* Ledger first - unique payment_id */
   try {
     await rest('payments', {
       method: 'POST',
@@ -218,7 +218,7 @@ async function grantFromVerifiedPayment({
   } catch (payErr) {
     const already = await getPaymentById(paymentId);
     if (already) {
-      /* Race: another worker ledgered first — do not extend */
+      /* Race: another worker ledgered first - do not extend */
       const row = await getEntitlementForUser(userId);
       return publicEntitlement(row);
     }

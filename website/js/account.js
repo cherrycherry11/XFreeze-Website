@@ -1,5 +1,5 @@
 /**
- * Account dashboard — Overview / Favorites / Billing / Usage / Settings
+ * Account dashboard - Overview / Favorites / Billing / Usage / Settings
  * Plan source: server entitlements table via /api/me/entitlement (authoritative).
  */
 (function () {
@@ -20,7 +20,7 @@
   }
 
   function formatDate(iso) {
-    if (!iso) return '—';
+    if (!iso) return '-';
     try {
       return new Date(iso).toLocaleDateString(undefined, {
         year: 'numeric',
@@ -28,7 +28,7 @@
         day: 'numeric',
       });
     } catch (e) {
-      return '—';
+      return '-';
     }
   }
 
@@ -336,16 +336,16 @@
         ? sub.interval === 'year'
           ? 'Yearly'
           : 'Monthly'
-        : '—';
+        : '-';
     }
-    if (bStarted) bStarted.textContent = pro && sub ? formatDate(sub.startedAt) : '—';
-    if (bExpires) bExpires.textContent = pro && sub ? formatDate(sub.expiresAt) : '—';
+    if (bStarted) bStarted.textContent = pro && sub ? formatDate(sub.startedAt) : '-';
+    if (bExpires) bExpires.textContent = pro && sub ? formatDate(sub.expiresAt) : '-';
     if (bPay) {
       var payId = (sub && sub.paymentId) || '';
       if (!payId && window.XFreezeUsage && window.XFreezeUsage.getLastPaymentId) {
         payId = window.XFreezeUsage.getLastPaymentId() || '';
       }
-      bPay.textContent = payId || '—';
+      bPay.textContent = payId || '-';
     }
 
     /* Usage */
@@ -606,11 +606,11 @@
     if (premLocked) {
       if (type === 'prompts' && textEl) {
         textEl.textContent =
-          'Premium prompt — upgrade to Pro to view the full text.';
+          'Premium prompt - upgrade to Pro to view the full text.';
       }
       if (type === 'skills' && textEl) {
         textEl.textContent =
-          'Premium skill — upgrade to Pro to open and copy install prompts.';
+          'Premium skill - upgrade to Pro to open and copy install prompts.';
       }
       externalHref = window.XFreezeAccess.pricingUrl({
         reason: 'premium',

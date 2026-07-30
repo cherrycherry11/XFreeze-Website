@@ -1,5 +1,5 @@
 /**
- * X Freeze — sitewide cinematic motion
+ * X Freeze - sitewide cinematic motion
  * Home: pinned hero, parallax, marquee safety, final CTA
  * Other pages: calm Lenis + GSAP reveals, soft card lifts
  */
@@ -74,14 +74,14 @@
   }
 
   function initAtmosphere() {
-    /* No mouse spotlight / gradient wash — felt gimmicky sitewide */
+    /* No mouse spotlight / gradient wash - felt gimmicky sitewide */
     document.querySelectorAll('.xf-spotlight, .xf-atmosphere, .xf-scroll-progress').forEach(function (el) {
       el.remove();
     });
   }
 
   function initProgress() {
-    /* Disabled — no gradient progress bar */
+    /* Disabled - no gradient progress bar */
   }
 
   function splitWords(el) {
@@ -156,7 +156,7 @@
 
   /**
    * Home-style word reveal for inner page heroes (prompts / skills).
-   * Does not rewrite layout — only animates existing title + support nodes.
+   * Does not rewrite layout - only animates existing title + support nodes.
    */
   function runHomeStyleHeroFlow(opts) {
     var root = opts.root;
@@ -378,7 +378,7 @@
      * Blur ramps up as Templates covers the hero.
      */
     var cover = document.getElementById('selected-work') || hero;
-    /* End scrub as next section reaches the top — avoids a growing empty band */
+    /* End scrub as next section reaches the top - avoids a growing empty band */
     var pinEnd = cover === hero ? 'bottom top' : 'top top';
     var stage = hero.querySelector('.hero-stage') || hero;
     var scrubCommon = {
@@ -662,7 +662,7 @@
               gsap.set(k, { clearProps: 'transform,opacity,visibility' });
             });
           }
-          /* Do not mark the whole section is-revealed here — that CSS path
+          /* Do not mark the whole section is-revealed here - that CSS path
              forced sibling .scroll-reveal-in blocks visible and killed the flow. */
         },
       });
@@ -741,7 +741,7 @@
   function initHomeSectionFlow(section) {
     if (!section || !isHome) return;
 
-    /* Only top-level reveal blocks — avoid double-binding titles/leads inside */
+    /* Only top-level reveal blocks - avoid double-binding titles/leads inside */
     var blocks = section.querySelectorAll(':scope > .scroll-reveal-in, :scope > .content-container > .scroll-reveal-in, :scope .content-container > .scroll-reveal-in');
     if (!blocks.length) {
       blocks = section.querySelectorAll('.scroll-reveal-in');
@@ -774,7 +774,7 @@
   }
 
   /**
-   * Template system section entrance — eyebrow → title → lead → filters → marquee.
+   * Template system section entrance - eyebrow → title → lead → filters → marquee.
    * CSS pre-hides children (.xf-selected-work-copy:not(.is-flow-done) > *).
    * Parent shell stays paint-ready so stagger is never blocked by parent opacity:0.
    * Primary trigger: IntersectionObserver on #selected-work (works with Lenis + fixed hero).
@@ -791,7 +791,7 @@
       section.querySelector('#templates > .scroll-reveal-in:not(.mt-4)') ||
       section.querySelector('.content-container > .scroll-reveal-in:not(.mt-4)');
 
-    /* Marquee CSS train must keep transform free — hide wrap until flow plays */
+    /* Marquee CSS train must keep transform free - hide wrap until flow plays */
     if (marquee) {
       gsap.set(marquee, { clearProps: 'transform,x,y' });
       marquee.style.visibility = 'visible';
@@ -941,7 +941,7 @@
       var isSkillsSection = section.id === 'xf-skills-spotlight-section';
       var isFinalCta = section.id === 'xf-final-cta';
 
-      /* Final CTA owned exclusively by initFinalCta — avoid double GSAP thrash */
+      /* Final CTA owned exclusively by initFinalCta - avoid double GSAP thrash */
       if (isFinalCta) {
         initFinalCta();
         return;
@@ -1003,7 +1003,7 @@
         wrap._xfExpandBound = true;
         wrap.setAttribute('data-xf-expand', '');
 
-        /* Mild scale only — large overscale softens HQ video/images */
+        /* Mild scale only - large overscale softens HQ video/images */
         gsap.fromTo(
           media,
           { scale: 1.04 },
@@ -1024,7 +1024,7 @@
 
   function initTilt() {
     if (!fine) return;
-    /* Skip marquee — tilt transform fights CSS marquee translate */
+    /* Skip marquee - tilt transform fights CSS marquee translate */
     var nodes = document.querySelectorAll(
       '.artistic-card, .xf-cat-showcase-card, .xf-motion-card'
     );
@@ -1056,7 +1056,7 @@
 
   function initMagneticEnhanced() {
     if (!fine) return;
-    /* Nav coffee is excluded — magnetic pull felt sticky next to the avatar */
+    /* Nav coffee is excluded - magnetic pull felt sticky next to the avatar */
     document
       .querySelectorAll('.hero-btn, .xf-final-cta-btn, [data-xf-magnetic]')
       .forEach(function (el) {
@@ -1075,7 +1075,7 @@
   }
 
   function initCursor() {
-    /* Keep native system cursor — no custom dot/ring */
+    /* Keep native system cursor - no custom dot/ring */
     document.documentElement.classList.remove('xf-cursor-on');
     document.querySelectorAll('.xf-cursor, .xf-cursor-ring').forEach(function (el) {
       el.remove();
@@ -1101,7 +1101,7 @@
       stage.classList.add('is-revealed', 'is-cinematic-revealed');
     }
 
-    /* Soft card entrance only — never re-hide to 0 (reload flash) */
+    /* Soft card entrance only - never re-hide to 0 (reload flash) */
     gsap.fromTo(
       box,
       { opacity: 0.88, y: 18 },
@@ -1149,7 +1149,7 @@
 
   function initFooter() {
     /*
-     * Do NOT translateY the footer — with a fixed hero underneath, any y offset
+     * Do NOT translateY the footer - with a fixed hero underneath, any y offset
      * opens a gap that shows the hero video between CTA and footer.
      */
     var footer = document.querySelector('.xf-site-footer');
@@ -1187,7 +1187,7 @@
     nav.classList.add('site-nav--elevated');
     /* Force a measure so is-scrolled kicks in under the sliding panel */
     if (window.XFreezeMotion && typeof window.XFreezeMotion.init === 'function') {
-      /* motion already running — dispatch scroll */
+      /* motion already running - dispatch scroll */
       window.dispatchEvent(new Event('scroll'));
     }
   }
@@ -1231,7 +1231,7 @@
   }
 
   /**
-   * Prompts library hero — home-style word flow on title + copy (typewriter stays solid).
+   * Prompts library hero - home-style word flow on title + copy (typewriter stays solid).
    */
   function initPromptsHeroFlow() {
     var hero = document.querySelector('.pl-hero');
@@ -1261,7 +1261,7 @@
   }
 
   /**
-   * Skills page hero — same word-by-word flow as home hero titles.
+   * Skills page hero - same word-by-word flow as home hero titles.
    */
   function initSkillsPageFlow() {
     var section = document.querySelector('.skills-hero-section, .skills-banner');
@@ -1292,7 +1292,7 @@
   }
 
   /**
-   * Templates page — calm opacity-only banner intro.
+   * Templates page - calm opacity-only banner intro.
    * No word-split reflow, no body y-reveals (filters + dynamic grid were glitching).
    */
   function initTemplatesPageFlow() {
@@ -1358,7 +1358,7 @@
   }
 
   /**
-   * Skill Builder — solid centered hero (word-split broke alignment: title left / lead right).
+   * Skill Builder - solid centered hero (word-split broke alignment: title left / lead right).
    */
   function initSkillBuilderPageFlow() {
     var hero = document.querySelector('.sb-hero');
@@ -1507,7 +1507,7 @@
   }
 
   /**
-   * Contact page — home-style centered word flow on hero (no FOUC flash).
+   * Contact page - home-style centered word flow on hero (no FOUC flash).
    */
   function initContactPageFlow() {
     var hero = document.querySelector('.contact-hero');
@@ -1571,7 +1571,7 @@
   }
 
   /**
-   * About page — home-style hero word flow + section reveals.
+   * About page - home-style hero word flow + section reveals.
    * Pre-hidden via inline CSS (xf-about-page) so nothing flashes before the slow fade-in.
    */
   function initAboutPageFlow() {
@@ -1585,7 +1585,7 @@
         supportSelector: '.xf-content-eyebrow, .xf-content-lead, .xf-section-eyebrow, .xf-section-lead',
         readyClass: 'is-hero-ready',
         onBeforeAnimate: function () {
-          /* Only after words/supports are at opacity 0 — then show shell */
+          /* Only after words/supports are at opacity 0 - then show shell */
           hero.classList.add('is-cinematic-revealing');
         },
         onComplete: function () {
@@ -1597,7 +1597,7 @@
       });
     }
 
-    /* Sections: CSS-hidden until onStart; slow fade once — no prior full paint */
+    /* Sections: CSS-hidden until onStart; slow fade once - no prior full paint */
     document.querySelectorAll('.xf-about-section').forEach(function (el) {
       if (el._xfInnerReveal) return;
       el._xfInnerReveal = true;
@@ -1715,16 +1715,16 @@
         ScrollTrigger.refresh();
       }, 320);
     } else if (document.querySelector('.pl-hero')) {
-      /* Prompts: dedicated calm flow only — no word-split, no body y-reveals */
+      /* Prompts: dedicated calm flow only - no word-split, no body y-reveals */
       initPromptsHeroFlow();
     } else if (document.querySelector('.templates-banner, .templates-main')) {
-      /* Templates: calm banner fade — no word-split, no filter/grid y thrash */
+      /* Templates: calm banner fade - no word-split, no filter/grid y thrash */
       initTemplatesPageFlow();
     } else if (document.querySelector('.skills-hero, .skills-hero-section, .skills-banner')) {
-      /* Skills: solid first paint — no word-split re-flow flash */
+      /* Skills: solid first paint - no word-split re-flow flash */
       initSkillsPageFlow();
     } else if (document.querySelector('.sb-hero, .sb-main')) {
-      /* Skill Builder: solid centered hero — word-split broke title/lead alignment */
+      /* Skill Builder: solid centered hero - word-split broke title/lead alignment */
       initSkillBuilderPageFlow();
     } else if (document.querySelector('.xf-about-body, .xf-about-section')) {
       /* About: pre-hidden, then home-style word flow + slow section fade (no FOUC flash) */

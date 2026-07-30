@@ -21,7 +21,7 @@
   isolation: isolate;
   overflow: hidden;
   z-index: 0;
-  /* Soft page surface — matches home #f6f5f8 (not pure white) */
+  /* Soft page surface - matches home #f6f5f8 (not pure white) */
   background: #f6f5f8 !important;
   border-color: rgba(229, 231, 235, 0.75) !important;
 }
@@ -339,7 +339,7 @@ html.dark .skills-hero-section.xf-glass-section:not(:has(.xf-glass-backdrop))::b
   z-index: 2;
 }
 
-/* Feature blobs off — keep Style/Product clean */
+/* Feature blobs off - keep Style/Product clean */
 .xf-feature-copy__blob,
 .xf-feature-copy__blob--2 {
   display: none !important;

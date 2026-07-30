@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   X Freeze theme switch — crystal orb glass control
+   X Freeze theme switch - crystal orb glass control
    Reference: overhanging glass lens + frosted pill + mode label
    Unique: ice-rim refraction, warm day / cyan-night dual glow
    Compact (nav) · Hero labeled · Sm drawer
@@ -28,7 +28,7 @@
   border-radius: 9999px;
 }
 
-/* ── Track (frosted glass pill) — compact default for nav ── */
+/* ── Track (frosted glass pill) - compact default for nav ── */
 .theme-switch-track {
   position: relative;
   display: block;
@@ -94,7 +94,7 @@
   transition: opacity 0.35s ease, background 0.35s ease;
 }
 
-/* Light mode track — soft silver frost (matches reference vibe) */
+/* Light mode track - soft silver frost (matches reference vibe) */
 html:not(.dark) .theme-switch-track,
 html.light .theme-switch-track {
   background:
@@ -121,7 +121,7 @@ html.light .theme-switch-track::after {
   );
 }
 
-/* Dark mode track — ink glass with ice rim */
+/* Dark mode track - ink glass with ice rim */
 html.dark .theme-switch-track {
   background:
     linear-gradient(
@@ -167,7 +167,7 @@ html.dark .theme-switch-track {
 }
 
 /*
- * Auto label via CSS (footer / empty label). Keep node text empty —
+ * Auto label via CSS (footer / empty label). Keep node text empty -
  * if JS writes into it, hide that text so we never get "LightLight".
  */
 .theme-switch-label--auto {
@@ -209,7 +209,7 @@ html.light .theme-switch-label {
   text-shadow: 0 1px 2px rgba(15, 23, 42, 0.22);
 }
 
-/* ── Crystal orb thumb — larger than track, overhangs ── */
+/* ── Crystal orb thumb - larger than track, overhangs ── */
 .theme-switch-thumb {
   position: absolute;
   top: 50%;
@@ -227,7 +227,7 @@ html.light .theme-switch-label {
     box-shadow 0.4s ease,
     background 0.4s ease,
     border-color 0.4s ease;
-  /* Light crystal — frosted lens (mid-tone so white sun pops, like the ref) */
+  /* Light crystal - frosted lens (mid-tone so white sun pops, like the ref) */
   background:
     radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.2) 28%, transparent 52%),
     radial-gradient(circle at 72% 78%, rgba(100, 116, 139, 0.28) 0%, transparent 48%),
@@ -368,7 +368,7 @@ html.dark .theme-switch-icon--moon {
   opacity: 1;
 }
 
-/* ~half the previous hero size — icon-only pill */
+/* ~half the previous hero size - icon-only pill */
 .theme-switch--hero .theme-switch-track {
   width: 2.85rem;
   height: 1.45rem;
@@ -396,7 +396,7 @@ html.dark .theme-switch--hero .theme-switch-track {
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     inset 0 -1px 0 rgba(0, 0, 0, 0.35),
     0 4px 14px rgba(0, 0, 0, 0.28);
-  /* no cyan bloom — stays quiet under logos */
+  /* no cyan bloom - stays quiet under logos */
 }
 
 .theme-switch--hero .theme-switch-track::after {
@@ -434,7 +434,7 @@ html.dark .theme-switch--hero .theme-switch-thumb {
   background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
 }
 
-/* Hide Light/Dark text on hero — icons alone are enough */
+/* Hide Light/Dark text on hero - icons alone are enough */
 .theme-switch--hero .theme-switch-label {
   display: none !important;
 }

@@ -398,7 +398,7 @@ html.dark .xf-start-card:hover {
   box-shadow: none !important;
 }
 
-/* Final CTA glass is styled in home-extras.css — do not flatten it here */
+/* Final CTA glass is styled in home-extras.css - do not flatten it here */
 
 .sb-hero {
   padding: clamp(4rem, 10vw, 6rem) 0 clamp(2rem, 4vw, 3rem);

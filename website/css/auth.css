@@ -1,4 +1,4 @@
-/* X Freeze auth - gate, nav slot + login page */
+/* FreezeStack auth - gate, nav slot + login page */
 
 html.xf-auth-pending body {
   visibility: hidden;

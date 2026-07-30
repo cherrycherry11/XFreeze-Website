@@ -55,7 +55,7 @@ var XF_IS_LOCAL_DEV = /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(location.hostna
 var XF_REQUIRE_AUTH_LIVE = true;
 
 /**
- * X Freeze Supabase auth config - xfreeze.com
+ * FreezeStack Supabase auth config - xfreeze.com
  */
 window.XFreezeAuthConfig = {
   supabaseUrl: 'https://ekmllicbgmuodptvgxsl.supabase.co',

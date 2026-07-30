@@ -1,5 +1,5 @@
 /**
- * X Freeze FAQ Bot - floating chat widget, FAQ answers + skill recommendations
+ * FreezeStack FAQ Bot - floating chat widget, FAQ answers + skill recommendations
  */
 (function (global) {
   'use strict';

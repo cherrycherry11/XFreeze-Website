@@ -81,7 +81,7 @@ module.exports = async function handler(req, res) {
       body.returnUrl ||
       `${site}/checkout-success?provider=dodo&plan=${encodeURIComponent(planId)}`;
 
-    /* Match X Freeze site theme so checkout is not stuck on Dodo dark default */
+    /* Match FreezeStack site theme so checkout is not stuck on Dodo dark default */
     const rawTheme = String(body.theme || body.colorScheme || '')
       .toLowerCase()
       .trim();
@@ -103,7 +103,7 @@ module.exports = async function handler(req, res) {
           name:
             user.user_metadata?.full_name ||
             user.email ||
-            'X Freeze customer',
+            'FreezeStack customer',
         },
         customization: {
           theme: checkoutTheme,

@@ -1,5 +1,5 @@
 /**
- * X Freeze site footer - render, active link, crypto copy
+ * FreezeStack site footer - render, active link, crypto copy
  */
 (function () {
   'use strict';
@@ -147,14 +147,14 @@
       '<div class="xf-footer-shell">' +
       '<div class="xf-footer-brand">' +
       '<p class="xf-footer-eyebrow">AI library for</p>' +
-      '<a href="' + base + 'home" class="xf-footer-logo">X Freeze</a>' +
+      '<a href="' + base + 'home" class="xf-footer-logo">FreezeStack</a>' +
       '<p class="xf-footer-tagline" data-xf-tagline>Ready-made AI assets for everything you ship.</p>' +
       renderFooterThemeSwitch() +
       '</div>' +
       '<div class="xf-footer-columns">' + columns + '</div>' +
       '</div>' +
       '<div class="xf-footer-bottom">' +
-      '<p class="xf-footer-copy">© 2026 X Freeze</p>' +
+      '<p class="xf-footer-copy">© 2026 FreezeStack</p>' +
       '<p class="xf-footer-note">' +
       'Not affiliated with xAI. Templates open in ' +
       '<a href="https://grok.com/imagine" target="_blank" rel="noopener noreferrer">Grok Imagine</a>.' +

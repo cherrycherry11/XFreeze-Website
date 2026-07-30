@@ -1,5 +1,5 @@
 /**
- * X Freeze - smooth, fast video playback
+ * FreezeStack - smooth, fast video playback
  * - Lazy-load sources near the viewport
  * - Pause when off-screen
  * - Cap concurrent plays (hero excluded) to reduce decode glitches

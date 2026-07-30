@@ -1,5 +1,5 @@
 /**
- * X Freeze Motion Prompt Library - browse, search, copy
+ * FreezeStack Motion Prompt Library - browse, search, copy
  */
 (function () {
   'use strict';

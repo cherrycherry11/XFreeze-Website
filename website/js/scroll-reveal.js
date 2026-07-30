@@ -1,5 +1,5 @@
 /**
- * X Freeze scroll reveal - IntersectionObserver-driven section animations
+ * FreezeStack scroll reveal - IntersectionObserver-driven section animations
  */
 (function () {
   'use strict';

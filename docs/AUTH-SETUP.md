@@ -1,4 +1,4 @@
-# X Freeze Auth Setup (xfreeze.com)
+# FreezeStack Auth Setup (xfreeze.com)
 
 The site uses [Supabase Auth](https://supabase.com/docs/guides/auth) for sign-in.
 
@@ -52,7 +52,7 @@ Use **X / Twitter (OAuth 2.0)** in Supabase - **not** the legacy “Twitter (OAu
 
 ### Why you see “Something went wrong” on X
 
-That message is from **x.com**, not X Freeze. It almost always means the X app or credentials are misconfigured.
+That message is from **x.com**, not FreezeStack. It almost always means the X app or credentials are misconfigured.
 
 **Scopes (code vs portal)**  
 - Site code requests: `tweet.read users.read offline.access` (no email in our client options).  

@@ -1,5 +1,5 @@
 /**
- * X Freeze Motion System - Phase 1
+ * FreezeStack Motion System - Phase 1
  * Lenis smooth scroll, nav, magnetic CTAs, count-up
  */
 (function () {

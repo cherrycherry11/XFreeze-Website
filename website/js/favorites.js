@@ -1,5 +1,5 @@
 /**
- * X Freeze favorites - templates, skills, prompts.
+ * FreezeStack favorites - templates, skills, prompts.
  * Persists in localStorage (works signed out; Account shows them when signed in).
  */
 (function (global) {

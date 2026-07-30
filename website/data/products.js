@@ -1,5 +1,5 @@
 /**
- * X Freeze product catalog (display / plan ids).
+ * FreezeStack product catalog (display / plan ids).
  * Paid checkout is offline - rebuild payments separately.
  */
 (function (global) {

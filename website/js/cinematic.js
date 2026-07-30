@@ -1,5 +1,5 @@
 /**
- * X Freeze - sitewide cinematic motion
+ * FreezeStack - sitewide cinematic motion
  * Home: pinned hero, parallax, marquee safety, final CTA
  * Other pages: calm Lenis + GSAP reveals, soft card lifts
  */

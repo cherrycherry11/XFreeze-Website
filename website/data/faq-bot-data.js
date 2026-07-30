@@ -1,5 +1,5 @@
 /**
- * X Freeze FAQ Bot - comprehensive Q&A dataset
+ * FreezeStack FAQ Bot - comprehensive Q&A dataset
  */
 (function (global) {
   'use strict';
@@ -8,13 +8,13 @@
     faq: [
       /* Getting started */
       {
-        question: 'What is X Freeze?',
-        answer: 'X Freeze is a creator library of <strong>500+ Grok Imagine templates</strong>, <strong>1200+ AI skills</strong>, and <strong>430+ motion prompts</strong>. Browse free, copy what you need, and run it in Grok, Claude, or Cursor.',
-        tags: ['what is', 'x freeze', 'about', 'library', 'overview']
+        question: 'What is FreezeStack?',
+        answer: 'FreezeStack is a creator library of <strong>500+ Grok Imagine templates</strong>, <strong>1200+ AI skills</strong>, and <strong>430+ motion prompts</strong>. Browse free, copy what you need, and run it in Grok, Claude, or Cursor.',
+        tags: ['what is', 'freezestack', 'about', 'library', 'overview']
       },
       {
-        question: 'Is X Freeze affiliated with xAI or Grok?',
-        answer: 'No. X Freeze is an <strong>independent fan library</strong> - not affiliated with xAI, Grok, X, or SpaceX. I curate links and prompts; Grok and other tools are run on their own platforms.',
+        question: 'Is FreezeStack affiliated with xAI or Grok?',
+        answer: 'No. FreezeStack is an <strong>independent fan library</strong> - not affiliated with xAI, Grok, X, or SpaceX. I curate links and prompts; Grok and other tools are run on their own platforms.',
         tags: ['affiliated', 'xai', 'grok', 'official', 'fan', 'unofficial']
       },
       {
@@ -39,7 +39,7 @@
       },
       {
         question: 'Do I need a paid Grok account?',
-        answer: 'Most Grok Imagine <strong>templates need Super Grok or Super Grok Heavy</strong> to run. Browsing X Freeze is free; check <a href="https://grok.com" target="_blank" rel="noopener noreferrer">grok.com</a> for current plans. Skills and motion prompts do not require Grok.',
+        answer: 'Most Grok Imagine <strong>templates need Super Grok or Super Grok Heavy</strong> to run. Browsing FreezeStack is free; check <a href="https://grok.com" target="_blank" rel="noopener noreferrer">grok.com</a> for current plans. Skills and motion prompts do not require Grok.',
         tags: ['paid', 'grok', 'subscription', 'super grok', 'premium grok', 'account']
       },
       {
@@ -48,7 +48,7 @@
         tags: ['super grok', 'heavy', 'subscription', 'imagine', 'tier']
       },
       {
-        question: 'Can I use X Freeze on mobile?',
+        question: 'Can I use FreezeStack on mobile?',
         answer: 'Yes - the site is mobile-friendly. Templates open Grok in your browser; skills and motion prompts copy to your clipboard for pasting into Grok, Claude, or Cursor on any device.',
         tags: ['mobile', 'phone', 'tablet', 'ios', 'android']
       },
@@ -65,8 +65,8 @@
         tags: ['click', 'template', 'open', 'happens', 'use']
       },
       {
-        question: 'Do templates run inside X Freeze or in Grok?',
-        answer: 'Templates run in <strong>Grok Imagine</strong> - not inside X Freeze. I provide the curated link; generation happens on Grok with your own image.',
+        question: 'Do templates run inside FreezeStack or in Grok?',
+        answer: 'Templates run in <strong>Grok Imagine</strong> - not inside FreezeStack. I provide the curated link; generation happens on Grok with your own image.',
         tags: ['where', 'run', 'grok', 'inside', 'imagine']
       },
       {
@@ -101,7 +101,7 @@
       },
       {
         question: 'What does the Premium badge on a template mean?',
-        answer: 'Premium templates are <strong>higher-tier looks in Grok Imagine</strong> - still opened with one tap, but they may require Super Grok access. The badge is a clarity label, not a separate X Freeze paywall.',
+        answer: 'Premium templates are <strong>higher-tier looks in Grok Imagine</strong> - still opened with one tap, but they may require Super Grok access. The badge is a clarity label, not a separate FreezeStack paywall.',
         tags: ['premium', 'badge', 'template', 'tier']
       },
       {
@@ -147,7 +147,7 @@
         tags: ['slash', 'command', 'trigger', 'skill']
       },
       {
-        question: 'Which AI tools support X Freeze skills?',
+        question: 'Which AI tools support FreezeStack skills?',
         answer: 'Skills are built for <strong>Grok</strong>, <strong>Claude</strong>, and <strong>Cursor</strong>. Copy the install prompt into your tool of choice. Templates and motion prompts target Grok Imagine and video tools instead.',
         tags: ['tools', 'claude', 'cursor', 'grok', 'chatgpt', 'support']
       },
@@ -249,8 +249,8 @@
         tags: ['email', 'access', 'gmail', 'cant', 'connector', 'error']
       },
       {
-        question: 'Does X Freeze see my Gmail or Notion data?',
-        answer: 'No. Connector skills use <strong>your AI tool\'s official integration</strong>. Data flows between you and Gmail/Notion/etc. - X Freeze only provides the prompt text, never your mail or files.',
+        question: 'Does FreezeStack see my Gmail or Notion data?',
+        answer: 'No. Connector skills use <strong>your AI tool\'s official integration</strong>. Data flows between you and Gmail/Notion/etc. - FreezeStack only provides the prompt text, never your mail or files.',
         tags: ['privacy', 'data', 'gmail', 'notion', 'see', 'safe']
       },
 
@@ -431,7 +431,7 @@
         tags: ['follow', 'updates', 'twitter', 'news']
       },
       {
-        question: 'How do I support X Freeze?',
+        question: 'How do I support FreezeStack?',
         answer: 'Unlock the full library on <a href="pricing">Pricing</a> with Pro. Optional crypto wallets remain in the footer if you want to tip.',
         tags: ['support', 'tip', 'coffee', 'crypto', 'donate']
       },
@@ -453,7 +453,7 @@
         tags: ['scrape', 'download', 'bulk', 'terms', 'allowed']
       },
       {
-        question: 'What data does X Freeze collect?',
+        question: 'What data does FreezeStack collect?',
         answer: 'Only the basics: contact form messages, optional sign-in, and normal website/tech prefs. I don’t sell your info and skills don’t send your Gmail/Drive to me. See the simple <a href="privacy.html">Privacy</a> page. Use the library for your own work - please don’t resell or redistribute it (<a href="terms.html">Terms</a>).',
         tags: ['privacy', 'data', 'collect', 'tracking', 'terms', 'resale']
       },
@@ -463,8 +463,8 @@
         tags: ['warranty', 'as-is', 'terms', 'liability']
       },
       {
-        question: 'Who built X Freeze?',
-        answer: 'X Freeze is an independent creator project - a curated library for faster AI workflows. Not affiliated with xAI. Learn more on <a href="about.html">About</a>.',
+        question: 'Who built FreezeStack?',
+        answer: 'FreezeStack is an independent creator project - a curated library for faster AI workflows. Not affiliated with xAI. Learn more on <a href="about.html">About</a>.',
         tags: ['who', 'built', 'creator', 'about']
       },
       {
@@ -476,7 +476,7 @@
       /* Catch-all from original FAQ */
       {
         question: 'Is this free?',
-        answer: 'Browsing is <strong>completely free</strong>. Most templates, skills, and motion prompts are free to copy and use. Premium labels mark depth or Grok tier - not a hidden X Freeze charge for browsing.',
+        answer: 'Browsing is <strong>completely free</strong>. Most templates, skills, and motion prompts are free to copy and use. Premium labels mark depth or Grok tier - not a hidden FreezeStack charge for browsing.',
         tags: ['free', 'cost', 'price', 'money', 'charge']
       },
       {

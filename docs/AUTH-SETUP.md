@@ -1,4 +1,4 @@
-# XFreeze Auth Setup (xfreeze.com)
+# X Freeze Auth Setup (xfreeze.com)
 
 The site uses [Supabase Auth](https://supabase.com/docs/guides/auth) for sign-in.
 

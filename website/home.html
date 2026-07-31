@@ -3138,11 +3138,64 @@
        Product clips are ~5s exact - advancing on a hard global timer freezes the
        last frame and swaps both cards at once (feels laggy vs longer style clips). */
     const VIDEO_CLIP_MS = 5000;
-    const VIDEO_PRELOAD_MS = 1400; /* start loading next earlier */
+    const VIDEO_PRELOAD_MS = 900; /* shorter preload window - less dual-decode thrash */
     const VIDEO_LEAD_MS = 280; /* begin crossfade slightly before clip ends */
-    const VIDEO_FADE_MS = 480;
-    const VIDEO_CARD_STAGGER_MS = 420; /* don't swap both cards on the same frame */
+    const VIDEO_FADE_MS = 400;
+    const VIDEO_CARD_STAGGER_MS = 720; /* spread swaps so decode spikes do not stack */
     const videoCycleInstances = [];
+
+    /*
+     * Hard cap concurrent showcase plays. Four 8-10MB H.264 clips + dual layers
+     * was stalling the main thread / GPU (pause/glitch like a hang).
+     */
+    const CYCLE_MAX_PLAYING = (function () {
+      try {
+        if (navigator.connection) {
+          if (navigator.connection.saveData) return 1;
+          if (/2g|slow-2g/i.test(navigator.connection.effectiveType || '')) return 1;
+        }
+      } catch (e) {}
+      if (window.matchMedia('(max-width: 1023px)').matches) return 1;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 1;
+      return 2;
+    })();
+    const cyclePlayingSet = new Set();
+
+    function releaseCyclePlay(video) {
+      if (!video) return;
+      cyclePlayingSet.delete(video);
+    }
+
+    function pauseCycleVideo(video) {
+      if (!video) return;
+      try {
+        video.pause();
+      } catch (e) {}
+      releaseCyclePlay(video);
+    }
+
+    /** Only CYCLE_MAX_PLAYING active showcase videos may decode at once. */
+    function requestCyclePlay(video) {
+      if (!video) return false;
+      /* Drop detached / pending layers */
+      if (video.classList.contains('is-pending')) {
+        pauseCycleVideo(video);
+        return false;
+      }
+      if (!cyclePlayingSet.has(video)) {
+        cyclePlayingSet.add(video);
+      }
+      /* Evict oldest excess players (keep newest requested) */
+      if (cyclePlayingSet.size > CYCLE_MAX_PLAYING) {
+        const list = Array.from(cyclePlayingSet);
+        const keep = list.slice(-CYCLE_MAX_PLAYING);
+        const keepSet = new Set(keep);
+        list.forEach(function (v) {
+          if (!keepSet.has(v)) pauseCycleVideo(v);
+        });
+      }
+      return cyclePlayingSet.has(video);
+    }
     /* Hard aliases so misspelled asset filenames never show as captions */
     const BEFORE_AFTER_TITLE_ALIASES = {
       'add-instant-beauty.mp4': 'Instant beauty retouch',
@@ -3411,8 +3464,19 @@
 
         const playIfVisible = (video) => {
           if (!container._isVisible || !video) return;
+          if (document.hidden) {
+            pauseCycleVideo(video);
+            return;
+          }
           video.muted = true;
           video.playsInline = true;
+          video.setAttribute('playsinline', '');
+          video.setAttribute('muted', '');
+          /* Never let idle/preload layers decode in the background */
+          if (video.classList.contains('is-pending')) {
+            pauseCycleVideo(video);
+            return;
+          }
           const markFrame = () => {
             video.classList.add('is-frame-ready');
             const card = video.closest('.artistic-card');
@@ -3420,16 +3484,22 @@
           };
           if (video.readyState >= 2) markFrame();
           else video.addEventListener('loadeddata', markFrame, { once: true });
+
+          if (!requestCyclePlay(video)) {
+            /* Over concurrent cap - freeze on current frame instead of fighting decode */
+            try {
+              video.pause();
+            } catch (e) {}
+            return;
+          }
+
           const kick = () => {
-            if (!container._isVisible || !video) return;
+            if (!container._isVisible || !video || document.hidden) return;
+            if (!cyclePlayingSet.has(video) && !requestCyclePlay(video)) return;
             const p = video.play();
             if (p && typeof p.catch === 'function') {
               p.catch(() => {
-                /* Autoplay/decode hiccup - retry once shortly */
-                setTimeout(() => {
-                  if (!container._isVisible) return;
-                  video.play().catch(() => {});
-                }, 220);
+                releaseCyclePlay(video);
               });
             }
           };
@@ -3668,21 +3738,28 @@
         const preloadNext = (cardIndex) => {
           const card = cards[cardIndex];
           if (!card || card._isSwapping) return;
+          const stack = ensureVideoStack(card);
+          if (!stack) return;
+          /* Only preload for cards that are actually allowed to play - saves bandwidth/decode */
+          if (!cyclePlayingSet.has(stack.active) && cyclePlayingSet.size >= CYCLE_MAX_PLAYING) {
+            return;
+          }
           const nextIdx = pickNextUniqueIndex(cardIndex, indices, pool.length);
           card._nextIndex = nextIdx;
           const src = pool[nextIdx];
-          const stack = ensureVideoStack(card);
-          if (!stack) return;
           const { idle } = stack;
           const idleSource = idle.querySelector('source');
           if (!idleSource) return;
           if (sourceMatches(idleSource, src) && idle.readyState >= 2) return;
 
-          idle.pause();
+          pauseCycleVideo(idle);
           idle.classList.remove('is-active');
           idle.classList.add('is-pending');
+          idle.preload = 'metadata';
           idleSource.setAttribute('src', src);
-          idle.load();
+          try {
+            idle.load();
+          } catch (e) {}
         };
 
         const advanceCard = (cardIndex) => {
@@ -3844,7 +3921,12 @@
             applyVideo(card, pool[indices[i]], false);
             bindActiveWatchdogs(card);
           });
-          scheduleAllCards(180);
+          /* Wider stagger on dense grids (beforeAfter has 4 cards) */
+          const base = cards.length > 2 ? 280 : 180;
+          const step = cards.length > 2 ? VIDEO_CARD_STAGGER_MS + 200 : VIDEO_CARD_STAGGER_MS;
+          cards.forEach((card, i) => {
+            scheduleCardCycle(i, base + i * step);
+          });
         };
 
         const startCycle = () => {
@@ -3862,10 +3944,10 @@
         });
 
         const resumeVisibleVideos = () => {
-          cards.forEach((card) => {
+          /* Prefer left-to-right cards that are on screen; cap via requestCyclePlay */
+          cards.forEach((card, i) => {
             const stack = card._videoStack;
             if (!stack) return;
-            /* Don't abort a fresh swap; clear ones stuck >4.5s */
             if (card._isSwapping) {
               const stuckFor = card._swapStuckSince
                 ? Date.now() - card._swapStuckSince
@@ -3875,9 +3957,14 @@
             }
             stack.active.classList.add('is-active');
             stack.active.classList.remove('is-pending');
+            if (stack.idle) {
+              pauseCycleVideo(stack.idle);
+              stack.idle.classList.add('is-pending');
+              stack.idle.classList.remove('is-active');
+            }
             bindActiveWatchdogs(card);
-            /* Force play while container is considered visible */
-            playIfVisible(stack.active);
+            /* Stagger kicks so 4 cards do not all call play() in one frame */
+            setTimeout(() => playIfVisible(stack.active), i * 90);
           });
         };
 
@@ -3918,9 +4005,20 @@
                 container._isVisible = false;
                 cards.forEach((card) => {
                   clearCardSchedule(card);
+                  forceClearSwap(card);
                 });
                 container.querySelectorAll('.section-video').forEach((video) => {
-                  video.pause();
+                  pauseCycleVideo(video);
+                  try {
+                    video.removeAttribute('src');
+                    const srcEl = video.querySelector('source');
+                    /* Keep active layer src so poster frame can return on re-entry;
+                       only drop pending/idle sources to free decoders. */
+                    if (video.classList.contains('is-pending') && srcEl) {
+                      srcEl.removeAttribute('src');
+                      try { video.load(); } catch (e) {}
+                    }
+                  } catch (e) {}
                 });
               }, 280);
             }
@@ -3950,6 +4048,17 @@
     }
 
     window.onload = init;
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) return;
+      cyclePlayingSet.forEach((v) => {
+        try { v.pause(); } catch (e) {}
+      });
+      cyclePlayingSet.clear();
+      document.querySelectorAll('[data-video-cycle] .section-video').forEach((v) => {
+        try { v.pause(); } catch (e) {}
+      });
+    });
 
     window.addEventListener('pageshow', () => {
       const { active } = heroLayers();

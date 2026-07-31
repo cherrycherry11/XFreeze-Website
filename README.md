@@ -1,4 +1,4 @@
-# FreezeStack Website
+# Freezestack Website
 
 Production static site for [xfreeze.com](https://xfreeze.com).
 

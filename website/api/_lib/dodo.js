@@ -198,8 +198,8 @@ async function ensureDefaultProducts() {
     monthly = await dodoFetch('/products', {
       method: 'POST',
       body: {
-        name: 'FreezeStack Pro Monthly',
-        description: 'FreezeStack Pro plan billed monthly',
+        name: 'Freezestack Pro Monthly',
+        description: 'Freezestack Pro plan billed monthly',
         tax_category: 'saas',
         price: {
           type: 'recurring_price',
@@ -239,8 +239,8 @@ async function ensureDefaultProducts() {
     yearly = await dodoFetch('/products', {
       method: 'POST',
       body: {
-        name: 'FreezeStack Pro Yearly',
-        description: 'FreezeStack Pro plan billed yearly',
+        name: 'Freezestack Pro Yearly',
+        description: 'Freezestack Pro plan billed yearly',
         tax_category: 'saas',
         price: {
           type: 'recurring_price',

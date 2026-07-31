@@ -1,5 +1,5 @@
 /**
- * FreezeStack checkout - Dodo Payments overlay (modal on top of the site).
+ * Freezestack checkout - Dodo Payments overlay (modal on top of the site).
  * Full-page redirect is avoided so pricing stays visible under the popup.
  */
 (function (global) {
@@ -85,7 +85,7 @@
     return 'test';
   }
 
-  /** Match current FreezeStack theme for Dodo checkout (light | dark | system). */
+  /** Match current Freezestack theme for Dodo checkout (light | dark | system). */
   function getSiteTheme() {
     try {
       var stored = localStorage.getItem('xfreeze-theme');

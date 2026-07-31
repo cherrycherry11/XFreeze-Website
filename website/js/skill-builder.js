@@ -1,5 +1,5 @@
 /**
- * FreezeStack Skill Builder - client-side meta-prompt assembly
+ * Freezestack Skill Builder - client-side meta-prompt assembly
  */
 (function (global) {
   'use strict';

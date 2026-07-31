@@ -1,5 +1,5 @@
 /**
- * FreezeStack Skills Browser - copy-first, no GitHub required
+ * Freezestack Skills Browser - copy-first, no GitHub required
  */
 (function (global) {
   const data = global.XFreezeSkillsBrowseIndex || global.XFreezeSkillsBrowseData || {};
@@ -710,7 +710,7 @@
       }
     }).catch(function (err) {
       if (typeof console !== 'undefined' && console.warn) {
-        console.warn('[FreezeStack] skill pack load failed:', b.id, err);
+        console.warn('[Freezestack] skill pack load failed:', b.id, err);
       }
       /* Keep the skill list visible - only note that full prompts need a retry */
       if (currentBundle && currentBundle.id === b.id && list) {

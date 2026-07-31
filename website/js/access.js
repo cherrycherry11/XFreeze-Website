@@ -1,5 +1,5 @@
 /**
- * FreezeStack access control - Free vs Pro for premium library items.
+ * Freezestack access control - Free vs Pro for premium library items.
  * UI gate only. Real enforcement is on /api/content/* + entitlements table.
  */
 (function (global) {

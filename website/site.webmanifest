@@ -1,6 +1,6 @@
 {
-  "name": "FreezeStack",
-  "short_name": "FreezeStack",
+  "name": "Freezestack",
+  "short_name": "Freezestack",
   "description": "Grok templates, AI skills, and motion prompts",
   "start_url": "/home.html",
   "display": "standalone",

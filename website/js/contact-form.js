@@ -1,5 +1,5 @@
 /**
- * FreezeStack contact form - Formspree, Web3Forms, or mailto fallback
+ * Freezestack contact form - Formspree, Web3Forms, or mailto fallback
  */
 (function () {
   'use strict';
@@ -119,7 +119,7 @@
     payload.append('email', email);
     payload.append('topic', topic);
     payload.append('message', message);
-    payload.append('_subject', 'FreezeStack contact: ' + topic);
+    payload.append('_subject', 'Freezestack contact: ' + topic);
     payload.append('_replyto', email);
 
     try {
@@ -129,7 +129,7 @@
           'mailto:' +
           encodeURIComponent(c.fallbackEmail || 'contact@xfreeze.com') +
           '?subject=' +
-          encodeURIComponent('FreezeStack - ' + topic) +
+          encodeURIComponent('Freezestack - ' + topic) +
           '&body=' +
           encodeURIComponent(body);
         showStatus('Opening your mail app. Add a Formspree or Web3Forms key in js/contact-config.js for inbox delivery.', 'success');

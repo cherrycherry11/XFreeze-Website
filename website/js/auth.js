@@ -1,5 +1,5 @@
 /**
- * FreezeStack auth - email/password + X/Twitter via Supabase
+ * Freezestack auth - email/password + X/Twitter via Supabase
  */
 (function () {
   'use strict';
@@ -752,7 +752,7 @@
     var confirmWrap = document.getElementById('xf-auth-password-confirm');
     var confirmLabel = document.querySelector('label[for="xf-auth-password-confirm"]');
 
-    if (heading) heading.textContent = authMode === 'signup' ? 'Create your account' : 'Sign in to FreezeStack';
+    if (heading) heading.textContent = authMode === 'signup' ? 'Create your account' : 'Sign in to Freezestack';
     if (subheading) {
       if (authMode === 'signup') {
         subheading.textContent = 'Set up email and password to save progress. Free to start.';

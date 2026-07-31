@@ -1,5 +1,5 @@
 /**
- * FreezeStack site config - single source for counts, copy, and featured content.
+ * Freezestack site config - single source for counts, copy, and featured content.
  */
 (function (global) {
   var TEMPLATE_COUNT = 502;
@@ -13,7 +13,7 @@
   var DISPLAY_MOTION_CATEGORY_COUNT = 37;
 
   var config = {
-    siteName: 'FreezeStack',
+    siteName: 'Freezestack',
     siteUrl: 'https://xfreeze.com',
     templates: TEMPLATE_COUNT,
     skills: SKILL_COUNT,
@@ -270,7 +270,7 @@
       { date: '2026-06-22', title: '+24 Style Edit templates', items: ['Cinematic lighting variants', 'Editorial mood presets', 'Updated marquee on homepage'] },
       { date: '2026-06-15', title: 'Skills library v2', items: ['284 skills across 27 packs', 'Connector vs instant badges', 'Copy-paste install prompts'] },
       { date: '2026-06-08', title: 'Mockup catalog expansion', items: ['214 Mockup templates', 'Category filters on templates page', 'Bundle pricing from $9'] },
-      { date: '2026-05-28', title: 'FreezeStack library launch', items: ['First 200+ product templates', 'Dark mode', 'Free Grok deep links'] },
+      { date: '2026-05-28', title: 'Freezestack library launch', items: ['First 200+ product templates', 'Dark mode', 'Free Grok deep links'] },
     ],
 
     startHere: [
@@ -293,8 +293,8 @@
       {
         step: 3,
         title: 'Learn the library',
-        desc: 'See how FreezeStack is built, what updates weekly, and how it relates to Grok Imagine.',
-        cta: 'About FreezeStack',
+        desc: 'See how Freezestack is built, what updates weekly, and how it relates to Grok Imagine.',
+        cta: 'About Freezestack',
         href: 'about',
         icon: 'fa-circle-info',
       },

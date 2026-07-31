@@ -1,5 +1,5 @@
 /**
- * FreezeStack - slide-in "Support my work" tab after copy / valuable actions.
+ * Freezestack - slide-in "Support my work" tab after copy / valuable actions.
  */
 (function (global) {
   function pricingUrl() {

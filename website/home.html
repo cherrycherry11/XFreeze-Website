@@ -3244,7 +3244,6 @@
       }
     }
 
-    /** One video element per card */
     function getCardVideo(card) {
       if (!card) return null;
       if (card._simpleVideo && card.contains(card._simpleVideo)) return card._simpleVideo;
@@ -3257,9 +3256,7 @@
         layers.forEach((v, i) => {
           if (i > 0) v.remove();
         });
-        if (video && video.parentElement === stack) {
-          card.appendChild(video);
-        }
+        if (video && video.parentElement === stack) card.appendChild(video);
         try {
           stack.remove();
         } catch (e) {}
@@ -3273,20 +3270,16 @@
       video.playsInline = true;
       video.loop = false;
       video.controls = false;
-      video.disableRemotePlayback = true;
       video.setAttribute('muted', '');
       video.setAttribute('playsinline', '');
       video.setAttribute('webkit-playsinline', '');
       video.removeAttribute('autoplay');
       video.removeAttribute('loop');
 
-      /* Prefer direct src for reliable swaps through CDN */
       const source = video.querySelector('source');
       if (source) {
         const s = source.getAttribute('src');
-        if (s && !video.getAttribute('src')) {
-          video.src = absoluteVideoUrl(s);
-        }
+        if (s && !video.getAttribute('src')) video.src = absoluteVideoUrl(s);
       }
 
       card._simpleVideo = video;
@@ -3297,47 +3290,37 @@
     function setVideoSource(video, src) {
       if (!video || !src) return false;
       const abs = absoluteVideoUrl(src);
-      const file = abs.split('/').pop().split('?')[0];
+      const file = (abs.split('/').pop() || '').split('?')[0];
       const cur = (video.currentSrc || video.src || '').split('?')[0];
-      if (cur && (cur === abs || cur.endsWith('/' + file) || cur.endsWith(file))) {
-        return false;
-      }
-      /* Clear old source children so only video.src is used */
+      if (cur && (cur === abs || cur.endsWith('/' + file) || cur.endsWith(file))) return false;
+
       video.querySelectorAll('source').forEach((el) => el.remove());
-      video.pause();
-      video.removeAttribute('src');
+      try {
+        video.pause();
+      } catch (e) {}
       video.src = abs;
-      video.load();
+      try {
+        video.load();
+      } catch (e) {}
       return true;
     }
 
     function playVideo(video) {
       if (!video || document.hidden) return;
+      /* Already playing - do not touch (prevents 1s stutter loops) */
+      if (!video.paused && !video.ended && video.readyState >= 2) return;
+
       video.muted = true;
       video.defaultMuted = true;
       video.playsInline = true;
-      const kick = () => {
-        if (document.hidden) return;
-        const p = video.play();
-        if (p && typeof p.catch === 'function') {
-          p.catch(() => {
-            setTimeout(() => {
-              if (!document.hidden) video.play().catch(() => {});
-            }, 250);
-          });
-        }
-      };
-      if (video.readyState >= 2) kick();
-      else {
-        const once = () => {
-          video.removeEventListener('canplay', once);
-          video.removeEventListener('loadeddata', once);
-          kick();
-        };
-        video.addEventListener('canplay', once);
-        video.addEventListener('loadeddata', once);
-        /* Safari sometimes needs play() even before canplay when muted */
-        kick();
+      const p = video.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(function () {
+          /* one quiet retry only */
+          setTimeout(function () {
+            if (!document.hidden && video.paused) video.play().catch(function () {});
+          }, 300);
+        });
       }
     }
 
@@ -3358,6 +3341,8 @@
       document.querySelectorAll('[data-video-cycle]').forEach((container) => {
         if (container._cycleRegistered) return;
         container._cycleRegistered = true;
+        container._isVisible = false;
+        container._cycleReady = false;
 
         const poolKey = container.getAttribute('data-video-cycle');
         let files = SECTION_VIDEO_POOLS[poolKey];
@@ -3367,9 +3352,7 @@
         if (!files || !files.length) return;
 
         const pool = files.map((file) =>
-          file.indexOf('assets/') === 0 || file.indexOf('http') === 0
-            ? file
-            : BA_VIDEOS_BASE + file
+          file.indexOf('assets/') === 0 || /^https?:/i.test(file) ? file : BA_VIDEOS_BASE + file
         );
         const cards = Array.from(container.querySelectorAll('.artistic-card'));
         if (!cards.length) return;
@@ -3377,7 +3360,10 @@
         const indices = assignUniqueIndices(cards.length, pool.length);
         cards.forEach((card, i) => {
           const video = getCardVideo(card);
-          const fromDom = poolIndexFromSrc((video && (video.getAttribute('src') || video.currentSrc)) || '', pool);
+          const fromDom = poolIndexFromSrc(
+            (video && (video.getAttribute('src') || video.currentSrc)) || '',
+            pool
+          );
           if (fromDom >= 0) indices[i] = fromDom;
         });
         const used = new Set();
@@ -3390,10 +3376,6 @@
           if (card._advanceTimer) {
             clearTimeout(card._advanceTimer);
             card._advanceTimer = null;
-          }
-          if (card._keepAliveTimer) {
-            clearInterval(card._keepAliveTimer);
-            card._keepAliveTimer = null;
           }
         };
 
@@ -3425,102 +3407,79 @@
           if (peerUsed.has(nextIdx)) nextIdx = pickNextUniqueIndex(cardIndex, indices, pool.length);
           indices[cardIndex] = nextIdx;
           showSrc(card, pool[nextIdx], true);
-          armCard(cardIndex);
+          bindEnded(cardIndex);
         };
 
-        const armCard = (cardIndex) => {
+        const bindEnded = (cardIndex) => {
           const card = cards[cardIndex];
-          if (!card) return;
-          clearTimers(card);
           const video = getCardVideo(card);
-          if (!video) return;
+          if (!card || !video) return;
+          clearTimers(card);
 
-          /* Gentle keepalive - only if really stalled mid-clip */
-          card._keepAliveTimer = setInterval(() => {
-            if (!container._isVisible || document.hidden) return;
-            if (video.ended) return;
-            if (video.paused && video.currentTime > 0.4 && video.readyState >= 2) {
-              playVideo(video);
-            }
-          }, 2000);
+          video._xfOnEnded = () => {
+            if (!container._isVisible || !container._cycleReady || document.hidden) return;
+            advanceCard(cardIndex);
+          };
 
-          if (!video._xfSimpleBound) {
-            video._xfSimpleBound = true;
+          if (!video._xfEndedBound) {
+            video._xfEndedBound = true;
             video.addEventListener('ended', () => {
-              if (!container._isVisible || !container._cycleReady) return;
               if (typeof video._xfOnEnded === 'function') video._xfOnEnded();
             });
             video.addEventListener('error', () => {
               if (!container._isVisible) return;
               setTimeout(() => {
                 if (typeof video._xfOnEnded === 'function') video._xfOnEnded();
-              }, 500);
-            });
-            video.addEventListener('playing', () => {
-              card._hasPlayed = true;
+              }, 600);
             });
           }
 
-          video._xfOnEnded = () => {
-            if (!container._isVisible || !container._cycleReady) return;
-            advanceCard(cardIndex);
-          };
-
-          /*
-           * Safety timer: NEVER advance while still buffering at the start.
-           * Only advance if ended, or stuck near the end, or error after a long wait.
-           */
-          const armSafety = () => {
+          /* Safety only after real playback has progressed - never cut a healthy play */
+          const scheduleSafety = () => {
             clearTimeout(card._advanceTimer);
             const d =
               Number.isFinite(video.duration) && video.duration > 0.5
                 ? video.duration * 1000
-                : 8000;
-            const wait = Math.min(Math.max(d + 4000, 9000), 20000);
+                : 10000;
             card._advanceTimer = setTimeout(() => {
-              if (!container._isVisible || !container._cycleReady) return;
+              if (!container._isVisible || !container._cycleReady || document.hidden) return;
 
-              /* Still loading first frame - keep waiting and retry play */
-              if (video.readyState < 2 || (video.currentTime < 0.25 && !video.ended)) {
+              /* Buffering at start: keep trying play, do not advance */
+              if (video.readyState < 2 || video.currentTime < 0.5) {
                 playVideo(video);
-                armSafety();
+                scheduleSafety();
                 return;
               }
 
-              /* Healthy playback - wait again */
-              if (!video.paused && !video.ended && video.currentTime > 0.25) {
-                const left = Math.max(1500, (video.duration - video.currentTime) * 1000 + 2500);
-                card._advanceTimer = setTimeout(() => {
-                  if (video.ended || video.paused) advanceCard(cardIndex);
-                  else armSafety();
-                }, left);
+              /* Playing fine */
+              if (!video.paused && !video.ended) {
+                const left = Math.max(2000, (video.duration - video.currentTime) * 1000 + 3000);
+                card._advanceTimer = setTimeout(() => scheduleSafety(), left);
                 return;
               }
 
-              /* Stuck paused near end, or ended without event */
-              if (video.ended || (video.duration && video.currentTime >= video.duration - 0.35)) {
+              /* Ended or stuck at end */
+              if (video.ended || (video.duration && video.currentTime >= video.duration - 0.4)) {
                 advanceCard(cardIndex);
                 return;
               }
 
-              /* Stuck mid-clip paused - resume, don't skip */
+              /* Paused mid-way: resume only, never skip */
               playVideo(video);
-              armSafety();
-            }, wait);
+              scheduleSafety();
+            }, Math.min(Math.max(d + 5000, 12000), 25000));
           };
 
-          armSafety();
-          if (!Number.isFinite(video.duration) || video.duration < 0.5) {
-            video.addEventListener('loadedmetadata', armSafety, { once: true });
-          }
+          if (Number.isFinite(video.duration) && video.duration > 0.5) scheduleSafety();
+          else video.addEventListener('loadedmetadata', scheduleSafety, { once: true });
         };
 
         const startAll = () => {
           cards.forEach((card, i) => {
             setTimeout(() => {
-              if (!container._isVisible) return;
+              if (!container._isVisible || document.hidden) return;
               showSrc(card, pool[indices[i]], true);
-              armCard(i);
+              bindEnded(i);
             }, i * VIDEO_CARD_STAGGER_MS);
           });
         };
@@ -3532,52 +3491,61 @@
           });
         };
 
-        const startCycle = () => {
-          if (container._cycleReady) {
-            cards.forEach((card, i) => {
-              const video = getCardVideo(card);
-              if (video) playVideo(video);
-              armCard(i);
-            });
-            return;
-          }
-          container._cycleReady = true;
-          startAll();
+        const resumeAll = () => {
+          if (!container._isVisible || document.hidden) return;
+          cards.forEach((card) => {
+            const video = getCardVideo(card);
+            if (!video) return;
+            /* Only resume - do not reload or rebind if already set up */
+            playVideo(video);
+            if (!card._advanceTimer) bindEnded(cards.indexOf(card));
+          });
         };
 
         let hideTimer = null;
         const visObserver = new IntersectionObserver(
           (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting && entry.intersectionRatio >= 0.05) {
-                if (hideTimer) {
-                  clearTimeout(hideTimer);
-                  hideTimer = null;
-                }
-                container._isVisible = true;
-                startCycle();
-              } else if (!entry.isIntersecting) {
-                if (hideTimer) clearTimeout(hideTimer);
-                hideTimer = setTimeout(() => {
-                  const rect = container.getBoundingClientRect();
-                  const vh = window.innerHeight || 0;
-                  if (rect.bottom > 0 && rect.top < vh) {
-                    container._isVisible = true;
-                    return;
-                  }
-                  container._isVisible = false;
-                  pauseAll();
-                }, 500);
+            const entry = entries[0];
+            if (!entry) return;
+
+            if (entry.isIntersecting && entry.intersectionRatio > 0) {
+              if (hideTimer) {
+                clearTimeout(hideTimer);
+                hideTimer = null;
               }
-            });
+              const wasVisible = container._isVisible;
+              container._isVisible = true;
+              if (!container._cycleReady) {
+                container._cycleReady = true;
+                startAll();
+              } else if (!wasVisible) {
+                /* Only resume when coming back from fully hidden */
+                resumeAll();
+              }
+              /* Ignore ratio flicker while still intersecting - do not pause/rearm */
+              return;
+            }
+
+            /* Fully left viewport - debounce pause so Lenis jitter cannot stutter */
+            if (hideTimer) clearTimeout(hideTimer);
+            hideTimer = setTimeout(() => {
+              const rect = container.getBoundingClientRect();
+              const vh = window.innerHeight || 0;
+              const stillOnScreen = rect.bottom > 80 && rect.top < vh - 80;
+              if (stillOnScreen) {
+                container._isVisible = true;
+                return;
+              }
+              container._isVisible = false;
+              pauseAll();
+            }, 1500);
           },
-          { threshold: [0, 0.05, 0.15], rootMargin: '8% 0px' }
+          { threshold: [0, 0.01], rootMargin: '0px' }
         );
         visObserver.observe(container);
       });
     }
 
-    /* Single page-level tab visibility handler for showcase videos */
     if (!window._xfShowcaseVisBound) {
       window._xfShowcaseVisBound = true;
       document.addEventListener('visibilitychange', () => {
@@ -3593,8 +3561,9 @@
           } else if (container._isVisible) {
             videos.forEach((v) => {
               try {
+                if (!v.paused || v.ended) return;
                 v.muted = true;
-                if (!v.ended) v.play().catch(() => {});
+                v.play().catch(() => {});
               } catch (e) {}
             });
           }

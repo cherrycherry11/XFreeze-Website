@@ -3063,7 +3063,9 @@
      * Videos are small H.264 + long CDN cache (see vercel.json).
      */
     const VIDEO_FADE_MS = 280;
-    const VIDEO_CARD_STAGGER_MS = 280;
+    const VIDEO_CARD_STAGGER_MS = 0; /* all cards start together */
+    /* Fixed sync clock - every card in a section advances together */
+    const VIDEO_CYCLE_MS = 6000;
     const BA_VIDEOS_BASE = 'assets/videos/';
 
     const SECTION_VIDEO_POOLS = {
@@ -3268,13 +3270,13 @@
       video.muted = true;
       video.defaultMuted = true;
       video.playsInline = true;
-      video.loop = false;
+      video.loop = true; /* synced sections swap on a 6s clock */
       video.controls = false;
       video.setAttribute('muted', '');
       video.setAttribute('playsinline', '');
       video.setAttribute('webkit-playsinline', '');
       video.removeAttribute('autoplay');
-      video.removeAttribute('loop');
+      video.setAttribute('loop', '');
 
       const source = video.querySelector('source');
       if (source) {
@@ -3399,106 +3401,77 @@
           }
         };
 
-        const advanceCard = (cardIndex) => {
-          const card = cards[cardIndex];
-          if (!card) return;
-          let nextIdx = pickNextUniqueIndex(cardIndex, indices, pool.length);
-          const peerUsed = new Set(indices.filter((_, i) => i !== cardIndex));
-          if (peerUsed.has(nextIdx)) nextIdx = pickNextUniqueIndex(cardIndex, indices, pool.length);
-          indices[cardIndex] = nextIdx;
-          showSrc(card, pool[nextIdx], true);
-          bindEnded(cardIndex);
+        const clearSyncTimer = () => {
+          if (container._syncTimer) {
+            clearInterval(container._syncTimer);
+            container._syncTimer = null;
+          }
+          if (container._syncKickTimer) {
+            clearTimeout(container._syncKickTimer);
+            container._syncKickTimer = null;
+          }
         };
 
-        const bindEnded = (cardIndex) => {
-          const card = cards[cardIndex];
-          const video = getCardVideo(card);
-          if (!card || !video) return;
-          clearTimers(card);
+        const playAllNow = () => {
+          if (!container._isVisible || document.hidden) return;
+          cards.forEach((card) => {
+            const video = getCardVideo(card);
+            if (!video) return;
+            video.loop = true; /* hold until the shared 6s clock swaps */
+            playVideo(video);
+          });
+        };
 
-          video._xfOnEnded = () => {
-            if (!container._isVisible || !container._cycleReady || document.hidden) return;
-            advanceCard(cardIndex);
-          };
+        const advanceAllSynced = () => {
+          if (!container._isVisible || !container._cycleReady || document.hidden) return;
 
-          if (!video._xfEndedBound) {
-            video._xfEndedBound = true;
-            video.addEventListener('ended', () => {
-              if (typeof video._xfOnEnded === 'function') video._xfOnEnded();
-            });
-            video.addEventListener('error', () => {
-              if (!container._isVisible) return;
-              setTimeout(() => {
-                if (typeof video._xfOnEnded === 'function') video._xfOnEnded();
-              }, 600);
-            });
-          }
+          /* Pick next unique indices for every card, then cut over together */
+          const nextIndices = indices.slice();
+          cards.forEach((_, i) => {
+            let nextIdx = pickNextUniqueIndex(i, nextIndices, pool.length);
+            const peerUsed = new Set(nextIndices.filter((__, j) => j !== i));
+            if (peerUsed.has(nextIdx)) nextIdx = pickNextUniqueIndex(i, nextIndices, pool.length);
+            nextIndices[i] = nextIdx;
+          });
+          nextIndices.forEach((idx, i) => {
+            indices[i] = idx;
+          });
 
-          /* Safety only after real playback has progressed - never cut a healthy play */
-          const scheduleSafety = () => {
-            clearTimeout(card._advanceTimer);
-            const d =
-              Number.isFinite(video.duration) && video.duration > 0.5
-                ? video.duration * 1000
-                : 10000;
-            card._advanceTimer = setTimeout(() => {
-              if (!container._isVisible || !container._cycleReady || document.hidden) return;
+          cards.forEach((card, i) => {
+            const video = getCardVideo(card);
+            if (!video) return;
+            video.loop = true;
+            showSrc(card, pool[indices[i]], true);
+            try {
+              video.currentTime = 0;
+            } catch (e) {}
+            playVideo(video);
+          });
 
-              /* Buffering at start: keep trying play, do not advance */
-              if (video.readyState < 2 || video.currentTime < 0.5) {
-                playVideo(video);
-                scheduleSafety();
-                return;
-              }
+          /* Re-kick shortly after swap so every card is running */
+          container._syncKickTimer = setTimeout(playAllNow, 200);
+        };
 
-              /* Playing fine */
-              if (!video.paused && !video.ended) {
-                const left = Math.max(2000, (video.duration - video.currentTime) * 1000 + 3000);
-                card._advanceTimer = setTimeout(() => scheduleSafety(), left);
-                return;
-              }
-
-              /* Ended or stuck at end */
-              if (video.ended || (video.duration && video.currentTime >= video.duration - 0.4)) {
-                advanceCard(cardIndex);
-                return;
-              }
-
-              /* Paused mid-way: resume only, never skip */
-              playVideo(video);
-              scheduleSafety();
-            }, Math.min(Math.max(d + 5000, 12000), 25000));
-          };
-
-          if (Number.isFinite(video.duration) && video.duration > 0.5) scheduleSafety();
-          else video.addEventListener('loadedmetadata', scheduleSafety, { once: true });
+        const startSyncClock = () => {
+          clearSyncTimer();
+          container._syncTimer = setInterval(advanceAllSynced, VIDEO_CYCLE_MS);
         };
 
         const startAll = () => {
-          /* Start every card - do not leave later cards paused waiting on stagger */
           cards.forEach((card, i) => {
             if (!container._isVisible || document.hidden) return;
+            const video = getCardVideo(card);
+            if (video) video.loop = true;
             showSrc(card, pool[indices[i]], true);
-            bindEnded(i);
           });
-          /* Second pass: browsers sometimes allow only the first muted plays; re-kick all */
-          setTimeout(() => {
-            if (!container._isVisible || document.hidden) return;
-            cards.forEach((card) => {
-              const video = getCardVideo(card);
-              if (video && video.paused && !video.ended) playVideo(video);
-            });
-          }, 400);
-          setTimeout(() => {
-            if (!container._isVisible || document.hidden) return;
-            cards.forEach((card) => {
-              const video = getCardVideo(card);
-              if (video && video.paused && !video.ended) playVideo(video);
-            });
-          }, 1200);
+          playAllNow();
+          setTimeout(playAllNow, 350);
+          setTimeout(playAllNow, 900);
+          startSyncClock();
         };
 
         const pauseAll = () => {
+          clearSyncTimer();
           cards.forEach((card) => {
             clearTimers(card);
             pauseVideo(getCardVideo(card));
@@ -3507,13 +3480,8 @@
 
         const resumeAll = () => {
           if (!container._isVisible || document.hidden) return;
-          cards.forEach((card) => {
-            const video = getCardVideo(card);
-            if (!video) return;
-            /* Only resume - do not reload or rebind if already set up */
-            playVideo(video);
-            if (!card._advanceTimer) bindEnded(cards.indexOf(card));
-          });
+          playAllNow();
+          startSyncClock();
         };
 
         let hideTimer = null;

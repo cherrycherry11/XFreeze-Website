@@ -55,12 +55,12 @@ var XF_IS_LOCAL_DEV = /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(location.hostna
 var XF_REQUIRE_AUTH_LIVE = true;
 
 /**
- * FreezeStack Supabase auth config - xfreeze.com
+ * FreezeStack Supabase auth config - freezestack.com
  */
 window.XFreezeAuthConfig = {
   supabaseUrl: 'https://ekmllicbgmuodptvgxsl.supabase.co',
   supabaseAnonKey: 'sb_publishable_hwfaIz4HJxim1Rb3o04-UA_jyyoJgfY',
-  siteUrl: 'https://xfreeze.com',
+  siteUrl: 'https://freezestack.com',
   loginPath: 'login',
   defaultRedirect: 'home',
 

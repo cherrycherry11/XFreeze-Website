@@ -8,7 +8,7 @@
 window.XFreezeAuthConfig = {
   supabaseUrl: 'https://YOUR_PROJECT_REF.supabase.co',
   supabaseAnonKey: 'YOUR_SUPABASE_ANON_OR_PUBLISHABLE_KEY',
-  siteUrl: 'https://xfreeze.com',
+  siteUrl: 'https://freezestack.com',
   loginPath: 'login',
   defaultRedirect: 'home',
 

@@ -1,4 +1,4 @@
-# FreezeStack Auth Setup (xfreeze.com)
+# FreezeStack Auth Setup (freezestack.com)
 
 The site uses [Supabase Auth](https://supabase.com/docs/guides/auth) for sign-in.
 
@@ -28,21 +28,25 @@ Config: `website/js/auth-config.js`
 
 **Site URL:**
 ```
-https://xfreeze.com
+https://freezestack.com
 ```
 
-**Redirect URLs** (add every line):
+**Redirect URLs** (add every line - OAuth fails if the return host is missing):
 ```
+https://freezestack.com/**
+https://freezestack.com/login
+https://freezestack.com/signup
+https://www.freezestack.com/**
+https://www.freezestack.com/login
+https://www.freezestack.com/signup
 https://xfreeze.com/**
 https://xfreeze.com/login
-https://xfreeze.com/signup
 https://www.xfreeze.com/**
-https://www.xfreeze.com/login
 http://localhost:8765/**
 http://127.0.0.1:8765/**
 ```
 
-If `https://xfreeze.com/login` is missing, OAuth can start but fail when returning to the site.
+If `https://freezestack.com/login` is missing, Google can start but fail when returning to the site.
 
 ---
 
@@ -74,9 +78,9 @@ X users without a public email can still sign in, but **checkout requires an ema
 | Request email from users | **ON** (keep on; Supabase may still request `users.email` even when our site scopes omit it) |
 | Type of App | **Web App** |
 | Callback URI / Redirect URL | `https://ekmllicbgmuodptvgxsl.supabase.co/auth/v1/callback` |
-| Website URL | `https://xfreeze.com` |
-| Terms of service | `https://xfreeze.com/terms` |
-| Privacy policy | `https://xfreeze.com/privacy` |
+| Website URL | `https://freezestack.com` |
+| Terms of service | `https://freezestack.com/terms` |
+| Privacy policy | `https://freezestack.com/privacy` |
 
 5. Save  
 6. **Keys and tokens** → copy **OAuth 2.0 Client ID** and **Client Secret**  
@@ -90,7 +94,7 @@ X users without a public email can still sign in, but **checkout requires an ema
 3. Enable **X / Twitter (OAuth 2.0)** only (disable legacy Twitter if both are on)  
 4. Paste **Client ID** + **Client Secret** from Part A  
 5. Save  
-6. Confirm redirect URLs from the section above include `https://xfreeze.com/login`
+6. Confirm redirect URLs from the section above include `https://freezestack.com/login`
 
 ### Part C - Site config
 
@@ -105,7 +109,7 @@ providers: {
 
 ### Test
 
-1. Hard-refresh `https://xfreeze.com/login`  
+1. Hard-refresh `https://freezestack.com/login`  
 2. Click **Continue with X**  
 3. X consent screen should appear (not “Something went wrong”)  
 4. Authorize → land on `/login` → redirect home signed in  
@@ -115,7 +119,7 @@ providers: {
 | Symptom | Fix |
 |--------|-----|
 | “Something went wrong” on x.com | Callback URI exact match; OAuth 2.0 Client ID/Secret; email toggle ON |
-| X works then “Sign-in did not complete” | Add `https://xfreeze.com/login` to Supabase Redirect URLs |
+| X works then “Sign-in did not complete” | Add `https://freezestack.com/login` to Supabase Redirect URLs |
 | Wrong keys | Regenerate OAuth 2.0 Client Secret; re-paste into Supabase |
 | App in restricted mode | Ensure your X account is an authorized user of the app if Development mode |
 
@@ -123,7 +127,56 @@ providers: {
 
 ## Google sign-in
 
-Use **Authentication → Providers → Google** with the same Web Client ID as in `auth-config.js` (`googleClientId`).
+### Part A - Google Cloud Console
+
+1. [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services → Credentials**
+2. Open the **OAuth 2.0 Web client** (or create one)
+3. **Authorized JavaScript origins** (add all you use):
+   ```
+   https://freezestack.com
+   https://www.freezestack.com
+   http://localhost:8765
+   ```
+4. **Authorized redirect URIs** - must be the Supabase callback (not freezestack.com/login):
+   ```
+   https://ekmllicbgmuodptvgxsl.supabase.co/auth/v1/callback
+   ```
+5. Copy **Client ID** and **Client secret**
+
+### Part B - Supabase
+
+1. **Authentication → Providers → Google** → Enable
+2. Paste the **same** Client ID + Client secret from Part A
+3. Optional: enable **Skip nonce check** if One Tap fails with a nonce error
+4. Confirm **URL Configuration** redirect list includes `https://freezestack.com/**` and `/login` (see above)
+
+### Part C - Site config
+
+`website/js/auth-config.js`:
+
+```js
+siteUrl: 'https://freezestack.com',
+googleClientId: '<same Web Client ID as Supabase>',
+googleOneTap: true,
+providers: { google: true, x: true },
+```
+
+The **Continue with Google** button uses Supabase OAuth (redirect). One Tap uses `googleClientId` on the page - both IDs must match.
+
+### Test
+
+1. Hard-refresh `https://freezestack.com/login`
+2. Click **Continue with Google** → Google account picker
+3. Approve → return to `/login` → redirect home signed in
+
+### Still broken?
+
+| Symptom | Fix |
+|--------|-----|
+| Google `redirect_uri_mismatch` | Redirect URI in Google Cloud must be exactly `https://ekmllicbgmuodptvgxsl.supabase.co/auth/v1/callback` |
+| Returns to site but "Sign-in did not complete" | Add freezestack.com to Supabase Redirect URLs; allow cookies/storage; close extra tabs |
+| One Tap does nothing | Add freezestack.com to Google **JavaScript origins**; try the button instead |
+| Client ID error | Supabase Google Client ID = Google Cloud Web client = `googleClientId` in auth-config.js |
 
 ---
 

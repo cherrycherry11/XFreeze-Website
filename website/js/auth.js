@@ -56,8 +56,9 @@
 
   function loginUrl() {
     var c = config();
-    var path = c.loginPath || 'login';
-    return siteOrigin() + '/' + path.replace(/^\//, '');
+    var path = (c.loginPath || 'login').replace(/^\//, '').replace(/\.html$/, '');
+    /* Absolute URL on the host the user is on (required for OAuth redirect allow-list match). */
+    return siteOrigin() + '/' + path;
   }
 
   function supabaseProviderName(name) {
@@ -552,29 +553,17 @@
       return null;
     }
 
+    /*
+     * PKCE: supabase-js with detectSessionInUrl already exchanges ?code= on init.
+     * Exchanging again with the same code fails (used once) and looks like
+     * "Google login broken". Prefer auto-detect, then one fallback exchange.
+     */
     try {
       if (typeof sb.auth.initialize === 'function') {
         await sb.auth.initialize();
       }
-    } catch (e) {}
-
-    /* Explicit PKCE code exchange - more reliable than relying only on auto-detect. */
-    try {
-      var params = new URLSearchParams(window.location.search || '');
-      var code = params.get('code');
-      if (code) {
-        var exchanged = await sb.auth.exchangeCodeForSession(code);
-        if (exchanged.error) {
-          console.warn('[xf-auth] code exchange failed', exchanged.error);
-        } else if (exchanged.data && exchanged.data.session) {
-          session = exchanged.data.session;
-          cleanAuthParamsFromUrl();
-          renderNavSlot();
-          return session;
-        }
-      }
-    } catch (err) {
-      console.warn('[xf-auth] code exchange error', err);
+    } catch (e) {
+      console.warn('[xf-auth] initialize failed', e);
     }
 
     var result = await sb.auth.getSession();
@@ -582,6 +571,27 @@
       console.warn('[xf-auth] getSession failed', result.error);
     }
     session = result.data && result.data.session ? result.data.session : null;
+
+    if (!session) {
+      try {
+        var params = new URLSearchParams(window.location.search || '');
+        var code = params.get('code');
+        if (code) {
+          var exchanged = await sb.auth.exchangeCodeForSession(code);
+          if (exchanged.error) {
+            console.warn('[xf-auth] code exchange failed', exchanged.error);
+          } else if (exchanged.data && exchanged.data.session) {
+            session = exchanged.data.session;
+          }
+        }
+      } catch (err) {
+        console.warn('[xf-auth] code exchange error', err);
+      }
+    }
+
+    if (session) {
+      cleanAuthParamsFromUrl();
+    }
     renderNavSlot();
     return session;
   }
@@ -601,6 +611,7 @@
     rememberRedirect();
 
     var oauthOptions = {
+      /* Always current origin (freezestack.com / www / preview) - must be in Supabase Redirect URLs */
       redirectTo: loginUrl(),
       skipBrowserRedirect: true,
     };
@@ -611,6 +622,14 @@
      */
     if (supabaseProviderName(provider) === 'x') {
       oauthOptions.scopes = 'tweet.read users.read offline.access';
+    }
+
+    /* Google: force account picker so a stale session does not silently fail */
+    if (supabaseProviderName(provider) === 'google') {
+      oauthOptions.queryParams = {
+        access_type: 'online',
+        prompt: 'select_account',
+      };
     }
 
     var result = await sb.auth.signInWithOAuth({
@@ -925,15 +944,17 @@
     var oauthError = params.get('error_description') || params.get('error');
     if (oauthError) {
       var decoded = decodeURIComponent(String(oauthError).replace(/\+/g, ' '));
-      /* X often fails before return; when it does return an error, surface a fix hint. */
       if (/access_denied|user_cancelled|user canceled/i.test(decoded)) {
-        decoded = 'X sign-in was cancelled. Try again, or use Google / email.';
-      } else if (/email|users\.email|scope/i.test(decoded)) {
+        decoded = 'Sign-in was cancelled. Try Google or email again.';
+      } else if (/email|users\.email|scope/i.test(decoded) && /twitter|\bx\b/i.test(decoded)) {
         decoded =
-          'X email permission is missing. In the X Developer Portal, turn ON “Request email from users”, then retry.';
-      } else if (/redirect|callback|uri/i.test(decoded)) {
+          'X email permission is missing. In the X Developer Portal, turn ON Request email from users, then retry.';
+      } else if (/redirect|callback|uri|allowed/i.test(decoded)) {
         decoded =
-          'X callback URL mismatch. Set callback to https://ekmllicbgmuodptvgxsl.supabase.co/auth/v1/callback';
+          'Redirect URL not allowed. In Supabase → Authentication → URL Configuration, add https://freezestack.com/** and https://freezestack.com/login (and www if you use it). Google Cloud redirect URI must be https://ekmllicbgmuodptvgxsl.supabase.co/auth/v1/callback';
+      } else if (/invalid.?client|client.?id|unauthorized/i.test(decoded)) {
+        decoded =
+          'Google client ID mismatch. Supabase Google provider Client ID must match Google Cloud Web client and auth-config.js googleClientId.';
       }
       setStatus(statusEl, 'error', decoded);
       cleanAuthParamsFromUrl();
@@ -953,14 +974,14 @@
         return;
       }
       var hint =
-        'Sign-in did not complete. Try Google or email again. If you switched tabs or devices during sign-in, start over on this browser.';
+        'Sign-in did not complete. Try Google again. Stay on this tab until you return from Google.';
       try {
         var codeLeft = new URLSearchParams(window.location.search || '').get(
           'code'
         );
         if (codeLeft) {
           hint =
-            'Could not finish OAuth (session code expired or storage cleared). Close other tabs and try again.';
+            'Could not finish Google sign-in (login code already used or blocked by browser storage). Close extra tabs, allow cookies/storage for freezestack.com, then try Continue with Google again.';
         }
       } catch (e) {}
       setStatus(statusEl, 'error', hint);

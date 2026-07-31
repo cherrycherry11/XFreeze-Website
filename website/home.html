@@ -389,6 +389,24 @@
     .scroll-reveal-in--right:has([data-video-cycle]) {
       transform: translateY(14px);
     }
+    /* Single showcase video per card (simple player) */
+    [data-video-cycle] .artistic-card {
+      position: relative;
+    }
+    [data-video-cycle] .artistic-card > .section-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 1;
+      visibility: visible;
+      z-index: 1;
+      background: #0a0a0a;
+      pointer-events: none;
+    }
+    /* Legacy dual-stack (if any remain) */
     .section-video-stack {
       position: absolute;
       inset: 0;
@@ -405,22 +423,13 @@
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
-      transition: opacity 480ms ease;
       background: transparent;
     }
-    .section-video-stack .section-video.is-active {
-      visibility: visible;
-      z-index: 1;
-    }
-    /* Only show once a real frame is decoded */
+    .section-video-stack .section-video.is-active,
     .section-video-stack .section-video.is-active.is-frame-ready {
+      visibility: visible;
       opacity: 1;
-    }
-    .section-video-stack .section-video.is-pending {
-      /* Preloading next clip - never show until is-active */
-      opacity: 0 !important;
-      visibility: hidden !important;
-      z-index: 0;
+      z-index: 1;
     }
     
     .stat {
@@ -2074,12 +2083,12 @@
       <div class="scroll-reveal-in scroll-reveal-in--right md:col-span-7" style="transition-delay: 100ms">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-video-cycle="experimental">
           <div class="h-[280px] sm:h-[360px] md:h-[520px] artistic-card">
-            <video class="section-video" muted playsinline preload="none" aria-label="Style video 1">
+            <video class="section-video" muted playsinline preload="metadata" aria-label="Style video 1">
               <source src="assets/videos/style-1.mp4" type="video/mp4">
             </video>
           </div>
           <div class="h-[280px] sm:h-[360px] md:h-[520px] artistic-card">
-            <video class="section-video" muted playsinline preload="none" aria-label="Style edit video 2">
+            <video class="section-video" muted playsinline preload="metadata" aria-label="Style edit video 2">
               <source src="assets/videos/style-edit-2.mp4" type="video/mp4">
             </video>
           </div>
@@ -2095,12 +2104,12 @@
       <div class="scroll-reveal-in scroll-reveal-in--left order-2 md:order-1 md:col-span-7">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-video-cycle="minimal">
           <div class="h-[280px] sm:h-[360px] md:h-[520px] artistic-card">
-            <video class="section-video" muted playsinline preload="none" aria-label="Product video 1">
+            <video class="section-video" muted playsinline preload="metadata" aria-label="Product video 1">
               <source src="assets/videos/product-add-1.mp4" type="video/mp4">
             </video>
           </div>
           <div class="h-[280px] sm:h-[360px] md:h-[520px] artistic-card">
-            <video class="section-video" muted playsinline preload="none" aria-label="Product video 2">
+            <video class="section-video" muted playsinline preload="metadata" aria-label="Product video 2">
               <source src="assets/videos/product-add-2.mp4" type="video/mp4">
             </video>
           </div>
@@ -2138,7 +2147,7 @@
     <div id="xf-category-showcase" class="xf-cat-showcase-grid scroll-reveal-in" data-video-cycle="beforeAfter">
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Change backgrounds">
+          <video class="section-video" muted playsinline preload="none" aria-label="Before and after: Change backgrounds">
             <source src="assets/videos/before-after/change-backgrounds.mp4" type="video/mp4">
           </video>
         </div>
@@ -2148,7 +2157,7 @@
       </div>
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Create mockups">
+          <video class="section-video" muted playsinline preload="none" aria-label="Before and after: Create mockups">
             <source src="assets/videos/before-after/create-mokeup-s.mp4" type="video/mp4">
           </video>
         </div>
@@ -2158,7 +2167,7 @@
       </div>
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Professional headshots">
+          <video class="section-video" muted playsinline preload="none" aria-label="Before and after: Professional headshots">
             <source src="assets/videos/before-after/professional-headshots.mp4" type="video/mp4">
           </video>
         </div>
@@ -2168,7 +2177,7 @@
       </div>
       <div class="xf-cat-showcase-item">
         <div class="artistic-card">
-          <video class="section-video" muted loop playsinline preload="none" aria-label="Before and after: Try on outfits">
+          <video class="section-video" muted playsinline preload="none" aria-label="Before and after: Try on outfits">
             <source src="assets/videos/before-after/try-on-outfits.mp4" type="video/mp4">
           </video>
         </div>
@@ -3040,7 +3049,14 @@
       section._xfLibGridBound = true;
     }
 
-    /* === Video cycling (fade only - no frame shuffle between slots) === */
+    /* === Showcase video cycle (simple, Cloudflare-friendly) ===
+     * Single video element per card. Play while section is on screen.
+     * Advance only on `ended` (plus a long safety timer). No concurrent-play
+     * eviction, no mid-clip pause, no dual-decode preload wars.
+     * Videos are small H.264 + long CDN cache (see vercel.json).
+     */
+    const VIDEO_FADE_MS = 280;
+    const VIDEO_CARD_STAGGER_MS = 280;
     const BA_VIDEOS_BASE = 'assets/videos/';
 
     const SECTION_VIDEO_POOLS = {
@@ -3062,7 +3078,6 @@
         'product-add-4.mp4',
         'product-production-quality-ads.mp4',
       ],
-      /* Fallback if before-after data script is late; titles come from aliases + data map */
       beforeAfter: [
         'before-after/change-backgrounds.mp4',
         'before-after/create-mokeup-s.mp4',
@@ -3087,75 +3102,6 @@
       ],
     };
 
-    function shuffleInPlace(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-
-    /** One unique pool index per card - no duplicate videos on screen at once. */
-    function assignUniqueIndices(cardCount, poolSize) {
-      const order = shuffleInPlace(Array.from({ length: poolSize }, (_, i) => i));
-      return order.slice(0, cardCount);
-    }
-
-    /** Next index for one card: not used by any other frame, and not this card's current clip. */
-    function pickNextUniqueIndex(cardIndex, indices, poolSize) {
-      const usedElsewhere = new Set();
-      const current = indices[cardIndex];
-      indices.forEach((idx, i) => {
-        if (i !== cardIndex) usedElsewhere.add(idx);
-      });
-
-      const candidates = shuffleInPlace(
-        Array.from({ length: poolSize }, (_, i) => i).filter(
-          (i) => i !== current && !usedElsewhere.has(i)
-        )
-      );
-
-      if (candidates.length) return candidates[0];
-
-      const anyOther = shuffleInPlace(
-        Array.from({ length: poolSize }, (_, i) => i).filter((i) => !usedElsewhere.has(i))
-      );
-      if (anyOther.length) return anyOther[0];
-
-      return (current + 1) % poolSize;
-    }
-
-    function poolIndexFromSrc(src, pool) {
-      if (!src) return -1;
-      const decoded = decodeURIComponent(src);
-      for (let i = 0; i < pool.length; i++) {
-        if (decoded === pool[i] || decoded.endsWith(pool[i].split('/').pop())) return i;
-      }
-      return -1;
-    }
-
-    /* Default clip window. Real duration is read from each video when known.
-       Product clips are ~5s exact - advancing on a hard global timer freezes the
-       last frame and swaps both cards at once (feels laggy vs longer style clips). */
-    const VIDEO_CLIP_MS = 5000;
-    const VIDEO_PRELOAD_MS = 600; /* light preload only near end of clip */
-    const VIDEO_LEAD_MS = 280; /* begin crossfade slightly before clip ends */
-    const VIDEO_FADE_MS = 400;
-    const VIDEO_CARD_STAGGER_MS = 350; /* mild stagger between cards */
-    const videoCycleInstances = [];
-
-    /*
-     * Clips are small (~0.3-1.5MB). Do NOT cap concurrent plays - that paused
-     * active cards mid-stream and left frozen frames. Only pause idle layers
-     * and sections that scroll off-screen.
-     */
-    function pauseCycleVideo(video) {
-      if (!video) return;
-      try {
-        video.pause();
-      } catch (e) {}
-    }
-    /* Hard aliases so misspelled asset filenames never show as captions */
     const BEFORE_AFTER_TITLE_ALIASES = {
       'add-instant-beauty.mp4': 'Instant beauty retouch',
       'add-makeup.mp4': 'Add makeup',
@@ -3176,21 +3122,23 @@
       'remove-watermark.mp4': 'Remove watermarks',
       'restore-old-images.mp4': 'Restore old photos',
       'try-on-outfits.mp4': 'Try on outfits',
-      'your-product-on-models.mp4': 'Place products on models',
+      'your-product-on-models.mp4': 'Product on models',
     };
 
-    /* Rebuild map at call time - data script is deferred and may load after this block */
     function getBeforeAfterTitleMap() {
       const map = {};
       Object.keys(BEFORE_AFTER_TITLE_ALIASES).forEach((file) => {
         map[file] = BEFORE_AFTER_TITLE_ALIASES[file];
         map['before-after/' + file] = BEFORE_AFTER_TITLE_ALIASES[file];
       });
-      (window.XFreezeBeforeAfterVideos || []).forEach((item) => {
-        if (!item || !item.file) return;
-        map[item.file] = item.title;
-        map['before-after/' + item.file] = item.title;
-      });
+      if (window.XFreezeBeforeAfterVideos && window.XFreezeBeforeAfterVideos.length) {
+        window.XFreezeBeforeAfterVideos.forEach((item) => {
+          if (item && item.file && item.title) {
+            map[item.file] = item.title;
+            map['before-after/' + item.file] = item.title;
+          }
+        });
+      }
       return map;
     }
 
@@ -3199,7 +3147,6 @@
       const map = getBeforeAfterTitleMap();
       if (map[file]) return map[file];
       if (map['before-after/' + file]) return map['before-after/' + file];
-      /* Fallback: clean filename into a readable professional label */
       return file
         .replace(/\.mp4$/i, '')
         .replace(/mokeup/gi, 'mockup')
@@ -3218,7 +3165,7 @@
         clearInterval(textEl._typeInterval);
         textEl._typeInterval = null;
       }
-      const cursor = textEl.parentElement?.querySelector('.xf-cat-showcase-label__cursor');
+      const cursor = textEl.parentElement && textEl.parentElement.querySelector('.xf-cat-showcase-label__cursor');
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       textEl.textContent = '';
       if (cursor) cursor.classList.add('is-active');
@@ -3242,7 +3189,7 @@
 
     function updateCardCaption(card, src, poolKey) {
       if (poolKey !== 'beforeAfter') return;
-      const textEl = card.closest('.xf-cat-showcase-item')?.querySelector('[data-cat-label]');
+      const textEl = card.closest('.xf-cat-showcase-item') && card.closest('.xf-cat-showcase-item').querySelector('[data-cat-label]');
       if (!textEl) return;
       const title = titleForPoolSrc(src);
       if (textEl.dataset.currentTitle === title) return;
@@ -3250,137 +3197,133 @@
       typewriterCaption(textEl, title);
     }
 
-    function ensureVideoStack(card) {
-      if (card._videoStack) return card._videoStack;
-
-      const existing = card.querySelector('.section-video-stack');
-      if (existing) {
-        const layers = existing.querySelectorAll('.section-video');
-        layers.forEach((v) => {
-          v.muted = true;
-          v.playsInline = true;
-          v.loop = false;
-        });
-        card._videoStack = {
-          active: layers[0],
-          idle: layers[1] || layers[0],
-        };
-        return card._videoStack;
-      }
-
-      const video = card.querySelector('.section-video');
-      if (!video) return null;
-
-      const stack = document.createElement('div');
-      stack.className = 'section-video-stack';
-      const layerA = video;
-      const layerB = video.cloneNode(true);
-      layerB.removeAttribute('id');
-      layerB.classList.remove('is-active');
-      layerB.classList.add('is-pending');
-      const sourceB = layerB.querySelector('source');
-      if (sourceB) sourceB.removeAttribute('src');
-      layerB.pause();
-      layerB.muted = true;
-      layerB.playsInline = true;
-      layerB.loop = false; /* freeze last frame until crossfade - no loop flash */
-      layerA.muted = true;
-      layerA.playsInline = true;
-      layerA.loop = false;
-
-      layerA.classList.add('is-active');
-      stack.appendChild(layerA);
-      stack.appendChild(layerB);
-      card.appendChild(stack);
-
-      card._videoStack = { active: layerA, idle: layerB };
-      return card._videoStack;
+    function wrapIndex(i, n) {
+      return ((i % n) + n) % n;
     }
 
-    /** Decode first frame only when card is near view (keeps HQ files, avoids full-page video download). */
-    function warmFirstFrame(card) {
-      const stack = ensureVideoStack(card);
-      if (!stack || !stack.active || card._firstFrameWarming) return;
-      const video = stack.active;
-      const source = video.querySelector('source');
-      const src = source && (source.getAttribute('src') || source.src);
-      if (!src) return;
+    function assignUniqueIndices(cardCount, poolLen) {
+      const out = [];
+      for (let i = 0; i < cardCount; i++) out.push(i % poolLen);
+      return out;
+    }
 
-      /* Save-Data / slow links: skip eager decode entirely */
-      try {
-        if (navigator.connection && (navigator.connection.saveData || /2g/.test(navigator.connection.effectiveType || ''))) {
-          card.classList.add('is-video-ready');
-          return;
-        }
-      } catch (e) { /* ignore */ }
-
-      card._firstFrameWarming = true;
-      video.muted = true;
-      video.playsInline = true;
-      video.preload = 'metadata';
-
-      const markReady = () => {
-        video.classList.add('is-frame-ready');
-        card.classList.add('is-video-ready');
-        try {
-          if (video.readyState >= 2 && video.currentTime < 0.04) video.currentTime = 0.05;
-        } catch (e) { /* ignore */ }
-        video.pause();
-      };
-
-      if (video.readyState >= 2) {
-        markReady();
-        return;
+    function pickNextUniqueIndex(cardIndex, indices, poolLen) {
+      const used = new Set(indices.filter((_, i) => i !== cardIndex));
+      let next = wrapIndex((indices[cardIndex] || 0) + 1, poolLen);
+      let guard = 0;
+      while (used.has(next) && guard < poolLen + 2) {
+        next = wrapIndex(next + 1, poolLen);
+        guard += 1;
       }
+      return next;
+    }
 
-      const onReady = () => {
-        markReady();
-      };
-      video.addEventListener('loadeddata', onReady, { once: true });
-      video.addEventListener('canplay', onReady, { once: true });
-      /* Only force network when close; cycle start will raise preload to auto */
+    function poolIndexFromSrc(src, pool) {
+      if (!src) return -1;
+      const file = src.split('/').pop();
+      for (let i = 0; i < pool.length; i++) {
+        if (pool[i] === src || pool[i].endsWith(file) || src.endsWith(pool[i])) return i;
+      }
+      return -1;
+    }
+
+    /** One video per card - drop dual-stack if present */
+    function getCardVideo(card) {
+      if (!card) return null;
+      if (card._simpleVideo && card.contains(card._simpleVideo)) return card._simpleVideo;
+
+      const stack = card.querySelector('.section-video-stack');
+      let video = card.querySelector('.section-video');
+      if (stack) {
+        const layers = stack.querySelectorAll('.section-video');
+        video = layers[0] || video;
+        /* Flatten to a single video for reliable playback */
+        layers.forEach((v, i) => {
+          if (i > 0) v.remove();
+        });
+        if (video && video.parentElement === stack) {
+          card.appendChild(video);
+        }
+        stack.remove();
+      }
+      if (!video) return null;
+
+      video.classList.add('section-video', 'is-active', 'is-frame-ready');
+      video.classList.remove('is-pending');
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      video.loop = false;
+      video.preload = 'metadata';
+      video.setAttribute('muted', '');
+      video.setAttribute('playsinline', '');
+      video.removeAttribute('autoplay');
+
+      card._simpleVideo = video;
+      card.classList.add('is-video-ready');
+      return video;
+    }
+
+    function setVideoSource(video, src) {
+      if (!video || !src) return false;
+      const source = video.querySelector('source') || video;
+      const current = (source.getAttribute && source.getAttribute('src')) || video.currentSrc || video.src || '';
+      const file = src.split('/').pop();
+      if (current === src || current.endsWith('/' + file) || current.endsWith(file)) {
+        return false; /* same */
+      }
+      if (source.tagName && source.tagName.toLowerCase() === 'source') {
+        source.setAttribute('src', src);
+      } else {
+        video.src = src;
+      }
       try {
         video.load();
-      } catch (e) { /* ignore */ }
+      } catch (e) {}
+      return true;
+    }
+
+    function playVideo(video) {
+      if (!video) return;
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      const go = () => {
+        const p = video.play();
+        if (p && typeof p.catch === 'function') {
+          p.catch(() => {
+            setTimeout(() => {
+              video.play().catch(() => {});
+            }, 200);
+          });
+        }
+      };
+      if (video.readyState >= 2) go();
+      else {
+        const onReady = () => {
+          video.removeEventListener('canplay', onReady);
+          video.removeEventListener('loadeddata', onReady);
+          go();
+        };
+        video.addEventListener('canplay', onReady, { once: true });
+        video.addEventListener('loadeddata', onReady, { once: true });
+      }
+    }
+
+    function pauseVideo(video) {
+      if (!video) return;
+      try {
+        video.pause();
+      } catch (e) {}
     }
 
     function bootShowcaseVideos() {
       document.querySelectorAll('[data-video-cycle] .artistic-card').forEach((card) => {
-        const stack = ensureVideoStack(card);
-        if (!stack) return;
-        card.querySelectorAll('.section-video').forEach((video) => {
-          video.classList.remove('is-swapping');
-          video.muted = true;
-          video.playsInline = true;
-          video.loop = false;
-        });
-        stack.active.classList.add('is-active');
-        stack.active.classList.remove('is-pending');
-        if (stack.idle !== stack.active) {
-          stack.idle.classList.remove('is-active');
-          stack.idle.classList.add('is-pending');
-          stack.idle.pause();
-          stack.idle.preload = 'none';
-        }
-        /* Keep HQ files on disk - do NOT warm every video on load (was ~250MB download) */
-        if (stack.active) stack.active.preload = 'none';
+        const video = getCardVideo(card);
+        if (!video) return;
+        pauseVideo(video);
+        video.preload = 'metadata';
       });
-
-      /* Only decode when a showcase section is near the viewport */
-      if (!window._xfWarmVideoIO) {
-        window._xfWarmVideoIO = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            entry.target.querySelectorAll('.artistic-card').forEach((card) => {
-              warmFirstFrame(card);
-            });
-          });
-        }, { rootMargin: '35% 0px 25% 0px', threshold: 0.01 });
-
-        document.querySelectorAll('[data-video-cycle]').forEach((el) => {
-          window._xfWarmVideoIO.observe(el);
-        });
-      }
     }
 
     function initSectionVideoCycling() {
@@ -3390,664 +3333,190 @@
 
         const poolKey = container.getAttribute('data-video-cycle');
         let files = SECTION_VIDEO_POOLS[poolKey];
-        if (poolKey === 'beforeAfter' && window.XFreezeBeforeAfterVideos?.length) {
+        if (poolKey === 'beforeAfter' && window.XFreezeBeforeAfterVideos && window.XFreezeBeforeAfterVideos.length) {
           files = window.XFreezeBeforeAfterVideos.map((item) => 'before-after/' + item.file);
         }
         if (!files || !files.length) return;
 
-        const pool = files.map((file) => BA_VIDEOS_BASE + file);
+        const pool = files.map((file) => (file.indexOf('assets/') === 0 ? file : BA_VIDEOS_BASE + file));
         const cards = Array.from(container.querySelectorAll('.artistic-card'));
         if (!cards.length) return;
 
-        cards.forEach((card) => ensureVideoStack(card));
-
-        if (pool.length < cards.length) {
-          console.warn(`[FreezeStack] ${poolKey}: need at least ${cards.length} videos for unique frames`);
-        }
-
         const indices = assignUniqueIndices(cards.length, pool.length);
-
         cards.forEach((card, i) => {
-          const source = card._videoStack?.active?.querySelector('source');
-          const fromDom = poolIndexFromSrc(source?.getAttribute('src') || '', pool);
+          const video = getCardVideo(card);
+          const source = video && video.querySelector('source');
+          const fromDom = poolIndexFromSrc((source && source.getAttribute('src')) || (video && video.src) || '', pool);
           if (fromDom >= 0) indices[i] = fromDom;
         });
 
+        /* unique initial indices */
         const used = new Set();
         indices.forEach((idx, i) => {
-          if (used.has(idx)) {
-            indices[i] = pickNextUniqueIndex(i, indices, pool.length);
-          }
+          if (used.has(idx)) indices[i] = pickNextUniqueIndex(i, indices, pool.length);
           used.add(indices[i]);
         });
 
-        const playIfVisible = (video, opts) => {
-          if (!container._isVisible || !video) return;
-          if (document.hidden) {
-            pauseCycleVideo(video);
-            return;
-          }
-          const force = !!(opts && opts.force);
-          /* Never play hidden preload layers */
-          if (!force && video.classList.contains('is-pending')) {
-            pauseCycleVideo(video);
-            return;
-          }
-
-          video.muted = true;
-          video.defaultMuted = true;
-          video.playsInline = true;
-          video.loop = false;
-          video.preload = 'auto';
-          video.setAttribute('playsinline', '');
-          video.setAttribute('muted', '');
-
-          const markFrame = () => {
-            video.classList.add('is-frame-ready');
-            const card = video.closest('.artistic-card');
-            if (card) card.classList.add('is-video-ready');
-          };
-          if (video.readyState >= 2) markFrame();
-          else video.addEventListener('loadeddata', markFrame, { once: true });
-
-          /* Already playing - do not restart (avoids mid-clip glitches) */
-          if (!force && !video.paused && !video.ended && video.readyState >= 2) {
-            markFrame();
-            return;
-          }
-
-          const p = video.play();
-          if (p && typeof p.then === 'function') {
-            p.then(markFrame).catch(function () {
-              setTimeout(function () {
-                if (!container._isVisible || document.hidden) return;
-                video.play().then(markFrame).catch(function () {});
-              }, 200);
-            });
-          } else {
-            markFrame();
-          }
-        };
-
-        const sourceMatches = (source, expected) => {
-          if (!source || !expected) return false;
-          const current = source.getAttribute('src') || source.src || '';
-          if (current === expected) return true;
-          try {
-            const decoded = decodeURIComponent(current);
-            const file = expected.split('/').pop();
-            return decoded === expected || decoded.endsWith('/' + file) || decoded.endsWith(file);
-          } catch (e) {
-            return false;
-          }
-        };
-
-        const clearCardSwap = (card) => {
-          if (card._swapFadeTimer) {
-            clearTimeout(card._swapFadeTimer);
-            card._swapFadeTimer = null;
-          }
-          if (card._swapRevealTimer) {
-            clearTimeout(card._swapRevealTimer);
-            card._swapRevealTimer = null;
-          }
-          if (card._preloadTimer) {
-            clearTimeout(card._preloadTimer);
-            card._preloadTimer = null;
-          }
-          if (card._readyHandler && card._readyTarget) {
-            card._readyTarget.removeEventListener('loadeddata', card._readyHandler);
-            card._readyTarget.removeEventListener('canplay', card._readyHandler);
-            card._readyTarget.removeEventListener('error', card._readyHandler);
-            card._readyHandler = null;
-            card._readyTarget = null;
-          }
-        };
-
-        /* rVFC can hang if play() never paints - always fall through after timeout */
-        const waitForPaintedFrame = (video, cb) => {
-          let done = false;
-          const finish = () => {
-            if (done) return;
-            done = true;
-            cb();
-          };
-          if (typeof video.requestVideoFrameCallback === 'function') {
-            try {
-              video.requestVideoFrameCallback(() => finish());
-            } catch (e) {
-              requestAnimationFrame(() => requestAnimationFrame(finish));
-            }
-          } else {
-            requestAnimationFrame(() => requestAnimationFrame(finish));
-          }
-          /* Hard fallback so crossfades never hang forever */
-          setTimeout(finish, 900);
-        };
-
-        const forceClearSwap = (card) => {
-          if (!card) return;
-          clearCardSwap(card);
-          card._isSwapping = false;
-          card._pendingSrc = null;
-          card._swapStuckSince = 0;
-        };
-
-        const playActive = (card, src) => {
-          const stack = card._videoStack;
-          if (!stack) return;
-          stack.active.classList.add('is-active');
-          stack.active.classList.remove('is-pending');
-          if (stack.idle !== stack.active) {
-            stack.idle.classList.remove('is-active');
-            stack.idle.classList.add('is-pending');
-            pauseCycleVideo(stack.idle);
-          }
-          updateCardCaption(card, src, poolKey);
-          playIfVisible(stack.active, { force: true });
-          queueMicrotask(() => {
-            try { bindActiveWatchdogs(card); } catch (e) { /* init order */ }
-          });
-        };
-
-        /**
-         * Load `src` onto the idle layer while it stays hidden (is-pending).
-         * Only crossfade once a decoded frame is ready - avoids mid-swap flicker.
-         */
-        const applyVideo = (card, src, animate) => {
-          const stack = ensureVideoStack(card);
-          if (!stack) return;
-
-          const { active, idle } = stack;
-          const activeSource = active.querySelector('source');
-          const idleSource = idle.querySelector('source');
-          if (!activeSource || !idleSource) return;
-
-          if (sourceMatches(activeSource, src)) {
-            clearCardSwap(card);
-            card._isSwapping = false;
-            card._pendingSrc = null;
-            try { active.currentTime = 0; } catch (e) { /* ignore */ }
-            playActive(card, src);
-            return;
-          }
-
-          /* Already loading this exact next clip - just wait for reveal. */
-          if (card._isSwapping && card._pendingSrc === src) return;
-
-          clearCardSwap(card);
-          card._swapToken = (card._swapToken || 0) + 1;
-          const token = card._swapToken;
-          card._isSwapping = true;
-          card._swapStuckSince = Date.now();
-          card._pendingSrc = src;
-
-          /* Keep next clip fully hidden while buffering */
-          idle.classList.remove('is-active');
-          idle.classList.add('is-pending');
-
-          const reveal = () => {
-            if (token !== card._swapToken) return;
-            if (!sourceMatches(idleSource, src)) return;
-            if (idle.readyState < 2) return;
-
-            /* Keep _swapRevealTimer until finalize so paint hangs still recover */
-            if (card._readyHandler && card._readyTarget) {
-              card._readyTarget.removeEventListener('loadeddata', card._readyHandler);
-              card._readyTarget.removeEventListener('canplay', card._readyHandler);
-              card._readyTarget.removeEventListener('error', card._readyHandler);
-              card._readyHandler = null;
-              card._readyTarget = null;
-            }
-
-            try { idle.currentTime = 0; } catch (e) { /* ignore */ }
-
-            const show = () => {
-              if (token !== card._swapToken) return;
-
-              /*
-               * Promote idle → active BEFORE play. playIfVisible used to ignore
-               * is-pending layers, so swaps only showed a frozen first frame.
-               */
-              idle.classList.remove('is-pending');
-              idle.classList.add('is-active');
-              active.classList.remove('is-active');
-              active.classList.add('is-pending');
-              pauseCycleVideo(active);
-
-              try { idle.currentTime = 0; } catch (e) { /* ignore */ }
-              playIfVisible(idle, { force: true });
-
-              waitForPaintedFrame(idle, () => {
-                if (token !== card._swapToken) return;
-
-                idle.classList.remove('is-pending');
-                idle.classList.add('is-active', 'is-frame-ready');
-                active.classList.remove('is-active');
-                card.classList.add('is-video-ready');
-                /* Keep outgoing visible under the fade until opacity hits 0 -
-                   do NOT clear its src until fade is fully done. */
-                updateCardCaption(card, src, poolKey);
-
-                const finalize = () => {
-                  if (token !== card._swapToken) return;
-                  active.pause();
-                  active.classList.remove('is-active');
-                  active.classList.add('is-pending');
-                  /* Only now clear the old layer (fully hidden) */
-                  try {
-                    activeSource.removeAttribute('src');
-                    active.removeAttribute('src');
-                    active.load();
-                  } catch (e) { /* ignore */ }
-                  card._videoStack = { active: idle, idle: active };
-                  forceClearSwap(card);
-                  bindActiveWatchdogs(card);
-                };
-
-                if (animate) {
-                  card._swapFadeTimer = setTimeout(finalize, VIDEO_FADE_MS + 80);
-                } else {
-                  finalize();
-                }
-              });
-            };
-
-            if (idle.readyState >= 2) {
-              show();
-            } else {
-              const onData = () => {
-                if (token !== card._swapToken) return;
-                show();
-              };
-              idle.addEventListener('loadeddata', onData, { once: true });
-              idle.addEventListener('canplay', onData, { once: true });
-            }
-          };
-
-          const onReady = () => {
-            if (token !== card._swapToken) return;
-            if (!sourceMatches(idleSource, src)) return;
-            reveal();
-          };
-
-          const onError = () => {
-            if (token !== card._swapToken) return;
-            forceClearSwap(card);
-            idle.classList.add('is-pending');
-            idle.classList.remove('is-active');
-            /* Keep current active playing so the slot never freezes blank */
-            playIfVisible(active);
-          };
-
-          /* Preloaded next clip is already on idle - reveal without reloading */
-          if (sourceMatches(idleSource, src) && idle.readyState >= 2) {
-            reveal();
-            return;
-          }
-
-          card._readyHandler = onReady;
-          card._readyTarget = idle;
-          idle.addEventListener('loadeddata', onReady);
-          idle.addEventListener('canplay', onReady);
-          idle.addEventListener('error', onError, { once: true });
-
-          idle.pause();
-          idleSource.setAttribute('src', src);
-          idle.load();
-
-          /* Safety: reveal if ready, else abandon swap and keep current clip alive */
-          card._swapRevealTimer = setTimeout(() => {
-            if (token !== card._swapToken) return;
-            if (idle.readyState >= 2 && sourceMatches(idleSource, src)) {
-              reveal();
-            } else {
-              forceClearSwap(card);
-              playIfVisible(active);
-            }
-          }, 3500);
-        };
-
-        /** Preload next index onto idle layer without revealing yet. */
-        const preloadNext = (cardIndex) => {
-          const card = cards[cardIndex];
-          if (!card || card._isSwapping) return;
-          const stack = ensureVideoStack(card);
-          if (!stack) return;
-          const nextIdx = pickNextUniqueIndex(cardIndex, indices, pool.length);
-          card._nextIndex = nextIdx;
-          const src = pool[nextIdx];
-          const { idle } = stack;
-          const idleSource = idle.querySelector('source');
-          if (!idleSource) return;
-          if (sourceMatches(idleSource, src) && idle.readyState >= 2) return;
-
-          pauseCycleVideo(idle);
-          idle.classList.remove('is-active');
-          idle.classList.add('is-pending');
-          idle.preload = 'auto';
-          idleSource.setAttribute('src', src);
-          try {
-            idle.load();
-          } catch (e) {}
-        };
-
-        const advanceCard = (cardIndex) => {
-          const card = cards[cardIndex];
-          if (!card) return false;
-          if (card._isSwapping) {
-            const stuckFor = card._swapStuckSince
-              ? Date.now() - card._swapStuckSince
-              : 0;
-            /* Force-clear hung crossfades so the grid never freezes */
-            if (stuckFor > 4500) {
-              forceClearSwap(card);
-            } else {
-              if (!card._swapStuckSince) card._swapStuckSince = Date.now();
-              return false;
-            }
-          }
-          card._swapStuckSince = 0;
-
-          let nextIdx = typeof card._nextIndex === 'number'
-            ? card._nextIndex
-            : pickNextUniqueIndex(cardIndex, indices, pool.length);
-
-          /* Ensure uniqueness against current peer cards */
-          const peerUsed = new Set(indices.filter((_, i) => i !== cardIndex));
-          if (peerUsed.has(nextIdx)) {
-            nextIdx = pickNextUniqueIndex(cardIndex, indices, pool.length);
-          }
-          indices[cardIndex] = nextIdx;
-          card._nextIndex = null;
-          card._swapStuckSince = Date.now();
-          applyVideo(card, pool[nextIdx], true);
-          return true;
-        };
-
-        /* Keep each layer playing; advance only when a clip truly ends */
-        const bindActiveWatchdogs = (card) => {
-          const stack = card && card._videoStack;
-          if (!stack) return;
-          [stack.active, stack.idle].forEach(function (video) {
-            if (!video || video._xfWatchBound) return;
-            video._xfWatchBound = true;
-
-            video.addEventListener('ended', () => {
-              if (!container._isVisible || !container._cycleReady) return;
-              if (card._videoStack && card._videoStack.active !== video) return;
-              const idx = cards.indexOf(card);
-              if (idx < 0) return;
-              if (card._isSwapping) forceClearSwap(card);
-              clearCardSchedule(card);
-              advanceCard(idx);
-              card._advanceTimer = setTimeout(() => {
-                scheduleCardCycle(idx, 0);
-              }, VIDEO_FADE_MS + 80);
-            });
-
-            video.addEventListener('pause', () => {
-              /* If something paused the active layer mid-clip, resume it */
-              if (!container._isVisible || document.hidden) return;
-              if (card._videoStack && card._videoStack.active !== video) return;
-              if (video.classList.contains('is-pending')) return;
-              if (video.ended) return;
-              setTimeout(() => {
-                if (!container._isVisible || document.hidden) return;
-                if (card._videoStack && card._videoStack.active !== video) return;
-                if (video.paused && !video.ended) {
-                  playIfVisible(video, { force: true });
-                }
-              }, 120);
-            });
-
-            video.addEventListener('stalled', () => {
-              if (!container._isVisible) return;
-              if (card._videoStack && card._videoStack.active !== video) return;
-              playIfVisible(video, { force: true });
-            });
-
-            video.addEventListener('waiting', () => {
-              if (!container._isVisible) return;
-              if (card._videoStack && card._videoStack.active !== video) return;
-              setTimeout(() => {
-                if (container._isVisible && video.paused && !video.ended) {
-                  playIfVisible(video, { force: true });
-                }
-              }, 250);
-            });
-
-            video.addEventListener('error', () => {
-              if (!container._isVisible || !container._cycleReady) return;
-              if (card._videoStack && card._videoStack.active !== video) return;
-              const idx = cards.indexOf(card);
-              if (idx < 0) return;
-              forceClearSwap(card);
-              advanceCard(idx);
-            });
-          });
-        };
-
-        const clipDurationMs = (card) => {
-          const v = card._videoStack && card._videoStack.active;
-          const d = v && Number.isFinite(v.duration) && v.duration > 0.4 ? v.duration * 1000 : VIDEO_CLIP_MS;
-          /* Clamp so a bad metadata value never stalls the cycle forever */
-          return Math.min(Math.max(d, 2800), 9000);
-        };
-
-        const clearCardSchedule = (card) => {
+        const clearTimers = (card) => {
           if (card._advanceTimer) {
             clearTimeout(card._advanceTimer);
             card._advanceTimer = null;
           }
-          if (card._preloadTimer) {
-            clearTimeout(card._preloadTimer);
-            card._preloadTimer = null;
+          if (card._keepAliveTimer) {
+            clearInterval(card._keepAliveTimer);
+            card._keepAliveTimer = null;
           }
         };
 
-        /**
-         * Playback is driven by the video `ended` event.
-         * Timer is only a long safety net (duration + 2.5s) so we never cut mid-clip early.
-         */
-        const scheduleCardCycle = (cardIndex, staggerMs) => {
+        const showSrc = (card, src, shouldPlay) => {
+          const video = getCardVideo(card);
+          if (!video) return;
+          updateCardCaption(card, src, poolKey);
+          const changed = setVideoSource(video, src);
+          video.classList.add('is-active', 'is-frame-ready');
+          video.classList.remove('is-pending');
+          card.classList.add('is-video-ready');
+          if (shouldPlay) {
+            if (changed) {
+              try {
+                video.currentTime = 0;
+              } catch (e) {}
+            }
+            playVideo(video);
+          } else {
+            pauseVideo(video);
+          }
+        };
+
+        const advanceCard = (cardIndex) => {
           const card = cards[cardIndex];
           if (!card) return;
-          clearCardSchedule(card);
+          let nextIdx = pickNextUniqueIndex(cardIndex, indices, pool.length);
+          const peerUsed = new Set(indices.filter((_, i) => i !== cardIndex));
+          if (peerUsed.has(nextIdx)) nextIdx = pickNextUniqueIndex(cardIndex, indices, pool.length);
+          indices[cardIndex] = nextIdx;
+          showSrc(card, pool[nextIdx], !!container._isVisible);
+          armCard(cardIndex);
+        };
 
-          const delay = Math.max(0, staggerMs || 0);
-          const run = () => {
-            if (!container._isVisible || !container._cycleReady) return;
-            const stackNow = card._videoStack;
-            if (stackNow && stackNow.active) {
-              /* Resume if paused; do not force-restart a healthy playhead */
-              if (stackNow.active.paused || stackNow.active.ended) {
-                playIfVisible(stackNow.active, { force: true });
-              } else {
-                playIfVisible(stackNow.active);
-              }
+        const armCard = (cardIndex) => {
+          const card = cards[cardIndex];
+          if (!card) return;
+          clearTimers(card);
+          const video = getCardVideo(card);
+          if (!video) return;
+
+          /* Keepalive: if browser pauses mid-clip, nudge play without restarting */
+          card._keepAliveTimer = setInterval(() => {
+            if (!container._isVisible || document.hidden) return;
+            if (video.paused && !video.ended && video.readyState >= 2) {
+              playVideo(video);
             }
-            const duration = clipDurationMs(card);
-            const preloadIn = Math.max(400, duration - VIDEO_PRELOAD_MS);
-            /* Safety only: let ended handle normal advances */
-            const safetyIn = Math.max(4000, duration + 2500);
+          }, 1200);
 
-            card._preloadTimer = setTimeout(() => {
-              if (!container._isVisible || !container._cycleReady) return;
-              preloadNext(cardIndex);
-            }, preloadIn);
-
-            card._advanceTimer = setTimeout(function tryAdvance(retries) {
-              if (!container._isVisible || !container._cycleReady) return;
-              const stack = card._videoStack;
-              const v = stack && stack.active;
-              /* If still playing normally, wait - do not interrupt */
-              if (v && !v.paused && !v.ended && v.currentTime > 0.2) {
-                const left = Math.max(800, (v.duration - v.currentTime) * 1000 + 1200);
-                card._advanceTimer = setTimeout(() => tryAdvance(0), left);
-                return;
-              }
-              const n = typeof retries === 'number' ? retries : 0;
-              const ok = advanceCard(cardIndex);
-              if (!ok) {
-                if (n > 20) {
-                  forceClearSwap(card);
-                  advanceCard(cardIndex);
-                  card._advanceTimer = setTimeout(() => {
-                    scheduleCardCycle(cardIndex, 0);
-                  }, VIDEO_FADE_MS + 100);
-                  return;
-                }
-                card._advanceTimer = setTimeout(() => tryAdvance(n + 1), 200);
-                return;
-              }
-              card._advanceTimer = setTimeout(() => {
-                scheduleCardCycle(cardIndex, 0);
-              }, VIDEO_FADE_MS + 100);
-            }, safetyIn);
+          const onEnded = () => {
+            if (!container._isVisible || !container._cycleReady) return;
+            advanceCard(cardIndex);
           };
 
-          if (delay > 0) {
-            card._advanceTimer = setTimeout(run, delay);
-          } else {
-            run();
+          if (!video._xfSimpleEnded) {
+            video._xfSimpleEnded = true;
+            video.addEventListener('ended', () => {
+              if (typeof video._xfOnEnded === 'function') video._xfOnEnded();
+            });
+            video.addEventListener('error', () => {
+              if (!container._isVisible) return;
+              setTimeout(() => advanceCard(cardIndex), 400);
+            });
           }
+          video._xfOnEnded = onEnded;
+
+          /* Safety: if ended never fires, advance after duration + buffer */
+          const safetyMs = () => {
+            const d = Number.isFinite(video.duration) && video.duration > 0.5 ? video.duration * 1000 : 6000;
+            return Math.min(Math.max(d + 2000, 5000), 14000);
+          };
+          const armSafety = () => {
+            clearTimeout(card._advanceTimer);
+            card._advanceTimer = setTimeout(() => {
+              if (!container._isVisible || !container._cycleReady) return;
+              if (!video.paused && !video.ended && video.currentTime > 0.3) {
+                /* still playing - re-arm */
+                armSafety();
+                return;
+              }
+              advanceCard(cardIndex);
+            }, safetyMs());
+          };
+          armSafety();
+          video.addEventListener('loadedmetadata', armSafety, { once: true });
         };
 
-        const scheduleAllCards = (baseStagger) => {
+        const startAll = () => {
           cards.forEach((card, i) => {
-            scheduleCardCycle(i, (baseStagger || 0) + i * VIDEO_CARD_STAGGER_MS);
+            showSrc(card, pool[indices[i]], true);
+            setTimeout(() => armCard(i), i * VIDEO_CARD_STAGGER_MS);
           });
         };
 
-        const primeCards = () => {
-          cards.forEach((card, i) => {
-            applyVideo(card, pool[indices[i]], false);
-            bindActiveWatchdogs(card);
-          });
-          /* Wider stagger on dense grids (beforeAfter has 4 cards) */
-          const base = cards.length > 2 ? 280 : 180;
-          const step = cards.length > 2 ? VIDEO_CARD_STAGGER_MS + 200 : VIDEO_CARD_STAGGER_MS;
-          cards.forEach((card, i) => {
-            scheduleCardCycle(i, base + i * step);
+        const pauseAll = () => {
+          cards.forEach((card) => {
+            clearTimers(card);
+            pauseVideo(getCardVideo(card));
           });
         };
 
         const startCycle = () => {
-          if (container._cycleReady) return;
+          if (container._cycleReady) {
+            /* already primed - just resume */
+            cards.forEach((card, i) => {
+              const video = getCardVideo(card);
+              if (video) playVideo(video);
+              armCard(i);
+            });
+            return;
+          }
           container._cycleReady = true;
-          primeCards();
+          startAll();
         };
 
-        videoCycleInstances.push({
-          container,
-          cards,
-          advanceCard,
-          scheduleAllCards,
-          clearCardSchedule,
-        });
-
-        const resumeVisibleVideos = () => {
-          /* Resume active layers only when the section is visible */
-          cards.forEach((card, i) => {
-            const stack = card._videoStack;
-            if (!stack) return;
-            if (card._isSwapping) {
-              const stuckFor = card._swapStuckSince
-                ? Date.now() - card._swapStuckSince
-                : 5000;
-              if (stuckFor < 4500) return;
-              forceClearSwap(card);
-            }
-            stack.active.classList.add('is-active');
-            stack.active.classList.remove('is-pending');
-            if (stack.idle) {
-              pauseCycleVideo(stack.idle);
-              stack.idle.classList.add('is-pending');
-              stack.idle.classList.remove('is-active');
-            }
-            bindActiveWatchdogs(card);
-            /* Stagger kicks so 4 cards do not all call play() in one frame */
-            setTimeout(() => playIfVisible(stack.active, { force: true }), i * 70);
-          });
-        };
-
-        /*
-         * Keep playing while cards are roughly on screen. Previous 0.35 threshold
-         * + negative rootMargin paused clips mid-scroll (Lenis smooth scroll).
-         * Debounce leave so brief intersection flickers don't stop playback.
-         */
         let hideTimer = null;
-        const visObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              if (hideTimer) {
-                clearTimeout(hideTimer);
-                hideTimer = null;
-              }
-              container._isVisible = true;
-              startCycle();
-              if (container._cycleReady) {
-                resumeVisibleVideos();
-                scheduleAllCards(120);
-              }
-            } else {
-              if (hideTimer) clearTimeout(hideTimer);
-              hideTimer = setTimeout(() => {
-                /* Still off-screen after grace period */
-                if (container._isVisible === false) return;
-                /* Re-check geometry - Lenis can fire stale leave events */
-                const rect = container.getBoundingClientRect();
-                const vh = window.innerHeight || 0;
-                const stillNear =
-                  rect.bottom > -80 && rect.top < vh + 80;
-                if (stillNear) {
-                  container._isVisible = true;
-                  resumeVisibleVideos();
-                  return;
+        const visObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                if (hideTimer) {
+                  clearTimeout(hideTimer);
+                  hideTimer = null;
                 }
-                container._isVisible = false;
-                cards.forEach((card) => {
-                  clearCardSchedule(card);
-                  forceClearSwap(card);
-                });
-                container.querySelectorAll('.section-video').forEach((video) => {
-                  pauseCycleVideo(video);
-                  try {
-                    video.removeAttribute('src');
-                    const srcEl = video.querySelector('source');
-                    /* Keep active layer src so poster frame can return on re-entry;
-                       only drop pending/idle sources to free decoders. */
-                    if (video.classList.contains('is-pending') && srcEl) {
-                      srcEl.removeAttribute('src');
-                      try { video.load(); } catch (e) {}
-                    }
-                  } catch (e) {}
-                });
-              }, 280);
-            }
-          });
-        }, { threshold: 0, rootMargin: '25% 0px 25% 0px' });
-
+                container._isVisible = true;
+                startCycle();
+              } else {
+                if (hideTimer) clearTimeout(hideTimer);
+                hideTimer = setTimeout(() => {
+                  const rect = container.getBoundingClientRect();
+                  const vh = window.innerHeight || 0;
+                  if (rect.bottom > -40 && rect.top < vh + 40) {
+                    container._isVisible = true;
+                    return;
+                  }
+                  container._isVisible = false;
+                  pauseAll();
+                }, 320);
+              }
+            });
+          },
+          { threshold: 0.08, rootMargin: '12% 0px' }
+        );
         visObserver.observe(container);
 
-        /* Safety: if user scrolls while still near section, keep clips alive */
-        const onScrollNudge = () => {
-          if (!container._cycleReady) return;
-          const rect = container.getBoundingClientRect();
-          const vh = window.innerHeight || 0;
-          if (rect.bottom > 40 && rect.top < vh - 40) {
-            if (!container._isVisible) {
-              container._isVisible = true;
-              startCycle();
-            }
-            resumeVisibleVideos();
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            if (container._isVisible) pauseAll();
+          } else if (container._isVisible && container._cycleReady) {
+            cards.forEach((card) => playVideo(getCardVideo(card)));
           }
-        };
-        window.addEventListener('scroll', onScrollNudge, { passive: true });
-        if (window.XFreezeLenis && typeof window.XFreezeLenis.on === 'function') {
-          window.XFreezeLenis.on('scroll', onScrollNudge);
-        }
+        });
       });
     }
 

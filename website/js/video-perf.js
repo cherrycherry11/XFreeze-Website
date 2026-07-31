@@ -7,7 +7,7 @@
 (function () {
   'use strict';
 
-  var MAX_ACTIVE = 1; /* non-cycle videos only; cycle gate is separate */
+  var MAX_ACTIVE = 2;
   var active = [];
 
   function isHero(video) {

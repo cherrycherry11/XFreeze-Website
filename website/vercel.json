@@ -12,30 +12,102 @@
     }
   ],
   "rewrites": [
-    { "source": "/", "destination": "/home.html" },
-    { "source": "/home", "destination": "/home.html" },
-    { "source": "/pricing", "destination": "/pricing.html" },
-    { "source": "/account", "destination": "/account.html" },
-    { "source": "/templates", "destination": "/templates.html" },
-    { "source": "/skills", "destination": "/skills.html" },
-    { "source": "/prompt-library", "destination": "/prompt-library.html" },
-    { "source": "/login", "destination": "/login.html" },
-    { "source": "/signup", "destination": "/signup.html" },
-    { "source": "/contact", "destination": "/contact.html" },
-    { "source": "/about", "destination": "/about.html" },
-    { "source": "/privacy", "destination": "/privacy.html" },
-    { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/refund", "destination": "/refund.html" },
-    { "source": "/workflows", "destination": "/workflows.html" },
-    { "source": "/use-cases", "destination": "/use-cases.html" },
-    { "source": "/changelog", "destination": "/changelog.html" },
-    { "source": "/blog", "destination": "/blog.html" },
-    { "source": "/blog/:slug", "destination": "/blog/:slug.html" },
-    { "source": "/skill-builder", "destination": "/skill-builder.html" },
-    { "source": "/connector-setup", "destination": "/connector-setup.html" },
-    { "source": "/checkout-success", "destination": "/checkout-success.html" },
-    { "source": "/checkout-cancel", "destination": "/checkout-cancel.html" },
-    { "source": "/pay-demo", "destination": "/pay-demo.html" }
+    {
+      "source": "/",
+      "destination": "/home.html"
+    },
+    {
+      "source": "/home",
+      "destination": "/home.html"
+    },
+    {
+      "source": "/pricing",
+      "destination": "/pricing.html"
+    },
+    {
+      "source": "/account",
+      "destination": "/account.html"
+    },
+    {
+      "source": "/templates",
+      "destination": "/templates.html"
+    },
+    {
+      "source": "/skills",
+      "destination": "/skills.html"
+    },
+    {
+      "source": "/prompt-library",
+      "destination": "/prompt-library.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/signup",
+      "destination": "/signup.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/refund",
+      "destination": "/refund.html"
+    },
+    {
+      "source": "/workflows",
+      "destination": "/workflows.html"
+    },
+    {
+      "source": "/use-cases",
+      "destination": "/use-cases.html"
+    },
+    {
+      "source": "/changelog",
+      "destination": "/changelog.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/blog.html"
+    },
+    {
+      "source": "/blog/:slug",
+      "destination": "/blog/:slug.html"
+    },
+    {
+      "source": "/skill-builder",
+      "destination": "/skill-builder.html"
+    },
+    {
+      "source": "/connector-setup",
+      "destination": "/connector-setup.html"
+    },
+    {
+      "source": "/checkout-success",
+      "destination": "/checkout-success.html"
+    },
+    {
+      "source": "/checkout-cancel",
+      "destination": "/checkout-cancel.html"
+    },
+    {
+      "source": "/pay-demo",
+      "destination": "/pay-demo.html"
+    }
   ],
   "functions": {
     "api/**/*.js": {
@@ -46,11 +118,41 @@
   },
   "headers": [
     {
+      "source": "/assets/videos/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "CDN-Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "Accept-Ranges",
+          "value": "bytes"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
         {
           "key": "Permissions-Policy",
           "value": "camera=(), microphone=(), geolocation=()"
@@ -64,14 +166,23 @@
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "no-store" }
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
       ]
     },
     {
       "source": "/data/skills-packs/premium-(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "no-store" },
-        { "key": "X-Robots-Tag", "value": "noindex" }
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
       ]
     }
   ]

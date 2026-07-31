@@ -20,6 +20,15 @@
     );
   }
 
+  /* Showcase cycle cards manage their own play - never pause them for the global cap */
+  function isCycleVideo(video) {
+    return !!(video && video.closest && video.closest('[data-video-cycle]'));
+  }
+
+  function isUnmanaged(video) {
+    return isHero(video) || isCycleVideo(video);
+  }
+
   function ensureSource(video) {
     if (video.getAttribute('data-xf-src-ready') === '1') return;
     var src = video.getAttribute('data-src') || video.getAttribute('src');
@@ -44,11 +53,12 @@
   }
 
   function trackPlay(video) {
-    if (isHero(video)) return;
+    if (isUnmanaged(video)) return;
     if (active.indexOf(video) === -1) active.push(video);
     while (active.length > MAX_ACTIVE) {
       var old = active.shift();
-      if (old && old !== video && !old.paused) {
+      /* Never pause hero or showcase cycle videos */
+      if (old && old !== video && !old.paused && !isUnmanaged(old)) {
         try {
           old.pause();
         } catch (e) {}
@@ -79,7 +89,7 @@
   }
 
   function softPause(video) {
-    if (!video || isHero(video)) return;
+    if (!video || isUnmanaged(video)) return;
     try {
       video.pause();
     } catch (e) {}

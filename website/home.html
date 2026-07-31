@@ -3475,13 +3475,27 @@
         };
 
         const startAll = () => {
+          /* Start every card - do not leave later cards paused waiting on stagger */
           cards.forEach((card, i) => {
-            setTimeout(() => {
-              if (!container._isVisible || document.hidden) return;
-              showSrc(card, pool[indices[i]], true);
-              bindEnded(i);
-            }, i * VIDEO_CARD_STAGGER_MS);
+            if (!container._isVisible || document.hidden) return;
+            showSrc(card, pool[indices[i]], true);
+            bindEnded(i);
           });
+          /* Second pass: browsers sometimes allow only the first muted plays; re-kick all */
+          setTimeout(() => {
+            if (!container._isVisible || document.hidden) return;
+            cards.forEach((card) => {
+              const video = getCardVideo(card);
+              if (video && video.paused && !video.ended) playVideo(video);
+            });
+          }, 400);
+          setTimeout(() => {
+            if (!container._isVisible || document.hidden) return;
+            cards.forEach((card) => {
+              const video = getCardVideo(card);
+              if (video && video.paused && !video.ended) playVideo(video);
+            });
+          }, 1200);
         };
 
         const pauseAll = () => {

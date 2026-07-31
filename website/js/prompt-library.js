@@ -443,18 +443,28 @@
   function ensurePromptText(row) {
     if (!row || !row.prompt) return Promise.resolve('');
     if (!isPremiumRow(row)) {
-      /* Free text is public, but using it still counts against the daily
-         quota. Premium is counted server-side by /api/content/prompt. */
+      /* Free text is public. Count usage without blocking the copy UI -
+         waiting on the network made the green check feel laggy. */
       var freeText = row.prompt.text || '';
       if (!freeText) return Promise.resolve('');
       if (!window.XFreezeAccess || !window.XFreezeAccess.consumeFreeUsage) {
         return Promise.resolve(freeText);
       }
-      return window.XFreezeAccess
-        .consumeFreeUsage('prompts', promptContentId(row))
-        .then(function (allowed) {
-          return allowed ? freeText : '';
-        });
+      /* Local remaining check for instant limit feedback when cache is warm */
+      if (
+        window.XFreezeUsage &&
+        typeof window.XFreezeUsage.canConsume === 'function' &&
+        !window.XFreezeUsage.canConsume('prompts')
+      ) {
+        return window.XFreezeAccess
+          .consumeFreeUsage('prompts', promptContentId(row))
+          .then(function (allowed) {
+            return allowed ? freeText : '';
+          });
+      }
+      /* Fire-and-forget server count; do not delay clipboard / checkmark */
+      window.XFreezeAccess.consumeFreeUsage('prompts', promptContentId(row));
+      return Promise.resolve(freeText);
     }
     if (row.prompt.text && !row.prompt.lockedText) {
       return Promise.resolve(row.prompt.text);
@@ -477,30 +487,44 @@
     return row.prompt.text || '';
   }
 
+  function markCopied(btn) {
+    if (!btn) return;
+    var icon = btn.querySelector('i');
+    btn.classList.add('is-copied');
+    if (icon) icon.className = 'fa-solid fa-check';
+    btn.setAttribute('data-pl-copied', '1');
+    /* Force a paint so the green check shows on the same frame as the click */
+    void btn.offsetWidth;
+    if (btn._xfCopyReset) clearTimeout(btn._xfCopyReset);
+    btn._xfCopyReset = setTimeout(function () {
+      btn.classList.remove('is-copied');
+      btn.removeAttribute('data-pl-copied');
+      if (icon) icon.className = 'fa-regular fa-copy';
+      btn._xfCopyReset = null;
+    }, 1600);
+  }
+
   function copyText(text, btn) {
-    function done() {
-      if (btn) {
-        btn.classList.add('is-copied');
-        var icon = btn.querySelector('i');
-        if (icon) icon.className = 'fa-solid fa-check';
-        setTimeout(function () {
-          btn.classList.remove('is-copied');
-          if (icon) icon.className = 'fa-regular fa-copy';
-        }, 1600);
-      }
+    /* Instant green check - do not wait on clipboard or network */
+    markCopied(btn);
+
+    function afterClipboard() {
       if (window.XFreezeSupportToast) {
-        window.XFreezeSupportToast.show({ context: 'copy', subtitle: 'Paste into Grok Imagine, Runway, Kling, or your image-to-video tool.' });
+        window.XFreezeSupportToast.show({
+          context: 'copy',
+          subtitle: 'Paste into Grok Imagine, Runway, Kling, or your image-to-video tool.',
+        });
       }
     }
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done).catch(function () {
+      navigator.clipboard.writeText(text).then(afterClipboard).catch(function () {
         fallbackCopy(text);
-        done();
+        afterClipboard();
       });
     } else {
       fallbackCopy(text);
-      done();
+      afterClipboard();
     }
   }
 
@@ -726,6 +750,12 @@
         var rowCopy = state.filtered[idx];
         if (!rowCopy) return;
         if (!requirePromptAccess(rowCopy)) return;
+        /* Free prompts: text is already on the card - copy + check on this tick */
+        if (!isPremiumRow(rowCopy) && rowCopy.prompt && rowCopy.prompt.text) {
+          ensurePromptText(rowCopy); /* counts usage in background */
+          copyText(rowCopy.prompt.text, copyBtn);
+          return;
+        }
         ensurePromptText(rowCopy)
           .then(function (text) {
             if (!text) return;
@@ -763,6 +793,11 @@
       if (state.panelIndex < 0) return;
       var rowPanel = state.filtered[state.panelIndex];
       if (!requirePromptAccess(rowPanel)) return;
+      if (!isPremiumRow(rowPanel) && rowPanel.prompt && rowPanel.prompt.text) {
+        ensurePromptText(rowPanel);
+        copyText(rowPanel.prompt.text, copyBtn);
+        return;
+      }
       ensurePromptText(rowPanel)
         .then(function (text) {
           if (!text) return;

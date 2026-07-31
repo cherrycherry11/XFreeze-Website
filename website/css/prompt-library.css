@@ -1408,7 +1408,7 @@ html.dark .pl-card--premium {
   background: var(--surface-muted);
   color: var(--text);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
 
 .pl-card__copy:hover {
@@ -1417,10 +1417,19 @@ html.dark .pl-card--premium {
   color: var(--surface);
 }
 
-.pl-card__copy.is-copied {
+.pl-card__copy.is-copied,
+.pl-card__copy.is-copied:hover {
   background: hsl(145, 60%, 42%);
   border-color: hsl(145, 60%, 42%);
   color: #fff;
+  transition: none; /* green check must paint immediately on click */
+}
+
+.pl-panel__copy-btn.is-copied {
+  background: hsl(145, 60%, 42%) !important;
+  border-color: hsl(145, 60%, 42%) !important;
+  color: #fff !important;
+  transition: none;
 }
 
 .pl-empty {

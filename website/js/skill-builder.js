@@ -107,7 +107,15 @@
 
     pre.textContent = text;
     panel.hidden = false;
+    /* Always start preview at the top so users can scroll through the full skill */
+    pre.scrollTop = 0;
     panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    /* Allow keyboard scrolling without trapping focus permanently */
+    try {
+      pre.focus({ preventScroll: true });
+    } catch (e) {
+      try { pre.focus(); } catch (e2) {}
+    }
   }
 
   function copyText(text, btn) {
@@ -141,7 +149,26 @@
     window.prompt('Copy this prompt:', text);
   }
 
+  function bindScrollableResult(root) {
+    var pre = root.querySelector('[data-sb-result-text]');
+    var wrap = root.querySelector('.sb-result__scroll');
+    var targets = [pre, wrap].filter(Boolean);
+    targets.forEach(function (el) {
+      /* Stop Lenis / document handlers from eating nested wheel + trackpad */
+      ['wheel', 'touchmove'].forEach(function (type) {
+        el.addEventListener(
+          type,
+          function (e) {
+            e.stopPropagation();
+          },
+          { passive: true }
+        );
+      });
+    });
+  }
+
   function bind(root) {
+    bindScrollableResult(root);
     root.querySelectorAll('[data-sb-connector], [data-sb-sensitivity]').forEach(function (pill) {
       pill.addEventListener('click', function () {
         var group = pill.hasAttribute('data-sb-connector') ? 'connector' : 'sensitivity';

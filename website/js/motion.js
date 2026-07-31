@@ -26,6 +26,16 @@
       easing: function (t) {
         return Math.min(1, 1.001 - Math.pow(2, -10 * t));
       },
+      /* Nested scroll areas (skill builder result, modals) must keep wheel */
+      prevent: function (node) {
+        return !!(
+          node &&
+          node.closest &&
+          node.closest(
+            '[data-lenis-prevent], .sb-result__pre, .sb-result__scroll, .pl-panel, .xf-limit-modal'
+          )
+        );
+      },
     });
     function raf(time) {
       lenis.raf(time);

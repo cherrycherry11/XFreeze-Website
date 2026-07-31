@@ -1,8 +1,18 @@
 /**
  * Shared mobile nav toggle - all pages with #mobile-menu
  * Also normalizes right-side action order: coffee → menu → auth
+ *
+ * Breakpoint must match site-nav.css: hamburger + drawer below 1200px,
+ * center pill links at 1200px+. (Do not use Tailwind lg/1024 here.)
  */
 (function () {
+  /* Must match @media (min-width: 1200px) in site-nav.css */
+  var NAV_DESKTOP_MIN = 1200;
+
+  function isDesktopNav() {
+    return window.innerWidth >= NAV_DESKTOP_MIN;
+  }
+
   function normalizeNavEnd() {
     var end = document.querySelector('#site-nav .site-nav-end');
     if (!end) return;
@@ -34,6 +44,11 @@
     var backdrop = document.getElementById('mobile-menu-backdrop');
     if (!menu) return;
 
+    /* Never open the drawer once the desktop pill nav is active */
+    if (isOpen && isDesktopNav()) {
+      isOpen = false;
+    }
+
     menu.classList.toggle('hidden', !isOpen);
     menu.classList.toggle('xf-mobile-open', isOpen);
     menu.classList.toggle('xf-mobile-closed', !isOpen);
@@ -56,9 +71,19 @@
     }
   }
 
-  window.toggleMobileMenu = function () {
+  window.toggleMobileMenu = function (event) {
+    if (event && typeof event.preventDefault === 'function') {
+      event.preventDefault();
+    }
+    if (event && typeof event.stopPropagation === 'function') {
+      event.stopPropagation();
+    }
     var menu = document.getElementById('mobile-menu');
     if (!menu) return;
+    if (isDesktopNav()) {
+      setMenuOpen(false);
+      return;
+    }
     setMenuOpen(menu.classList.contains('hidden'));
   };
 
@@ -82,9 +107,22 @@
     }
   });
 
+  var resizeCloseTimer = null;
+  function onViewportChange() {
+    if (isDesktopNav()) setMenuOpen(false);
+  }
   window.addEventListener('resize', function () {
-    if (window.innerWidth >= 1024) setMenuOpen(false);
+    if (resizeCloseTimer) window.clearTimeout(resizeCloseTimer);
+    resizeCloseTimer = window.setTimeout(onViewportChange, 50);
   });
+  window.addEventListener('orientationchange', onViewportChange);
+  if (window.matchMedia) {
+    try {
+      var mql = window.matchMedia('(min-width: ' + NAV_DESKTOP_MIN + 'px)');
+      if (mql.addEventListener) mql.addEventListener('change', onViewportChange);
+      else if (mql.addListener) mql.addListener(onViewportChange);
+    } catch (err) { /* ignore */ }
+  }
 
   var menu = document.getElementById('mobile-menu');
   if (menu && menu.classList.contains('hidden')) {

@@ -96,6 +96,35 @@
     </div>
   </nav>
 
+  <div id="mobile-menu-backdrop" class="site-nav-mobile-backdrop hidden" aria-hidden="true"></div>
+  <div id="mobile-menu" class="site-nav-mobile-panel site-nav-mobile-panel--drawer hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Site menu">
+    <div class="site-nav-mobile-drawer">
+      <header class="site-nav-drawer-head">
+        <a href="home" class="site-nav-drawer-logo" onclick="toggleMobileMenu()">X Freeze</a>
+        <button type="button" class="site-nav-drawer-close" onclick="toggleMobileMenu()" aria-label="Close menu"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </header>
+      <nav class="site-nav-drawer-nav" aria-label="Mobile">
+        <a href="templates" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Templates</a>
+        <a href="prompt-library" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Prompts</a>
+        <a href="skills" class="site-nav-drawer-link" onclick="toggleMobileMenu()">Skills</a>
+        <a href="about" class="site-nav-drawer-link" onclick="toggleMobileMenu()">About</a>
+      </nav>
+      <div class="site-nav-drawer-bottom">
+        <div id="xf-auth-drawer" class="site-nav-drawer-auth">
+          <a href="signup" class="site-nav-drawer-auth-btn site-nav-drawer-cta" onclick="toggleMobileMenu()">Get started</a>
+          <a href="login" class="site-nav-drawer-auth-btn site-nav-drawer-auth-btn--ghost" onclick="toggleMobileMenu()">Sign in</a>
+        </div>
+        <div class="site-nav-drawer-meta-row">
+          <a href="contact" onclick="toggleMobileMenu()">Contact</a>
+          <span class="site-nav-drawer-meta-dot" aria-hidden="true">·</span>
+          <a href="privacy" onclick="toggleMobileMenu()">Legal</a>
+          <span class="site-nav-drawer-meta-dot" aria-hidden="true">·</span>
+          <a href="terms" onclick="toggleMobileMenu()">Terms</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <main id="xf-auth-page" class="xf-auth-page">
     <div class="content-container xf-auth-page-inner">
       <div class="xf-auth-card">

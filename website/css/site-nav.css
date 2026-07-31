@@ -498,7 +498,7 @@ html.dark .site-nav-logo__img--on-dark {
 }
 
 .site-nav-mobile-backdrop.hidden {
-  display: none;
+  display: none !important;
 }
 
 /* ── Mobile menu - xAI-style full panel ───────────────── */
@@ -526,6 +526,11 @@ html.dark .site-nav-mobile-panel--drawer {
   transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
 }
 
+.site-nav-mobile-panel--drawer.hidden,
+.site-nav-mobile-panel--drawer.xf-mobile-closed {
+  display: none !important;
+}
+
 .site-nav-mobile-panel--drawer.xf-mobile-closed {
   transform: translateY(-0.5rem);
   opacity: 0;
@@ -534,10 +539,38 @@ html.dark .site-nav-mobile-panel--drawer {
 }
 
 .site-nav-mobile-panel--drawer.xf-mobile-open {
+  display: block !important;
   transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
   visibility: visible;
+}
+
+/*
+ * Breakpoint parity: hamburger + drawer stay active until 1200px (center pill).
+ * Tailwind lg:hidden (1024px) was killing the open drawer in the 1024–1199 dead zone.
+ */
+@media (min-width: 1024px) and (max-width: 1199.98px) {
+  #mobile-menu.site-nav-mobile-panel--drawer.xf-mobile-open,
+  #mobile-menu.site-nav-mobile-panel--drawer:not(.hidden):not(.xf-mobile-closed) {
+    display: block !important;
+  }
+
+  #mobile-menu-backdrop:not(.hidden) {
+    display: block !important;
+  }
+}
+
+/* Once the desktop pill is shown, never show the drawer/backdrop */
+@media (min-width: 1200px) {
+  #mobile-menu,
+  #mobile-menu.site-nav-mobile-panel--drawer,
+  #mobile-menu.site-nav-mobile-panel--drawer.xf-mobile-open,
+  #mobile-menu-backdrop {
+    display: none !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+  }
 }
 
 .site-nav-mobile-drawer {

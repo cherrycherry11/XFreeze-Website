@@ -988,6 +988,13 @@
       transform: none;
     }
 
+
+    /* Showcase videos: no transform while playing (compositor lag on CF) */
+    [data-video-cycle] .artistic-card video.section-video {
+      transform: none !important;
+      will-change: auto;
+    }
+
     #xf-more-categories .artistic-card,
     #xf-more-categories .artistic-card:hover {
       transition: box-shadow 200ms ease;
@@ -3227,24 +3234,35 @@
       return -1;
     }
 
-    /** One video per card - drop dual-stack if present */
+    function absoluteVideoUrl(src) {
+      if (!src) return src;
+      if (/^https?:\/\//i.test(src)) return src;
+      try {
+        return new URL(src.replace(/^\//, ''), window.location.origin + '/').href;
+      } catch (e) {
+        return src;
+      }
+    }
+
+    /** One video element per card */
     function getCardVideo(card) {
       if (!card) return null;
       if (card._simpleVideo && card.contains(card._simpleVideo)) return card._simpleVideo;
 
       const stack = card.querySelector('.section-video-stack');
-      let video = card.querySelector('.section-video');
+      let video = card.querySelector('video.section-video, video');
       if (stack) {
-        const layers = stack.querySelectorAll('.section-video');
+        const layers = stack.querySelectorAll('video');
         video = layers[0] || video;
-        /* Flatten to a single video for reliable playback */
         layers.forEach((v, i) => {
           if (i > 0) v.remove();
         });
         if (video && video.parentElement === stack) {
           card.appendChild(video);
         }
-        stack.remove();
+        try {
+          stack.remove();
+        } catch (e) {}
       }
       if (!video) return null;
 
@@ -3254,10 +3272,22 @@
       video.defaultMuted = true;
       video.playsInline = true;
       video.loop = false;
-      video.preload = 'metadata';
+      video.controls = false;
+      video.disableRemotePlayback = true;
       video.setAttribute('muted', '');
       video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', '');
       video.removeAttribute('autoplay');
+      video.removeAttribute('loop');
+
+      /* Prefer direct src for reliable swaps through CDN */
+      const source = video.querySelector('source');
+      if (source) {
+        const s = source.getAttribute('src');
+        if (s && !video.getAttribute('src')) {
+          video.src = absoluteVideoUrl(s);
+        }
+      }
 
       card._simpleVideo = video;
       card.classList.add('is-video-ready');
@@ -3266,47 +3296,48 @@
 
     function setVideoSource(video, src) {
       if (!video || !src) return false;
-      const source = video.querySelector('source') || video;
-      const current = (source.getAttribute && source.getAttribute('src')) || video.currentSrc || video.src || '';
-      const file = src.split('/').pop();
-      if (current === src || current.endsWith('/' + file) || current.endsWith(file)) {
-        return false; /* same */
+      const abs = absoluteVideoUrl(src);
+      const file = abs.split('/').pop().split('?')[0];
+      const cur = (video.currentSrc || video.src || '').split('?')[0];
+      if (cur && (cur === abs || cur.endsWith('/' + file) || cur.endsWith(file))) {
+        return false;
       }
-      if (source.tagName && source.tagName.toLowerCase() === 'source') {
-        source.setAttribute('src', src);
-      } else {
-        video.src = src;
-      }
-      try {
-        video.load();
-      } catch (e) {}
+      /* Clear old source children so only video.src is used */
+      video.querySelectorAll('source').forEach((el) => el.remove());
+      video.pause();
+      video.removeAttribute('src');
+      video.src = abs;
+      video.load();
       return true;
     }
 
     function playVideo(video) {
-      if (!video) return;
+      if (!video || document.hidden) return;
       video.muted = true;
       video.defaultMuted = true;
       video.playsInline = true;
-      const go = () => {
+      const kick = () => {
+        if (document.hidden) return;
         const p = video.play();
         if (p && typeof p.catch === 'function') {
           p.catch(() => {
             setTimeout(() => {
-              video.play().catch(() => {});
-            }, 200);
+              if (!document.hidden) video.play().catch(() => {});
+            }, 250);
           });
         }
       };
-      if (video.readyState >= 2) go();
+      if (video.readyState >= 2) kick();
       else {
-        const onReady = () => {
-          video.removeEventListener('canplay', onReady);
-          video.removeEventListener('loadeddata', onReady);
-          go();
+        const once = () => {
+          video.removeEventListener('canplay', once);
+          video.removeEventListener('loadeddata', once);
+          kick();
         };
-        video.addEventListener('canplay', onReady, { once: true });
-        video.addEventListener('loadeddata', onReady, { once: true });
+        video.addEventListener('canplay', once);
+        video.addEventListener('loadeddata', once);
+        /* Safari sometimes needs play() even before canplay when muted */
+        kick();
       }
     }
 
@@ -3319,10 +3350,7 @@
 
     function bootShowcaseVideos() {
       document.querySelectorAll('[data-video-cycle] .artistic-card').forEach((card) => {
-        const video = getCardVideo(card);
-        if (!video) return;
-        pauseVideo(video);
-        video.preload = 'metadata';
+        getCardVideo(card);
       });
     }
 
@@ -3338,19 +3366,20 @@
         }
         if (!files || !files.length) return;
 
-        const pool = files.map((file) => (file.indexOf('assets/') === 0 ? file : BA_VIDEOS_BASE + file));
+        const pool = files.map((file) =>
+          file.indexOf('assets/') === 0 || file.indexOf('http') === 0
+            ? file
+            : BA_VIDEOS_BASE + file
+        );
         const cards = Array.from(container.querySelectorAll('.artistic-card'));
         if (!cards.length) return;
 
         const indices = assignUniqueIndices(cards.length, pool.length);
         cards.forEach((card, i) => {
           const video = getCardVideo(card);
-          const source = video && video.querySelector('source');
-          const fromDom = poolIndexFromSrc((source && source.getAttribute('src')) || (video && video.src) || '', pool);
+          const fromDom = poolIndexFromSrc((video && (video.getAttribute('src') || video.currentSrc)) || '', pool);
           if (fromDom >= 0) indices[i] = fromDom;
         });
-
-        /* unique initial indices */
         const used = new Set();
         indices.forEach((idx, i) => {
           if (used.has(idx)) indices[i] = pickNextUniqueIndex(i, indices, pool.length);
@@ -3376,14 +3405,14 @@
           video.classList.add('is-active', 'is-frame-ready');
           video.classList.remove('is-pending');
           card.classList.add('is-video-ready');
-          if (shouldPlay) {
+          if (shouldPlay && container._isVisible && !document.hidden) {
             if (changed) {
               try {
                 video.currentTime = 0;
               } catch (e) {}
             }
             playVideo(video);
-          } else {
+          } else if (!shouldPlay) {
             pauseVideo(video);
           }
         };
@@ -3395,7 +3424,7 @@
           const peerUsed = new Set(indices.filter((_, i) => i !== cardIndex));
           if (peerUsed.has(nextIdx)) nextIdx = pickNextUniqueIndex(cardIndex, indices, pool.length);
           indices[cardIndex] = nextIdx;
-          showSrc(card, pool[nextIdx], !!container._isVisible);
+          showSrc(card, pool[nextIdx], true);
           armCard(cardIndex);
         };
 
@@ -3406,56 +3435,93 @@
           const video = getCardVideo(card);
           if (!video) return;
 
-          /* Keepalive: if browser pauses mid-clip, nudge play without restarting */
+          /* Gentle keepalive - only if really stalled mid-clip */
           card._keepAliveTimer = setInterval(() => {
             if (!container._isVisible || document.hidden) return;
-            if (video.paused && !video.ended && video.readyState >= 2) {
+            if (video.ended) return;
+            if (video.paused && video.currentTime > 0.4 && video.readyState >= 2) {
               playVideo(video);
             }
-          }, 1200);
+          }, 2000);
 
-          const onEnded = () => {
-            if (!container._isVisible || !container._cycleReady) return;
-            advanceCard(cardIndex);
-          };
-
-          if (!video._xfSimpleEnded) {
-            video._xfSimpleEnded = true;
+          if (!video._xfSimpleBound) {
+            video._xfSimpleBound = true;
             video.addEventListener('ended', () => {
+              if (!container._isVisible || !container._cycleReady) return;
               if (typeof video._xfOnEnded === 'function') video._xfOnEnded();
             });
             video.addEventListener('error', () => {
               if (!container._isVisible) return;
-              setTimeout(() => advanceCard(cardIndex), 400);
+              setTimeout(() => {
+                if (typeof video._xfOnEnded === 'function') video._xfOnEnded();
+              }, 500);
+            });
+            video.addEventListener('playing', () => {
+              card._hasPlayed = true;
             });
           }
-          video._xfOnEnded = onEnded;
 
-          /* Safety: if ended never fires, advance after duration + buffer */
-          const safetyMs = () => {
-            const d = Number.isFinite(video.duration) && video.duration > 0.5 ? video.duration * 1000 : 6000;
-            return Math.min(Math.max(d + 2000, 5000), 14000);
+          video._xfOnEnded = () => {
+            if (!container._isVisible || !container._cycleReady) return;
+            advanceCard(cardIndex);
           };
+
+          /*
+           * Safety timer: NEVER advance while still buffering at the start.
+           * Only advance if ended, or stuck near the end, or error after a long wait.
+           */
           const armSafety = () => {
             clearTimeout(card._advanceTimer);
+            const d =
+              Number.isFinite(video.duration) && video.duration > 0.5
+                ? video.duration * 1000
+                : 8000;
+            const wait = Math.min(Math.max(d + 4000, 9000), 20000);
             card._advanceTimer = setTimeout(() => {
               if (!container._isVisible || !container._cycleReady) return;
-              if (!video.paused && !video.ended && video.currentTime > 0.3) {
-                /* still playing - re-arm */
+
+              /* Still loading first frame - keep waiting and retry play */
+              if (video.readyState < 2 || (video.currentTime < 0.25 && !video.ended)) {
+                playVideo(video);
                 armSafety();
                 return;
               }
-              advanceCard(cardIndex);
-            }, safetyMs());
+
+              /* Healthy playback - wait again */
+              if (!video.paused && !video.ended && video.currentTime > 0.25) {
+                const left = Math.max(1500, (video.duration - video.currentTime) * 1000 + 2500);
+                card._advanceTimer = setTimeout(() => {
+                  if (video.ended || video.paused) advanceCard(cardIndex);
+                  else armSafety();
+                }, left);
+                return;
+              }
+
+              /* Stuck paused near end, or ended without event */
+              if (video.ended || (video.duration && video.currentTime >= video.duration - 0.35)) {
+                advanceCard(cardIndex);
+                return;
+              }
+
+              /* Stuck mid-clip paused - resume, don't skip */
+              playVideo(video);
+              armSafety();
+            }, wait);
           };
+
           armSafety();
-          video.addEventListener('loadedmetadata', armSafety, { once: true });
+          if (!Number.isFinite(video.duration) || video.duration < 0.5) {
+            video.addEventListener('loadedmetadata', armSafety, { once: true });
+          }
         };
 
         const startAll = () => {
           cards.forEach((card, i) => {
-            showSrc(card, pool[indices[i]], true);
-            setTimeout(() => armCard(i), i * VIDEO_CARD_STAGGER_MS);
+            setTimeout(() => {
+              if (!container._isVisible) return;
+              showSrc(card, pool[indices[i]], true);
+              armCard(i);
+            }, i * VIDEO_CARD_STAGGER_MS);
           });
         };
 
@@ -3468,7 +3534,6 @@
 
         const startCycle = () => {
           if (container._cycleReady) {
-            /* already primed - just resume */
             cards.forEach((card, i) => {
               const video = getCardVideo(card);
               if (video) playVideo(video);
@@ -3484,62 +3549,60 @@
         const visObserver = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
-              if (entry.isIntersecting) {
+              if (entry.isIntersecting && entry.intersectionRatio >= 0.05) {
                 if (hideTimer) {
                   clearTimeout(hideTimer);
                   hideTimer = null;
                 }
                 container._isVisible = true;
                 startCycle();
-              } else {
+              } else if (!entry.isIntersecting) {
                 if (hideTimer) clearTimeout(hideTimer);
                 hideTimer = setTimeout(() => {
                   const rect = container.getBoundingClientRect();
                   const vh = window.innerHeight || 0;
-                  if (rect.bottom > -40 && rect.top < vh + 40) {
+                  if (rect.bottom > 0 && rect.top < vh) {
                     container._isVisible = true;
                     return;
                   }
                   container._isVisible = false;
                   pauseAll();
-                }, 320);
+                }, 500);
               }
             });
           },
-          { threshold: 0.08, rootMargin: '12% 0px' }
+          { threshold: [0, 0.05, 0.15], rootMargin: '8% 0px' }
         );
         visObserver.observe(container);
+      });
+    }
 
-        document.addEventListener('visibilitychange', () => {
+    /* Single page-level tab visibility handler for showcase videos */
+    if (!window._xfShowcaseVisBound) {
+      window._xfShowcaseVisBound = true;
+      document.addEventListener('visibilitychange', () => {
+        document.querySelectorAll('[data-video-cycle]').forEach((container) => {
+          if (!container._cycleReady) return;
+          const videos = container.querySelectorAll('video.section-video');
           if (document.hidden) {
-            if (container._isVisible) pauseAll();
-          } else if (container._isVisible && container._cycleReady) {
-            cards.forEach((card) => playVideo(getCardVideo(card)));
+            videos.forEach((v) => {
+              try {
+                v.pause();
+              } catch (e) {}
+            });
+          } else if (container._isVisible) {
+            videos.forEach((v) => {
+              try {
+                v.muted = true;
+                if (!v.ended) v.play().catch(() => {});
+              } catch (e) {}
+            });
           }
         });
       });
     }
 
     window.onload = init;
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        document.querySelectorAll('[data-video-cycle] .section-video').forEach((v) => {
-          try { v.pause(); } catch (e) {}
-        });
-        return;
-      }
-      /* Tab visible again - resume active layers only */
-      document.querySelectorAll('[data-video-cycle]').forEach((container) => {
-        if (!container._isVisible || !container._cycleReady) return;
-        container.querySelectorAll('.section-video.is-active').forEach((v) => {
-          try {
-            v.muted = true;
-            v.play().catch(function () {});
-          } catch (e) {}
-        });
-      });
-    });
 
     window.addEventListener('pageshow', () => {
       const { active } = heroLayers();

@@ -3145,19 +3145,19 @@
     const videoCycleInstances = [];
 
     /*
-     * Hard cap concurrent showcase plays. Four 8-10MB H.264 clips + dual layers
-     * was stalling the main thread / GPU (pause/glitch like a hang).
+     * Cap concurrent showcase plays. Clips are compressed (~0.3-1.5MB) so we can
+     * allow a full section (2-4 cards) to play without freezing the page.
      */
     const CYCLE_MAX_PLAYING = (function () {
       try {
         if (navigator.connection) {
-          if (navigator.connection.saveData) return 1;
-          if (/2g|slow-2g/i.test(navigator.connection.effectiveType || '')) return 1;
+          if (navigator.connection.saveData) return 2;
+          if (/2g|slow-2g/i.test(navigator.connection.effectiveType || '')) return 2;
         }
       } catch (e) {}
-      if (window.matchMedia('(max-width: 1023px)').matches) return 1;
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 1;
-      return 2;
+      if (window.matchMedia('(max-width: 1023px)').matches) return 3;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 2;
+      return 6;
     })();
     const cyclePlayingSet = new Set();
 
@@ -3177,11 +3177,6 @@
     /** Only CYCLE_MAX_PLAYING active showcase videos may decode at once. */
     function requestCyclePlay(video) {
       if (!video) return false;
-      /* Drop detached / pending layers */
-      if (video.classList.contains('is-pending')) {
-        pauseCycleVideo(video);
-        return false;
-      }
       if (!cyclePlayingSet.has(video)) {
         cyclePlayingSet.add(video);
       }
@@ -3462,21 +3457,24 @@
           used.add(indices[i]);
         });
 
-        const playIfVisible = (video) => {
+        const playIfVisible = (video, opts) => {
           if (!container._isVisible || !video) return;
           if (document.hidden) {
             pauseCycleVideo(video);
             return;
           }
+          const force = opts && opts.force;
           video.muted = true;
+          video.defaultMuted = true;
           video.playsInline = true;
           video.setAttribute('playsinline', '');
           video.setAttribute('muted', '');
-          /* Never let idle/preload layers decode in the background */
-          if (video.classList.contains('is-pending')) {
+          /* Pending idle layers must not play unless this is an explicit reveal */
+          if (!force && video.classList.contains('is-pending')) {
             pauseCycleVideo(video);
             return;
           }
+
           const markFrame = () => {
             video.classList.add('is-frame-ready');
             const card = video.closest('.artistic-card');
@@ -3486,7 +3484,6 @@
           else video.addEventListener('loadeddata', markFrame, { once: true });
 
           if (!requestCyclePlay(video)) {
-            /* Over concurrent cap - freeze on current frame instead of fighting decode */
             try {
               video.pause();
             } catch (e) {}
@@ -3496,11 +3493,26 @@
           const kick = () => {
             if (!container._isVisible || !video || document.hidden) return;
             if (!cyclePlayingSet.has(video) && !requestCyclePlay(video)) return;
+            try {
+              if (video.ended || video.currentTime > 0.05) {
+                /* restart only when advancing; leave mid-play alone */
+              }
+            } catch (e) {}
             const p = video.play();
-            if (p && typeof p.catch === 'function') {
-              p.catch(() => {
-                releaseCyclePlay(video);
+            if (p && typeof p.then === 'function') {
+              p.then(function () {
+                markFrame();
+              }).catch(function () {
+                /* Retry once - autoplay policies / decode hiccups */
+                setTimeout(function () {
+                  if (!container._isVisible || document.hidden) return;
+                  video.play().then(markFrame).catch(function () {
+                    releaseCyclePlay(video);
+                  });
+                }, 180);
               });
+            } else {
+              markFrame();
             }
           };
           kick();
@@ -3578,9 +3590,10 @@
           if (stack.idle !== stack.active) {
             stack.idle.classList.remove('is-active');
             stack.idle.classList.add('is-pending');
+            pauseCycleVideo(stack.idle);
           }
           updateCardCaption(card, src, poolKey);
-          playIfVisible(stack.active);
+          playIfVisible(stack.active, { force: true });
           queueMicrotask(() => {
             try { bindActiveWatchdogs(card); } catch (e) { /* init order */ }
           });
@@ -3641,8 +3654,18 @@
             const show = () => {
               if (token !== card._swapToken) return;
 
-              /* Start playback first so the painted frame is the first frame */
-              playIfVisible(idle);
+              /*
+               * Promote idle → active BEFORE play. playIfVisible used to ignore
+               * is-pending layers, so swaps only showed a frozen first frame.
+               */
+              idle.classList.remove('is-pending');
+              idle.classList.add('is-active');
+              active.classList.remove('is-active');
+              active.classList.add('is-pending');
+              pauseCycleVideo(active);
+
+              try { idle.currentTime = 0; } catch (e) { /* ignore */ }
+              playIfVisible(idle, { force: true });
 
               waitForPaintedFrame(idle, () => {
                 if (token !== card._swapToken) return;
@@ -3870,6 +3893,11 @@
           const delay = Math.max(0, staggerMs || 0);
           const run = () => {
             if (!container._isVisible || !container._cycleReady) return;
+            /* Ensure this card is actually playing, not stuck on frame 0 */
+            const stackNow = card._videoStack;
+            if (stackNow && stackNow.active) {
+              playIfVisible(stackNow.active, { force: true });
+            }
             const duration = clipDurationMs(card);
             const advanceIn = Math.max(1200, duration - VIDEO_LEAD_MS);
             const preloadIn = Math.max(200, advanceIn - VIDEO_PRELOAD_MS);

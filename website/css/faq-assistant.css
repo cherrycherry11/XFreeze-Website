@@ -95,8 +95,10 @@ html.dark .xf-faq-bot__launcher:focus-visible {
     width: min(22rem, calc(100% - 1.5rem)) !important;
     max-width: calc(100vw - 1.5rem);
     height: min(70vh, calc(100svh - 5rem)) !important;
+    max-height: min(70dvh, calc(100dvh - 5rem)) !important;
     right: 0;
     bottom: 0;
+    min-height: 0;
   }
 
   /* Keep bot under drawer chrome; drawer is ~320 */
@@ -116,8 +118,11 @@ body.xf-menu-open .xf-faq-bot {
   bottom: 0;
   width: min(22rem, calc(100vw - 2rem));
   height: min(32rem, calc(100vh - 6rem));
+  max-height: min(32rem, calc(100dvh - 6rem));
   display: none;
   flex-direction: column;
+  /* Required so flex children can shrink and scroll inside the panel */
+  min-height: 0;
   border: 1px solid var(--border, #e5e7eb);
   border-radius: 1.125rem;
   background: var(--surface, #fff);
@@ -148,6 +153,7 @@ html.dark .xf-faq-bot__panel {
   padding: 0.9rem 1rem;
   border-bottom: 1px solid var(--border, #e5e7eb);
   background: var(--surface-muted, #f8f8f8);
+  flex: 0 0 auto;
 }
 
 html.dark .xf-faq-bot__head {
@@ -202,13 +208,21 @@ html.dark .xf-faq-bot__avatar {
 }
 
 .xf-faq-bot__messages {
-  flex: 1;
+  /* min-height:0 is required for overflow scroll inside a flex column */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
   background: var(--surface, #fff);
+  /* Keep the scrollport usable even with many long answers */
+  scrollbar-gutter: stable;
 }
 
 .xf-faq-bot__row {
@@ -348,8 +362,11 @@ html.dark .xf-faq-bot__skill-list code {
   display: flex;
   gap: 0.4rem;
   overflow-x: auto;
+  flex: 0 0 auto;
   padding: 0 1rem 0.65rem;
   scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
 }
 
 .xf-faq-bot__quick::-webkit-scrollbar {
@@ -380,6 +397,7 @@ html.dark .xf-faq-bot__skill-list code {
   padding: 0.75rem 1rem 1rem;
   border-top: 1px solid var(--border, #e5e7eb);
   background: var(--surface, #fff);
+  flex: 0 0 auto;
 }
 
 .xf-faq-bot__input {
@@ -443,6 +461,8 @@ body:has(#xf-faq-bot) .xf-support-toast {
   .xf-faq-bot__panel {
     width: calc(100vw - 1.7rem);
     height: min(70vh, 28rem);
+    max-height: min(70dvh, 28rem);
+    min-height: 0;
   }
 }
 

@@ -566,6 +566,28 @@
     document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape' && self.isOpen) self.close();
     });
+
+    /*
+     * Keep wheel/touch scroll inside the messages pane.
+     * Without this, some parent overflow/overscroll rules can steal the gesture.
+     */
+    if (this.messagesEl) {
+      this.messagesEl.addEventListener(
+        'wheel',
+        function (event) {
+          var el = self.messagesEl;
+          if (!el) return;
+          var delta = event.deltaY;
+          var atTop = el.scrollTop <= 0;
+          var atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+          if ((delta < 0 && atTop) || (delta > 0 && atBottom)) {
+            event.preventDefault();
+          }
+          event.stopPropagation();
+        },
+        { passive: false }
+      );
+    }
   };
 
   FaqBot.prototype.open = function () {
@@ -634,7 +656,19 @@
 
     row.appendChild(bubble);
     this.messagesEl.appendChild(row);
-    this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
+    this.scrollMessagesToBottom();
+  };
+
+  FaqBot.prototype.scrollMessagesToBottom = function () {
+    var el = this.messagesEl;
+    if (!el) return;
+    /* Double rAF so layout settles after long HTML bubbles */
+    window.requestAnimationFrame(function () {
+      el.scrollTop = el.scrollHeight;
+      window.requestAnimationFrame(function () {
+        el.scrollTop = el.scrollHeight;
+      });
+    });
   };
 
   FaqBot.prototype.showTyping = function () {
@@ -655,7 +689,7 @@
     row.appendChild(avatar);
     row.appendChild(typing);
     this.messagesEl.appendChild(row);
-    this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
+    this.scrollMessagesToBottom();
     return row;
   };
 
@@ -732,7 +766,7 @@
     if (!document.querySelector('link[data-xf-faq-bot-css]')) {
       var link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = base + 'css/faq-assistant.css?v=9';
+      link.href = base + 'css/faq-assistant.css?v=10';
       link.setAttribute('data-xf-faq-bot-css', '');
       document.head.appendChild(link);
     }

@@ -57,7 +57,7 @@
         { href: 'skill-builder', label: 'Skill Builder' },
         { href: 'connector-setup', label: 'Connector setup' },
         { href: 'use-cases', label: 'Use cases', nav: 'use-cases' },
-        { href: 'workflows', label: 'Workflow combos', nav: 'workflows' },
+        { href: 'workflows', label: 'Workflow collections', nav: 'workflows' },
         { href: 'account', label: 'My Library', nav: 'account' },
       ],
     },
@@ -280,14 +280,14 @@
     if (!document.querySelector('link[data-xf-faq-bot-css]')) {
       var link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = base + 'css/faq-assistant.css?v=8';
+      link.href = base + 'css/faq-assistant.css?v=10';
       link.setAttribute('data-xf-faq-bot-css', '');
       document.head.appendChild(link);
     }
 
     function loadAssistant() {
       var script = document.createElement('script');
-      script.src = base + 'js/faq-assistant.js?v=8';
+      script.src = base + 'js/faq-assistant.js?v=10';
       script.defer = true;
       document.body.appendChild(script);
     }

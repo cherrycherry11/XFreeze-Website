@@ -51,7 +51,17 @@
   function siteOrigin() {
     /* Prefer the origin the user is actually on so the session cookie/storage
        stays on the same host (www vs apex, vercel vs custom domain). */
-    return window.location.origin;
+    var origin = window.location.origin;
+    var host = (window.location.hostname || '').toLowerCase();
+    /* Canonicalize www → apex for freezestack so OAuth redirect matches
+       Supabase allow-list and localStorage stays on the host that serves the app. */
+    if (host === 'www.freezestack.com') {
+      return 'https://freezestack.com';
+    }
+    if (host === 'www.xfreeze.com') {
+      return 'https://xfreeze.com';
+    }
+    return origin;
   }
 
   function loginUrl() {
@@ -343,6 +353,53 @@
     return shouldRequireAuth() && isProtectedPage(currentPage());
   }
 
+  /**
+   * Dual localStorage + sessionStorage so the PKCE code verifier survives
+   * flaky storage, private-mode quirks, and some mobile browsers that drop
+   * localStorage across the Google redirect.
+   */
+  function authStorage() {
+    var ls = null;
+    var ss = null;
+    try {
+      ls = window.localStorage;
+    } catch (e) {}
+    try {
+      ss = window.sessionStorage;
+    } catch (e2) {}
+
+    return {
+      getItem: function (key) {
+        var v = null;
+        try {
+          if (ls) v = ls.getItem(key);
+        } catch (e) {}
+        if (v != null && v !== '') return v;
+        try {
+          if (ss) return ss.getItem(key);
+        } catch (e2) {}
+        return null;
+      },
+      setItem: function (key, value) {
+        var str = String(value);
+        try {
+          if (ls) ls.setItem(key, str);
+        } catch (e) {}
+        try {
+          if (ss) ss.setItem(key, str);
+        } catch (e2) {}
+      },
+      removeItem: function (key) {
+        try {
+          if (ls) ls.removeItem(key);
+        } catch (e) {}
+        try {
+          if (ss) ss.removeItem(key);
+        } catch (e2) {}
+      },
+    };
+  }
+
   function getClient() {
     if (client) return client;
     if (!isConfigured() || !window.supabase) return null;
@@ -354,7 +411,7 @@
         autoRefreshToken: true,
         detectSessionInUrl: true,
         flowType: 'pkce',
-        storage: window.localStorage,
+        storage: authStorage(),
         storageKey: 'xf-auth-session',
       },
     });
@@ -558,12 +615,14 @@
      * Exchanging again with the same code fails (used once) and looks like
      * "Google login broken". Prefer auto-detect, then one fallback exchange.
      */
+    var lastExchangeError = null;
     try {
       if (typeof sb.auth.initialize === 'function') {
         await sb.auth.initialize();
       }
     } catch (e) {
       console.warn('[xf-auth] initialize failed', e);
+      lastExchangeError = e;
     }
 
     var result = await sb.auth.getSession();
@@ -579,18 +638,43 @@
         if (code) {
           var exchanged = await sb.auth.exchangeCodeForSession(code);
           if (exchanged.error) {
+            lastExchangeError = exchanged.error;
             console.warn('[xf-auth] code exchange failed', exchanged.error);
           } else if (exchanged.data && exchanged.data.session) {
             session = exchanged.data.session;
+            lastExchangeError = null;
           }
         }
       } catch (err) {
+        lastExchangeError = err;
         console.warn('[xf-auth] code exchange error', err);
+      }
+    }
+
+    /* Brief retry: some browsers finish writing the verifier a tick late. */
+    if (!session && isOAuthCallback()) {
+      try {
+        await new Promise(function (resolve) {
+          window.setTimeout(resolve, 120);
+        });
+        var retry = await sb.auth.getSession();
+        if (retry.data && retry.data.session) {
+          session = retry.data.session;
+          lastExchangeError = null;
+        }
+      } catch (retryErr) {
+        console.warn('[xf-auth] session retry failed', retryErr);
       }
     }
 
     if (session) {
       cleanAuthParamsFromUrl();
+    } else if (lastExchangeError) {
+      /* Keep error params so handleLoginCallback can surface a clear message,
+         but stash the last exchange error for friendlier copy. */
+      try {
+        window.__xfAuthLastExchangeError = lastExchangeError;
+      } catch (e) {}
     }
     renderNavSlot();
     return session;
@@ -610,6 +694,9 @@
 
     rememberRedirect();
 
+    /* Drop any leftover ?code= / error params before starting a fresh OAuth round. */
+    cleanAuthParamsFromUrl();
+
     var oauthOptions = {
       /* Always current origin (freezestack.com / www / preview) - must be in Supabase Redirect URLs */
       redirectTo: loginUrl(),
@@ -624,8 +711,9 @@
       oauthOptions.scopes = 'tweet.read users.read offline.access';
     }
 
-    /* Google: force account picker so a stale session does not silently fail */
+    /* Google: openid required for ID token; account picker avoids stale silent fail */
     if (supabaseProviderName(provider) === 'google') {
+      oauthOptions.scopes = 'openid email profile';
       oauthOptions.queryParams = {
         access_type: 'online',
         prompt: 'select_account',
@@ -679,7 +767,8 @@
     if (url.indexOf('error') !== -1 && url.indexOf('error=') !== -1) {
       throw new Error('Could not start sign-in. Try Google or email instead.');
     }
-    window.location.assign(url);
+    /* Full navigation (not only assign) so the PKCE verifier is already on disk. */
+    window.location.href = url;
     return data;
   }
 
@@ -979,12 +1068,24 @@
         var codeLeft = new URLSearchParams(window.location.search || '').get(
           'code'
         );
-        if (codeLeft) {
+        var exchangeErr = window.__xfAuthLastExchangeError;
+        var exchangeMsg =
+          (exchangeErr && (exchangeErr.message || exchangeErr.error_description)) ||
+          '';
+        if (/PKCE|code verifier|verifier not found/i.test(exchangeMsg)) {
+          hint =
+            'Google sign-in was interrupted (login security code missing). Close other freezestack.com tabs, allow cookies/storage, then click Continue with Google once and stay on this tab.';
+        } else if (/flow state|invalid request|both auth code/i.test(exchangeMsg)) {
+          hint =
+            'Google sign-in expired. Click Continue with Google again and finish in the same browser tab.';
+        } else if (codeLeft) {
           hint =
             'Could not finish Google sign-in (login code already used or blocked by browser storage). Close extra tabs, allow cookies/storage for freezestack.com, then try Continue with Google again.';
         }
       } catch (e) {}
       setStatus(statusEl, 'error', hint);
+      /* Remove spent ?code= so a refresh does not re-fail on a dead code. */
+      cleanAuthParamsFromUrl();
     }
   }
 

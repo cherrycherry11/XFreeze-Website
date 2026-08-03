@@ -124,6 +124,10 @@
     afterCopy: afterCopy,
     afterAction: afterAction,
     copyWithSupport: copyWithSupport,
-    url: SUPPORT_URL,
+    /* Prefer pricing page; never throw if a legacy SUPPORT_URL global is missing. */
+    url:
+      typeof global.SUPPORT_URL === 'string' && global.SUPPORT_URL
+        ? global.SUPPORT_URL
+        : pricingUrl(),
   };
 })(typeof window !== 'undefined' ? window : globalThis);

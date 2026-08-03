@@ -73,7 +73,7 @@ module.exports = async function handler(req, res) {
       return json(res, 400, { error: 'Email is required for checkout' });
     }
 
-    const site = (process.env.SITE_URL || 'https://xfreeze.com').replace(
+    const site = (process.env.SITE_URL || 'https://freezestack.com').replace(
       /\/$/,
       ''
     );

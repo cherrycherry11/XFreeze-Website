@@ -33,13 +33,15 @@
     return src.replace(/js\/site-meta\.js(\?.*)?$/, '') + relFromJs.replace(/^\//, '');
   }
 
-  /** Prefer https://xfreeze.com/... on live; relative elsewhere */
+  /** Prefer absolute freezestack.com icons on live; relative elsewhere */
   function iconUrl(path) {
     var host = (location.hostname || '').toLowerCase();
-    if (host === 'xfreeze.com' || host === 'www.xfreeze.com') {
-      return 'https://xfreeze.com/' + path.replace(/^\//, '');
-    }
-    if (host === 'freezestack.com' || host === 'www.freezestack.com') {
+    if (
+      host === 'freezestack.com' ||
+      host === 'www.freezestack.com' ||
+      host === 'xfreeze.com' ||
+      host === 'www.xfreeze.com'
+    ) {
       return 'https://freezestack.com/' + path.replace(/^\//, '');
     }
     return assetUrl(path);

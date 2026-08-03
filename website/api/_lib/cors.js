@@ -7,6 +7,8 @@ function allowedOrigins() {
     .map((s) => s.trim())
     .filter(Boolean);
   const defaults = [
+    'https://freezestack.com',
+    'https://www.freezestack.com',
     'https://xfreeze.com',
     'https://www.xfreeze.com',
     'http://localhost:8080',

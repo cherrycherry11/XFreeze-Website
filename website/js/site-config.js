@@ -14,7 +14,7 @@
 
   var config = {
     siteName: 'Freezestack',
-    siteUrl: 'https://xfreeze.com',
+    siteUrl: 'https://freezestack.com',
     templates: TEMPLATE_COUNT,
     skills: SKILL_COUNT,
     motionPrompts: MOTION_PROMPT_COUNT,

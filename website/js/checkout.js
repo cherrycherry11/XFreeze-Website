@@ -71,7 +71,7 @@
       );
     } catch (e) {
       return (
-        'https://xfreeze.com/checkout-success?provider=dodo&plan=' +
+        'https://freezestack.com/checkout-success?provider=dodo&plan=' +
         encodeURIComponent(planId || '')
       );
     }

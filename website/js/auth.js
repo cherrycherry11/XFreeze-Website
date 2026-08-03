@@ -48,26 +48,48 @@
     );
   }
 
-  function siteOrigin() {
-    /* Prefer the origin the user is actually on so the session cookie/storage
-       stays on the same host (www vs apex, vercel vs custom domain). */
-    var origin = window.location.origin;
-    var host = (window.location.hostname || '').toLowerCase();
-    /* Canonicalize www → apex for freezestack so OAuth redirect matches
-       Supabase allow-list and localStorage stays on the host that serves the app. */
-    if (host === 'www.freezestack.com') {
+  function configuredSiteOrigin() {
+    var c = config();
+    var raw = (c.siteUrl || 'https://freezestack.com').replace(/\/$/, '');
+    try {
+      return new URL(raw).origin;
+    } catch (e) {
       return 'https://freezestack.com';
     }
-    if (host === 'www.xfreeze.com') {
-      return 'https://xfreeze.com';
+  }
+
+  function siteOrigin() {
+    var host = (window.location.hostname || '').toLowerCase();
+    /* Local preview keeps the real origin so redirect allow-list can include localhost. */
+    if (
+      host === 'localhost' ||
+      host === '127.0.0.1' ||
+      host === '[::1]' ||
+      host === '0.0.0.0'
+    ) {
+      return window.location.origin;
     }
-    return origin;
+    /*
+     * Production OAuth must never return to the dead xfreeze.com domain
+     * (Supabase Site URL used to be xfreeze → users landed on DEPLOYMENT_NOT_FOUND).
+     * Always use freezestack.com from auth-config.
+     */
+    if (
+      host === 'xfreeze.com' ||
+      host === 'www.xfreeze.com' ||
+      host === 'www.freezestack.com' ||
+      host === 'freezestack.com' ||
+      /\.vercel\.app$/i.test(host)
+    ) {
+      return configuredSiteOrigin();
+    }
+    return window.location.origin;
   }
 
   function loginUrl() {
     var c = config();
     var path = (c.loginPath || 'login').replace(/^\//, '').replace(/\.html$/, '');
-    /* Absolute URL on the host the user is on (required for OAuth redirect allow-list match). */
+    /* Absolute allowlisted URL - must be freezestack.com/login on production. */
     return siteOrigin() + '/' + path;
   }
 
@@ -1040,7 +1062,7 @@
           'X email permission is missing. In the X Developer Portal, turn ON Request email from users, then retry.';
       } else if (/redirect|callback|uri|allowed/i.test(decoded)) {
         decoded =
-          'Redirect URL not allowed. In Supabase → Authentication → URL Configuration, add https://freezestack.com/** and https://freezestack.com/login (and www if you use it). Google Cloud redirect URI must be https://ekmllicbgmuodptvgxsl.supabase.co/auth/v1/callback';
+          'Redirect URL not allowed. In Supabase → Authentication → URL Configuration, set Site URL to https://freezestack.com (not xfreeze.com) and add https://freezestack.com/** plus https://freezestack.com/login. Google Cloud redirect URI must be https://ekmllicbgmuodptvgxsl.supabase.co/auth/v1/callback';
       } else if (/invalid.?client|client.?id|unauthorized/i.test(decoded)) {
         decoded =
           'Google client ID mismatch. Supabase Google provider Client ID must match Google Cloud Web client and auth-config.js googleClientId.';

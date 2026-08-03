@@ -26,10 +26,14 @@ Config: `website/js/auth-config.js`
 
 **Authentication → URL Configuration**
 
-**Site URL:**
+**Site URL (must NOT be xfreeze.com - that domain is dead / DEPLOYMENT_NOT_FOUND):**
 ```
 https://freezestack.com
 ```
+
+If Site URL is still `https://xfreeze.com`, Google login returns to
+`xfreeze.com/?code=...` and users see a Vercel 404. Change Site URL to freezestack.com
+and save before testing Google again.
 
 **Redirect URLs** (add every line - OAuth fails if the return host is missing):
 ```
@@ -39,9 +43,6 @@ https://freezestack.com/signup
 https://www.freezestack.com/**
 https://www.freezestack.com/login
 https://www.freezestack.com/signup
-https://xfreeze.com/**
-https://xfreeze.com/login
-https://www.xfreeze.com/**
 http://localhost:8765/**
 http://127.0.0.1:8765/**
 ```

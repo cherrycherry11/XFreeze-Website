@@ -900,127 +900,6 @@
     } catch (e) {}
   }
 
-  /**
-   * Google via Identity Services (popup / account chooser) → signInWithIdToken.
-   * Stays on freezestack.com so a wrong Supabase Site URL (xfreeze.com) cannot
-   * hijack the return. Falls back to full OAuth redirect if GIS is unavailable.
-   */
-  function signInWithGoogleGis(statusEl) {
-    var c = config();
-    if (!c.googleClientId) {
-      return signInWithOAuth('google');
-    }
-
-    rememberRedirect();
-    setStatus(statusEl, 'info', 'Opening Google…');
-
-    return new Promise(function (resolve, reject) {
-      loadGoogleIdentityServices(function () {
-        if (!window.google || !window.google.accounts || !window.google.accounts.id) {
-          signInWithOAuth('google').then(resolve).catch(reject);
-          return;
-        }
-
-        generateGoogleOneTapNonce()
-          .then(function (pair) {
-            googleOneTapNonce = pair ? pair.raw : null;
-
-            var settled = false;
-            function done(err, value) {
-              if (settled) return;
-              settled = true;
-              if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
-              if (err) reject(err);
-              else resolve(value);
-            }
-
-            var overlay = document.createElement('div');
-            overlay.setAttribute('role', 'dialog');
-            overlay.setAttribute('aria-label', 'Continue with Google');
-            overlay.style.cssText =
-              'position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;' +
-              'background:rgba(0,0,0,.45);padding:24px;';
-            var panel = document.createElement('div');
-            panel.style.cssText =
-              'background:#fff;color:#111;border-radius:16px;padding:24px 28px;max-width:360px;width:100%;' +
-              'box-shadow:0 20px 50px rgba(0,0,0,.25);text-align:center;font-family:system-ui,sans-serif;';
-            panel.innerHTML =
-              '<p style="margin:0 0 8px;font-size:16px;font-weight:600;">Continue with Google</p>' +
-              '<p style="margin:0 0 18px;font-size:13px;color:#52525b;line-height:1.4;">' +
-              'Choose your Google account. You stay on freezestack.com.</p>' +
-              '<div id="xf-gsi-btn-slot" style="display:flex;justify-content:center;min-height:44px;"></div>' +
-              '<button type="button" id="xf-gsi-cancel" style="margin-top:14px;border:0;background:transparent;' +
-              'color:#71717a;font-size:13px;cursor:pointer;text-decoration:underline;">Cancel</button>';
-            overlay.appendChild(panel);
-            document.body.appendChild(overlay);
-
-            var cancelBtn = panel.querySelector('#xf-gsi-cancel');
-            if (cancelBtn) {
-              cancelBtn.addEventListener('click', function () {
-                done(new Error('Google sign-in cancelled.'));
-              });
-            }
-            overlay.addEventListener('click', function (e) {
-              if (e.target === overlay) done(new Error('Google sign-in cancelled.'));
-            });
-
-            try {
-              window.google.accounts.id.initialize({
-                client_id: c.googleClientId,
-                callback: function (response) {
-                  handleGoogleOneTap(response)
-                    .then(function () {
-                      if (session && session.user) {
-                        if (document.getElementById('xf-auth-page')) {
-                          finishLogin(statusEl || document.getElementById('xf-auth-status'));
-                        }
-                        done(null, session);
-                      } else {
-                        done(new Error('Google sign-in did not create a session. Try again.'));
-                      }
-                    })
-                    .catch(function (err) {
-                      done(err || new Error('Google sign-in failed.'));
-                    });
-                },
-                auto_select: false,
-                cancel_on_tap_outside: true,
-                context: 'signin',
-                itp_support: true,
-                use_fedcm_for_prompt: true,
-                nonce: pair && pair.hashed ? pair.hashed : undefined,
-              });
-              googleOneTapInited = true;
-
-              var slot = document.getElementById('xf-gsi-btn-slot');
-              if (slot) {
-                window.google.accounts.id.renderButton(slot, {
-                  type: 'standard',
-                  theme: 'outline',
-                  size: 'large',
-                  text: 'continue_with',
-                  shape: 'pill',
-                  width: 300,
-                  logo_alignment: 'left',
-                });
-              }
-
-              /* Also open One Tap / FedCM account chooser when the browser allows it. */
-              try {
-                window.google.accounts.id.prompt();
-              } catch (promptErr) {}
-            } catch (initErr) {
-              if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-              signInWithOAuth('google').then(resolve).catch(reject);
-            }
-          })
-          .catch(function () {
-            signInWithOAuth('google').then(resolve).catch(reject);
-          });
-      });
-    });
-  }
-
   function bindProviderButton(btn, provider, statusEl) {
     if (!btn) return;
 
@@ -1048,15 +927,14 @@
       setStatus(
         statusEl,
         'info',
-        provider === 'google' ? 'Opening Google…' : 'Redirecting to X...'
+        provider === 'google' ? 'Redirecting to Google…' : 'Redirecting to X…'
       );
 
       try {
-        if (provider === 'google') {
-          await signInWithGoogleGis(statusEl);
-        } else {
-          await signInWithOAuth(provider);
-        }
+        /* Full Google OAuth redirect (no intermediate modal).
+           xfreeze.com → freezestack.com/login is handled in vercel.json if
+           Supabase Site URL is still the old domain. */
+        await signInWithOAuth(provider);
       } catch (err) {
         setStatus(statusEl, 'error', err.message || 'Sign-in failed.');
         btn.disabled = false;

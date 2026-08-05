@@ -193,7 +193,7 @@
       },
       {
         question: 'How often is new stuff added?',
-        answer: 'New templates, skills, and motion prompts drop <strong>every week</strong>. Follow <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer">@XFreeze</a> for the latest drops.',
+        answer: 'New templates, skills, and motion prompts drop <strong>every week</strong>. Follow <a href="https://x.com/Freezestack" target="_blank" rel="noopener noreferrer">Freezestack</a> for the latest drops.',
         tags: ['updates', 'new', 'weekly', 'often']
       },
       {
@@ -417,7 +417,7 @@
       /* Support */
       {
         question: 'How do I contact support?',
-        answer: 'Email <a href="mailto:contact@xfreeze.com">contact@xfreeze.com</a>, use the <a href="contact.html">contact form</a>, or DM <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer">@XFreeze</a>. Pick a topic: support, template request, skill request, or partnership.',
+        answer: 'Email <a href="mailto:contact@freezestack.com">contact@freezestack.com</a>, use the <a href="contact.html">contact form</a>, or DM <a href="https://x.com/Freezestack" target="_blank" rel="noopener noreferrer">Freezestack</a>. Pick a topic: support, template request, skill request, or partnership.',
         tags: ['contact', 'support', 'help', 'email']
       },
       {
@@ -427,7 +427,7 @@
       },
       {
         question: 'How do I follow updates?',
-        answer: 'Follow <a href="https://x.com/XFreeze" target="_blank" rel="noopener noreferrer">@XFreeze</a>, or check the About and Help pages.',
+        answer: 'Follow <a href="https://x.com/Freezestack" target="_blank" rel="noopener noreferrer">Freezestack</a>, or check the About and Help pages.',
         tags: ['follow', 'updates', 'twitter', 'news']
       },
       {

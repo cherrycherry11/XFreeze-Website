@@ -127,7 +127,7 @@
         var body = ['Name: ' + name, 'Email: ' + email, 'Topic: ' + topic, '', message].join('\n');
         window.location.href =
           'mailto:' +
-          encodeURIComponent(c.fallbackEmail || 'contact@xfreeze.com') +
+          encodeURIComponent(c.fallbackEmail || 'contact@freezestack.com') +
           '?subject=' +
           encodeURIComponent('Freezestack - ' + topic) +
           '&body=' +
@@ -163,7 +163,7 @@
       setTopic('general');
       showStatus("Message sent. I'll reply within 24-48 hours.", 'success');
     } catch (error) {
-      showStatus(error.message || 'Something went wrong. Email contact@xfreeze.com directly.', 'error');
+      showStatus(error.message || 'Something went wrong. Email contact@freezestack.com directly.', 'error');
     } finally {
       if (submitBtn) submitBtn.disabled = false;
     }

@@ -1,4 +1,4 @@
--- X Freeze: server-owned daily usage limits
+-- Freezestack: server-owned daily usage limits
 -- Run in Supabase SQL Editor (service role writes only).
 -- Safe to re-run.
 --

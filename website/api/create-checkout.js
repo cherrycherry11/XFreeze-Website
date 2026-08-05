@@ -113,7 +113,7 @@ module.exports = async function handler(req, res) {
           user_id: user.id,
           plan_id: planId,
           product_type: 'subscription',
-          source: 'xfreeze',
+          source: 'freezestack',
           site_theme: checkoutTheme,
         },
       },

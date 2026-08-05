@@ -1,4 +1,4 @@
--- X Freeze: server-owned entitlements (run in Supabase SQL editor)
+-- Freezestack: server-owned entitlements (run in Supabase SQL editor)
 -- Users can READ their own row only. No user INSERT/UPDATE/DELETE.
 -- Server uses SUPABASE_SERVICE_ROLE_KEY (bypasses RLS) after verified payment.
 

@@ -64,13 +64,13 @@
     {
       title: 'Connect',
       links: [
-        { href: 'https://x.com/XFreeze', label: '@XFreeze', external: true },
+        { href: 'https://x.com/Freezestack', label: 'Freezestack', external: true },
         { href: 'https://grok.com', label: 'grok.com', external: true },
         { href: 'https://grok.com/imagine', label: 'Grok Imagine', external: true },
         { href: 'privacy', label: 'Privacy', nav: 'privacy' },
         { href: 'terms', label: 'Terms', nav: 'terms' },
         { href: 'refund', label: 'Refunds', nav: 'refund' },
-        { href: 'mailto:contact@xfreeze.com', label: 'contact@xfreeze.com' },
+        { href: 'mailto:contact@freezestack.com', label: 'contact@freezestack.com' },
       ],
     },
   ];

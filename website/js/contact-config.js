@@ -8,5 +8,5 @@ window.XFreezeContactConfig = {
   provider: 'formspree',
   formspreeId: 'mdarznel',
   web3formsAccessKey: '',
-  fallbackEmail: 'contact@xfreeze.com',
+  fallbackEmail: 'contact@freezestack.com',
 };

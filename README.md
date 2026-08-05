@@ -1,25 +1,24 @@
 # Freezestack Website
 
-Production static site for [xfreeze.com](https://xfreeze.com).
+Production static site for [freezestack.com](https://freezestack.com).
 
 ## Folder layout
 
 ```
-XFreeze-Website/
-├── website/          ← Deploy THIS folder to your host
-│   ├── index.html    ← Entry (redirects to home.html)
+├── website/          ← Deploy THIS folder (Vercel root: website)
+│   ├── index.html    ← Entry (redirects to home)
 │   ├── home.html
 │   ├── login.html / signup.html
 │   ├── templates.html, prompt-library.html, skills.html
 │   ├── css/  js/  data/  assets/  grok-templates/
-├── docs/             ← AUTH-SETUP.md, PAYMENT-SETUP.md
+├── docs/             ← AUTH-SETUP.md, payment docs
 ├── scripts/          ← Optional skills sync helpers
 ```
 
 ## Deploy
 
-1. Upload everything inside **`website/`** to your web root.
-2. Default page: **`index.html`**.
+1. Vercel project: **freezestack** (root directory `website`)
+2. Domains: freezestack.com (primary). Old domain xfreeze.com redirects here.
 3. Auth: see `docs/AUTH-SETUP.md`.
 
 ## Local preview
@@ -28,5 +27,3 @@ XFreeze-Website/
 cd website
 python3 -m http.server 8765
 ```
-
-Open http://localhost:8765/

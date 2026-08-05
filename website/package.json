@@ -1,5 +1,5 @@
 {
-  "name": "xfreeze-website",
+  "name": "freezestack-website",
   "private": true,
   "version": "1.0.0",
   "description": "Freezestack static site + Vercel serverless APIs",

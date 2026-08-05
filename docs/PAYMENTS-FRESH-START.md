@@ -13,7 +13,7 @@ have been removed. Rebuild from zero when ready.
 
 ## Deleted connections
 
-- Dodo webhook endpoint → `https://xfreeze.com/api/webhooks/dodo` (removed in Dodo live)
+- Dodo webhook endpoint → `https://freezestack.com/api/webhooks/dodo` (removed in Dodo live)
 
 ## Deleted from repo
 

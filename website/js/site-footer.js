@@ -304,11 +304,32 @@
     document.body.appendChild(dataScript);
   }
 
+  /**
+   * Vercel Speed Insights for static HTML (not Next.js).
+   * Do not use: import { SpeedInsights } from "@vercel/speed-insights/next"
+   * Enable Speed Insights in the Vercel project dashboard as well.
+   */
+  function injectSpeedInsights() {
+    if (document.querySelector('script[src*="speed-insights/script.js"]')) return;
+    try {
+      window.si =
+        window.si ||
+        function () {
+          (window.siq = window.siq || []).push(arguments);
+        };
+    } catch (e) {}
+    var s = document.createElement('script');
+    s.defer = true;
+    s.src = '/_vercel/speed-insights/script.js';
+    document.head.appendChild(s);
+  }
+
   function init() {
     renderFooter();
     initFooterNav();
     initTopNav();
     loadFaqBot();
+    injectSpeedInsights();
   }
 
   if (document.readyState === 'loading') {

@@ -3,5 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "Freezestack static site + Vercel serverless APIs",
-  "dependencies": {}
+  "dependencies": {
+    "@vercel/speed-insights": "^2.0.0"
+  }
 }

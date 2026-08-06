@@ -375,10 +375,7 @@
     if (s1) s1.textContent = usage.prompts || 0;
     if (s2) s2.textContent = usage.templates || 0;
     if (s3) s3.textContent = usage.skills || 0;
-    if (useBadge) {
-      useBadge.textContent = periodLabel;
-      useBadge.title = 'Daily usage window. Limits reset at midnight UTC.';
-    }
+    if (useBadge) useBadge.textContent = periodLabel;
 
     /* Settings */
     var setName = $('xf-set-name');

@@ -48,8 +48,8 @@
     'studio-yearly': {
       id: 'studio-yearly',
       name: 'Premium Plus Yearly',
-      /* $109 × 12 × 0.80 → $1,046.40, charged as $1046 */
-      price: 1046,
+      /* $109 × 12 × 0.75 → $981 (25% off) */
+      price: 981,
       type: 'subscription',
       interval: 'year',
       tier: 'studio',

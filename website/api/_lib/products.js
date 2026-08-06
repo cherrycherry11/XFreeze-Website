@@ -39,7 +39,7 @@ const SUBSCRIPTIONS = {
   'studio-yearly': {
     id: 'studio-yearly',
     name: 'Premium Plus Yearly',
-    price: 1046,
+    price: 981,
     type: 'subscription',
     interval: 'year',
     tier: 'studio',

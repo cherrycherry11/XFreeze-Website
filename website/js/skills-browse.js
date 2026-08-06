@@ -120,6 +120,13 @@
     );
   }
 
+  /** True when the install prompt carries bundled files, not just SKILL.md. */
+  function hasBundledFiles(skill) {
+    const aip = (skill && skill.aiInstallPrompt) || '';
+    const body = (skill && skill.skillContent) || '';
+    return Boolean(body) && aip.length > body.length * 1.6;
+  }
+
   function buildCopyText(skill) {
     const base = skill.aiInstallPrompt || '';
     if (skill.requiresConnectors) {
@@ -573,6 +580,9 @@
           ? global.XFreezeFavorites.heartButtonHtml('skills', s.id)
           : '') +
         '<button type="button" class="skills-browse-btn primary" data-copy-skill="' + esc(s.id) + '">Copy prompt</button>' +
+        (hasBundledFiles(s)
+          ? '<button type="button" class="skills-browse-btn" data-copy-body="' + esc(s.id) + '" title="Just the SKILL.md text, for pasting into a chat">Copy for chat</button>'
+          : '') +
         '<button type="button" class="skills-browse-btn" data-preview-skill="' + esc(s.id) + '">Preview</button>' +
         '</div></div>'
       );
@@ -595,6 +605,38 @@
           connector: Boolean(skill.requiresConnectors),
         });
         global.XFreezeFavorites.syncButton(btn);
+      });
+    });
+
+    list.querySelectorAll('[data-copy-body]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (!requireSkillPackAccess(b)) return;
+        const skillId = btn.getAttribute('data-copy-body');
+        const skill = b.skills.find(function (x) { return x.id === skillId; });
+        if (!skill) return;
+        const original = btn.textContent;
+        btn.disabled = true;
+        countFreeSkillUse(b, skillId).then(function (allowed) {
+          if (!allowed) {
+            btn.disabled = false;
+            return;
+          }
+          if (skill.skillContent) {
+            btn.disabled = false;
+            copyText(skill.skillContent, btn);
+            return;
+          }
+          btn.textContent = 'Loading…';
+          return loadPack(b.id).then(function () {
+            const loaded = b.skills.find(function (x) { return x.id === skillId; });
+            copyText((loaded && loaded.skillContent) || '', btn);
+          }).catch(function () {
+            window.alert('Could not load this skill. Please try again.');
+          }).finally(function () {
+            btn.disabled = false;
+            btn.textContent = original;
+          });
+        });
       });
     });
 
@@ -672,6 +714,26 @@
     }
   }
 
+  /**
+   * "Pairs well with" — templates and motion prompts that fit the same work,
+   * plus the collections this pack sits on. Card metadata only; no pack bodies.
+   * Silently absent when data/collections.js or js/pairs-well-with.js is not
+   * on the page.
+   */
+  function renderPairsModule(b) {
+    const el = $('xf-skills-pairs');
+    if (!el) return;
+    if (!global.XFreezePairs || !global.XFreezeCollections) {
+      el.hidden = true;
+      return;
+    }
+    try {
+      global.XFreezePairs.renderForSkillPack(el, b.id, { limit: 4 });
+    } catch (e) {
+      el.hidden = true;
+    }
+  }
+
   function showBundleUI(id) {
     const b = BUNDLES.find(function (x) { return x.id === id; });
     if (!b) {
@@ -702,6 +764,7 @@
 
     const list = $('xf-skills-skill-list');
     renderBundleSkillList(b);
+    renderPairsModule(b);
 
     loadPack(b.id).then(function () {
       if (currentBundle && currentBundle.id === b.id) {
@@ -861,10 +924,12 @@
       '" data-id="' +
       esc(b.id) +
       '" tabindex="0" role="button">' +
-      favBtn +
       '<div class="skills-browse-card-top">' +
       '<span class="skills-browse-tag' + (conn ? ' connector' : '') + (premium ? ' premium' : '') + '">' + tagText + '</span>' +
+      '<div class="skills-browse-card-top-end">' +
       countBadge(b.skillCount || b.skills.length) +
+      favBtn +
+      '</div>' +
       '</div>' +
       '<h4>' + esc(displayBundleName(b.name)) + '</h4>' +
       '<p class="skills-browse-card-desc">' + esc(b.desc || '') + '</p>' +

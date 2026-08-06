@@ -32,6 +32,15 @@ html.dark .xf-fav-btn {
   transform: scale(1.06);
 }
 
+.xf-fav-btn:focus {
+  outline: none;
+}
+
+.xf-fav-btn:focus-visible {
+  outline: 2px solid rgba(225, 29, 72, 0.45);
+  outline-offset: 2px;
+}
+
 .xf-fav-btn.is-active {
   color: #e11d48;
   border-color: rgba(225, 29, 72, 0.45);
@@ -91,15 +100,21 @@ html.dark .pl-card__actions .xf-fav-btn {
   box-shadow: none;
 }
 
-.skills-browse-card {
-  position: relative;
+/* Pack cards: heart sits in top-end row with the skill count (no absolute overlap) */
+.skills-browse-card .xf-fav-btn--pack {
+  position: static;
+  width: 1.85rem;
+  height: 1.85rem;
+  box-shadow: none;
+  background: var(--surface-subtle, #f4f4f5);
 }
 
-.skills-browse-card .xf-fav-btn--pack {
-  position: absolute;
-  top: 0.65rem;
-  right: 0.65rem;
-  z-index: 3;
+html.dark .skills-browse-card .xf-fav-btn--pack {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.skills-browse-card .xf-fav-btn--pack i {
+  font-size: 0.72rem;
 }
 
 /* Account favorites list */

@@ -857,6 +857,16 @@ html.dark .skills-cat-btn.is-active {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  min-width: 0;
+}
+
+/* Tag left · count + heart right (no absolute overlap) */
+.skills-browse-card-top-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .skills-browse-tag {
@@ -929,11 +939,13 @@ html.dark .skills-browse-tag.premium {
 .skills-count-badge {
   display: inline-flex;
   align-items: baseline;
-  gap: 0.3rem;
-  padding: 0.3rem 0.65rem;
+  gap: 0.28rem;
+  padding: 0.28rem 0.6rem;
   border-radius: 9999px;
   background: var(--surface-subtle, #f4f4f5);
   border: 1px solid var(--border, #e5e7eb);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .skills-count-num {
@@ -949,6 +961,7 @@ html.dark .skills-browse-tag.premium {
   font-size: 0.6875rem;
   font-weight: 500;
   color: var(--text-secondary, #52525b);
+  white-space: nowrap;
 }
 
 .skills-browse-card-link {

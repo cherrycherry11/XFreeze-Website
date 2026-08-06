@@ -72,18 +72,25 @@
     document.head.appendChild(link);
   }
 
-  /* Root icons (next to index.html): ico + 32 PNG + apple-touch */
-  var v = 'fs-logo5-202608060605';
-  var ico = iconUrl('favicon.ico') + '?v=' + v;
-  var png32 = iconUrl('favicon-32x32.png') + '?v=' + v;
-  var apple = iconUrl('apple-touch-icon.png') + '?v=' + v;
-  /* 48px at root for Google Search results */
-  var png48 = iconUrl('favicon-48x48.png') + '?v=' + v;
-  var manifest = iconUrl('site.webmanifest');
+  /* Google SERP: clean absolute 48x48+ first, no cache-bust query on primary icons */
+  var origin = 'https://freezestack.com';
+  try {
+    var host = (location.hostname || '').toLowerCase();
+    if (host === 'localhost' || host === '127.0.0.1' || host === '[::1]') {
+      origin = location.origin;
+    }
+  } catch (e) {}
+  var ico = origin + '/favicon.ico';
+  var png32 = origin + '/favicon-32x32.png';
+  var png48 = origin + '/favicon-48x48.png';
+  var png96 = origin + '/favicon-96x96.png';
+  var apple = origin + '/apple-touch-icon.png';
+  var manifest = origin + '/site.webmanifest';
 
+  ensureLink('icon', png48, { type: 'image/png', sizes: '48x48' });
+  ensureLink('icon', png96, { type: 'image/png', sizes: '96x96' });
   ensureLink('icon', ico, { type: 'image/x-icon' });
   ensureLink('icon', png32, { type: 'image/png', sizes: '32x32' });
-  ensureLink('icon', png48, { type: 'image/png', sizes: '48x48' });
   ensureLink('apple-touch-icon', apple, { sizes: '180x180' });
   ensureLink('manifest', manifest, {});
 })();

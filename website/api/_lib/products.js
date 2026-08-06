@@ -23,7 +23,8 @@ const SUBSCRIPTIONS = {
   'pro-yearly': {
     id: 'pro-yearly',
     name: 'Premium Yearly',
-    price: 500,
+    /* $49 × 12 = $588 → $499 (~15% off) */
+    price: 499,
     type: 'subscription',
     interval: 'year',
     tier: 'pro',
@@ -39,7 +40,8 @@ const SUBSCRIPTIONS = {
   'studio-yearly': {
     id: 'studio-yearly',
     name: 'Premium Plus Yearly',
-    price: 981,
+    /* $109 × 12 = $1308 → $999 (~24% off) */
+    price: 999,
     type: 'subscription',
     interval: 'year',
     tier: 'studio',

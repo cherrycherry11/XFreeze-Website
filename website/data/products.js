@@ -17,7 +17,7 @@
    * Subscriptions
    * Free browse + Premium + Premium Plus (monthly or yearly).
    * Plan ids stay pro-* / studio-* for checkout + Dodo env compatibility.
-   * Yearly: Premium 15% off, Premium Plus 20% off list monthly×12.
+   * Yearly: Premium $499 (~15% off $49×12), Premium Plus $999 (~24% off $109×12).
    */
   const SUBSCRIPTIONS = {
     'pro-monthly': {
@@ -31,8 +31,8 @@
     'pro-yearly': {
       id: 'pro-yearly',
       name: 'Premium Yearly',
-      /* $49 × 12 × 0.85 → $499.80, charged as $500 */
-      price: 500,
+      /* $49 × 12 = $588 → $499 (save $89 ≈ 15% off) */
+      price: 499,
       type: 'subscription',
       interval: 'year',
       tier: 'pro',
@@ -48,8 +48,8 @@
     'studio-yearly': {
       id: 'studio-yearly',
       name: 'Premium Plus Yearly',
-      /* $109 × 12 × 0.75 → $981 (25% off) */
-      price: 981,
+      /* $109 × 12 = $1308 → $999 (save $309 ≈ 24% off) */
+      price: 999,
       type: 'subscription',
       interval: 'year',
       tier: 'studio',

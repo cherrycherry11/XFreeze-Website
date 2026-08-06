@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" data-xf-meta-title="Workflow combos" data-xf-meta-desc="Multi-step skill stacks for real operating workflows." data-xf-meta-path="workflows">
+<html lang="en" data-xf-meta-title="Workflow collections" data-xf-meta-desc="Ten curated paths that stack visual templates, motion prompts and skill packs into one ordered workflow." data-xf-meta-path="workflows">
 <head>
-  <!-- Favicon for browsers + Google Search (48px+ PNG required for SERP) -->
-  <link rel="icon" href="/favicon.ico?v=share3" type="image/x-icon">
-  <link rel="icon" href="/favicon.png?v=share3" type="image/png" sizes="48x48">
-  <link rel="icon" href="/assets/images/logo/favicon-32.png?v=share3" type="image/png" sizes="32x32">
-  <link rel="icon" href="/assets/images/logo/favicon-96.png?v=share3" type="image/png" sizes="96x96">
-  <link rel="icon" href="/assets/images/logo/favicon-192.png?v=share3" type="image/png" sizes="192x192">
-  <link rel="apple-touch-icon" href="/assets/images/logo/apple-touch-icon.png?v=share3" sizes="180x180">
+  <!-- Main Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=fs-logo4">
+  <!-- PNG fallback for modern browsers -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=fs-logo4">
+  <!-- 48px for Google Search -->
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png?v=fs-logo4">
+  <!-- Apple Touch Icon for iOS -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=fs-logo4">
   <link rel="manifest" href="/site.webmanifest">
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Workflow combos</title>
+  <title>Workflow collections</title>
   <script>
     (function () {
       var stored = localStorage.getItem('xfreeze-theme');
@@ -47,7 +47,8 @@
   <link rel="stylesheet" href="css/scroll-reveal.css">
   <link rel="stylesheet" href="css/motion.css">
   <link rel="stylesheet" href="css/cinematic.css">
-  
+  <link rel="stylesheet" href="css/collections.css">
+
   <style>
 :root {
       --text: #0a0a0a; --text-secondary: #52525b; --border: #e5e7eb;
@@ -144,19 +145,46 @@
   <div class="xf-glass-hero">
     <div class="content-container">
       <div class="scroll-reveal-in xf-content-hero" style="margin-bottom:0;padding-top:0">
-        <p class="xf-content-eyebrow">Guides</p>
-        <h1 class="xf-content-title">Workflow combos</h1>
-        <p class="xf-content-lead">Multi-step skill stacks for real operating workflows.</p>
+        <p class="xf-content-eyebrow">Collections</p>
+        <h1 class="xf-content-title">Workflow collections</h1>
+        <p class="xf-content-lead">Curated paths that stack visual templates, motion prompts and skill packs into one ordered workflow — with a reason for every step.</p>
       </div>
     </div>
   </div>
   <main class="page-main content-container" data-scroll-reveal>
-    <div class="scroll-reveal-in xf-prose"><p>Pick a workflow pack on the <a href="skills">Skills</a> page, then copy the SKILL.md files for each step. Popular combos include content pipeline, meeting closed loop, and finance closed loop.</p><p>Need live apps? Start with the <a href="connector-setup">connector setup guide</a>.</p></div>
+    <div id="xf-col-home" class="scroll-reveal-in" data-scroll-reveal>
+      <div id="xf-col-summary" class="xf-col-summary" aria-label="Library size"></div>
+
+      <div class="xf-prose" style="max-width:44rem;margin-inline:auto;text-align:center">
+        <p>The three libraries are usually browsed separately. A collection is the opposite: one job of work, broken into ordered steps, each one pointing at a real item in the library and explaining why it sits at that point in the path.</p>
+      </div>
+
+      <div id="xf-col-filters" class="xf-col-filters" role="group" aria-label="Filter collections"></div>
+      <div id="xf-col-grid" class="xf-col-grid"></div>
+
+      <div class="xf-prose" style="max-width:44rem;margin-inline:auto;margin-top:2.5rem;text-align:center">
+        <p>Prefer to browse raw? Go to <a href="templates">Templates</a>, <a href="prompt-library">Prompts</a> or <a href="skills">Skills</a>. Connector-based steps need the <a href="connector-setup">connector setup guide</a> first.</p>
+      </div>
+    </div>
+
+    <div id="xf-col-detail" class="xf-col-detail xf-col-hidden scroll-reveal-in" data-scroll-reveal></div>
+
+    <noscript>
+      <div class="xf-prose" style="max-width:44rem;margin-inline:auto;margin-top:2rem">
+        <p>Collections are rendered from the live library data and need JavaScript. Browse <a href="templates">Templates</a>, <a href="prompt-library">Prompts</a> and <a href="skills">Skills</a> directly instead.</p>
+      </div>
+    </noscript>
   </main>
 
   <footer class="xf-site-footer" data-xf-footer-root></footer>
   <script src="js/scroll-reveal.js"></script>
-  <script src="js/support-toast.js?v=gauth4"></script>
+  <script src="js/support-toast.js"></script>
+  <!-- collections.js carries denormalised card metadata for every id it
+       references, so this page does not pull the ~1MB of library data files.
+       Regenerate with scripts/sync-collections-meta.js. -->
+  <script src="data/collections.js"></script>
+  <script src="js/pairs-well-with.js"></script>
+  <script src="js/collections-page.js"></script>
   <script>
     function getPreferredTheme() {
       var stored = localStorage.getItem('xfreeze-theme');

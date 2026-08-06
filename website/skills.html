@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" data-xf-meta-title="1000+ AI Skills for Grok, Cursor &amp; Claude - Freezestack" data-xf-meta-desc="Copy-paste skill prompts for business, social, connectors, and workflows. Free library with instant and connector skills." data-xf-meta-path="skills">
 <head>
-  <!-- Favicon for browsers + Google Search (48px+ PNG required for SERP) -->
-  <link rel="icon" href="/favicon.ico?v=share3" type="image/x-icon">
-  <link rel="icon" href="/favicon.png?v=share3" type="image/png" sizes="48x48">
-  <link rel="icon" href="/assets/images/logo/favicon-32.png?v=share3" type="image/png" sizes="32x32">
-  <link rel="icon" href="/assets/images/logo/favicon-96.png?v=share3" type="image/png" sizes="96x96">
-  <link rel="icon" href="/assets/images/logo/favicon-192.png?v=share3" type="image/png" sizes="192x192">
-  <link rel="apple-touch-icon" href="/assets/images/logo/apple-touch-icon.png?v=share3" sizes="180x180">
+  <!-- Main Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=fs-logo4">
+  <!-- PNG fallback for modern browsers -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=fs-logo4">
+  <!-- 48px for Google Search -->
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png?v=fs-logo4">
+  <!-- Apple Touch Icon for iOS -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=fs-logo4">
   <link rel="manifest" href="/site.webmanifest">
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Freezestack - AI Skills Library</title>
@@ -64,6 +64,7 @@
   <link rel="stylesheet" href="css/site-mobile.css">
   <link rel="stylesheet" href="css/auth.css">
   <link rel="stylesheet" href="css/skills-browse.css">
+  <link rel="stylesheet" href="css/collections.css">
   <link rel="stylesheet" href="css/support-toast.css">
   <link rel="stylesheet" href="css/request-cta.css">
   <link rel="stylesheet" href="css/skill-builder.css">
@@ -330,6 +331,7 @@
           <div id="xf-skills-connector-banner" class="skills-connector-banner skills-browse-hidden" role="note"></div>
         </div>
         <div id="xf-skills-skill-list" data-scroll-stagger></div>
+        <aside id="xf-skills-pairs" class="xf-pairs" aria-label="Pairs well with" hidden></aside>
       </div>
     </div>
 
@@ -370,9 +372,11 @@
   <script src="js/favorites.js"></script>
   <script src="js/access.js"></script>
   <link rel="stylesheet" href="css/favorites.css">
-  <script src="js/support-toast.js?v=gauth4"></script>
+  <script src="js/support-toast.js"></script>
   <script src="data/skills-browse-index.js"></script>
   <script src="data/skills-taxonomy.js"></script>
+  <script src="data/collections.js"></script>
+  <script src="js/pairs-well-with.js"></script>
   <script src="js/skills-browse.js"></script>
   <script>
     function getPreferredTheme() {

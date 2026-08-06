@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Favicon for browsers + Google Search (48px+ PNG required for SERP) -->
-  <link rel="icon" href="/favicon.ico?v=share3" type="image/x-icon">
-  <link rel="icon" href="/favicon.png?v=share3" type="image/png" sizes="48x48">
-  <link rel="icon" href="/assets/images/logo/favicon-32.png?v=share3" type="image/png" sizes="32x32">
-  <link rel="icon" href="/assets/images/logo/favicon-96.png?v=share3" type="image/png" sizes="96x96">
-  <link rel="icon" href="/assets/images/logo/favicon-192.png?v=share3" type="image/png" sizes="192x192">
-  <link rel="apple-touch-icon" href="/assets/images/logo/apple-touch-icon.png?v=share3" sizes="180x180">
+  <!-- Main Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=fs-logo4">
+  <!-- PNG fallback for modern browsers -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=fs-logo4">
+  <!-- 48px for Google Search -->
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png?v=fs-logo4">
+  <!-- Apple Touch Icon for iOS -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=fs-logo4">
   <link rel="manifest" href="/site.webmanifest">
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Freezestack - Grok Imagine Templates</title>
@@ -48,6 +48,7 @@
   <link rel="stylesheet" href="css/auth.css">
   <link rel="stylesheet" href="css/support-toast.css">
   <link rel="stylesheet" href="css/request-cta.css">
+  <link rel="stylesheet" href="css/collections.css">
 
   <style>
 
@@ -981,6 +982,7 @@
     </div>
     <!-- No data-scroll-stagger: opacity:0 children fought dynamic re-renders -->
     <div id="visual-templates-grid"></div>
+    <aside id="xf-templates-pairs" class="xf-pairs scroll-reveal-in" aria-label="Pairs well with" hidden></aside>
   </main>
 
   <a href="contact?topic=template" class="xf-request-cta" title="Missing a template? Request one">
@@ -995,9 +997,11 @@
   <script src="js/favorites.js"></script>
   <script src="js/access.js"></script>
   <link rel="stylesheet" href="css/favorites.css">
-  <script src="js/support-toast.js?v=gauth4"></script>
+  <script src="js/support-toast.js"></script>
   <script src="data/visual-templates-data.js"></script>
   <script src="data/template-taxonomy.js"></script>
+  <script src="data/collections.js"></script>
+  <script src="js/pairs-well-with.js"></script>
   <script>
     function getPreferredTheme() {
       const stored = localStorage.getItem('xfreeze-theme');
@@ -1118,6 +1122,23 @@
           currentSubcatFilter = subcat;
         }
       }
+    }
+
+    /* Cross-links from workflow collections arrive as ?cat=..&subcat=..#t-CODE.
+       The query params pick the gallery view; this scrolls to the exact tile. */
+    function focusTemplateFromHash() {
+      var h = String(window.location.hash || '');
+      if (h.indexOf('#t-') !== 0) return;
+      var code = decodeURIComponent(h.slice(3));
+      requestAnimationFrame(function () {
+        var tile = document.querySelector(
+          '[data-template-code="' + code.replace(/["\\]/g, '') + '"]'
+        );
+        if (!tile) return;
+        tile.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        tile.classList.add('is-linked');
+        setTimeout(function () { tile.classList.remove('is-linked'); }, 2400);
+      });
     }
 
     function escapeHtml(str) {
@@ -1402,8 +1423,33 @@
       bindTemplateActions(grid);
       grid.classList.add('is-revealed', 'is-cinematic-revealed');
 
+      renderTemplatePairs();
+
       if (window.XFreezeScrollReveal) {
         window.XFreezeScrollReveal.reveal(grid);
+      }
+    }
+
+    /* "Pairs well with" — motion prompt sets, skill packs and workflow
+       collections that go with whatever the gallery is currently showing.
+       Card metadata only; never a premium template's source link. */
+    function renderTemplatePairs() {
+      var el = document.getElementById('xf-templates-pairs');
+      if (!el) return;
+      if (!window.XFreezePairs || !window.XFreezeCollections) {
+        el.hidden = true;
+        return;
+      }
+      try {
+        var shown = window.XFreezePairs.renderForTemplateCategory(
+          el,
+          currentVisualFilter,
+          currentSubcatFilter,
+          { limit: 4 }
+        );
+        if (shown && window.XFreezeScrollReveal) window.XFreezeScrollReveal.reveal(el);
+      } catch (e) {
+        el.hidden = true;
       }
     }
 
@@ -1525,6 +1571,7 @@
       initTierFilters();
       initVisualTemplates();
       initTemplateSearch();
+      focusTemplateFromHash();
       /* Keep filters/search solid; mark grid revealed (no GSAP re-bind thrash) */
       document.querySelectorAll('.templates-main .scroll-reveal-in').forEach(function (el) {
         el.classList.add('is-revealed', 'is-cinematic-revealed');

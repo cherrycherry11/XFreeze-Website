@@ -342,11 +342,11 @@
     if (bStarted) bStarted.textContent = pro && sub ? formatDate(sub.startedAt) : '-';
     if (bExpires) bExpires.textContent = pro && sub ? formatDate(sub.expiresAt) : '-';
     if (bPay) {
-      var payId = (sub && sub.paymentId) || '';
-      if (!payId && window.XFreezeUsage && window.XFreezeUsage.getLastPaymentId) {
-        payId = window.XFreezeUsage.getLastPaymentId() || '';
-      }
-      bPay.textContent = payId || '-';
+      /* Show date of last successful payment, never the pay_… id */
+      var lastPaidAt =
+        (sub && (sub.lastPaidAt || sub.paidAt || sub.updatedAt || sub.startedAt)) ||
+        null;
+      bPay.textContent = pro && lastPaidAt ? formatDate(lastPaidAt) : '-';
     }
 
     /* Usage */

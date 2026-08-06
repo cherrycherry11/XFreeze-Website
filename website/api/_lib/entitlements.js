@@ -22,6 +22,13 @@ function publicEntitlement(row) {
     return { isPro: false, subscription: null };
   }
   const active = isActiveRow(row);
+  /* Prefer payment ledger time / row update for "Last payment" date in Account UI */
+  const lastPaidAt =
+    row.last_paid_at ||
+    row.paid_at ||
+    row.updated_at ||
+    row.started_at ||
+    null;
   return {
     isPro: active,
     subscription: {
@@ -32,6 +39,8 @@ function publicEntitlement(row) {
       status: active ? 'active' : row.status || 'expired',
       startedAt: row.started_at || null,
       expiresAt: row.expires_at || null,
+      lastPaidAt,
+      updatedAt: row.updated_at || null,
       paymentId: row.payment_id || null,
       orderId: row.order_id || null,
       paddleCustomerId: row.paddle_customer_id || null,

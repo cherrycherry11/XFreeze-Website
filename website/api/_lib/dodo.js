@@ -188,115 +188,144 @@ function priceAmount(p) {
 }
 
 /**
- * Ensure catalog products exist at live prices ($49 / $499).
- * Creates them once if missing; PATCHes amount when wrong.
- * Returns { monthlyId, yearlyId, created, priceFixed }.
+ * Target catalog for Freezestack subscriptions (cents).
+ * Keep in sync with website/data/products.js.
+ */
+const PLAN_CATALOG = {
+  'pro-monthly': {
+    planId: 'pro-monthly',
+    name: 'Freezestack Premium Monthly',
+    description: 'Premium plan billed monthly',
+    amountCents: 4900,
+    interval: 'Month',
+    nameMatch: /premium monthly|pro monthly/i,
+  },
+  'pro-yearly': {
+    planId: 'pro-yearly',
+    name: 'Freezestack Premium Yearly',
+    description: 'Premium plan billed yearly ($499, ~15% off)',
+    amountCents: 49900,
+    interval: 'Year',
+    nameMatch: /premium yearly|pro yearly/i,
+  },
+  'studio-monthly': {
+    planId: 'studio-monthly',
+    name: 'Freezestack Premium Plus Monthly',
+    description: 'Premium Plus plan billed monthly',
+    amountCents: 10900,
+    interval: 'Month',
+    nameMatch: /premium plus monthly|studio monthly/i,
+  },
+  'studio-yearly': {
+    planId: 'studio-yearly',
+    name: 'Freezestack Premium Plus Yearly',
+    description: 'Premium Plus plan billed yearly ($999, ~24% off)',
+    amountCents: 99900,
+    interval: 'Year',
+    nameMatch: /premium plus yearly|studio yearly/i,
+  },
+};
+
+function recurringPriceBody(amountCents, interval) {
+  return {
+    type: 'recurring_price',
+    price: amountCents,
+    currency: 'USD',
+    discount: 0,
+    purchasing_power_parity: false,
+    payment_frequency_count: 1,
+    payment_frequency_interval: interval,
+    subscription_period_count: 1,
+    subscription_period_interval: interval,
+  };
+}
+
+function findCatalogProduct(items, planId, map) {
+  const cfg = PLAN_CATALOG[planId];
+  const envId = map[planId];
+  if (envId) {
+    const byId = items.find(
+      (p) => p.product_id === envId || p.productId === envId
+    );
+    if (byId) return byId;
+  }
+  return items.find((p) => cfg.nameMatch.test(p.name || '')) || null;
+}
+
+/**
+ * Ensure all four subscription products exist at catalog prices:
+ * Premium $49 / $499, Premium Plus $109 / $999.
+ * Creates missing products; PATCHes amount/name when wrong.
+ * Returns { products, created, priceFixed, ids }.
  * Prefer setting DODO_PRODUCT_* in Vercel after first create.
  */
 async function ensureDefaultProducts() {
   const map = productMap();
-  const list = await dodoFetch('/products?page_size=50');
+  const list = await dodoFetch('/products?page_size=100');
   const items = (list && list.items) || [];
-
-  let monthly = items.find(
-    (p) =>
-      (map['pro-monthly'] && p.product_id === map['pro-monthly']) ||
-      /pro monthly/i.test(p.name || '')
-  );
-  let yearly = items.find(
-    (p) =>
-      (map['pro-yearly'] && p.product_id === map['pro-yearly']) ||
-      /pro yearly/i.test(p.name || '')
-  );
 
   let created = false;
   let priceFixed = false;
+  const products = {};
+  const ids = {};
 
-  if (!monthly) {
-    monthly = await dodoFetch('/products', {
-      method: 'POST',
-      body: {
-        name: 'Freezestack Pro Monthly',
-        description: 'Freezestack Pro plan billed monthly',
-        tax_category: 'saas',
-        price: {
-          type: 'recurring_price',
-          price: 4900,
-          currency: 'USD',
-          discount: 0,
-          purchasing_power_parity: false,
-          payment_frequency_count: 1,
-          payment_frequency_interval: 'Month',
-          subscription_period_count: 1,
-          subscription_period_interval: 'Month',
-        },
-      },
-    });
-    created = true;
-  } else if (priceAmount(monthly) !== 4900) {
-    await dodoFetch(`/products/${monthly.product_id}`, {
-      method: 'PATCH',
-      body: {
-        price: {
-          type: 'recurring_price',
-          price: 4900,
-          currency: 'USD',
-          discount: 0,
-          purchasing_power_parity: false,
-          payment_frequency_count: 1,
-          payment_frequency_interval: 'Month',
-          subscription_period_count: 1,
-          subscription_period_interval: 'Month',
-        },
-      },
-    });
-    priceFixed = true;
-  }
+  for (const planId of KNOWN_PLAN_IDS) {
+    const cfg = PLAN_CATALOG[planId];
+    let product = findCatalogProduct(items, planId, map);
 
-  if (!yearly) {
-    yearly = await dodoFetch('/products', {
-      method: 'POST',
-      body: {
-        name: 'Freezestack Pro Yearly',
-        description: 'Freezestack Pro plan billed yearly',
-        tax_category: 'saas',
-        price: {
-          type: 'recurring_price',
-          price: 49900,
-          currency: 'USD',
-          discount: 0,
-          purchasing_power_parity: false,
-          payment_frequency_count: 1,
-          payment_frequency_interval: 'Year',
-          subscription_period_count: 1,
-          subscription_period_interval: 'Year',
+    if (!product) {
+      product = await dodoFetch('/products', {
+        method: 'POST',
+        body: {
+          name: cfg.name,
+          description: cfg.description,
+          tax_category: 'saas',
+          price: recurringPriceBody(cfg.amountCents, cfg.interval),
         },
-      },
-    });
-    created = true;
-  } else if (priceAmount(yearly) !== 49900) {
-    await dodoFetch(`/products/${yearly.product_id}`, {
-      method: 'PATCH',
-      body: {
-        price: {
-          type: 'recurring_price',
-          price: 49900,
-          currency: 'USD',
-          discount: 0,
-          purchasing_power_parity: false,
-          payment_frequency_count: 1,
-          payment_frequency_interval: 'Year',
-          subscription_period_count: 1,
-          subscription_period_interval: 'Year',
-        },
-      },
-    });
-    priceFixed = true;
+      });
+      created = true;
+      if (product && (product.product_id || product.productId)) {
+        items.push(product);
+      }
+    } else {
+      const pid = product.product_id || product.productId;
+      const current = priceAmount(product);
+      const needsPrice = current !== cfg.amountCents;
+      const needsName = (product.name || '') !== cfg.name;
+      if (needsPrice || needsName) {
+        const body = {
+          name: cfg.name,
+          description: cfg.description,
+        };
+        if (needsPrice) {
+          body.price = recurringPriceBody(cfg.amountCents, cfg.interval);
+        }
+        await dodoFetch(`/products/${pid}`, {
+          method: 'PATCH',
+          body,
+        });
+        priceFixed = true;
+        product = {
+          ...product,
+          name: cfg.name,
+          price: body.price || product.price,
+        };
+      }
+    }
+
+    const id =
+      (product && (product.product_id || product.productId)) || map[planId] || '';
+    products[planId] = product;
+    ids[planId] = id;
   }
 
   return {
-    monthlyId: monthly.product_id || monthly.productId || map['pro-monthly'],
-    yearlyId: yearly.product_id || yearly.productId || map['pro-yearly'],
+    monthlyId: ids['pro-monthly'],
+    yearlyId: ids['pro-yearly'],
+    studioMonthlyId: ids['studio-monthly'],
+    studioYearlyId: ids['studio-yearly'],
+    products,
+    ids,
     created,
     priceFixed,
   };
@@ -372,6 +401,8 @@ module.exports = {
   planRank,
   isKnownPlanId,
   KNOWN_PLAN_IDS,
+  PLAN_CATALOG,
+  priceAmount,
   resolvePlanIdFromPayment,
   productsReady,
   dodoFetch,

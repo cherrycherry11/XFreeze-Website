@@ -56,10 +56,16 @@ module.exports = async function handler(req, res) {
     }
 
     let productId = productIdForPlan(planId);
-    if (!productId && (planId === 'pro-monthly' || planId === 'pro-yearly')) {
+    if (!productId) {
+      /* Create/patch catalog prices if product IDs are missing from env */
       const ensured = await ensureDefaultProducts();
-      productId =
-        planId === 'pro-yearly' ? ensured.yearlyId : ensured.monthlyId;
+      productId = (ensured.ids && ensured.ids[planId]) || '';
+      if (planId === 'pro-yearly' && !productId) productId = ensured.yearlyId;
+      if (planId === 'pro-monthly' && !productId) productId = ensured.monthlyId;
+      if (planId === 'studio-yearly' && !productId)
+        productId = ensured.studioYearlyId;
+      if (planId === 'studio-monthly' && !productId)
+        productId = ensured.studioMonthlyId;
     }
     if (!productId) {
       return json(res, 400, {

@@ -284,54 +284,79 @@ html.dark .xf-account-badge--pro {
 .xf-account-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1.2rem;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1.1rem;
 }
 
+/* Match site nav / pricing pill controls (compact, not chunky) */
 .xf-account-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.45rem;
-  padding: 0.5rem 1.05rem;
+  box-sizing: border-box;
+  height: 2.125rem;
+  min-height: 2.125rem;
+  padding: 0 0.9rem;
   border-radius: 9999px;
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
   text-decoration: none;
   border: 1px solid var(--border, #e5e7eb);
-  color: var(--text, #0a0a0a);
+  color: var(--text-secondary, #52525b);
   background: transparent;
   cursor: pointer;
-  transition: opacity 0.15s ease, background 0.15s ease;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
   font-family: inherit;
+  white-space: nowrap;
 }
 
 .xf-account-btn:hover {
+  color: var(--text, #0a0a0a);
   background: var(--surface-muted, #f4f4f5);
+  border-color: rgba(15, 23, 42, 0.12);
 }
 
 html.dark .xf-account-btn {
-  color: #f5f5f5;
+  color: #a3a3a3;
+  border-color: #2a2a2a;
 }
 
 html.dark .xf-account-btn:hover {
+  color: #f5f5f5;
   background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .xf-account-btn--primary {
   background: var(--text, #0a0a0a);
   color: var(--surface, #fff);
   border-color: transparent;
+  font-weight: 600;
 }
 
 .xf-account-btn--primary:hover {
-  opacity: 0.92;
+  opacity: 0.9;
+  color: var(--surface, #fff);
   background: var(--text, #0a0a0a);
+  border-color: transparent;
 }
 
 html.dark .xf-account-btn--primary {
   background: #f2f5f3;
   color: #020403;
+}
+
+html.dark .xf-account-btn--primary:hover {
+  color: #020403;
+  background: #f2f5f3;
+  opacity: 0.92;
 }
 
 /* Usage meters */

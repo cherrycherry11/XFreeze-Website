@@ -84,9 +84,10 @@ module.exports = async function handler(req, res) {
       /\/$/,
       ''
     );
+    /* Land on a real site page so the success card overlays Freezestack UI */
     const returnUrl =
       body.returnUrl ||
-      `${site}/checkout-success?provider=dodo&plan=${encodeURIComponent(planId)}`;
+      `${site}/pricing?provider=dodo&xf_pay=1&plan=${encodeURIComponent(planId)}`;
 
     /* Match Freezestack site theme so checkout is not stuck on Dodo dark default */
     const rawTheme = String(body.theme || body.colorScheme || '')

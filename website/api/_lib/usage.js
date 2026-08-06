@@ -6,22 +6,27 @@ const { rest, hasServiceRole } = require('./supabase');
 const { userIsPro } = require('./entitlements');
 
 const FREE_LIMITS = {
-  templates: 3,
-  skills: 5,
-  prompts: 5,
+  templates: 2,
+  skills: 3,
+  prompts: 3,
 };
 
+/** Premium (pro-*) */
 const PRO_LIMITS = {
   templates: 20,
   skills: 30,
   prompts: 30,
 };
 
-/** Studio: higher daily quotas on the same full library. */
+/**
+ * Premium Plus (studio-*): 50 templates/day, unlimited skills & prompts.
+ * Unlimited is represented as a very high cap for quota math.
+ */
+const UNLIMITED = 999999;
 const STUDIO_LIMITS = {
-  templates: 100,
-  skills: 100,
-  prompts: 100,
+  templates: 50,
+  skills: UNLIMITED,
+  prompts: UNLIMITED,
 };
 
 function utcDayKey(d) {

@@ -15,37 +15,41 @@
 
   /**
    * Subscriptions
-   * Free browse + two paid tiers (Pro, Studio), each monthly or yearly.
+   * Free browse + Premium + Premium Plus (monthly or yearly).
+   * Plan ids stay pro-* / studio-* for checkout + Dodo env compatibility.
+   * Yearly: Premium 15% off, Premium Plus 20% off list monthly×12.
    */
   const SUBSCRIPTIONS = {
     'pro-monthly': {
       id: 'pro-monthly',
-      name: 'Pro Monthly',
-      price: 29,
+      name: 'Premium Monthly',
+      price: 49,
       type: 'subscription',
       interval: 'month',
       tier: 'pro',
     },
     'pro-yearly': {
       id: 'pro-yearly',
-      name: 'Pro Yearly',
-      price: 290,
+      name: 'Premium Yearly',
+      /* $49 × 12 × 0.85 → $499.80, charged as $500 */
+      price: 500,
       type: 'subscription',
       interval: 'year',
       tier: 'pro',
     },
     'studio-monthly': {
       id: 'studio-monthly',
-      name: 'Studio Monthly',
-      price: 79,
+      name: 'Premium Plus Monthly',
+      price: 109,
       type: 'subscription',
       interval: 'month',
       tier: 'studio',
     },
     'studio-yearly': {
       id: 'studio-yearly',
-      name: 'Studio Yearly',
-      price: 790,
+      name: 'Premium Plus Yearly',
+      /* $109 × 12 × 0.80 → $1,046.40, charged as $1046 */
+      price: 1046,
       type: 'subscription',
       interval: 'year',
       tier: 'studio',

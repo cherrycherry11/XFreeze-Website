@@ -241,10 +241,11 @@
       : { prompts: 0, templates: 0, skills: 0 };
     var limits = window.XFreezeUsage
       ? window.XFreezeUsage.getLimits(sub)
-      : { prompts: 5, templates: 3, skills: 5 };
+      : { prompts: 3, templates: 2, skills: 3 };
 
     var planLabel = pro
-      ? (sub && sub.name) || (sub && sub.interval === 'year' ? 'Pro Yearly' : 'Pro Monthly')
+      ? (sub && sub.name) ||
+        (sub && sub.interval === 'year' ? 'Premium Yearly' : 'Premium Monthly')
       : 'Free';
     var planMeta = '';
     if (pro && sub) {

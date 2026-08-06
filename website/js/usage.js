@@ -4,9 +4,9 @@
  * SECURITY: Only /api/content/* and /api/usage/consume increment counters
  * via service role. localStorage is display-only and cannot unlock content.
  *
- * Free:   3 templates · 5 skills · 5 prompts / UTC day
- * Pro:   20 templates · 30 skills · 30 prompts / UTC day
- * Studio: 100 templates · 100 skills · 100 prompts / UTC day
+ * Free:          2 templates · 3 skills · 3 prompts / UTC day
+ * Premium:      20 templates · 30 skills · 30 prompts / UTC day
+ * Premium Plus: 50 templates · unlimited skills & prompts / UTC day
  */
 (function (global) {
   'use strict';
@@ -15,10 +15,12 @@
   var USAGE_KEY = 'xf_usage_server_v1';
   var META_KEY = 'xf_subscription';
 
+  var UNLIMITED = 999999;
+
   var FREE_LIMITS = {
-    prompts: 5,
-    templates: 3,
-    skills: 5,
+    prompts: 3,
+    templates: 2,
+    skills: 3,
   };
 
   var PRO_LIMITS = {
@@ -28,9 +30,9 @@
   };
 
   var STUDIO_LIMITS = {
-    prompts: 100,
-    templates: 100,
-    skills: 100,
+    prompts: UNLIMITED,
+    templates: 50,
+    skills: UNLIMITED,
   };
 
   var serverCache = null;
@@ -321,7 +323,8 @@
   }
 
   function formatLimit(n) {
-    if (n >= 99999) return '∞';
+    if (n == null) return '0';
+    if (n >= 99999) return 'Unlimited';
     return String(n);
   }
 

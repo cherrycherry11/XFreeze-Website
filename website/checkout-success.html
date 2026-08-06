@@ -603,16 +603,18 @@
 
             var planLabel =
               data.planId === 'studio-yearly' || planId === 'studio-yearly'
-                ? 'Studio Yearly'
+                ? 'Premium Plus Yearly'
                 : data.planId === 'studio-monthly' || planId === 'studio-monthly'
-                ? 'Studio Monthly'
+                ? 'Premium Plus Monthly'
                 : data.planId === 'pro-yearly' || planId === 'pro-yearly'
-                ? 'Pro Yearly'
+                ? 'Premium Yearly'
                 : data.planId === 'pro-monthly' || planId === 'pro-monthly'
-                  ? 'Pro Monthly'
-                  : 'Pro';
+                  ? 'Premium Monthly'
+                  : 'Premium';
             success(
-              planLabel.indexOf('Studio') !== -1 ? 'Welcome to Studio' : 'Welcome to Pro',
+              planLabel.indexOf('Plus') !== -1
+                ? 'Welcome to Premium Plus'
+                : 'Welcome to Premium',
               planLabel +
                 ' is active. Full templates, skills, and library access are unlocked.'
             );

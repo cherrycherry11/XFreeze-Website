@@ -289,22 +289,37 @@
       }
     }
 
-    /* Daily usage window (UTC calendar day). Compact label for the badge only. */
-    var periodLabel = 'Today (UTC)';
+    /*
+     * Daily usage counters key off the UTC calendar day and reset at the next
+     * UTC midnight. Badge shows when that refresh happens ("Renews on …").
+     * usage.day comes from the server/client utcDayKey() and advances each day.
+     */
+    var periodLabel = 'Renews on —';
     try {
       var dayIso = usage.day || '';
+      var base;
       if (dayIso && /^\d{4}-\d{2}-\d{2}$/.test(dayIso)) {
         var parts = dayIso.split('-');
-        var d = new Date(Date.UTC(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])));
-        periodLabel =
-          d.toLocaleDateString(undefined, {
-            month: 'short',
-            day: 'numeric',
-            timeZone: 'UTC',
-          }) + ' UTC';
+        base = new Date(
+          Date.UTC(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]))
+        );
+      } else {
+        var now = new Date();
+        base = new Date(
+          Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+        );
       }
+      /* Next UTC day = when today's counters clear */
+      base.setUTCDate(base.getUTCDate() + 1);
+      periodLabel =
+        'Renews on ' +
+        base.toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          timeZone: 'UTC',
+        });
     } catch (e) {
-      periodLabel = 'Today (UTC)';
+      periodLabel = 'Renews on —';
     }
 
     renderFavoritesSummary();
@@ -340,7 +355,13 @@
         : '-';
     }
     if (bStarted) bStarted.textContent = pro && sub ? formatDate(sub.startedAt) : '-';
-    if (bExpires) bExpires.textContent = pro && sub ? formatDate(sub.expiresAt) : '-';
+    if (bExpires) {
+      if (pro && sub && sub.expiresAt) {
+        bExpires.textContent = 'Renews on ' + formatDate(sub.expiresAt);
+      } else {
+        bExpires.textContent = '-';
+      }
+    }
 
     /* Usage */
     fillMeter(

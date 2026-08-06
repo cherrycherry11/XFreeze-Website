@@ -360,8 +360,8 @@
         el.classList.contains('xf-auth-support-coffee') &&
         /Go Pro|Upgrade|Get Pro/i.test(el.textContent || '')
       ) {
-        /* Keep crown icon, replace label text node */
-        var icon = el.querySelector('i');
+        /* Keep crown icon (FA i or inline SVG), replace label text node */
+        var icon = el.querySelector('i, .site-nav-go-pro-icon, svg');
         el.textContent = '';
         if (icon) el.appendChild(icon);
         el.appendChild(document.createTextNode(' ' + label));

@@ -384,36 +384,15 @@ html.dark .site-nav-logo__img--on-dark {
 }
 
 /*
- * Instant crown: do not wait on Font Awesome CDN.
- * FA is often deferred (media=print onload) on home, so .fa-crown was blank
- * until the webfont arrived. Inline mask paints with site-nav.css.
+ * Instant crown: inline SVG in HTML (not Font Awesome webfont).
+ * Paints with first nav paint; no CDN / font-face wait.
  */
-.site-nav-go-pro > .fa-crown,
-.site-nav-coffee > .fa-crown {
-  font-family: inherit !important;
-  font-weight: 400 !important;
-  font-style: normal !important;
-  font-size: 0 !important;
-  line-height: 0 !important;
-  display: inline-block;
+.site-nav-go-pro-icon {
+  display: block;
   width: 0.75rem;
   height: 0.75rem;
   flex-shrink: 0;
-  background-color: currentColor;
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'%3E%3Cpath fill='black' d='M309 106c11.4-7 19-19.7 19-34 0-22.1-17.9-40-40-40s-40 17.9-40 40c0 14.4 7.6 27 19 34L209.7 220.6c-9.1 9.7-22.4 15.4-36.7 15.4-27.6 0-50-22.4-50-50V130.5c0-4.4-3.6-8-8-8H56c-4.4 0-8 3.6-8 8v55.5c0 27.6-22.4 50-50 50-14.3 0-27.6-5.7-36.7-15.4L-47 106C-35.6 99-28 86.4-28 72c0-22.1-17.9-40-40-40S-108 49.9-108 72c0 14.4 7.6 27 19 34l74.3 114.6c9.1 9.7 22.4 15.4 36.7 15.4H-2v48H-66c-17.7 0-32 14.3-32 32v32c0 17.7 14.3 32 32 32H482c17.7 0 32-14.3 32-32V350c0-17.7-14.3-32-32-32H418V272h76c14.3 0 27.6-5.7 36.7-15.4L605 106c11.4-7 19-19.7 19-34 0-22.1-17.9-40-40-40s-40 17.9-40 40c0 14.4 7.6 27 19 34L489.7 220.6c-9.1 9.7-22.4 15.4-36.7 15.4-27.6 0-50-22.4-50-50V130.5c0-4.4-3.6-8-8-8H319c-4.4 0-8 3.6-8 8v55.5c0 27.6-22.4 50-50 50-14.3 0-27.6-5.7-36.7-15.4L160 106z'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'%3E%3Cpath fill='black' d='M309 106c11.4-7 19-19.7 19-34 0-22.1-17.9-40-40-40s-40 17.9-40 40c0 14.4 7.6 27 19 34L209.7 220.6c-9.1 9.7-22.4 15.4-36.7 15.4-27.6 0-50-22.4-50-50V130.5c0-4.4-3.6-8-8-8H56c-4.4 0-8 3.6-8 8v55.5c0 27.6-22.4 50-50 50-14.3 0-27.6-5.7-36.7-15.4L-47 106C-35.6 99-28 86.4-28 72c0-22.1-17.9-40-40-40S-108 49.9-108 72c0 14.4 7.6 27 19 34l74.3 114.6c9.1 9.7 22.4 15.4 36.7 15.4H-2v48H-66c-17.7 0-32 14.3-32 32v32c0 17.7 14.3 32 32 32H482c17.7 0 32-14.3 32-32V350c0-17.7-14.3-32-32-32H418V272h76c14.3 0 27.6-5.7 36.7-15.4L605 106c11.4-7 19-19.7 19-34 0-22.1-17.9-40-40-40s-40 17.9-40 40c0 14.4 7.6 27 19 34L489.7 220.6c-9.1 9.7-22.4 15.4-36.7 15.4-27.6 0-50-22.4-50-50V130.5c0-4.4-3.6-8-8-8H319c-4.4 0-8 3.6-8 8v55.5c0 27.6-22.4 50-50 50-14.3 0-27.6-5.7-36.7-15.4L160 106z'/%3E%3C/svg%3E");
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-}
-
-.site-nav-go-pro > .fa-crown::before,
-.site-nav-coffee > .fa-crown::before {
-  content: none !important;
-  display: none !important;
+  color: inherit;
 }
 
 /* “Go Pro” text only on wide screens - icon alone mid-width */

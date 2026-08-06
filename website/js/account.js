@@ -330,7 +330,6 @@
     var bCycle = $('xf-bill-cycle');
     var bStarted = $('xf-bill-started');
     var bExpires = $('xf-bill-expires');
-    var bPay = $('xf-bill-payment');
     if (bStatus) bStatus.textContent = pro ? 'Active' : 'Free plan';
     if (bCycle) {
       bCycle.textContent = pro
@@ -341,13 +340,6 @@
     }
     if (bStarted) bStarted.textContent = pro && sub ? formatDate(sub.startedAt) : '-';
     if (bExpires) bExpires.textContent = pro && sub ? formatDate(sub.expiresAt) : '-';
-    if (bPay) {
-      /* Show date of last successful payment, never the pay_… id */
-      var lastPaidAt =
-        (sub && (sub.lastPaidAt || sub.paidAt || sub.updatedAt || sub.startedAt)) ||
-        null;
-      bPay.textContent = pro && lastPaidAt ? formatDate(lastPaidAt) : '-';
-    }
 
     /* Usage */
     fillMeter(

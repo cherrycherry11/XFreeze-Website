@@ -424,13 +424,19 @@ html:not(.dark) .xf-usage-bar__fill--pro {
   gap: 0.75rem;
 }
 
-.xf-account-stats--compact {
-  grid-template-columns: repeat(3, 1fr);
+.xf-account-stats--compact,
+.xf-account-stats--3 {
+  grid-template-columns: repeat(2, 1fr);
 }
 
 @media (min-width: 640px) {
-  .xf-account-stats:not(.xf-account-stats--compact) {
+  .xf-account-stats:not(.xf-account-stats--compact):not(.xf-account-stats--3) {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  .xf-account-stats--compact,
+  .xf-account-stats--3 {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 

@@ -36,7 +36,7 @@
   <link rel="stylesheet" href="css/site-mobile.css">
   <link rel="stylesheet" href="css/site-footer.css">
   <link rel="stylesheet" href="css/auth.css">
-  <link rel="stylesheet" href="css/account.css?v=btns1">
+  <link rel="stylesheet" href="css/account.css?v=usage2">
   <link rel="stylesheet" href="css/favorites.css">
   <link rel="stylesheet" href="css/theme-dark.css">
   <style>
@@ -276,8 +276,8 @@
       <section class="xf-account-panel" id="panel-usage" role="tabpanel" aria-labelledby="tab-usage" hidden>
         <article class="xf-account-card">
           <div class="xf-account-card__head">
-            <h2 class="xf-account-card__title">Usage this month</h2>
-            <span class="xf-account-badge" id="xf-use-period-badge">-</span>
+            <h2 class="xf-account-card__title">Usage today</h2>
+            <span class="xf-account-badge" id="xf-use-period-badge" title="Daily limits reset at midnight UTC">Today (UTC)</span>
           </div>
           <div class="xf-usage-list">
             <div>
@@ -302,10 +302,10 @@
               <div class="xf-usage-bar"><div class="xf-usage-bar__fill" id="xf-bar-skills" style="width:0%"></div></div>
             </div>
           </div>
-          <p class="xf-account-note">Daily limits (UTC): Free 3 templates · 5 skills · 5 prompts. Pro 20 · 30 · 30. Enforced on the server - not only in this browser.</p>
+          <p class="xf-account-note">Daily limits reset at midnight UTC. Free: 2 templates · 3 skills · 3 prompts. Premium: 20 · 30 · 30. Premium Plus: 50 templates · unlimited skills &amp; prompts.</p>
         </article>
 
-        <div class="xf-account-stats" style="margin-top:1rem">
+        <div class="xf-account-stats xf-account-stats--3" style="margin-top:1rem">
           <div class="xf-account-stat">
             <p class="xf-account-stat__value" id="xf-stat-prompts">0</p>
             <p class="xf-account-stat__label">Prompts used</p>
@@ -317,10 +317,6 @@
           <div class="xf-account-stat">
             <p class="xf-account-stat__value" id="xf-stat-skills">0</p>
             <p class="xf-account-stat__label">Skills copied</p>
-          </div>
-          <div class="xf-account-stat">
-            <p class="xf-account-stat__value" id="xf-stat-month">-</p>
-            <p class="xf-account-stat__label">Period</p>
           </div>
         </div>
       </section>
@@ -382,7 +378,7 @@
   <script src="js/favorites.js" defer></script>
   <script src="js/access.js" defer></script>
   <script src="js/auth.js?v=gauth5" defer></script>
-  <script src="js/account.js?v=nolastpay1" defer></script>
+  <script src="js/account.js?v=usage2" defer></script>
   <script src="js/site-nav.js" defer></script>
   <script src="js/site-footer.js" defer></script>
 </body>

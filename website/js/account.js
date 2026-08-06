@@ -289,21 +289,22 @@
       }
     }
 
+    /* Daily usage window (UTC calendar day). Compact label for the badge only. */
     var periodLabel = 'Today (UTC)';
     try {
-      if (usage.day) {
-        periodLabel = 'Day: ' + usage.day + ' (UTC)';
-      } else {
+      var dayIso = usage.day || '';
+      if (dayIso && /^\d{4}-\d{2}-\d{2}$/.test(dayIso)) {
+        var parts = dayIso.split('-');
+        var d = new Date(Date.UTC(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])));
         periodLabel =
-          'Today · ' +
-          new Date().toLocaleString(undefined, {
+          d.toLocaleDateString(undefined, {
             month: 'short',
             day: 'numeric',
-            year: 'numeric',
-          });
+            timeZone: 'UTC',
+          }) + ' UTC';
       }
     } catch (e) {
-      periodLabel = usage.day || 'Today (UTC)';
+      periodLabel = 'Today (UTC)';
     }
 
     renderFavoritesSummary();
@@ -370,13 +371,14 @@
     var s1 = $('xf-stat-prompts');
     var s2 = $('xf-stat-templates');
     var s3 = $('xf-stat-skills');
-    var s4 = $('xf-stat-month');
     var useBadge = $('xf-use-period-badge');
     if (s1) s1.textContent = usage.prompts || 0;
     if (s2) s2.textContent = usage.templates || 0;
     if (s3) s3.textContent = usage.skills || 0;
-    if (s4) s4.textContent = periodLabel;
-    if (useBadge) useBadge.textContent = periodLabel;
+    if (useBadge) {
+      useBadge.textContent = periodLabel;
+      useBadge.title = 'Daily usage window. Limits reset at midnight UTC.';
+    }
 
     /* Settings */
     var setName = $('xf-set-name');

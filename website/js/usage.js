@@ -4,8 +4,9 @@
  * SECURITY: Only /api/content/* and /api/usage/consume increment counters
  * via service role. localStorage is display-only and cannot unlock content.
  *
- * Free:  3 templates · 5 skills · 5 prompts / UTC day
- * Pro:  20 templates · 30 skills · 30 prompts / UTC day
+ * Free:   3 templates · 5 skills · 5 prompts / UTC day
+ * Pro:   20 templates · 30 skills · 30 prompts / UTC day
+ * Studio: 100 templates · 100 skills · 100 prompts / UTC day
  */
 (function (global) {
   'use strict';
@@ -24,6 +25,12 @@
     prompts: 30,
     templates: 20,
     skills: 30,
+  };
+
+  var STUDIO_LIMITS = {
+    prompts: 100,
+    templates: 100,
+    skills: 100,
   };
 
   var serverCache = null;
@@ -274,11 +281,31 @@
     return true;
   }
 
+  function planTier(sub) {
+    var planId =
+      (sub && (sub.planId || sub.plan_id)) ||
+      (serverCache && serverCache.tier) ||
+      '';
+    if (
+      global.XFreezeProducts &&
+      typeof global.XFreezeProducts.tierFromPlanId === 'function'
+    ) {
+      return global.XFreezeProducts.tierFromPlanId(planId);
+    }
+    var s = String(planId || '').toLowerCase();
+    if (s.indexOf('studio') !== -1) return 'studio';
+    if (s.indexOf('pro') !== -1) return 'pro';
+    return isPro(sub) ? 'pro' : 'free';
+  }
+
   function getLimits(sub) {
     if (serverCache && serverCache.limits && serverCache.day === utcDayKey()) {
       return serverCache.limits;
     }
-    return isPro(sub) ? PRO_LIMITS : FREE_LIMITS;
+    var tier = planTier(sub);
+    if (tier === 'studio') return STUDIO_LIMITS;
+    if (tier === 'pro' || isPro(sub)) return PRO_LIMITS;
+    return FREE_LIMITS;
   }
 
   function remaining(kind, sub) {
@@ -419,6 +446,8 @@
     getLastPaymentId: getLastPaymentId,
     FREE_LIMITS: FREE_LIMITS,
     PRO_LIMITS: PRO_LIMITS,
+    STUDIO_LIMITS: STUDIO_LIMITS,
+    planTier: planTier,
     META_KEY: META_KEY,
   };
 })(window);

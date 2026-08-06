@@ -12,7 +12,7 @@ const {
 
 /**
  * Create a Dodo checkout session.
- * POST { planId: 'pro-monthly' | 'pro-yearly', email?, returnUrl? }
+ * POST { planId: 'pro-monthly' | 'pro-yearly' | 'studio-monthly' | 'studio-yearly', email?, returnUrl? }
  */
 module.exports = async function handler(req, res) {
   if (handlePreflight(req, res, 'POST,OPTIONS')) return;
@@ -50,12 +50,13 @@ module.exports = async function handler(req, res) {
     const plan = SUBSCRIPTIONS[planId];
     if (!plan) {
       return json(res, 400, {
-        error: 'Unknown plan. Use pro-monthly or pro-yearly.',
+        error:
+          'Unknown plan. Use pro-monthly, pro-yearly, studio-monthly, or studio-yearly.',
       });
     }
 
     let productId = productIdForPlan(planId);
-    if (!productId) {
+    if (!productId && (planId === 'pro-monthly' || planId === 'pro-yearly')) {
       const ensured = await ensureDefaultProducts();
       productId =
         planId === 'pro-yearly' ? ensured.yearlyId : ensured.monthlyId;

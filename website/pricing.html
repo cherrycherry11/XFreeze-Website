@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-xf-meta-title="Pricing - Freezestack Pro" data-xf-meta-desc="Freezestack Pro plans. Monthly $49 or yearly $499. Checkout rebuilding." data-xf-meta-path="pricing">
+<html lang="en" data-xf-meta-title="Pricing - Freezestack" data-xf-meta-desc="Freezestack plans: Free, Pro ($29/mo), and Studio ($79/mo). Unlock the full library." data-xf-meta-path="pricing">
 <head>
   <!-- Google Search prefers stable 48x48+ PNG at a clean URL (no ?v=) -->
   <link rel="icon" type="image/png" sizes="48x48" href="https://freezestack.com/favicon-48x48.png">
@@ -141,13 +141,22 @@
     <div class="content-container">
       <header class="xf-pricing-hero scroll-reveal-in">
         <p class="xf-content-eyebrow">Pricing</p>
-        <h1 class="xf-content-title">Simple plans. Full library.</h1>
+        <h1 class="xf-content-title">Free to explore. Pro to ship. Studio to scale.</h1>
         <p class="xf-content-lead">
-          Start free, or unlock the full library with a subscription.
+          Browse free forever. Unlock the full library with Pro, or go Studio for higher daily limits.
         </p>
         <p id="xf-pricing-premium-banner" class="xf-pricing-premium-banner" hidden>
-          Upgrade to Pro to unlock premium templates.
+          Upgrade to unlock premium templates and skills.
         </p>
+
+        <div class="xf-pricing-toggle" role="group" aria-label="Billing period">
+          <button type="button" class="xf-pricing-toggle__btn is-active" data-billing="month" aria-pressed="true">
+            Monthly
+          </button>
+          <button type="button" class="xf-pricing-toggle__btn" data-billing="year" aria-pressed="false">
+            Yearly <span class="xf-pricing-toggle__save">Save ~2 months</span>
+          </button>
+        </div>
       </header>
 
       <div class="xf-pricing-grid">
@@ -160,7 +169,7 @@
             <span class="xf-price-card__period">forever</span>
           </div>
           <p class="xf-price-card__note">
-            Start exploring with free templates and skills.
+            Explore the library with free templates and skills. No card required.
           </p>
           <ul class="xf-price-card__features">
             <li>
@@ -183,24 +192,21 @@
               <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
               Works with Grok, Claude, Cursor, GPT
             </li>
-            <li>
-              <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
-              No card required
-            </li>
           </ul>
           <a href="templates" class="xf-price-card__cta">Get started</a>
         </article>
 
-        <!-- Monthly -->
-        <article class="xf-price-card scroll-reveal-in" data-plan="pro-monthly">
-          <p class="xf-price-card__plan">Monthly</p>
+        <!-- Pro -->
+        <article class="xf-price-card xf-price-card--featured scroll-reveal-in" data-plan-tier="pro">
+          <span class="xf-price-card__badge" data-default-badge="Most popular">Most popular</span>
+          <p class="xf-price-card__plan">Pro</p>
           <div class="xf-price-card__amount">
             <span class="xf-price-card__dollar">$</span>
-            <span class="xf-price-card__value">49</span>
-            <span class="xf-price-card__period">/ month</span>
+            <span class="xf-price-card__value" data-price-month="29" data-price-year="290">29</span>
+            <span class="xf-price-card__period" data-period-month="/ month" data-period-year="/ year">/ month</span>
           </div>
-          <p class="xf-price-card__note">
-            Flexible month-to-month access. Cancel anytime.
+          <p class="xf-price-card__note" data-note-month="Full library. Cancel anytime." data-note-year="Equals ~$24.17 / month. Save $58 vs monthly.">
+            Full library. Cancel anytime.
           </p>
           <ul class="xf-price-card__features">
             <li>
@@ -213,7 +219,7 @@
             </li>
             <li>
               <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
-              AI skills packs
+              Premium AI skills packs
             </li>
             <li>
               <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
@@ -230,34 +236,36 @@
           </ul>
           <button
             type="button"
-            class="xf-price-card__cta"
+            class="xf-price-card__cta xf-price-card__cta--primary"
             data-checkout-plan="pro-monthly"
-            data-default-label="Start monthly"
+            data-plan-month="pro-monthly"
+            data-plan-year="pro-yearly"
+            data-default-label-month="Start Pro"
+            data-default-label-year="Get Pro yearly"
           >
-            Start monthly
+            Start Pro
           </button>
         </article>
 
-        <!-- Yearly -->
-        <article class="xf-price-card xf-price-card--featured scroll-reveal-in" data-plan="pro-yearly">
-          <span class="xf-price-card__badge" data-default-badge="Best value · Save $89">Best value · Save $89</span>
-          <p class="xf-price-card__plan">Yearly</p>
+        <!-- Studio -->
+        <article class="xf-price-card scroll-reveal-in" data-plan-tier="studio">
+          <p class="xf-price-card__plan">Studio</p>
           <div class="xf-price-card__amount">
             <span class="xf-price-card__dollar">$</span>
-            <span class="xf-price-card__value">499</span>
-            <span class="xf-price-card__period">/ year</span>
+            <span class="xf-price-card__value" data-price-month="79" data-price-year="790">79</span>
+            <span class="xf-price-card__period" data-period-month="/ month" data-period-year="/ year">/ month</span>
           </div>
-          <p class="xf-price-card__note">
-            Equals <strong>~$41.58 / month</strong>. Best value, save $89 vs monthly.
+          <p class="xf-price-card__note" data-note-month="For high-volume teams and power users." data-note-year="Equals ~$65.83 / month. Save $158 vs monthly.">
+            For high-volume teams and power users.
           </p>
           <ul class="xf-price-card__features">
             <li>
               <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
-              Everything in Monthly
+              Everything in Pro
             </li>
             <li>
               <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
-              Daily limits: 20 templates, 30 skills, 30 prompts
+              Daily limits: 100 templates, 100 skills, 100 prompts
             </li>
             <li>
               <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
@@ -265,24 +273,27 @@
             </li>
             <li>
               <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
-              Best rate for serious creators
+              Built for agencies and daily shippers
             </li>
             <li>
               <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
-              One payment, full year unlocked
+              Higher ceiling for client work
             </li>
             <li>
               <span class="xf-price-card__check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
-              Full year of library updates
+              Full library + updates while active
             </li>
           </ul>
           <button
             type="button"
-            class="xf-price-card__cta xf-price-card__cta--primary"
-            data-checkout-plan="pro-yearly"
-            data-default-label="Get yearly access"
+            class="xf-price-card__cta"
+            data-checkout-plan="studio-monthly"
+            data-plan-month="studio-monthly"
+            data-plan-year="studio-yearly"
+            data-default-label-month="Start Studio"
+            data-default-label-year="Get Studio yearly"
           >
-            Get yearly access
+            Start Studio
           </button>
         </article>
       </div>
@@ -290,12 +301,16 @@
       <section class="xf-pricing-faq scroll-reveal-in" aria-labelledby="faq-title">
         <h2 id="faq-title" class="xf-pricing-faq__title">Questions</h2>
         <details>
+          <summary>What’s the difference between Pro and Studio?</summary>
+          <p>Both unlock the full premium library. Pro is built for most creators (20 templates, 30 skills, 30 prompts per day). Studio is for high volume: 100 of each per day, plus priority on new packs.</p>
+        </details>
+        <details>
           <summary>What’s the difference between monthly and yearly?</summary>
-          <p>Same library access and the same daily usage limits. Yearly is $499/year (~$41.58/mo) and saves $89 versus twelve monthly payments of $49.</p>
+          <p>Same access and limits for the tier you pick. Yearly Pro is $290 (~$24.17/mo) and saves $58 versus $29×12. Yearly Studio is $790 (~$65.83/mo) and saves $158 versus $79×12.</p>
         </details>
         <details>
           <summary>What are the daily usage limits?</summary>
-          <p>Free: 3 templates, 5 skills, and 5 prompts per day. Pro (monthly or yearly): 20 templates, 30 skills, and 30 prompts per day. Limits reset every 24 hours (UTC). Reopening the same item the same day does not count twice.</p>
+          <p>Free: 3 templates, 5 skills, 5 prompts. Pro: 20 / 30 / 30. Studio: 100 / 100 / 100. Limits reset every 24 hours (UTC). Reopening the same item the same day does not count twice.</p>
         </details>
         <details>
           <summary>How do I pay?</summary>
@@ -338,12 +353,67 @@
     }
     applyTheme(getPreferredTheme());
 
+    var billingPeriod = 'month';
+
     function normalizePlanId(id) {
       if (!id) return '';
       var s = String(id).toLowerCase().trim();
       if (s === 'monthly' || s === 'pro_monthly' || s === 'pro-month') return 'pro-monthly';
       if (s === 'yearly' || s === 'annual' || s === 'pro_yearly' || s === 'pro-year') return 'pro-yearly';
+      if (s === 'studio_monthly' || s === 'studio-month') return 'studio-monthly';
+      if (s === 'studio_yearly' || s === 'studio-year' || s === 'studio-annual') return 'studio-yearly';
       return s;
+    }
+
+    function applyBillingPeriod(period) {
+      billingPeriod = period === 'year' ? 'year' : 'month';
+      document.querySelectorAll('.xf-pricing-toggle__btn').forEach(function (btn) {
+        var on = btn.getAttribute('data-billing') === billingPeriod;
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      document.querySelectorAll('.xf-price-card[data-plan-tier]').forEach(function (card) {
+        var valueEl = card.querySelector('.xf-price-card__value');
+        var periodEl = card.querySelector('.xf-price-card__period');
+        var noteEl = card.querySelector('.xf-price-card__note');
+        var btn = card.querySelector('[data-checkout-plan]');
+        if (valueEl) {
+          valueEl.textContent =
+            billingPeriod === 'year'
+              ? valueEl.getAttribute('data-price-year') || valueEl.textContent
+              : valueEl.getAttribute('data-price-month') || valueEl.textContent;
+        }
+        if (periodEl) {
+          periodEl.textContent =
+            billingPeriod === 'year'
+              ? periodEl.getAttribute('data-period-year') || '/ year'
+              : periodEl.getAttribute('data-period-month') || '/ month';
+        }
+        if (noteEl) {
+          noteEl.textContent =
+            billingPeriod === 'year'
+              ? noteEl.getAttribute('data-note-year') || noteEl.textContent
+              : noteEl.getAttribute('data-note-month') || noteEl.textContent;
+        }
+        if (btn) {
+          var plan =
+            billingPeriod === 'year'
+              ? btn.getAttribute('data-plan-year')
+              : btn.getAttribute('data-plan-month');
+          var label =
+            billingPeriod === 'year'
+              ? btn.getAttribute('data-default-label-year')
+              : btn.getAttribute('data-default-label-month');
+          if (plan) btn.setAttribute('data-checkout-plan', plan);
+          if (label && btn.dataset.checkoutBlocked !== '1') {
+            btn.textContent = label;
+            btn.setAttribute(
+              'data-default-label',
+              label
+            );
+          }
+        }
+      });
     }
 
     function resetPricingCtas() {
@@ -351,20 +421,24 @@
         card.classList.remove('is-current-plan');
       });
       document.querySelectorAll('[data-checkout-plan]').forEach(function (btn) {
-        var def = btn.getAttribute('data-default-label') || btn.textContent;
-        btn.textContent = def;
         btn.disabled = false;
         btn.removeAttribute('aria-disabled');
         btn.classList.remove('xf-price-card__cta--current');
         btn.dataset.checkoutBlocked = '';
-        if (btn.getAttribute('data-checkout-plan') === 'pro-yearly') {
-          btn.classList.add('xf-price-card__cta--primary');
-        }
+        var tier = btn.closest('[data-plan-tier]');
+        var isPro =
+          tier && tier.getAttribute('data-plan-tier') === 'pro';
+        btn.classList.toggle('xf-price-card__cta--primary', Boolean(isPro));
+        var label =
+          billingPeriod === 'year'
+            ? btn.getAttribute('data-default-label-year')
+            : btn.getAttribute('data-default-label-month');
+        if (label) btn.textContent = label;
       });
       var badge = document.querySelector('.xf-price-card--featured .xf-price-card__badge');
       if (badge) {
         badge.textContent =
-          badge.getAttribute('data-default-badge') || 'Best value · Save $89';
+          badge.getAttribute('data-default-badge') || 'Most popular';
         badge.classList.remove('xf-price-card__badge--current');
       }
     }
@@ -380,50 +454,48 @@
       );
       if (!planId) planId = 'pro-monthly';
 
-      var monthlyBtn = document.querySelector('[data-checkout-plan="pro-monthly"]');
-      var yearlyBtn = document.querySelector('[data-checkout-plan="pro-yearly"]');
-      var monthlyCard = document.querySelector('.xf-price-card[data-plan="pro-monthly"]');
-      var yearlyCard = document.querySelector('.xf-price-card[data-plan="pro-yearly"]');
+      var tier =
+        planId.indexOf('studio') !== -1
+          ? 'studio'
+          : planId.indexOf('pro') !== -1
+            ? 'pro'
+            : '';
+      if (!tier) return;
+
+      var card = document.querySelector(
+        '.xf-price-card[data-plan-tier="' + tier + '"]'
+      );
+      var btn = card ? card.querySelector('[data-checkout-plan]') : null;
       var badge = document.querySelector('.xf-price-card--featured .xf-price-card__badge');
 
-      function markCurrent(btn, card) {
-        if (!btn) return;
+      if (btn) {
         btn.textContent = 'Current plan';
         btn.disabled = true;
         btn.setAttribute('aria-disabled', 'true');
         btn.classList.add('xf-price-card__cta--current');
         btn.classList.remove('xf-price-card__cta--primary');
         btn.dataset.checkoutBlocked = '1';
-        if (card) card.classList.add('is-current-plan');
+      }
+      if (card) card.classList.add('is-current-plan');
+      if (tier === 'pro' && badge) {
+        badge.textContent = 'Your plan';
+        badge.classList.add('xf-price-card__badge--current');
       }
 
-      if (planId === 'pro-yearly') {
-        markCurrent(yearlyBtn, yearlyCard);
-        if (badge) {
-          badge.textContent = 'Your plan';
-          badge.classList.add('xf-price-card__badge--current');
+      /* Offer upgrade path on the other paid card */
+      document.querySelectorAll('.xf-price-card[data-plan-tier]').forEach(function (other) {
+        if (other === card) return;
+        var otherBtn = other.querySelector('[data-checkout-plan]');
+        if (!otherBtn) return;
+        var otherTier = other.getAttribute('data-plan-tier');
+        if (tier === 'pro' && otherTier === 'studio') {
+          otherBtn.textContent =
+            billingPeriod === 'year' ? 'Upgrade to Studio yearly' : 'Upgrade to Studio';
+        } else if (tier === 'studio' && otherTier === 'pro') {
+          otherBtn.textContent = 'Manage billing';
+          otherBtn.dataset.checkoutBlocked = 'manage';
         }
-        if (monthlyBtn) {
-          monthlyBtn.textContent = 'Manage billing';
-          monthlyBtn.dataset.checkoutBlocked = 'manage';
-        }
-      } else if (planId === 'pro-monthly') {
-        markCurrent(monthlyBtn, monthlyCard);
-        if (yearlyBtn) {
-          yearlyBtn.textContent = 'Upgrade to yearly';
-          yearlyBtn.classList.add('xf-price-card__cta--primary');
-        }
-      } else {
-        if (monthlyBtn) {
-          monthlyBtn.textContent = 'Manage billing';
-          monthlyBtn.dataset.checkoutBlocked = 'manage';
-        }
-        if (yearlyBtn) {
-          yearlyBtn.textContent = 'Manage billing';
-          yearlyBtn.dataset.checkoutBlocked = 'manage';
-          yearlyBtn.classList.remove('xf-price-card__cta--primary');
-        }
-      }
+      });
     }
 
     function refreshPricingFromServer() {
@@ -436,6 +508,14 @@
         return snap;
       });
     }
+
+    document.querySelectorAll('.xf-pricing-toggle__btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        applyBillingPeriod(btn.getAttribute('data-billing') || 'month');
+        refreshPricingFromServer();
+      });
+    });
+    applyBillingPeriod('month');
 
     document.querySelectorAll('[data-checkout-plan]').forEach(function (btn) {
       btn.addEventListener('click', function () {

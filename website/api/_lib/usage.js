@@ -17,6 +17,13 @@ const PRO_LIMITS = {
   prompts: 30,
 };
 
+/** Studio: higher daily quotas on the same full library. */
+const STUDIO_LIMITS = {
+  templates: 100,
+  skills: 100,
+  prompts: 100,
+};
+
 function utcDayKey(d) {
   const x = d || new Date();
   const y = x.getUTCFullYear();
@@ -36,10 +43,32 @@ function normalizeKind(kind) {
 }
 
 async function getLimitsForUser(userId) {
+  const { getEntitlementForUser, isActiveRow } = require('./entitlements');
+  const { tierFromPlanId } = require('./products');
   const pro = await userIsPro(userId);
+  let tier = 'free';
+  if (pro) {
+    try {
+      const row = await getEntitlementForUser(userId);
+      if (row && isActiveRow(row)) {
+        tier = tierFromPlanId(row.plan_id) || 'pro';
+      } else {
+        tier = 'pro';
+      }
+    } catch (e) {
+      tier = 'pro';
+    }
+  }
+  const limits =
+    tier === 'studio'
+      ? { ...STUDIO_LIMITS }
+      : tier === 'pro'
+        ? { ...PRO_LIMITS }
+        : { ...FREE_LIMITS };
   return {
     isPro: pro,
-    limits: pro ? { ...PRO_LIMITS } : { ...FREE_LIMITS },
+    tier,
+    limits,
   };
 }
 
@@ -287,6 +316,7 @@ async function consumeUsage(userId, kind, resourceId) {
 module.exports = {
   FREE_LIMITS,
   PRO_LIMITS,
+  STUDIO_LIMITS,
   utcDayKey,
   normalizeKind,
   getLimitsForUser,

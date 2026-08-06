@@ -11,21 +11,38 @@ const BUNDLES = {
   ultimate: { id: 'ultimate', name: 'Ultimate Library', price: 79, type: 'bundle' },
 };
 
-/** Plan catalog for entitlements display (checkout offline). */
 const SUBSCRIPTIONS = {
   'pro-monthly': {
     id: 'pro-monthly',
     name: 'Pro Monthly',
-    price: 49,
+    price: 29,
     type: 'subscription',
     interval: 'month',
+    tier: 'pro',
   },
   'pro-yearly': {
     id: 'pro-yearly',
     name: 'Pro Yearly',
-    price: 499,
+    price: 290,
     type: 'subscription',
     interval: 'year',
+    tier: 'pro',
+  },
+  'studio-monthly': {
+    id: 'studio-monthly',
+    name: 'Studio Monthly',
+    price: 79,
+    type: 'subscription',
+    interval: 'month',
+    tier: 'studio',
+  },
+  'studio-yearly': {
+    id: 'studio-yearly',
+    name: 'Studio Yearly',
+    price: 790,
+    type: 'subscription',
+    interval: 'year',
+    tier: 'studio',
   },
 };
 
@@ -35,6 +52,13 @@ const TEMPLATE_CATEGORY_PRICES = {
   Filters: 1.99,
   'Style Edit': 2.49,
 };
+
+function tierFromPlanId(planId) {
+  const s = String(planId || '').toLowerCase();
+  if (s.includes('studio')) return 'studio';
+  if (s.includes('pro')) return 'pro';
+  return 'free';
+}
 
 function resolveProduct(productType, productId, category) {
   if (productType === 'bundle') {
@@ -65,4 +89,10 @@ function resolveProduct(productType, productId, category) {
   return null;
 }
 
-module.exports = { BUNDLES, SUBSCRIPTIONS, TEMPLATE_CATEGORY_PRICES, resolveProduct };
+module.exports = {
+  BUNDLES,
+  SUBSCRIPTIONS,
+  TEMPLATE_CATEGORY_PRICES,
+  resolveProduct,
+  tierFromPlanId,
+};

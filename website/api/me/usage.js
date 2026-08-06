@@ -1,7 +1,12 @@
 const { json } = require('../_lib/http');
 const { handlePreflight, applyCors } = require('../_lib/cors');
 const { getUserFromRequest, hasServiceRole } = require('../_lib/supabase');
-const { getUsageSnapshot, FREE_LIMITS, PRO_LIMITS } = require('../_lib/usage');
+const {
+  getUsageSnapshot,
+  FREE_LIMITS,
+  PRO_LIMITS,
+  STUDIO_LIMITS,
+} = require('../_lib/usage');
 
 /**
  * GET /api/me/usage - server daily usage for signed-in user.
@@ -19,7 +24,7 @@ module.exports = async function handler(req, res) {
       return json(res, 503, {
         error: 'Usage store not configured',
         code: 'usage_store_missing',
-        limits: { free: FREE_LIMITS, pro: PRO_LIMITS },
+        limits: { free: FREE_LIMITS, pro: PRO_LIMITS, studio: STUDIO_LIMITS },
       });
     }
 
@@ -28,7 +33,7 @@ module.exports = async function handler(req, res) {
       return json(res, 401, {
         error: 'Sign in required',
         code: 'auth_required',
-        limits: { free: FREE_LIMITS, pro: PRO_LIMITS },
+        limits: { free: FREE_LIMITS, pro: PRO_LIMITS, studio: STUDIO_LIMITS },
       });
     }
 

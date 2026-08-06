@@ -72,6 +72,68 @@ html.dark .xf-pricing-currency {
   background: var(--surface-muted, #161616);
 }
 
+/* Billing toggle */
+.xf-pricing-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 1.5rem;
+  padding: 0.25rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border, #e5e7eb);
+  background: var(--surface-muted, #f4f4f5);
+}
+
+html.dark .xf-pricing-toggle {
+  background: #161616;
+  border-color: #2a2a2a;
+}
+
+.xf-pricing-toggle__btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary, #52525b);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.xf-pricing-toggle__btn.is-active {
+  background: var(--surface, #fff);
+  color: var(--text, #0a0a0a);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+html.dark .xf-pricing-toggle__btn.is-active {
+  background: #0a0a0a;
+  color: #f5f5f5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.xf-pricing-toggle__save {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #16a34a;
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  background: rgba(22, 163, 74, 0.12);
+}
+
+html.dark .xf-pricing-toggle__save {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.12);
+}
+
 /* ── Cards grid ── */
 .xf-pricing-grid {
   display: grid;

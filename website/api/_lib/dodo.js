@@ -60,6 +60,14 @@ function productMap() {
       process.env.DODO_PRODUCT_PRO_YEARLY ||
       process.env.DODO_PRODUCT_ID_YEARLY ||
       '',
+    'studio-monthly':
+      process.env.DODO_PRODUCT_STUDIO_MONTHLY ||
+      process.env.DODO_PRODUCT_ID_STUDIO_MONTHLY ||
+      '',
+    'studio-yearly':
+      process.env.DODO_PRODUCT_STUDIO_YEARLY ||
+      process.env.DODO_PRODUCT_ID_STUDIO_YEARLY ||
+      '',
   };
 }
 
@@ -76,8 +84,21 @@ function planIdFromProductId(productId) {
   return null;
 }
 
-/** Higher wins when upgrading (monthly → yearly). */
+const KNOWN_PLAN_IDS = [
+  'pro-monthly',
+  'pro-yearly',
+  'studio-monthly',
+  'studio-yearly',
+];
+
+function isKnownPlanId(planId) {
+  return KNOWN_PLAN_IDS.indexOf(planId) !== -1;
+}
+
+/** Higher wins when upgrading (Pro monthly → Studio yearly). */
 function planRank(planId) {
+  if (planId === 'studio-yearly') return 4;
+  if (planId === 'studio-monthly') return 3;
   if (planId === 'pro-yearly') return 2;
   if (planId === 'pro-monthly') return 1;
   return 0;
@@ -100,7 +121,7 @@ function resolvePlanIdFromPayment(payment, bodyPlanId) {
 
   const meta = (payment && (payment.metadata || payment.meta)) || {};
   const fromMeta = meta.plan_id || meta.planId;
-  if (fromMeta === 'pro-monthly' || fromMeta === 'pro-yearly') {
+  if (fromMeta && isKnownPlanId(fromMeta)) {
     /* Only trust metadata if product IDs are configured and cart is empty
        (some webhooks omit cart) OR metadata matches the cart product. */
     if (!cartProductId) return fromMeta;
@@ -109,10 +130,7 @@ function resolvePlanIdFromPayment(payment, bodyPlanId) {
   }
 
   /* body plan_id is client-supplied - only accept if it matches cart product */
-  if (
-    bodyPlanId &&
-    (bodyPlanId === 'pro-monthly' || bodyPlanId === 'pro-yearly')
-  ) {
+  if (bodyPlanId && isKnownPlanId(bodyPlanId)) {
     const expectedId = productIdForPlan(bodyPlanId);
     if (expectedId && cartProductId && expectedId === cartProductId) {
       return bodyPlanId;
@@ -336,6 +354,8 @@ function publicDodoConfig() {
     products: {
       'pro-monthly': Boolean(productMap()['pro-monthly']),
       'pro-yearly': Boolean(productMap()['pro-yearly']),
+      'studio-monthly': Boolean(productMap()['studio-monthly']),
+      'studio-yearly': Boolean(productMap()['studio-yearly']),
     },
   };
 }
@@ -350,6 +370,8 @@ module.exports = {
   productIdForPlan,
   planIdFromProductId,
   planRank,
+  isKnownPlanId,
+  KNOWN_PLAN_IDS,
   resolvePlanIdFromPayment,
   productsReady,
   dodoFetch,

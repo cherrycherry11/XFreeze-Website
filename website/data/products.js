@@ -1,6 +1,6 @@
 /**
  * Freezestack product catalog (display / plan ids).
- * Paid checkout is offline - rebuild payments separately.
+ * Keep in sync with website/api/_lib/products.js
  */
 (function (global) {
   const BUNDLES = {
@@ -13,21 +13,42 @@
     ultimate: { id: 'ultimate', name: 'Ultimate Library', price: 79, type: 'bundle' },
   };
 
-  /** Subscription plan display catalog (checkout offline). */
+  /**
+   * Subscriptions
+   * Free browse + two paid tiers (Pro, Studio), each monthly or yearly.
+   */
   const SUBSCRIPTIONS = {
     'pro-monthly': {
       id: 'pro-monthly',
       name: 'Pro Monthly',
-      price: 49,
+      price: 29,
       type: 'subscription',
       interval: 'month',
+      tier: 'pro',
     },
     'pro-yearly': {
       id: 'pro-yearly',
       name: 'Pro Yearly',
-      price: 499,
+      price: 290,
       type: 'subscription',
       interval: 'year',
+      tier: 'pro',
+    },
+    'studio-monthly': {
+      id: 'studio-monthly',
+      name: 'Studio Monthly',
+      price: 79,
+      type: 'subscription',
+      interval: 'month',
+      tier: 'studio',
+    },
+    'studio-yearly': {
+      id: 'studio-yearly',
+      name: 'Studio Yearly',
+      price: 790,
+      type: 'subscription',
+      interval: 'year',
+      tier: 'studio',
     },
   };
 
@@ -62,6 +83,13 @@
     return '$' + (Number.isInteger(amount) ? amount.toFixed(0) : amount.toFixed(2));
   }
 
+  function tierFromPlanId(planId) {
+    var s = String(planId || '').toLowerCase();
+    if (s.indexOf('studio') !== -1) return 'studio';
+    if (s.indexOf('pro') !== -1) return 'pro';
+    return 'free';
+  }
+
   global.XFreezeProducts = {
     BUNDLES: BUNDLES,
     SUBSCRIPTIONS: SUBSCRIPTIONS,
@@ -70,5 +98,6 @@
     getSubscription: getSubscription,
     getTemplateProduct: getTemplateProduct,
     formatUSD: formatUSD,
+    tierFromPlanId: tierFromPlanId,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

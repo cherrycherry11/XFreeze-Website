@@ -73,7 +73,7 @@
   }
 
   /* Root icons (next to index.html): ico + 32 PNG + apple-touch */
-  var v = 'fs-logo4';
+  var v = 'fs-logo5-202608060605';
   var ico = iconUrl('favicon.ico') + '?v=' + v;
   var png32 = iconUrl('favicon-32x32.png') + '?v=' + v;
   var apple = iconUrl('apple-touch-icon.png') + '?v=' + v;

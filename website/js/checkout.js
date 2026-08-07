@@ -481,39 +481,49 @@
     return startCheckout(product, triggerBtn);
   }
 
-  /* ── Payment confirmed overlay (on top of live site) ───────────── */
+  /* ── Payment result overlay (on top of live site) ─────────────── */
 
   function injectPayResultStyles() {
     if (document.getElementById('xf-pay-result-css')) return;
     var css = document.createElement('style');
     css.id = 'xf-pay-result-css';
     css.textContent =
-      '#xf-pay-result{position:fixed;inset:0;z-index:10050;display:none;align-items:center;justify-content:center;padding:1.25rem;background:rgba(10,12,14,.48);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}' +
+      '#xf-pay-result{position:fixed;inset:0;z-index:10050;display:none;align-items:center;justify-content:center;padding:1.25rem;background:rgba(10,12,14,.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}' +
       '#xf-pay-result.is-open{display:flex}' +
-      '#xf-pay-result .xf-pr-card{position:relative;width:100%;max-width:22.5rem;background:#fff;color:#0a0a0a;border-radius:1.35rem;padding:2.25rem 1.75rem 1.75rem;text-align:center;box-shadow:0 24px 64px -20px rgba(0,0,0,.22),0 0 0 1px rgba(0,0,0,.04);overflow:hidden;font-family:var(--font-sans,Inter,system-ui,sans-serif)}' +
-      'html.dark #xf-pay-result .xf-pr-card{background:#141816;color:#f2f5f3;box-shadow:0 24px 64px -16px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.06)}' +
-      '#xf-pay-result .xf-pr-icon{position:relative;width:7.5rem;height:7.5rem;margin:.25rem auto 1.35rem;display:flex;align-items:center;justify-content:center}' +
-      '#xf-pay-result .xf-pr-badge{position:relative;z-index:1;width:4.5rem;height:4.5rem;border-radius:50%;background:linear-gradient(160deg,#4ade80 0%,#22c55e 45%,#16a34a 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(34,197,94,.18),0 0 0 8px rgba(34,197,94,.18)}' +
-      '#xf-pay-result.is-error .xf-pr-badge{background:linear-gradient(160deg,#f87171,#ef4444);box-shadow:0 10px 28px rgba(239,68,68,.2),0 0 0 8px rgba(239,68,68,.12)}' +
+      '#xf-pay-result .xf-pr-card{position:relative;width:100%;max-width:22rem;background:#fff;color:#0a0a0a;border-radius:1.5rem;padding:2.15rem 1.65rem 1.65rem;text-align:center;box-shadow:0 28px 70px -24px rgba(0,0,0,.28),0 0 0 1px rgba(0,0,0,.05);overflow:hidden;font-family:var(--font-sans,Inter,system-ui,sans-serif)}' +
+      'html.dark #xf-pay-result .xf-pr-card{background:#141816;color:#f2f5f3;box-shadow:0 28px 70px -18px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06)}' +
+      '#xf-pay-result .xf-pr-icon{position:relative;width:5.5rem;height:5.5rem;margin:.15rem auto 1.2rem;display:flex;align-items:center;justify-content:center}' +
+      '#xf-pay-result .xf-pr-badge{position:relative;z-index:1;width:4.25rem;height:4.25rem;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s ease,box-shadow .2s ease}' +
+      '#xf-pay-result .xf-pr-badge svg{width:1.85rem;height:1.85rem;stroke:#fff;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round;display:none}' +
+      '#xf-pay-result .xf-pr-badge svg.is-on{display:block}' +
+      /* success */
+      '#xf-pay-result.is-success .xf-pr-badge{background:linear-gradient(160deg,#4ade80 0%,#22c55e 50%,#16a34a 100%);box-shadow:0 10px 28px rgba(34,197,94,.22),0 0 0 8px rgba(34,197,94,.14)}' +
+      '#xf-pay-result.is-success .xf-pr-label{color:#16a34a}' +
+      '#xf-pay-result.is-success .xf-pr-title{color:#0a0a0a}' +
+      'html.dark #xf-pay-result.is-success .xf-pr-title{color:#f2f5f3}' +
+      'html.dark #xf-pay-result.is-success .xf-pr-label{color:#4ade80}' +
+      /* error / failed */
+      '#xf-pay-result.is-error .xf-pr-badge{background:linear-gradient(160deg,#f87171 0%,#ef4444 50%,#dc2626 100%);box-shadow:0 10px 28px rgba(239,68,68,.22),0 0 0 8px rgba(239,68,68,.14)}' +
+      '#xf-pay-result.is-error .xf-pr-label{color:#dc2626}' +
+      'html.dark #xf-pay-result.is-error .xf-pr-label{color:#f87171}' +
+      /* loading */
       '#xf-pay-result.is-loading .xf-pr-badge{background:linear-gradient(160deg,#a3a3a3,#737373);box-shadow:0 0 0 8px rgba(115,115,115,.12);animation:xf-pr-pulse 1.1s ease-in-out infinite}' +
-      '#xf-pay-result .xf-pr-badge svg{width:2.1rem;height:2.1rem;stroke:#fff;stroke-width:2.75;fill:none;stroke-linecap:round;stroke-linejoin:round}' +
-      '#xf-pay-result .xf-pr-label{margin:0 0 .35rem;font-size:.8125rem;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:#6b7280}' +
-      'html.dark #xf-pay-result .xf-pr-label{color:#9ca3af}' +
-      '#xf-pay-result .xf-pr-title{margin:0 0 .5rem;font-size:1.5rem;font-weight:600;letter-spacing:-.03em;line-height:1.25}' +
-      '#xf-pay-result.is-success .xf-pr-title{color:#16a34a}' +
-      'html.dark #xf-pay-result.is-success .xf-pr-title{color:#4ade80}' +
-      '#xf-pay-result .xf-pr-msg{margin:0 auto;max-width:18rem;font-size:.9375rem;line-height:1.5;color:#6b7280;font-weight:400}' +
+      '#xf-pay-result.is-loading .xf-pr-label{color:#737373}' +
+      '#xf-pay-result .xf-pr-label{margin:0 0 .4rem;font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase}' +
+      '#xf-pay-result .xf-pr-title{margin:0 0 .5rem;font-size:1.4rem;font-weight:650;letter-spacing:-.03em;line-height:1.25}' +
+      '#xf-pay-result .xf-pr-msg{margin:0 auto;max-width:17.5rem;font-size:.9rem;line-height:1.5;color:#6b7280;font-weight:400}' +
       'html.dark #xf-pay-result .xf-pr-msg{color:#9ca3af}' +
-      '#xf-pay-result .xf-pr-actions{display:flex;flex-wrap:wrap;gap:.65rem;justify-content:center;margin-top:1.65rem}' +
-      '#xf-pay-result .xf-pr-btn{display:inline-flex;align-items:center;justify-content:center;min-height:2.65rem;padding:.6rem 1.25rem;border-radius:9999px;font-size:.875rem;font-weight:600;text-decoration:none;border:1px solid transparent;cursor:pointer}' +
+      '#xf-pay-result .xf-pr-actions{display:flex;flex-wrap:wrap;gap:.55rem;justify-content:center;margin-top:1.5rem}' +
+      '#xf-pay-result .xf-pr-btn{display:inline-flex;align-items:center;justify-content:center;min-height:2.35rem;padding:.55rem 1.15rem;border-radius:9999px;font-size:.8125rem;font-weight:600;text-decoration:none;border:1px solid transparent;cursor:pointer;font-family:inherit;line-height:1}' +
       '#xf-pay-result .xf-pr-btn--primary{background:#0a0a0a;color:#fff;border:0}' +
       'html.dark #xf-pay-result .xf-pr-btn--primary{background:#f2f5f3;color:#0a0a0a}' +
       '#xf-pay-result .xf-pr-btn--ghost{background:transparent;color:inherit;border-color:#e5e7eb}' +
       'html.dark #xf-pay-result .xf-pr-btn--ghost{border-color:#2a312e}' +
-      '#xf-pay-result .xf-pr-close{position:absolute;top:.85rem;right:.85rem;width:2rem;height:2rem;border:0;border-radius:999px;background:transparent;color:#9ca3af;font-size:1.25rem;line-height:1;cursor:pointer}' +
+      '#xf-pay-result .xf-pr-close{position:absolute;top:.75rem;right:.75rem;width:2rem;height:2rem;border:0;border-radius:999px;background:transparent;color:#9ca3af;font-size:1.15rem;line-height:1;cursor:pointer}' +
       '#xf-pay-result .xf-pr-close:hover{color:#0a0a0a}' +
       'html.dark #xf-pay-result .xf-pr-close:hover{color:#f2f5f3}' +
-      '@keyframes xf-pr-pulse{0%,100%{transform:scale(1)}50%{transform:scale(.96)}}';
+      '@keyframes xf-pr-pulse{0%,100%{transform:scale(1)}50%{transform:scale(.96)}}' +
+      '@media (prefers-reduced-motion:reduce){#xf-pay-result.is-loading .xf-pr-badge{animation:none}}';
     document.head.appendChild(css);
   }
 
@@ -531,9 +541,16 @@
       '<button type="button" class="xf-pr-close" id="xf-pr-close" aria-label="Close">&times;</button>' +
       '<div class="xf-pr-icon" aria-hidden="true">' +
       '<div class="xf-pr-badge" id="xf-pr-badge">' +
-      '<svg id="xf-pr-icon-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>' +
-      '<svg id="xf-pr-icon-spin" viewBox="0 0 24 24" hidden><circle cx="12" cy="12" r="8" stroke="rgba(255,255,255,.35)" stroke-width="2.5" fill="none"></circle><path d="M12 4a8 8 0 0 1 8 8" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"></path></svg>' +
-      '<svg id="xf-pr-icon-x" viewBox="0 0 24 24" hidden><path d="M7 7l10 10M17 7L7 17"></path></svg>' +
+      /* Check - success only */ 
+      '<svg id="xf-pr-icon-check" class="xf-pr-ico" viewBox="0 0 24 24" aria-hidden="true">' +
+      '<path d="M5 13l4 4L19 7"></path></svg>' +
+      /* Spinner - loading */ 
+      '<svg id="xf-pr-icon-spin" class="xf-pr-ico" viewBox="0 0 24 24" aria-hidden="true">' +
+      '<circle cx="12" cy="12" r="8" stroke="rgba(255,255,255,.35)" stroke-width="2.5" fill="none"></circle>' +
+      '<path d="M12 4a8 8 0 0 1 8 8" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"></path></svg>' +
+      /* X mark - failed only (not a check) */ 
+      '<svg id="xf-pr-icon-x" class="xf-pr-ico" viewBox="0 0 24 24" aria-hidden="true">' +
+      '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"></path></svg>' +
       '</div></div>' +
       '<p class="xf-pr-label" id="xf-pr-label">Please wait</p>' +
       '<h2 class="xf-pr-title" id="xf-pr-title">Confirming payment</h2>' +
@@ -555,10 +572,14 @@
     var check = document.getElementById('xf-pr-icon-check');
     var spin = document.getElementById('xf-pr-icon-spin');
     var x = document.getElementById('xf-pr-icon-x');
-    if (!check) return;
-    check.hidden = mode !== 'check';
-    spin.hidden = mode !== 'spin';
-    x.hidden = mode !== 'x';
+    if (!check || !spin || !x) return;
+    /* Class-based show so SVG never sticks on "check" when failed */
+    check.classList.toggle('is-on', mode === 'check');
+    spin.classList.toggle('is-on', mode === 'spin');
+    x.classList.toggle('is-on', mode === 'x');
+    check.setAttribute('aria-hidden', mode === 'check' ? 'false' : 'true');
+    spin.setAttribute('aria-hidden', mode === 'spin' ? 'false' : 'true');
+    x.setAttribute('aria-hidden', mode === 'x' ? 'false' : 'true');
   }
 
   function setPayResultState(state) {
@@ -571,6 +592,7 @@
       el.classList.add('is-success');
       setPayResultIcons('check');
     } else {
+      /* failed / cancelled / error */
       el.classList.add('is-error');
       setPayResultIcons('x');
     }
@@ -589,7 +611,7 @@
       primary.href = actions.primaryHref;
       primary.textContent = actions.primaryText || 'Open Account';
       primary.hidden = false;
-      secondary.textContent = actions.secondaryText || 'Stay here';
+      secondary.textContent = actions.secondaryText || 'Close';
       secondary.hidden = false;
       acts.hidden = false;
     } else {
@@ -607,7 +629,6 @@
     try {
       document.body.style.overflow = '';
     } catch (e) {}
-    /* Drop pay-return query so refresh does not re-run verify */
     try {
       var u = new URL(global.location.href);
       var keys = [
@@ -687,11 +708,41 @@
         return true;
       }
       var st = (p.get('status') || '').toLowerCase();
-      if (st && (st === 'succeeded' || st === 'success' || st === 'active' || st === 'paid' || st === 'failed' || st === 'cancelled' || st === 'canceled')) {
+      if (
+        st &&
+        (st === 'succeeded' ||
+          st === 'success' ||
+          st === 'active' ||
+          st === 'paid' ||
+          st === 'failed' ||
+          st === 'cancelled' ||
+          st === 'canceled')
+      ) {
         return true;
       }
     } catch (e) {}
     return false;
+  }
+
+  /** User-facing copy for failed / incomplete checkouts */
+  function paymentFailedUi(kind, serverMsg) {
+    var cancelled = kind === 'cancelled' || kind === 'canceled';
+    if (cancelled) {
+      return {
+        label: 'Checkout cancelled',
+        title: 'Payment cancelled',
+        msg:
+          serverMsg ||
+          'You closed checkout before paying. No charge was made.',
+      };
+    }
+    return {
+      label: 'Payment failed',
+      title: 'Payment failed',
+      msg:
+        serverMsg ||
+        'We could not confirm a successful payment. No plan change was applied.',
+    };
   }
 
   function handlePaymentReturn() {
@@ -719,17 +770,12 @@
     );
 
     if (FAIL[status]) {
-      openPayResult(
-        'error',
-        'Payment failed',
-        'Payment not completed',
-        'No charge went through. Premium was not unlocked. Try again when you are ready.',
-        {
-          primaryHref: 'pricing',
-          primaryText: 'Back to Pricing',
-          secondaryText: 'Close',
-        }
-      );
+      var failCopy = paymentFailedUi(status);
+      openPayResult('error', failCopy.label, failCopy.title, failCopy.msg, {
+        primaryHref: 'pricing',
+        primaryText: 'Try again',
+        secondaryText: 'Close',
+      });
       return;
     }
 
@@ -749,7 +795,7 @@
           'error',
           'Sign in required',
           'Sign in to finish',
-          'Sign in with the same account you used at checkout, then we will finish activating Premium if payment succeeded.',
+          'Sign in with the same account you used at checkout so we can finish activating your plan.',
           {
             primaryHref: 'login',
             primaryText: 'Sign in',
@@ -804,18 +850,23 @@
             data.code !== 'no_payment';
 
           if (!paidOk) {
-            openPayResult(
-              'error',
-              'Payment failed',
-              'Payment not completed',
+            var code = (data && data.code) || '';
+            var kind =
+              code === 'payment_failed' || status === 'failed'
+                ? 'failed'
+                : status === 'cancelled' || status === 'canceled'
+                  ? 'cancelled'
+                  : 'failed';
+            var copy = paymentFailedUi(
+              kind,
               (data && data.error) ||
-                'We could not confirm a successful payment. Premium was not unlocked.',
-              {
-                primaryHref: 'pricing',
-                primaryText: 'Try again',
-                secondaryText: 'Close',
-              }
+                'We could not confirm a successful payment. No plan change was applied.'
             );
+            openPayResult('error', copy.label, copy.title, copy.msg, {
+              primaryHref: 'pricing',
+              primaryText: 'Try again',
+              secondaryText: 'Close',
+            });
             return;
           }
 
@@ -840,7 +891,6 @@
             }
           );
 
-          /* Refresh pricing CTA labels if present */
           try {
             if (typeof global.bootPricingPlanUi === 'function') {
               global.bootPricingPlanUi();
@@ -853,13 +903,13 @@
         .catch(function (err) {
           openPayResult(
             'error',
-            'Could not confirm',
-            'Could not confirm payment',
+            'Payment failed',
+            'Payment failed',
             (err && err.message) ||
               'We could not verify this checkout. If you were charged, contact support with your email.',
             {
               primaryHref: 'pricing',
-              primaryText: 'Back to Pricing',
+              primaryText: 'Try again',
               secondaryText: 'Close',
             }
           );

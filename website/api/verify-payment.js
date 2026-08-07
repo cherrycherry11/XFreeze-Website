@@ -81,7 +81,7 @@ module.exports = async function handler(req, res) {
       return json(res, 400, {
         success: false,
         granted: false,
-        error: 'Payment was not completed',
+        error: 'Payment failed',
         code: 'payment_failed',
         status: checkoutStatus,
       });
@@ -99,7 +99,7 @@ module.exports = async function handler(req, res) {
         return json(res, 400, {
           success: false,
           granted: false,
-          error: 'Payment not successful (status: ' + (st || 'unknown') + ')',
+          error: 'Payment failed (status: ' + (st || 'unknown') + ')',
           code: 'payment_not_paid',
           status: st,
         });
@@ -155,7 +155,7 @@ module.exports = async function handler(req, res) {
       return json(res, 404, {
         success: false,
         granted: false,
-        error: 'No successful payment found for this checkout',
+        error: 'Payment failed. No successful charge was found for this checkout.',
         code: 'no_payment',
         alreadyPro: Boolean(existingPublic.isPro),
       });
@@ -168,7 +168,7 @@ module.exports = async function handler(req, res) {
       return json(res, 400, {
         success: false,
         granted: false,
-        error: 'Payment not successful (status: ' + status + ')',
+        error: 'Payment failed (status: ' + status + ')',
         code: 'payment_not_paid',
         status,
       });

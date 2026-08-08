@@ -433,7 +433,7 @@
         checkoutUrl: overlayUrl,
         options: {
           showTimer: true,
-          showSecurityBadge: true,
+          showSecurityBadge: false,
         },
       });
       /* open() may be sync or return a Promise depending on SDK version */

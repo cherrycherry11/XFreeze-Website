@@ -249,14 +249,27 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const amountCents =
-      payment.total_amount != null
-        ? Number(payment.total_amount)
-        : payment.settlement_amount != null
-          ? Number(payment.settlement_amount)
-          : payment.amount != null
-            ? Number(payment.amount)
-            : null;
+    /*
+     * Dodo payment payloads use several amount fields; values may be in
+     * major currency units (999) or cents (99900). grantFromVerifiedPayment
+     * normalizes to cents against the catalog price.
+     */
+    const amountCents = (() => {
+      const candidates = [
+        payment.total_amount,
+        payment.settlement_amount,
+        payment.amount,
+        payment.payment_amount,
+        payment.final_amount,
+        payment.price && payment.price.price,
+      ];
+      for (const c of candidates) {
+        if (c != null && c !== '' && !Number.isNaN(Number(c))) {
+          return Number(c);
+        }
+      }
+      return null;
+    })();
 
     const upgradeFromMonthly =
       planId === 'pro-yearly' &&

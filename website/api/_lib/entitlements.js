@@ -155,7 +155,18 @@ async function grantFromVerifiedPayment({
   }
 
   const expectedCents = Math.round(Number(plan.price) * 100);
-  const paid = amountCents != null ? Number(amountCents) : null;
+  /*
+   * Dodo may return amounts in major units (e.g. 999 for $999) or minor
+   * units / cents (99900). Normalize to cents before the underpay check.
+   */
+  let paid = amountCents != null ? Number(amountCents) : null;
+  if (paid != null && !Number.isNaN(paid) && paid > 0 && expectedCents > 0) {
+    if (paid < expectedCents * 0.5 && paid * 100 >= expectedCents * 0.5) {
+      paid = Math.round(paid * 100);
+    } else {
+      paid = Math.round(paid);
+    }
+  }
   /*
    * Product ID is source of truth. Still reject obviously underpaid amounts
    * (e.g. $1 test product) unless skipAmountCheck is forced.

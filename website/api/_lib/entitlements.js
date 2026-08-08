@@ -161,11 +161,13 @@ async function grantFromVerifiedPayment({
    */
   let paid = amountCents != null ? Number(amountCents) : null;
   if (paid != null && !Number.isNaN(paid) && paid > 0 && expectedCents > 0) {
-    if (paid < expectedCents * 0.5 && paid * 100 >= expectedCents * 0.5) {
-      paid = Math.round(paid * 100);
-    } else {
-      paid = Math.round(paid);
-    }
+    /* Pick cents vs major units by whichever is closer to catalog price */
+    const asCents = Math.round(paid);
+    const asMajor = Math.round(paid * 100);
+    paid =
+      Math.abs(asMajor - expectedCents) < Math.abs(asCents - expectedCents)
+        ? asMajor
+        : asCents;
   }
   /*
    * Product ID is source of truth. Still reject obviously underpaid amounts

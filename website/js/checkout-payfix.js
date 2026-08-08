@@ -481,48 +481,65 @@
     return startCheckout(product, triggerBtn);
   }
 
-  /* ── Payment result overlay (on top of live site) ─────────────── */
+  /* ── Payment result overlay (Grok-minimal) ───────────────────── */
 
   function injectPayResultStyles() {
     if (document.getElementById('xf-pay-result-css')) return;
     var css = document.createElement('style');
     css.id = 'xf-pay-result-css';
     css.textContent =
-      '#xf-pay-result{position:fixed;inset:0;z-index:10050;display:none;align-items:center;justify-content:center;padding:1.25rem;background:rgba(10,12,14,.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}' +
+      /* Backdrop: soft dim, light blur — product stays visible */
+      '#xf-pay-result{position:fixed;inset:0;z-index:10050;display:none;align-items:center;justify-content:center;padding:1.25rem;background:rgba(0,0,0,.42);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}' +
       '#xf-pay-result.is-open{display:flex}' +
-      '#xf-pay-result .xf-pr-card{position:relative;width:100%;max-width:22rem;background:#fff;color:#0a0a0a;border-radius:1.5rem;padding:2.15rem 1.65rem 1.65rem;text-align:center;box-shadow:0 28px 70px -24px rgba(0,0,0,.28),0 0 0 1px rgba(0,0,0,.05);overflow:hidden;font-family:var(--font-sans,Inter,system-ui,sans-serif)}' +
-      'html.dark #xf-pay-result .xf-pr-card{background:#141816;color:#f2f5f3;box-shadow:0 28px 70px -18px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06)}' +
-      '#xf-pay-result .xf-pr-icon{position:relative;width:5.5rem;height:5.5rem;margin:.15rem auto 1.2rem;display:flex;align-items:center;justify-content:center}' +
-      '#xf-pay-result .xf-pr-badge{position:relative;z-index:1;width:4.25rem;height:4.25rem;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s ease,box-shadow .2s ease}' +
-      '#xf-pay-result .xf-pr-badge svg{width:1.85rem;height:1.85rem;stroke:#fff;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round;display:none}' +
+      /* Card: compact, flat, thin border — Grok-like */
+      '#xf-pay-result .xf-pr-card{position:relative;width:100%;max-width:20rem;background:#fafafa;color:#0a0a0a;border-radius:1rem;padding:1.75rem 1.5rem 1.35rem;text-align:center;border:1px solid rgba(0,0,0,.08);box-shadow:0 16px 48px -20px rgba(0,0,0,.35);font-family:var(--font-sans,Inter,system-ui,sans-serif)}' +
+      'html.dark #xf-pay-result .xf-pr-card{background:#111;color:#f2f2f2;border-color:rgba(255,255,255,.1);box-shadow:0 20px 56px -16px rgba(0,0,0,.7)}' +
+      /* Icon row — small, flat circle, no glow rings */
+      '#xf-pay-result .xf-pr-icon{width:3rem;height:3rem;margin:0 auto 1rem;display:flex;align-items:center;justify-content:center}' +
+      '#xf-pay-result .xf-pr-badge{width:2.75rem;height:2.75rem;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid transparent}' +
+      '#xf-pay-result .xf-pr-badge svg{width:1.15rem;height:1.15rem;stroke-width:2.25;fill:none;stroke-linecap:round;stroke-linejoin:round;display:none}' +
       '#xf-pay-result .xf-pr-badge svg.is-on{display:block}' +
-      /* success */
-      '#xf-pay-result.is-success .xf-pr-badge{background:linear-gradient(160deg,#4ade80 0%,#22c55e 50%,#16a34a 100%);box-shadow:0 10px 28px rgba(34,197,94,.22),0 0 0 8px rgba(34,197,94,.14)}' +
-      '#xf-pay-result.is-success .xf-pr-label{color:#16a34a}' +
-      '#xf-pay-result.is-success .xf-pr-title{color:#0a0a0a}' +
-      'html.dark #xf-pay-result.is-success .xf-pr-title{color:#f2f5f3}' +
-      'html.dark #xf-pay-result.is-success .xf-pr-label{color:#4ade80}' +
-      /* error / failed */
-      '#xf-pay-result.is-error .xf-pr-badge{background:linear-gradient(160deg,#f87171 0%,#ef4444 50%,#dc2626 100%);box-shadow:0 10px 28px rgba(239,68,68,.22),0 0 0 8px rgba(239,68,68,.14)}' +
-      '#xf-pay-result.is-error .xf-pr-label{color:#dc2626}' +
-      'html.dark #xf-pay-result.is-error .xf-pr-label{color:#f87171}' +
-      /* loading */
-      '#xf-pay-result.is-loading .xf-pr-badge{background:linear-gradient(160deg,#a3a3a3,#737373);box-shadow:0 0 0 8px rgba(115,115,115,.12);animation:xf-pr-pulse 1.1s ease-in-out infinite}' +
-      '#xf-pay-result.is-loading .xf-pr-label{color:#737373}' +
-      '#xf-pay-result .xf-pr-label{margin:0 0 .4rem;font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase}' +
-      '#xf-pay-result .xf-pr-title{margin:0 0 .5rem;font-size:1.4rem;font-weight:650;letter-spacing:-.03em;line-height:1.25}' +
-      '#xf-pay-result .xf-pr-msg{margin:0 auto;max-width:17.5rem;font-size:.9rem;line-height:1.5;color:#6b7280;font-weight:400}' +
-      'html.dark #xf-pay-result .xf-pr-msg{color:#9ca3af}' +
-      '#xf-pay-result .xf-pr-actions{display:flex;flex-wrap:wrap;gap:.55rem;justify-content:center;margin-top:1.5rem}' +
-      '#xf-pay-result .xf-pr-btn{display:inline-flex;align-items:center;justify-content:center;min-height:2.35rem;padding:.55rem 1.15rem;border-radius:9999px;font-size:.8125rem;font-weight:600;text-decoration:none;border:1px solid transparent;cursor:pointer;font-family:inherit;line-height:1}' +
+      /* Success: quiet green, no gradient party */
+      '#xf-pay-result.is-success .xf-pr-badge{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.28)}' +
+      '#xf-pay-result.is-success .xf-pr-badge svg{stroke:#16a34a}' +
+      'html.dark #xf-pay-result.is-success .xf-pr-badge{background:rgba(34,197,94,.14);border-color:rgba(74,222,128,.25)}' +
+      'html.dark #xf-pay-result.is-success .xf-pr-badge svg{stroke:#4ade80}' +
+      '#xf-pay-result.is-success .xf-pr-label{color:#52525b}' +
+      'html.dark #xf-pay-result.is-success .xf-pr-label{color:#a3a3a3}' +
+      /* Error: quiet red */
+      '#xf-pay-result.is-error .xf-pr-badge{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.28)}' +
+      '#xf-pay-result.is-error .xf-pr-badge svg{stroke:#dc2626}' +
+      'html.dark #xf-pay-result.is-error .xf-pr-badge{background:rgba(239,68,68,.12);border-color:rgba(248,113,113,.28)}' +
+      'html.dark #xf-pay-result.is-error .xf-pr-badge svg{stroke:#f87171}' +
+      '#xf-pay-result.is-error .xf-pr-label{color:#52525b}' +
+      'html.dark #xf-pay-result.is-error .xf-pr-label{color:#a3a3a3}' +
+      /* Loading */
+      '#xf-pay-result.is-loading .xf-pr-badge{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.1)}' +
+      'html.dark #xf-pay-result.is-loading .xf-pr-badge{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}' +
+      '#xf-pay-result.is-loading .xf-pr-badge svg{stroke:#737373}' +
+      'html.dark #xf-pay-result.is-loading .xf-pr-badge svg{stroke:#a3a3a3}' +
+      '#xf-pay-result.is-loading .xf-pr-badge{animation:xf-pr-pulse 1.15s ease-in-out infinite}' +
+      /* Type: quiet, tight */
+      '#xf-pay-result .xf-pr-label{margin:0 0 .3rem;font-size:.7rem;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:#737373}' +
+      'html.dark #xf-pay-result .xf-pr-label{color:#a3a3a3}' +
+      '#xf-pay-result .xf-pr-title{margin:0 0 .4rem;font-size:1.125rem;font-weight:600;letter-spacing:-.025em;line-height:1.3;color:inherit}' +
+      '#xf-pay-result .xf-pr-msg{margin:0 auto;max-width:16.5rem;font-size:.8125rem;line-height:1.5;color:#737373;font-weight:400}' +
+      'html.dark #xf-pay-result .xf-pr-msg{color:#a3a3a3}' +
+      /* Actions: slim pills */
+      '#xf-pay-result .xf-pr-actions{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;margin-top:1.25rem}' +
+      '#xf-pay-result .xf-pr-btn{display:inline-flex;align-items:center;justify-content:center;height:2rem;min-height:2rem;padding:0 .95rem;border-radius:9999px;font-size:.8125rem;font-weight:500;text-decoration:none;border:1px solid transparent;cursor:pointer;font-family:inherit;line-height:1}' +
       '#xf-pay-result .xf-pr-btn--primary{background:#0a0a0a;color:#fff;border:0}' +
-      'html.dark #xf-pay-result .xf-pr-btn--primary{background:#f2f5f3;color:#0a0a0a}' +
-      '#xf-pay-result .xf-pr-btn--ghost{background:transparent;color:inherit;border-color:#e5e7eb}' +
-      'html.dark #xf-pay-result .xf-pr-btn--ghost{border-color:#2a312e}' +
-      '#xf-pay-result .xf-pr-close{position:absolute;top:.75rem;right:.75rem;width:2rem;height:2rem;border:0;border-radius:999px;background:transparent;color:#9ca3af;font-size:1.15rem;line-height:1;cursor:pointer}' +
-      '#xf-pay-result .xf-pr-close:hover{color:#0a0a0a}' +
-      'html.dark #xf-pay-result .xf-pr-close:hover{color:#f2f5f3}' +
-      '@keyframes xf-pr-pulse{0%,100%{transform:scale(1)}50%{transform:scale(.96)}}' +
+      'html.dark #xf-pay-result .xf-pr-btn--primary{background:#f2f2f2;color:#0a0a0a}' +
+      '#xf-pay-result .xf-pr-btn--primary:hover{opacity:.9}' +
+      '#xf-pay-result .xf-pr-btn--ghost{background:transparent;color:inherit;border-color:rgba(0,0,0,.12)}' +
+      'html.dark #xf-pay-result .xf-pr-btn--ghost{border-color:rgba(255,255,255,.14)}' +
+      '#xf-pay-result .xf-pr-btn--ghost:hover{background:rgba(0,0,0,.04)}' +
+      'html.dark #xf-pay-result .xf-pr-btn--ghost:hover{background:rgba(255,255,255,.06)}' +
+      /* Close */
+      '#xf-pay-result .xf-pr-close{position:absolute;top:.55rem;right:.55rem;width:1.75rem;height:1.75rem;border:0;border-radius:999px;background:transparent;color:#a3a3a3;font-size:1.05rem;line-height:1;cursor:pointer}' +
+      '#xf-pay-result .xf-pr-close:hover{color:#0a0a0a;background:rgba(0,0,0,.05)}' +
+      'html.dark #xf-pay-result .xf-pr-close:hover{color:#f2f2f2;background:rgba(255,255,255,.06)}' +
+      '@keyframes xf-pr-pulse{0%,100%{opacity:1}50%{opacity:.65}}' +
       '@media (prefers-reduced-motion:reduce){#xf-pay-result.is-loading .xf-pr-badge{animation:none}}';
     document.head.appendChild(css);
   }
@@ -541,23 +558,20 @@
       '<button type="button" class="xf-pr-close" id="xf-pr-close" aria-label="Close">&times;</button>' +
       '<div class="xf-pr-icon" aria-hidden="true">' +
       '<div class="xf-pr-badge" id="xf-pr-badge">' +
-      /* Check - success only */ 
       '<svg id="xf-pr-icon-check" class="xf-pr-ico" viewBox="0 0 24 24" aria-hidden="true">' +
       '<path d="M5 13l4 4L19 7"></path></svg>' +
-      /* Spinner - loading */ 
       '<svg id="xf-pr-icon-spin" class="xf-pr-ico" viewBox="0 0 24 24" aria-hidden="true">' +
-      '<circle cx="12" cy="12" r="8" stroke="rgba(255,255,255,.35)" stroke-width="2.5" fill="none"></circle>' +
-      '<path d="M12 4a8 8 0 0 1 8 8" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"></path></svg>' +
-      /* X mark - failed only (not a check) */ 
+      '<circle cx="12" cy="12" r="8" stroke="currentColor" stroke-opacity=".25" stroke-width="2" fill="none"></circle>' +
+      '<path d="M12 4a8 8 0 0 1 8 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"></path></svg>' +
       '<svg id="xf-pr-icon-x" class="xf-pr-ico" viewBox="0 0 24 24" aria-hidden="true">' +
       '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"></path></svg>' +
       '</div></div>' +
       '<p class="xf-pr-label" id="xf-pr-label">Please wait</p>' +
       '<h2 class="xf-pr-title" id="xf-pr-title">Confirming payment</h2>' +
-      '<p class="xf-pr-msg" id="xf-pr-msg">Activating Premium on your account…</p>' +
+      '<p class="xf-pr-msg" id="xf-pr-msg">Activating your plan…</p>' +
       '<div class="xf-pr-actions" id="xf-pr-actions" hidden>' +
       '<a class="xf-pr-btn xf-pr-btn--primary" href="account" id="xf-pr-primary">Open Account</a>' +
-      '<button type="button" class="xf-pr-btn xf-pr-btn--ghost" id="xf-pr-secondary">Stay here</button>' +
+      '<button type="button" class="xf-pr-btn xf-pr-btn--ghost" id="xf-pr-secondary">Close</button>' +
       '</div></div>';
     document.body.appendChild(el);
     document.getElementById('xf-pr-close').onclick = closePayResult;
@@ -573,7 +587,6 @@
     var spin = document.getElementById('xf-pr-icon-spin');
     var x = document.getElementById('xf-pr-icon-x');
     if (!check || !spin || !x) return;
-    /* Class-based show so SVG never sticks on "check" when failed */
     check.classList.toggle('is-on', mode === 'check');
     spin.classList.toggle('is-on', mode === 'spin');
     x.classList.toggle('is-on', mode === 'x');
@@ -592,7 +605,6 @@
       el.classList.add('is-success');
       setPayResultIcons('check');
     } else {
-      /* failed / cancelled / error */
       el.classList.add('is-error');
       setPayResultIcons('x');
     }
@@ -657,8 +669,8 @@
 
   function planWelcomeLabel(planId) {
     var s = String(planId || '').toLowerCase();
-    if (s.indexOf('studio') !== -1) return 'Welcome to Premium Plus';
-    return 'Welcome to Premium';
+    if (s.indexOf('studio') !== -1) return "You're on Premium Plus";
+    return "You're on Premium";
   }
 
   function planDisplayName(planId) {
@@ -724,24 +736,21 @@
     return false;
   }
 
-  /** User-facing copy for failed / incomplete checkouts */
   function paymentFailedUi(kind, serverMsg) {
     var cancelled = kind === 'cancelled' || kind === 'canceled';
     if (cancelled) {
       return {
-        label: 'Checkout cancelled',
-        title: 'Payment cancelled',
-        msg:
-          serverMsg ||
-          'You closed checkout before paying. No charge was made.',
+        label: 'Cancelled',
+        title: 'Checkout cancelled',
+        msg: serverMsg || 'No charge was made.',
       };
     }
     return {
-      label: 'Payment failed',
+      label: 'Failed',
       title: 'Payment failed',
       msg:
         serverMsg ||
-        'We could not confirm a successful payment. No plan change was applied.',
+        'No successful payment was found. Your plan was not changed.',
     };
   }
 
@@ -766,7 +775,7 @@
       'loading',
       'Please wait',
       'Confirming payment',
-      'Activating Premium on your account…'
+      'Activating your plan…'
     );
 
     if (FAIL[status]) {
@@ -793,9 +802,9 @@
         } catch (e) {}
         openPayResult(
           'error',
-          'Sign in required',
+          'Sign in',
           'Sign in to finish',
-          'Sign in with the same account you used at checkout so we can finish activating your plan.',
+          'Sign in with the same account you used at checkout.',
           {
             primaryHref: 'login',
             primaryText: 'Sign in',
@@ -860,7 +869,7 @@
             var copy = paymentFailedUi(
               kind,
               (data && data.error) ||
-                'We could not confirm a successful payment. No plan change was applied.'
+                'No successful payment was found. Your plan was not changed.'
             );
             openPayResult('error', copy.label, copy.title, copy.msg, {
               primaryHref: 'pricing',
@@ -880,14 +889,13 @@
           var planLabel = planDisplayName(resolved);
           openPayResult(
             'success',
-            'Payment confirmed',
+            'Confirmed',
             planWelcomeLabel(resolved),
-            planLabel +
-              ' is active. Full templates, skills, and library access are unlocked.',
+            planLabel + ' is active.',
             {
               primaryHref: 'account',
               primaryText: 'Open Account',
-              secondaryText: 'Stay here',
+              secondaryText: 'Close',
             }
           );
 
@@ -903,10 +911,10 @@
         .catch(function (err) {
           openPayResult(
             'error',
-            'Payment failed',
+            'Failed',
             'Payment failed',
             (err && err.message) ||
-              'We could not verify this checkout. If you were charged, contact support with your email.',
+              'Could not verify this checkout. If you were charged, contact support.',
             {
               primaryHref: 'pricing',
               primaryText: 'Try again',

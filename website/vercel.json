@@ -1,32 +1,84 @@
 {
   "redirects": [
     {
-      "source": "/",
+      "source": "/:path*",
       "has": [
-        { "type": "host", "value": "xfreeze.com" },
-        { "type": "query", "key": "code" }
-      ],
-      "destination": "https://freezestack.com/login",
-      "permanent": false
-    },
-    {
-      "source": "/",
-      "has": [
-        { "type": "host", "value": "www.xfreeze.com" },
-        { "type": "query", "key": "code" }
+        {
+          "type": "host",
+          "value": "xfreeze.com"
+        },
+        {
+          "type": "query",
+          "key": "code"
+        }
       ],
       "destination": "https://freezestack.com/login",
       "permanent": false
     },
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "xfreeze.com" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "www.xfreeze.com"
+        },
+        {
+          "type": "query",
+          "key": "code"
+        }
+      ],
+      "destination": "https://freezestack.com/login",
+      "permanent": false
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "xfreeze.com"
+        },
+        {
+          "type": "query",
+          "key": "error"
+        }
+      ],
+      "destination": "https://freezestack.com/login",
+      "permanent": false
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.xfreeze.com"
+        },
+        {
+          "type": "query",
+          "key": "error"
+        }
+      ],
+      "destination": "https://freezestack.com/login",
+      "permanent": false
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "xfreeze.com"
+        }
+      ],
       "destination": "https://freezestack.com/:path*",
       "permanent": true
     },
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "www.xfreeze.com" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "www.xfreeze.com"
+        }
+      ],
       "destination": "https://freezestack.com/:path*",
       "permanent": true
     },

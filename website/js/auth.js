@@ -70,27 +70,30 @@
       return window.location.origin;
     }
     /*
-     * Production OAuth must never return to the dead xfreeze.com domain
-     * (Supabase Site URL used to be xfreeze → users landed on DEPLOYMENT_NOT_FOUND).
-     * Always use freezestack.com from auth-config.
+     * Production OAuth must always return to freezestack.com — never xfreeze.com
+     * (legacy Supabase Site URL / old domain). freezestack.com is the only brand domain.
      */
-    if (
-      host === 'xfreeze.com' ||
-      host === 'www.xfreeze.com' ||
-      host === 'www.freezestack.com' ||
-      host === 'freezestack.com' ||
-      /\.vercel\.app$/i.test(host)
-    ) {
-      return configuredSiteOrigin();
-    }
-    return window.location.origin;
+    return configuredSiteOrigin() || 'https://freezestack.com';
   }
 
   function loginUrl() {
     var c = config();
     var path = (c.loginPath || 'login').replace(/^\//, '').replace(/\.html$/, '');
-    /* Absolute allowlisted URL - must be freezestack.com/login on production. */
-    return siteOrigin() + '/' + path;
+    /*
+     * Hard-pin production Google OAuth return to freezestack.com/login.
+     * Do not use window.location.origin here — Supabase may still fall back
+     * to Site URL if redirectTo is wrong; this must stay absolute & allowlisted.
+     */
+    var host = (window.location.hostname || '').toLowerCase();
+    if (
+      host === 'localhost' ||
+      host === '127.0.0.1' ||
+      host === '[::1]' ||
+      host === '0.0.0.0'
+    ) {
+      return window.location.origin + '/' + path;
+    }
+    return 'https://freezestack.com/' + path;
   }
 
   function supabaseProviderName(name) {
